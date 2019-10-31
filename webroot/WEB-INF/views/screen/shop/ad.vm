@@ -1,0 +1,81 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+
+
+	function deletead(id,status){
+ 		var obj = document.getElementById("adId");
+	  	obj.value = id;
+
+  		var	mymes=confirm("确定删除广告？");
+		 if(true==mymes){
+	  		document.listForm.action = "/shop/deletead.html";
+			document.listForm.submit();
+	  	}else {
+
+	  	}
+
+	}
+
+	function updateAdPage(id){
+		window.location.href = "$appServer/shop/updateap.html?adId="+id;
+	}
+
+</script>
+#set($title = "广告管理 - 添加广告")
+<form name="listForm" action="" method="post"><!-- start ads list -->
+	<input type="hidden" id="adId" name="adId" value="" />
+	<input type="hidden" name="$ad.adType" value="$!adType"></input>
+	<div class="tool">
+
+            <span><a href="/shop/addap.html" hidefocus="true" class="bt_add">添加广告</a></span>
+
+        </div>
+		<div class="clear"></div>
+		 <ul class="form-tab">
+            <li #if($!adType=="d") class="c" #end><span><a href="$appServer.get('/shop/adListAdmin.html').addQueryData('adType','d')">代销</a></span></li>
+            <li #if($!adType=="w") class="c" #end><span><a href="$appServer.get('/shop/adListAdmin.html').addQueryData('adType','w')">批发</a></span></li>
+        </ul>
+		<div class="clear"></div>
+	<div class="listBox">
+			<h3><span>广告列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>广告名称</th>
+      <th>广告位置</th>
+      <th>媒介类型</th>
+	  <th>图片</th>
+      <th>开始日期</th>
+      <th>结束日期</th>
+      <th>操作</th>
+    </tr>
+	#foreach( $ad in ${query.items})
+   <tr  align="center">
+      <td><label>#if($!ad.adName.length()>12)
+                <div title="$!ad.adName">$!ad.adName.substring(0,12)...</div>
+				#else
+					$!ad.adName
+				#end</label></td>
+      <td>$!{ad.positionName}</td>
+      <td>#if($!{ad.mediaType} && $!{ad.mediaType} =='picture' ) 图片#end</td>
+	  <td><img src="${upServer}/$!{ad.mediaCode}" width="150" height="50" /></td>
+      <td><!-- #BeginDate format:IS1 -->$!dateUtil.convertDateToString('yyyy-MM-dd',${ad.startTime})<!-- #EndDate --></td>
+      <td><!-- #BeginDate format:IS1 -->$!dateUtil.convertDateToString('yyyy-MM-dd',${ad.endTime})<!-- #EndDate --></td>
+      <td><a href="javascript:deletead('$!{ad.id}','$!{ad.status}')">删除</a> <a href="javascript:updateAdPage('$!{ad.id}')">修改</a></td>
+    </tr>
+	#end
+
+  </table>
+  </div>
+  </form>
+  #if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/adListAdmin.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>
+

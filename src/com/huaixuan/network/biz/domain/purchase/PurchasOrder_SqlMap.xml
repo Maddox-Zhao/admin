@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+ 
+<sqlMap namespace="purchaselifecycleNameSpace">
+	<typeAlias alias="PurchaseOrder" type="com.huaixuan.network.biz.domain.purchase.PurchaseOrder"/>
+	<resultMap id="PurchaseOrderResult" class="PurchaseOrder">
+		<result property="idPurchaseLifeCycle" column="idPurchaseLifeCycle"/>
+		<result property="idPurchase" column="idPurchase"/>
+		<result property="idMoneyStatus" column="idMoneyStatus"/>
+		<result property="moneyStatus" column="moneyStatus"/>
+		<result property="idStatus" column="idStatus"/>
+		<result property="status" column="status"/>
+		<result property="origDoc" column="origDoc"/>
+		<result property="idPayAccount" column="idPayAccount"/>
+		<result property="payMentAccount" column="payMentAccount"/>
+		<result property="exchangeRate" column="exchangeRate"/>
+		<result property="taxesReate" column="taxesReate"/>
+		<result property="idProxyAgency" column="idProxyAgency"/>
+		<result property="proxyAgency" column="proxyAgency"/>
+		<result property="sentDate" column="sentDate"/>
+		<result property="date" column="date"/>
+		<result property="finishDate" column="finishDate"/>
+		<result property="idLastOperator" column="idLastOperator"/>
+		<result property="lastOperatorName" column="lastOperatorName"/>
+		<result property="idOperator" column="idOperator"/>
+		<result property="operatorName" column="operatorName"/>
+		<result property="transportationFee" column="transportationFee"/>
+		<result property="extraFee" column="extraFee"/>
+		<result property="supplyDebt" column="supplyDebt"/>
+		<result property="remark" column="remark"/>
+		<result property="isBilling" column="isBilling"/>
+		<result property="idSupply" column="idSupply"/>
+		<result property="supplyName" column="supplyName"/>
+		<result property="subTotal" column="subTotal"/>
+		<result property="inSubTotal" column="inSubTotal"/>
+		<result property="idCurrency" column="idCurrency"/>
+	</resultMap>
+	
+	
+	<resultMap id="PurchaseProductResult" class="com.huaixuan.network.biz.domain.purchase.PurchaseProductYangJie">
+		<result property="idPurchaseLifecycle" column="idPurchaseLifecycle"/>
+		<result property="idPurchaseProduct" column="idPurchaseProduct"/>
+		<result property="idBrand" column="idBrand"/>
+		<result property="idSeries" column="idSeries"/>
+		<result property="type" column="type"/>
+		<result property="material" column="material"/>
+		<result property="color" column="color"/>
+		<result property="cost" column="unitCost"/>
+		<result property="euPrice" column="EUPrice"/>
+		<result property="dxPrice" column="HKPrice"/>
+		<result property="dlPrice" column="CNPrice"/>
+		<result property="ssPrice" column="HXPrice"/>
+		<result property="smPrice" column="HKHXPrice"/>
+		<result property="idSize" column="idSize"/>
+		<result property="idCostCurrency" column="idCostCurrency"/>
+		<result property="totalNumber" column="totalNumber"/>
+		<result property="origin" column="origin"/>
+		<result property="number" column="number"/>
+		<result property="sizeName" column="sizeName"/>
+		<result property="seriesName" column="seriesName"/>
+		<result property="brandName" column="brandName"/>
+		<result property="idSupply" column="idSupply"/>
+	</resultMap>
+	 
+	<sql id="PurchaseOrderFields">
+		<isNotEmpty prepend="and" property="idPurchaseLifeCycle">
+			pl.idPurchaseLifeCycle=#idPurchaseLifeCycle#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idPurchase">
+			pl.idPurchase=#idPurchase#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplyName">
+			 s.name like '%$supplyName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idStatus">
+			pl.idStatus=#idStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idMoneyStatus">
+			pl.idMoneyStatus=#idMoneyStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lastOperatorName">
+			pl.idLastOperator in
+			(
+				SELECT idemployee FROM employee WHERE NAME LIKE '%$lastOperatorName$%'
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="operatorName">
+			p.operator IN
+			(
+				SELECT idemployee FROM employee WHERE NAME LIKE '%$operatorName$%'
+			)
+		</isNotEmpty>
+	</sql>
+ 
+	<select id="queryPurchaseOrder" parameterClass="java.util.Map" resultMap="PurchaseOrderResult">
+		SELECT  pl.*,s.idSupply,s.name supplyName,p.operator idOperator,p.subTotal,p.inSubTotal,p.idCurrency,p.date,pl.isBilling,pl.taxesReate,
+		(SELECT STATUS FROM STATUS WHERE idStatus = pl.idStatus) `status`,
+		(SELECT STATUS FROM STATUS WHERE idStatus = pl.idMoneyStatus) moneyStatus,
+		(SELECT NAME FROM employee WHERE idemployee = pl.idLastOperator) lastOperatorName,
+		(SELECT NAME FROM employee WHERE idemployee = p.operator) operatorName,
+		(SELECT NAME FROM payaccount WHERE pl.idPayAccount = idPayAccount) payMentAccount,
+		(SELECT NAME FROM proxyagency WHERE pl.idProxyAgency = idProxyAgency) proxyAgency,
+		(SELECT DATE FROM purchasehistory WHERE idPurchaseLifeCycle = pl.idPurchaseLifeCycle AND idOperation = 7 ORDER BY DATE DESC LIMIT 1) finishDate
+		FROM 
+		purchase p,purchaselifecycle pl,supply s
+		WHERE p.idPurchase = pl.idPurchase
+		AND s.idSupply = p.idSupply
+
+	  <include refid="PurchaseOrderFields"/>
+	  ORDER BY pl.idPurchaseLifeCycle DESC
+	  
+	   <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	
+	
+	<select id="queryPurchaseOrderCnt" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT count(pl.idPurchaseLifeCycle)
+		FROM 
+		purchase p,purchaselifecycle pl,supply s
+		WHERE p.idPurchase = pl.idPurchase
+		AND s.idSupply = p.idSupply
+		 
+	  <include refid="PurchaseOrderFields"/>
+	</select>
+	
+	
+	
+	
+	
+	
+	<select id="queryPurchaseProduct" parameterClass="java.util.Map" resultMap="PurchaseProductResult">
+		SELECT pp.*,p.idSupply ,b.name brandName,series.name seriesName,s.name sizeName,p.idCurrency idCostCurrency
+		FROM purchaseproduct pp,size s,purchase p,purchaselifecycle pl,brand b,series 
+		WHERE  pp.idSize = s.idSize
+		AND pp.idBrand = b.idBrand
+		AND pp.idSeries = series.idSeries
+		AND p.idPurchase = pl.idPurchase
+		AND pp.idPurchaseLifeCycle = pl.idPurchaseLifeCycle
+		AND  pl.idPurchaseLifeCycle = #idPurchaseLifeCycle#
+		<isNotEmpty property="idBrand">
+			AND  pp.idBrand = #idBrand#
+		</isNotEmpty>
+		<isNotEmpty property="idSeries">
+			AND  pp.idSeries = #idSeries#
+		</isNotEmpty>
+		<isNotEmpty property="type">
+			AND  pp.type = #type#
+		</isNotEmpty>
+		<isNotEmpty property="material">
+			AND  pp.material = #material#
+		</isNotEmpty>
+		<isNotEmpty property="color">
+			AND  pp.color = #color#
+		</isNotEmpty>
+	</select>
+ 
+	 
+</sqlMap>
+
+

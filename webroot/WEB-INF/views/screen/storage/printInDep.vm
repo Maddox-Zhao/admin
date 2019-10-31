@@ -1,0 +1,156 @@
+#set($layout = "layout/print.vm")
+#set($title = "入库单打印")
+#set($base = true)
+
+<body>
+<form id="form1" name="form1" action="printInDep.html?id=$!id" method="post">
+<h1>
+	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+	<span class="action-span">每页条数
+		<select name="pageNum" id="pageNum" onChange="document.form1.submit();">
+			<option value="1" #if("$!pageNum"=="1") selected #end>1</option>
+			<option value="2" #if("$!pageNum"=="2") selected #end>2</option>
+			<option value="3" #if("$!pageNum"=="3") selected #end>3</option>
+			<option value="4" #if("$!pageNum"=="4") selected #end>4</option>
+			<option value="5" #if("$!pageNum"=="5") selected #end>5</option>
+			<option value="6" #if("$!pageNum"=="6") selected #end>6</option>
+			<option value="7" #if("$!pageNum"=="7") selected #end>7</option>
+			<option value="8" #if("$!pageNum"=="8") selected #end>8</option>
+			<option value="9" #if("$!pageNum"=="9") selected #end>9</option>
+			<option value="10" #if("$!pageNum"=="10") selected #end>10</option>
+		</select>
+	</span>
+	<span class="action-span">字体大小
+		<select name="fontSize" id="fontSize" onChange="document.form1.submit();">
+			<option value="2" #if("$!fontSize"=="2") selected #end>小</option>
+			<option value="3" #if("$!fontSize"=="3") selected #end>中</option>
+			<option value="4" #if("$!fontSize"=="4") selected #end>大</option>
+		</select>
+	</span>
+</h1>
+<div style="border-right: #DDF0FE 1px solid; border-top: #DDF0FE 1px solid; background: #eef8f9; border-left: #DDF0FE 1px solid; border-bottom: #DDF0FE 1px solid">
+<div id="print">
+	#set($titleSize=$fontSize + 1)
+	#set($no=$!pageNum)
+	#set($no_2=$no - 1)
+	#set($pageSize=0)
+	<table width="100%" style="border: 1px solid #006699;border-collapse:collapse;">
+		#if($prodRelationInLists)
+			#if($prodRelationInLists.size()%$no==0)
+				#set($sumPageSize=$prodRelationInLists.size()/$no)
+			#else
+				#set($sumPageSize=$prodRelationInLists.size()/$no+1)
+			#end
+			
+			#foreach($obj in $prodRelationInLists)
+				#set($count=$velocityCount - 1)
+				#if($count%$no==0)
+					#set($pageSize=$pageSize+1)
+					#if($pageSize>1)
+				<tr>
+        			<td height="20" colspan="9">&nbsp;&nbsp;</td>
+        		</tr>
+					#end
+        		<tr>
+        			<td style="border: 1px solid #006699;" colspan="9">
+        				<table width="100%">
+        					<tr>
+        						<td colspan="8" align="center"><font size="$titleSize"><B>1858$!inDepositoryTypeMap.get("$!{inDepositoryDispaly.type}")入库单</B></font></td>
+        					</tr>
+                    		<tr>
+                    			<td width="350"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;日&nbsp;&nbsp;&nbsp;&nbsp;期：$!date.format('yyyy-MM-dd',${inDepositoryDispaly.gmtInDep})</font></td>
+								<td width="350"><font size="$fontSize">编&nbsp;&nbsp;&nbsp;&nbsp;号：${inDepositoryDispaly.billNum}</font></td>
+								<td width="100">&nbsp;&nbsp;</td>
+							</tr>
+                    		<tr>
+								#if($!inDepositoryTypeMap.get("$!{inDepositoryDispaly.type}")=="采购入库")
+								<td width="350"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;供应商：$!{suppilerName}</font></td>
+        						<td width="350"><font size="$fontSize">采购单号：$!{inDepositoryDispaly.relationNum}</font></td>
+								#elseif($!inDepositoryTypeMap.get("$!{inDepositoryDispaly.type}")=="销售退货")
+                    			<td width="350"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;昵称：$!{buyNick}</font></td>
+        						<td width="350"><font size="$fontSize">销售退货单号：$!{inDepositoryDispaly.relationNum}</font></td>
+								#else
+								<td width="350"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;供应商：</font></td>
+        						<td width="350"><font size="$fontSize">关联单号：$!{inDepositoryDispaly.relationNum}</font></td>
+								#end
+								<td width="100" align="center"><font size="$fontSize">页码：$pageSize / $sumPageSize</font></td>
+                    		</tr>
+                    	</table>
+        			</td>
+        		</tr>
+        		<tr>
+        			<td width="7%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品编码</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品名称</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">属性</font></td>
+        			<td width="4%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单位</font></td>
+        			<td width="8%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">仓库</font></td>
+        			<td width="8%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">库位</font></td>
+        			<td width="6%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">数量</font></td>
+        			<td width="7%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单价(￥)</font></td>
+        			<td width="8%"  style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">金额(￥)</font></td>
+        		</tr>
+				#end
+
+        		<tr>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.instanceCode</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">$!obj.instanceName</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">$!attributeManager.getFullAttributeStringByAttrs($!obj.attrs)</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.goodsUnit</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.depName</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" ><font size="$fontSize">$!obj.locName</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!obj.amount</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!obj.unitPrice,'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!obj.money,'0.00')</font></td>
+        		</tr>
+				#if($velocityCount==$prodRelationInLists.size())
+				<tr>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center" colspan="6"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;合 &nbsp;&nbsp;&nbsp;&nbsp;计 &nbsp;&nbsp;&nbsp;&nbsp;</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!sumCount</font></td>
+					<td style="border: 1px solid #006699;background: #fff;">&nbsp;</td>
+					<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!{sumMoney},'0.00')</font></td>
+        		</tr>
+				#end
+				#if($count%$no==$no_2 || $velocityCount==$prodRelationInLists.size())
+				<tr>
+        			<td height="30" style="border: 1px solid #006699;background: #fff;" colspan="9">
+						<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;备注：$!remark</font>
+					</td>
+        		</tr>
+        		<tr>
+        			<td style="border: 1px solid #006699;background: #fff;" colspan="9">
+        				<table width="100%">
+                    		<tr>
+                    			<td width="330"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;制单：$!{inDepositoryDispaly.creater}</font></td>
+                    			<td width="320"><font size="$fontSize">检验：</font></td>
+        						<td width="320"><font size="$fontSize">仓管：$!userName</font></td>
+                    		</tr>
+                    	</table>
+        			</td>
+        		</tr>
+				#end
+			#end
+		#end
+	</table>
+</div>
+</div>
+<h1>
+	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+</h1>
+</form>
+</body>
+	
+<script >
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+	
+	function cl(){
+		window.close();
+	}
+</script>

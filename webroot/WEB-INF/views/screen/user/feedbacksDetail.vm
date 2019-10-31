@@ -1,0 +1,125 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+  <table width="100%">
+    <tr style="text-align:center;" >
+      <td colspan="2">
+      <b>$!leaveword.name </b>&nbsp;于      &nbsp; $!dateUtilHX.convertDateToString("yyyy-MM-dd",${leaveword.leaveTime}) &nbsp; 留言 </td>
+    </tr>
+    <tr>
+      <td colspan="2"><hr size="1" color="#dadada"></td>
+    </tr>
+		 <tr>
+		<td style="text-align:center;width:320px;">
+        <div >标题：</div>
+      </td>
+
+      <td style="text-align:left;">
+        <div style="color:red;">#direct($!leaveword.title)</div>
+      </td>
+    </tr>
+	<tr>
+      <td colspan="2"><hr size="1" color="#dadada"></td>
+    </tr>
+	 <tr>
+		<td style="text-align:center;width:320px;">
+        <div >内容：</div>
+      </td>
+
+      <td style="text-align:left;">
+        <div style="color:red;">#direct($!leaveword.content)</div>
+      </td>
+    </tr>
+	
+	#foreach($insertcontent in $leaveword.insertcontentList)
+		#if($velocityCount!=1)
+		
+	<tr>
+      <td colspan="2"><hr size="1" color="#dadada"></td>
+    </tr>
+		<tr>
+			<td style="text-align:center;width:320px;"></td>
+			<td style="text-align:left;">
+    		#if("$!insertcontent.idCustomer"=="7")
+    		<div style="float:left;">$insertcontent.content</div> <div style="display:inline;float:right"> 回复时间：$!dateUtil.getDateTime('yyyy-MM-dd', $insertcontent.leaveTime)</div> <br/><br/>
+    		#else
+    		<div style="float:left;color:red;">$!leaveword.name：$insertcontent.content</div>  <div style="display:inline;float:right"> 咨询时间：$!dateUtil.getDateTime('yyyy-MM-dd', $insertcontent.leaveTime)</div><br/><br/>
+			#end
+			</td>
+		</tr>
+		#end
+	#end
+	
+	<tr>
+      <td colspan="2"> <br/></td>
+    </tr>
+	
+	<tr>
+      <td colspan="2"><br/></td>
+    </tr>
+  </table>
+
+    #if($leaveword.replyFlag == "yes")
+    <div class="main-div">
+      <table width="100%">
+        <tbody><tr>
+          <td>
+          $!leaveword.toUserNick &nbsp;&nbsp;于      &nbsp;$!date.format('yyyy-MM-dd HH:mm:ss',${leaveword.gmtReply}) &nbsp;回复    </td>
+        </tr>
+        <tr>
+          <td><hr size="1" color="#dadada"></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="overflow: hidden;">#direct($leaveword.replyContent)</div>
+          </td>
+        </tr>
+      </tbody></table>
+    </div>
+    #end
+
+
+	##if($leaveword.toUserType == "shop")
+    <div>
+    <form  name="updateForm"  id="updateForm" action="replyfb.html" method="post">
+		<input  type="hidden" name="id" value="$!leaveword.id">
+		<input  type="hidden" name="idCustomer" value="7">
+    <table align="center" border="0" style="margin-left:400px">
+      <tr><th colspan="2">
+      <strong>回复留言</strong>
+      </th></tr>
+      <tr>
+        <td>##回复:</td>
+        <td><textarea name="theReply" id="theReply" cols="50" rows="10" ></textarea></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>提示：若回复内容为空，则视为没有回复！</td>
+      </tr>
+        <tr>
+        <td>&nbsp;</td>
+        <td>
+       <input name="save" value=" 确定 " class="button" type="button" onclick="formSubmit();">
+          <font color="red">$!message</font>
+          <script language="javascript" type="text/javascript">
+
+    		function formSubmit(){
+    			var reply= document.getElementById('theReply').value;
+    			if(reply.length>300){
+    			     alert("回复超长，不能保存！");
+        			return false;
+    			}else{
+        		document.getElementById('updateForm').submit();
+        		}
+    	 		}
+    	 	</script>
+        </td>
+      </tr>
+        </table>
+        </form>
+        </div>
+    </div>
+##end

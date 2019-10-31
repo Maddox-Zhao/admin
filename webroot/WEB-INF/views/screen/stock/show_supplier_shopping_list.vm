@@ -1,0 +1,166 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购管理 - 供应商供货查询")
+
+<div class="main">
+<h2>采购管理 - 供应商供货查询</h2>
+<div class="searchBox">
+	<h3><span>搜索供货商供货</span></h3>
+		<form name="form1" id="form1" action="$appServer/stock/search_supplier_shopping_list.html" method="post">
+		<table >
+			<tr >
+            	<th>供应商:</th>
+				<td >
+					<input type="text" name="supplierName" id="supplierName" value="$!{queryObject.supplierName}" readonly/>
+					<input type="hidden" name="supplierId" id="supplierId" value="$!{queryObject.supplierId}" readonly/>
+					<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+					<input type="button" value="清空" class="button" onclick="clearSupplier();"/>
+                </td>
+				<th>采购单状态:</th>
+				<td >
+					<select name="status" id="status" >
+						<option value="">请选择</option>
+						#foreach($s in $enumStockStatusMap.entrySet())
+							<option value="$!{s.key}" #if($!{queryObject.status} == ${s.key}) selected="true" #end>$!{s.value}</option>
+						#end
+                    </select>
+                </td>
+			</tr>
+			<tr >
+            	<th>采购时间:从</th>
+				<td >
+					<input type="text" name="startTime" id="startTime" size="10" theme="simple" readonly="true"  value="$!queryObject.startTime" />
+                </td>
+				<th>到</th>
+				<td >
+					<input type="text" name="endTime" id="endTime" size="10" theme="simple" readonly="true"  value="$!queryObject.endTime" />
+        			<script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "startTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "endTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "startTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "endTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </td>
+			</tr>
+			<tr >
+            	<th></th>
+				<td >
+					<input  type="button" value=" 查询 " class="button" onclick="formSubmit();"/>
+					<input type="reset" value=" 重置 " class="button"/>
+					<input type="button" value="供货商供货商品Excel" class="button" onclick="doExcel();"/>
+                </td>
+				<th></th>
+				<td >
+                </td>
+			</tr>
+        </table>
+	</form>
+</div>
+
+  <div class="listBox" id="listDiv">
+	<table  id="listTable" name="listTable"  class="list-table">
+		<tr>
+		  <th >供货商</th>
+		  <th >采购订单号</th>
+		  <th >采购单状态</th>
+		  <th >采购时间</th>
+		  <th >预期到货时间</th>
+		  <th >应付金额</th>
+		  <th >实付金额</th>
+		</tr>
+		 #foreach ($shoppingList in $query.items)
+				<tr   #if($velocityCount%2==0) class="bg" #end>
+				<td>&nbsp;$!shoppingList.supplierName</td>
+				<td>&nbsp;<a href="$appServer/stock/search_stock_detail.html?stockId=$!shoppingList.id">$!shoppingList.shoppingNum</a></td>
+				<td>&nbsp;$!enumStockStatusMap.get("$!{shoppingList.status}")</td>
+				<td align="center">$!date.format('yyyy-MM-dd',${shoppingList.shoppingTime})</td>
+				<td align="center">$!date.format('yyyy-MM-dd',${shoppingList.arriveTime})</td>
+				<td>￥$!moneyUtil.getFormatMoney($!shoppingList.dueFee,'0.00')</td>
+				<td>￥$!moneyUtil.getFormatMoney($!shoppingList.factFee,'0.00')</td>
+				</tr>
+		 #end
+    </table>
+
+	<!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/search_supplier_shopping_list.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function clearSupplier(){
+		document.getElementById("supplierName").value="";
+		document.getElementById("supplierId").value="";
+	}
+
+	function sesp(){
+     	var ret = window.showModalDialog("../supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}
+    }
+		function formSubmit(){
+			var dateStart1=document.getElementById("startTime").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("endTime").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("startTime").value=document.getElementById("startTime").value.trim();
+	    	document.getElementById("endTime").value=document.getElementById("endTime").value.trim();
+
+        	document.forms[0].submit();
+	    }
+
+		function doExcel(){
+			var dateStart1=document.getElementById("startTime").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("endTime").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("startTime").value=document.getElementById("startTime").value.trim();
+	    	document.getElementById("endTime").value=document.getElementById("endTime").value.trim();
+        	document.forms[0].action = "$appServer/stock/export_supplier_shopping_list.html";
+			document.forms[0].submit();
+			document.forms[0].action = "$appServer/stock/search_supplier_shopping_list.html";
+	    }
+
+</script>

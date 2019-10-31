@@ -1,0 +1,102 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<style>
+	.className{
+  line-height:50px;
+  height:50px;
+  width:80px;
+  color:#777777;
+  background-color:#ededed;
+  font-size:16px;
+  font-weight:normal;
+  font-family:Arial;
+  background:-webkit-gradient(linear, left top, left bottom, color-start(0.05, #ededed), color-stop(1, #f5f5f5));
+  background:-moz-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:-o-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:-ms-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:linear-gradient(to bottom, #ededed 5%, #f5f5f5 100%);
+  background:-webkit-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#f5f5f5',GradientType=0);
+  border:1px solid #dcdcdc;
+  -webkit-border-top-left-radius:27px;
+  -moz-border-radius-topleft:27px;
+  border-top-left-radius:27px;
+  -webkit-border-top-right-radius:27px;
+  -moz-border-radius-topright:27px;
+  border-top-right-radius:27px;
+  -webkit-border-bottom-left-radius:27px;
+  -moz-border-radius-bottomleft:27px;
+  border-bottom-left-radius:27px;
+  -webkit-border-bottom-right-radius:27px;
+  -moz-border-radius-bottomright:27px;
+  border-bottom-right-radius:27px;
+  -moz-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  box-shadow: inset 0px 0px 0px 0px #ffffff;
+  text-align:center;
+  display:inline-block;
+  text-decoration:none;
+}
+.className:hover{
+  background-color:#f5f5f5;
+  background:-webkit-gradient(linear, left top, left bottom, color-start(0.05, #f5f5f5), color-stop(1, #ededed));
+  background:-moz-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:-o-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:-ms-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:linear-gradient(to bottom, #f5f5f5 5%, #ededed 100%);
+  background:-webkit-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#ededed',GradientType=0);
+}
+
+table tr td{text-align:center}
+	
+</style>
+    <head>
+        <title>调货产品打印</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	</head>
+	
+<body style="font-size:12px;">
+	<div id="btn" style="margin-left:50%">
+		<a href='javascript:void(0)' onclick="printOrder()" class='className'>打印</a>
+		<a href="javascript:window.opener=null;window.open('','_self');window.close();" class="className">关闭</a>
+	</div>
+    <table border="0" width="80%"  style="margin-top:10px;width:600px;" >
+		<tr>
+			<th>idProduct</th>
+            <th>品牌</th>
+            <th>品类</th>
+            <th>型号</th>
+            <th>材质</th>
+            <th>颜色</th>
+            <th>大小</th>
+            <th>尚美价</th>
+		</tr>
+		<tr></tr>
+		#foreach($product in $list)
+		<tr>
+			 <td>$product.idProduct</td>
+			 <td> $product.brandName </td>
+			 <td>$product.seriesName</td>
+			 <td>$product.type</td>
+			 <td>$product.material</td>
+			 <td>$product.color</td>
+			 <td>$product.size</td>
+			 <td>$product.smPrice</td>
+		</tr>
+		#end
+	</table>
+</body>
+</html>
+
+<script type="text/javascript">
+ 
+function printOrder()
+{
+	document.getElementById("btn").style.visibility = "hidden";
+	window.print();
+	document.getElementById("btn").style.visibility = "visible";
+}
+</script>
+

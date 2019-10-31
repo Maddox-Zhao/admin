@@ -1,0 +1,200 @@
+#set($layout = 'layout\default.vm')
+#if($!message)
+    <div class="warning_min">$!message</div>
+#end
+	<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>后台用户注册</span></h3>
+	<form name="regform" action="crmSiveBackreg.html" id="regform" method="post">
+             <table width="100%" cellpadding="3" cellspacing="1">
+				<tbody>
+           		<tr>
+    				<th class="label">用户名：</th>
+    				<td>
+						<input id="parMap.account" size="15" name="parMap.account" type="text" value="$!{parMap.account}">(长度为4到20个字符)</td>
+    				<th class="label">性别：</th>
+    				<td>
+						<input type="radio" id="parMap.sex" name="parMap.sex" value="2" checked/>男
+                        <input type="radio" id="parMap.sex" name="parMap.sex" value="1"/>女
+					</td>
+				</tr>
+
+				<tr>
+    				<th class="label">电话：</th>
+				    <td><input size="15" id="parMap.mobilePhone" name="parMap.mobilePhone" type="text" value="$!{parMap.mobilePhone}">(填写有效的联系方式)</td>
+    				<th class="label">E-mail：</th>
+    				<td><input size="15" id="parMap.email" name="parMap.email" type="text" value="$!{parMap.email}"></td>
+				</tr>
+
+				<tr>
+				<th class="label">联系省市：</th>
+				<td>
+				            <select name="parMap.province" id="province"  onchange="selectCity(this.value);" >
+                                <option value="">请选择</option>
+                                #foreach($province in $provinceList)
+                                    <option value="$!{province.code}" >$!{province.regionName}</option>
+                                #end
+                            </select>
+                            <select id="city" name="parMap.city" >
+                                <option value="">请选择</option>
+                                #foreach($city in $cityListInit)
+                                    <option value="$!{city.code}">$!{city.regionName}</option>
+                                #end
+                            </select>
+				</td>
+				<th class="label">具体地址(不必重写省市):</th>
+    		    <td><input size="15" id="parMap.address" name="parMap.address" type="text" value="$!{parMap.address}"/></td>
+				</tr>
+
+				<tr>
+				<th class="label">邮编：</th>
+				<td><input size="15" type="text" id="parMap.zipcode" name="parMap.zipcode"  value="$!{parMap.zipcode}"/></td>
+				</tr>
+
+	   </table>
+	    </form>
+<div class="form-but">
+						<input type="button" value="确定" class="btn" onclick="validate();"/>
+					    <input type="button" value="重置" class="btn" onclick="reset();"/>
+</div>
+	   </tbody> </div>
+
+
+<script language="javascript" type="text/javascript">
+   function validate(){
+	 var reg=/^([0-9]|[\-])+$/g ;
+	 var regzip = /^[0-9]{6}$/ ;
+     var account = document.getElementById("parMap.account");
+	 var mobilePhone = document.getElementById("parMap.mobilePhone");
+	 var province = document.getElementById("province");
+     var city = document.getElementById("city");
+     var address = document.getElementById("parMap.address");
+	 var zipcode = document.getElementById("parMap.zipcode");
+	 var email = document.getElementById("parMap.email");
+	 if(jQuery.trim(account.value) == ''){
+	   alert("请输入用户名!");
+	   account.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(mobilePhone.value) == ''){
+	   alert("请输入电话!");
+	   mobilePhone.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(email.value) == ''){
+	   alert("请输入Email!");
+	   email.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(province.value) == ''){
+	   alert("请选择省市!");
+	   province.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(city.value) == ''){
+	   alert("请选择省市!");
+	   city.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(address.value) == ''){
+	   alert("请输入具体地址!");
+	   address.focus();
+	   return false;
+	 }
+	 if(jQuery.trim(zipcode.value) == ''){
+	   alert("请输入邮编!");
+	   zipcode.focus();
+	   return false;
+	 }
+	 if(getBytesLength(account.value) < 4|| getBytesLength(account.value) > 20){
+	   alert("用户名长度为4到20个字符");
+	   account.focus();
+	   return false;
+	 }
+	 if(!(reg.test(jQuery.trim(mobilePhone.value)))){
+	  	  alert("请填写有效的联系方式!");
+		  mobilePhone.focus();
+	      return false;
+	 }
+	 if(!(isEmail(jQuery.trim(email.value)))){
+	  	  alert("请填写有效的E-mail");
+		  email.focus();
+	      return false;
+	 }
+	 if(address.value.length > 120){
+	  	  alert("地址长度不能超过120个字符!");
+		  address.focus();
+	      return false;
+	 }
+     if(!(regzip.test(jQuery.trim(zipcode.value)))){
+        alert("请输入6位数字邮政编码");
+        zipcode.focus();
+		return false;
+	 }
+	 document.regform.submit();
+   }
+
+function isEmail(strMail)
+{
+/* 如果长度为0则返回假 */
+if(strMail.length==0) return false
+
+/* 验证邮件地址的格式是否合法，如: abc@def.com/net等 */
+var objReg = new RegExp("[a-z0-9-_]+@[a-z0-9-_]+[\.]{1}(com|net|bta|cn|org|edu|mil)","gi")
+var IsRightFmt = objReg.test(strMail)
+
+/* 验证邮件地址中是否含有非法字符，结果等于-1表示不含有 */
+var objRegErrChar = new RegExp("[^a-z0-9-._@]","ig")
+var IsRightChar = (strMail.search(objRegErrChar)==-1)
+
+/* 邮件地址最大长度为60字符 */
+var IsRightLength = strMail.length <= 60
+
+/* 判断字符'@'和'.'的位置，不能为第一个或者最后一个 */
+var IsRightPos = (strMail.indexOf("@",0) != 0 && strMail.indexOf(".",0) != 0 && strMail.lastIndexOf("@")+1 != strMail.length && strMail.lastIndexOf(".")+1 != strMail.length)
+
+/* 判断字符'@'是否唯一 */
+var IsNoDupChar = (strMail.indexOf("@",0) == strMail.lastIndexOf("@"))
+
+/* 将'格式'、'字符'、'长度'、'@唯一'四者做“与”操作，任一条件不满足都将返回假 */
+return (IsRightFmt && IsRightChar && IsRightLength && IsRightPos && IsNoDupChar)
+}
+
+function selectCity(code){
+    var obj = document.getElementById("city");
+    var length = obj.length = 0;
+        obj.style.display='';
+        obj.options[length++] = new Option("请选择", "");
+
+		jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/crm/crmSelectcityback.html')",
+            			data :{param:code},
+    			        success:function(data){
+    			         var list=data;
+                          for(var i=0;i<list.length;i++){
+                                  var city=list[i];
+                                  obj.options[length++] = new Option(city.regionName, city.code);
+                          }
+    			   }
+			});
+
+}
+
+function reset(){
+     document.getElementById("parMap.account").value = '';
+	 document.getElementById("parMap.mobilePhone").value = '';
+	 document.getElementById("province").value = '';
+     document.getElementById("city").value = '';
+     document.getElementById("parMap.address").value = '';
+	 document.getElementById("parMap.zipcode").value = '';
+	 document.getElementById("parMap.email").value = '';
+}
+
+	 function getBytesLength(str) {
+	   return str.replace(/[^\x00-\xff]/g, 'xx').length;
+	 }
+</script>
+</body>
+
+

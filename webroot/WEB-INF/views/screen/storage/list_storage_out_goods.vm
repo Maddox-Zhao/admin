@@ -1,0 +1,164 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<form id="searchform" name="searchform" action="/storage/list_storage_out_goods.html" method="post">
+		<div class="searchBox">
+		<h3><span>缺货登记查询</span></h3>
+    	<table>
+    		<tr>
+				<th>产品名称：</th>
+				<td>
+					#springBind("stockoutQuery.title")
+					<input type="text"  id="title" name="${status.expression}" value="$!{status.value}" class="inp"/>
+				</td>
+				<th>产品编号： </th>
+				<td>
+					#springBind("stockoutQuery.goodsSn")
+					<input type="text" id="goodsSn" name="${status.expression}" value="$!{status.value}" class="inp"/>
+				</td>
+				<th>类目：</th>
+    			<td>
+					#springBind("stockoutQuery.catCode")
+                    <select id="catCode" name="${status.expression}" class="select">
+                                  <option  value="">-=请选择=-</option>
+                    			  #set($i=0)
+                    			  	  #foreach($category in $categorys)
+                    					#if($category.depth==1)
+                    						#set($i=$i+1)
+                    					#end
+                            				#if("$!{status.value}"=="$category.catCode")
+                            					<option class="s" selected="selected" value="$category.catCode">
+													#if($category.catCode.length()< 4)
+                    								#elseif($category.catCode.length()< 8)
+                    								&nbsp;&nbsp;&nbsp;&nbsp;
+                    								#else
+                    								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    								#end
+                    								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+                                                </option>
+                            				#else
+                            					<option  value="$category.catCode">#if($category.catCode.length()< 4)
+                    								#elseif($category.catCode.length()< 8)
+                    								&nbsp;&nbsp;&nbsp;&nbsp;
+                    								#else
+                    								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    								#end
+                    								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end</option>
+                    						#end
+                    				#end
+                    </select>
+                </td>
+			</tr>
+			<tr>
+				<th>上架通知：</th>
+				<td>
+					#springBind("stockoutQuery.notifyStatus")
+					<select name="${status.expression}" id="notifyStatus" class="inp">
+        				#foreach($obj in $stockOutStatus.entrySet())
+        					<option value="$!{obj.getKey()}" #if("${status.value}" == "${obj.key}")selected="true" #end>$!{obj.getValue()}</option>
+        				#end
+        			</select>
+				</td>
+				<th>创建时间：</th>
+				<td>
+					#springBind("stockoutQuery.optTimeStart")
+					<input name="${status.expression}" id="optTimeStart" size="10" theme="simple" readonly="true" value="$!{status.value}"/>
+					-
+					#springBind("stockoutQuery.optTimeEnd")
+					<input name="${status.expression}" id="optTimeEnd" size="10" theme="simple" readonly="true" value="$!{status.value}"/>
+        			<script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "optTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "optTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+				</td>
+    		<th>
+				<input type="button" value="查询" class="btn"  onclick="formSubmit();"/>
+    		</th>
+			<td>
+				<input type="button" value="excel导出" class="btn" onclick="doExport();" />
+			</td>
+            <td></td>
+			</tr>
+    	</table>
+    </div>
+	</form>
+
+	<div class="listBox" id="listDiv">
+		<h3><span>缺货登记列表</span></h3>
+		<table  id="listTable" name="listTable">
+			<tr>
+			<th>产品名称</th>
+			<th>产品编码</th>
+			<th>属性</th>
+			<th>类目</th>
+			<th>用户昵称</th>
+			<th>用户Email</th>
+			<th>创建时间</th>
+			<th>上架通知</th>
+			</tr>
+		#if($query && $query.items.size()>0)
+			#foreach($stockout in $query.items)
+			<tr #if($velocityCount%2==0) class="bg" #end>
+				<td>$stockout.title</td>
+				<td>$stockout.goodsSn</td>
+				<td title="$!attributeManager.getFullAttributeStringByAttrs($!{stockout.goodsDesc})">
+					$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($!{stockout.goodsDesc}),20)
+				</td>
+				<td>$!categoryManager.getCatFullNameByCatcode($!{stockout.catCode})</td>
+				<td>$!stockout.account</td>
+				<td>$!stockout.userEmail</td>
+				<td>$dateUtil.convertDateToString('yyyy-MM-dd HH:mm',$!{stockout.gmtCreate})</td>
+				<td>#if($stockout.notifyStatus=="init")
+							未通知
+						#elseif($stockout.notifyStatus=="notified")
+							已通知
+						#else
+							不需要通知
+						#end
+				</td>
+			</tr>
+			#end
+		#end
+		</table>
+    	<!-- 分页 -->
+        #if($query.items.size()>0)
+    		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_storage_out_goods.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+        #else
+    		没有结果！
+        #end
+</div>
+
+<script language="javascript" type="text/javascript">
+		function formSubmit(){
+			var dateStart=jQuery.trim(document.getElementById('optTimeStart').value);
+    		var dateEnd=jQuery.trim(document.getElementById('optTimeEnd').value);
+    		var b_date=new Date(Date.parse(dateStart));
+            var e_date=new Date(Date.parse(dateEnd));
+    		if(e_date < b_date){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}
+	    	document.getElementById('optTimeStart').value=jQuery.trim(document.getElementById('optTimeStart').value);
+	    	document.getElementById('optTimeEnd').value=jQuery.trim(document.getElementById('optTimeEnd').value);
+	     	document.getElementById('title').value=jQuery.trim(document.getElementById('title').value);
+	     	document.getElementById('goodsSn').value=jQuery.trim(document.getElementById('goodsSn').value);
+      		document.getElementById('searchform').submit();
+	    }
+
+
+	function doExport(){
+        var form1=document.getElementById('searchform');
+		form1.action="/storage/export_storage_out_excel.html";
+        form1.submit();
+		form1.action="/storage/list_storage_out_goods.html";
+    }
+</script>
+</div>

@@ -1,0 +1,273 @@
+#set($layout = "layout/default.vm")
+#set($title = "物流范围查询")
+<script type="text/javascript">
+		var objCityList = new Array();
+        var objDistincList = new Array();
+		var j=0;
+        var i=0;
+        #foreach($objCity in $cityList)
+            objCityList[j] = new Array("$!{objCity.code}","$!{objCity.parentCode}","#direct($!{objCity.regionName})");
+            j++;
+        #end
+		#foreach($objDistinc in $distincList)
+            objDistincList[i] = new Array("$!{objDistinc.code}","$!{objDistinc.parentCode}","#direct($!{objDistinc.regionName})");
+            i++;
+        #end
+		var count=j;
+		var num=i;
+		function selectCity(code,cityVar,districtVar){
+            var obj = document.getElementById(cityVar);
+            var length = obj.length = 0;
+    		obj.options[length++] = new Option("-=请选择=-", "");
+            for(var m=0; m<count; m++){
+                if( objCityList[m][1] == code){
+                    obj.options[length] = new Option(objCityList[m][2], objCityList[m][0]);
+                    length++;
+                }
+            }
+            var obj2 = document.getElementById(districtVar);
+            var length2 = obj2.length = 0;
+            obj2.options[length2] = new Option("-=请选择=-", "");
+        }
+        function selectDistinc(code,districtVar){
+            var obj = document.getElementById(districtVar);
+            var length = obj.length = 0;
+			obj.options[length++] = new Option("-=请选择=-", "");
+            for(var m=0; m<num; m++){
+                if( objDistincList[m][1] == code){
+                    obj.options[length] = new Option(objDistincList[m][2], objDistincList[m][0]);
+                    length++;
+                }
+             }
+         }
+		function allCheck() {
+      		var objs = document.forms[0].getElementsByTagName("input");
+			var obj = document.getElementById("checkcon");
+       		if(obj.checked == true){
+          		for(var i = 0; i < objs.length; i++) {
+            		if(objs[i].type.toLowerCase() == "checkbox" ){
+              			objs[i].checked = true;
+        	  		}
+          		}
+      		}else{
+      	 		for(var i = 0; i < objs.length; i++) {
+            		if(objs[i].type.toLowerCase() == "checkbox" ){
+              			objs[i].checked = false;
+        	  		}
+          		}
+      		}
+    	}
+</script>
+
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+	<form action="/express/list_express_dist.html" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>物流范围查询</span></h3>
+		<table>
+			<tr>
+        		<th>快递始发地：</th>
+				<td>
+					#springBind("expressDistQuery.provinceStart")
+            		<select id="provinceStart"  name="${status.expression}" onchange="selectCity(this.value,'cityStart','districtStart');" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($province in $provinceList)
+                            <option value="$!{province.code}" #if($!{status.value}==$!{province.code}) selected #end>$!{province.regionName}</option>
+                        #end
+                    </select>
+					#springBind("expressDistQuery.cityStart")
+                    <select id="cityStart"  name="${status.expression}" onchange="selectDistinc(this.value,'districtStart');" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($cityStart in $cityListInit)
+                            <option value="$!{cityStart.code}" #if($!{status.value}==$!{cityStart.code}) selected #end>$!{cityStart.regionName}</option>
+                        #end
+                    </select>
+					#springBind("expressDistQuery.districtStart")
+                    <select id="districtStart"  name="${status.expression}" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($districtStart in $distincListInit)
+                            <option value="$!{districtStart.code}" #if($!{status.value}==$!{districtStart.code}) selected #end>$!{districtStart.regionName}</option>
+                        #end
+                    </select>
+				</td>
+				<th>物流名称：</th>
+				<td>
+					#springBind("expressDistQuery.expressId")
+        			<select name="${status.expression}" id="expressId" class="inp">
+        				<option value="">-=全部=-</option>
+        				#foreach($expressInfo in $allExpressInfoList)
+        					<option value="$!{expressInfo.id}" #if("${status.value}" == "${expressInfo.id}")selected="true" #end>$!{expressInfo.expressName}</option>
+        				#end
+        			</select>
+				</td>
+			</tr>
+			<tr>
+        		<th>快递目的地：</th>
+				<td>
+					#springBind("expressDistQuery.provinceEnd")
+            		<select id="provinceEnd"  name="${status.expression}" onchange="selectCity(this.value,'cityEnd','districtEnd');" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($province in $provinceList)
+                            <option value="$!{province.code}" #if($!{status.value}==$!{province.code}) selected #end>$!{province.regionName}</option>
+                        #end
+                    </select>
+					#springBind("expressDistQuery.cityEnd")
+                    <select id="cityEnd"  name="${status.expression}" onchange="selectDistinc(this.value,'districtEnd');" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($cityEnd in $cityEndListInit)
+                            <option value="$!{cityEnd.code}" #if($!{status.value}==$!{cityEnd.code}) selected #end>$!{cityEnd.regionName}</option>
+                        #end
+                    </select>
+					#springBind("expressDistQuery.districtEnd")
+                    <select id="districtEnd"  name="${status.expression}" class="inp">
+                        <option value="">-=请选择=-</option>
+                        #foreach($districtEnd in $distincEndListInit)
+                            <option value="$!{districtEnd.code}" #if($!{status.value}==$!{districtEnd.code}) selected #end>$!{districtEnd.regionName}</option>
+                        #end
+                    </select>
+				</td>
+				<th>支付方式：</th>
+				<td>
+					#springBind("expressDistQuery.payment")
+					<select name="${status.expression}" id="payment" class="inp">
+        				<option value="">-=全部=-</option>
+        				#foreach($payment in $expressDistPaymentPartMap.entrySet())
+        					<option value="$!{payment.key}" #if("${status.value}" == "${payment.key}")selected="true" #end>$!{payment.value}</option>
+        				#end
+        			</select>
+				</td>
+			</tr>
+			<tr>
+
+        		<th>修改时间：</th>
+				<td>
+					#springBind("expressDistQuery.optTimeStart")
+					<input type="text" id="optTimeStart" name="${status.expression}" value="$!{status.value}" class="inp" readonly="true"/>
+					-
+					#springBind("expressDistQuery.optTimeEnd")
+					<input type="text" id="optTimeEnd" name="${status.expression}" value="$!{status.value}" class="inp" readonly="true"/>
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "optTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "optTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+				</td>
+				<th>状态：</th>
+				<td>
+					#springBind("expressDistQuery.status")
+					<select name="${status.expression}" id="status" class="inp">
+        				<option value="">-=全部=-</option>
+        				#foreach($obj in $expressDistStatusMap.entrySet())
+        					<option value="$!{obj.getKey()}" #if("${status.value}" == "${obj.key}")selected="true" #end>$!{obj.getValue()}</option>
+        				#end
+        			</select>
+					&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value=" 查询  " class="btn"  onclick="formSubmit();"/>
+				</td>
+			</tr>
+		</table>
+     </div>
+#if($query.items.size()>0)
+    <div class="tool">
+    	 <span><a href="$appServer.get('/express/add_express_dist_page.html?optType=batch')" hidefocus="true" class="bt_add">批量修改物流范围</a></span>
+    	 <span><a href="javascript:modifyStatus('disabled');" hidefocus="true" class="bt_wu">批量失效</a></span>
+		 <span><a href="javascript:modifyStatus('enabled');" hidefocus="true" class="bt_wu">批量有效</a></span>
+    </div>
+#end
+
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable">
+      <tr>
+		<th width="50"><input onclick="javascript:allCheck();" id="checkcon" type="checkbox" disabled="disabled">全选</th>
+        <th>物流名称</th>
+        <th>快递始发地</th>
+        <th>快递目的地</th>
+        <th>修改时间</th>
+        <th>支付方式</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+   #if($query && $query.items.size()>0)
+	  #foreach($obj in $query.items)
+	  	<tr #if($velocityCount % 2 == 0) class="bg" #end>
+           <td><label>
+				<input type="checkbox" name="checkbox" value="${obj.id}" />
+		   </label></td>
+		   <td><a href="/express/add_express.html?eid=$!obj.expressId">$!obj.expressName</a></td>
+		   <td>$!{obj.regionCodeStartProvinceName}$!{obj.regionCodeStartCityName}$!{obj.regionCodeStartName}</td>
+           <td>$!{obj.regionCodeEndProvinceName}$!{obj.regionCodeEndCityName}$!{obj.regionCodeEndName}</td>
+		   <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!obj.gmtModify)</td>
+           <td>$!expressDistPaymentPartMap.get("$!obj.payment")</td>
+           <td>$!expressDistStatusMap.get("$obj.status")</td>
+           <td><a href="/express/add_express_dist_page.html?eid=$!obj.expressId&edid=$!obj.id">点击查看</a></td>
+        </tr>
+	  #end
+   #end
+    </table>
+	</div>
+	<input type="hidden" id="optStatus" name="optStatus" value=""/>
+</form>
+<!-- 分页 -->
+    #if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/express/list_express_dist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+	function formSubmit(){
+		var dateStart1=document.getElementById("optTimeStart").value.replace(/-/g, "/");
+		var dateEnd1=document.getElementById("optTimeEnd").value.replace(/-/g, "/");
+		var b_date1=new Date(Date.parse(dateStart1));
+        var e_date1=new Date(Date.parse(dateEnd1));
+		if(e_date1 < b_date1){
+			alert("修改起始时间不能大于结束时间！");
+			return false;
+		}
+    	document.forms[0].submit();
+    }
+
+	function modifyStatus(status){
+ 		var objs = document.forms[0].getElementsByTagName("input");
+	  	var mymes;
+		var num = 0;
+     	for(var i = 0; i < objs.length; i++) {
+       	 if(objs[i].type.toLowerCase() == "checkbox" )
+         	 if(objs[i].checked == true) {
+			 	num++;
+			}
+      	}
+		if(num==0){
+			alert("请先至少选中一条物流信息");
+		}else{
+			mymes=confirm("确定要批量更新？");
+			 if(true==mymes){
+			 	var dateStart1=document.getElementById("optTimeStart").value.replace(/-/g, "/");
+				var dateEnd1=document.getElementById("optTimeEnd").value.replace(/-/g, "/");
+				var b_date1=new Date(Date.parse(dateStart1));
+        		var e_date1=new Date(Date.parse(dateEnd1));
+				if(e_date1 < b_date1){
+					alert("修改起始时间不能大于结束时间！");
+					return false;
+				}//以上为验证表单
+				document.getElementById("optStatus").value = status;
+		  		document.forms[0].action = "/express/bath_update_status.html";
+  				document.forms[0].submit();
+		  	}else {
+
+		  	}
+		}
+	}
+	document.getElementById("checkcon").disabled="";
+</script>
+</div>

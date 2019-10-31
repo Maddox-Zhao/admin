@@ -1,0 +1,165 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<body>
+	<div class="main">
+    	 <h2>现货查看</h2>
+		
+		 
+		 <form action="productviewList.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>品牌：</th>
+                    <td>
+            			#springBind("productView.idBrand")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+							#foreach($bp in $brandList)
+                            <option value="$!bp.id" #if("$!bp.id"=="$!{status.value}") selected #end>$!bp.brandName</option>
+                            #end
+                        </select>
+            		</td>
+					
+					<th>仓库：</th>
+                    <td>
+            			#springBind("productView.idLocation")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+                            #foreach($loc in $locationMap.entrySet())
+                            <option value="$!loc.key" #if("$!loc.key"=="$!{status.value}") selected #end>$!loc.value</option>
+                            #end
+                        </select>
+            		</td>
+					
+					<th>品名：</th>
+                    <td>
+            			#springBind("productView.idSeries")
+            			<select name="${status.expression}" class="select" onchange="szietarDis(this.value);">
+                            <option value="">-=请选择=-</option>
+                            #foreach($seri in $seriesMap.entrySet())
+                            <option value="$!seri.key" #if("$!seri.key"=="$!{status.value}") selected #end>$!seri.value</option>
+                            #end
+                        </select>
+            		</td>
+					
+					
+                </tr>
+				<tr>
+        			<th>型号：</th>
+                    <td>
+            			#springBind("productView.type")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>材质：</th>
+                    <td>
+            			#springBind("productView.material")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>颜色：</th>
+                    <td>
+            			#springBind("productView.color")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+                </tr>
+				<tr id="sizetar" style="display:none;">
+        			<th>尺寸：</th>
+                    <td>
+            			#springBind("productView.size")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>目标人群：</th>
+                    <td>
+            			#springBind("productView.targetCustomers")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+                            #foreach($tarc in $tarcustomerMap.entrySet())
+                            <option value="$!tarc.key" #if("$!tarc.key"=="$!{status.value}") selected #end>$!tarc.value</option>
+                            #end
+                        </select>
+            		</td>
+					
+                </tr>
+    		</table>
+		</div>
+	</form>
+		 
+		 
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>历史管理</span></h3>
+            <table >
+                <tr>
+                    <th>产品id</th>
+                    <th>品牌</th>
+                    <th>品名</th>
+                    <th>型号</th>
+					<th>材质</th>
+					<th>颜色</th>
+					<th>图片</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($hview in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+                    <td>$!hview.idProduct</td>
+					<td>$!hview.brandname</td>
+					<td>$!hview.seriesname</td>
+					<td>$!hview.type</td>
+					<td>$!hview.material</td>
+					<td>$!hview.color</td>
+					<td><a href="http://www.shangshangsp.com:88$!stringUtils.replace($!hview.picture,'view.php?filename=','')" onmousemove="cursor('http://www.shangshangsp.com:88$!stringUtils.replace($!hview.picture,'view.php?filename=','')',event)"  onmouseout="hidecursor()" target="_blank">$!stringUtils.replace($!hview.picture,'view.php?filename=','')</a></td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/productview/productviewList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+
+
+    </div>
+	<script language="javascript" type="text/javascript">
+	
+	function cursor(str,evt){
+
+        var id = document.getElementById("Layer3");
+        //id.innerHTML = str; //文字
+        evt = evt||window.event;
+
+        id.innerHTML = "<img src='" + str + "' height=\"270px\" width=\"270px\">"; //图片
+        id.style.visibility = "visible";
+        id.style.position = "absolute";
+        id.style.left = evt.clientX -350+"px";
+        id.style.top = evt.clientY -270+document.documentElement.scrollTop+"px";
+    }
+    
+    function hidecursor(){
+        var id = document.getElementById("Layer3");
+        id.style.visibility = "hidden";
+    }
+	function szietarDis(num){
+		var ser = document.getElementById("sizetar");
+		if(num=="1"||num=="2"){
+			ser.style.display="none";
+		}else{
+			ser.style.display="";
+		}
+	}
+</script>
+	<div id="Layer3" style="visibility:hidden; border:#E1E1E1 1px solid; padding:3px;">Hello</div>
+</body>

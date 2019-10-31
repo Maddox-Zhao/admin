@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RefundApplySQL">
+<typeAlias alias="refundApply" type="com.huaixuan.network.biz.domain.trade.RefundApply"/>
+	<resultMap class="refundApply" id="refundApplyResult">
+		<result column="ID" property="id"/>
+		<result column="TID" property="tid"/>
+		<result column="BUY_ID" property="buyId"/>
+		<result column="BUY_NICK" property="buyNick"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="NOTE" property="note"/>
+		<result column="CREATER" property="creater"/>
+		<result column="CREATER_ID" property="createrId"/>
+		<result column="SERVICE_NOTE" property="serviceNote"/>
+		<result column="DEP_FIRST_ID" property="depFirstId"/>
+		<result column="GMT_APPLY" property="gmtApply"/>
+		<result column="TYPE" property="type"/>
+		<result column="STATUS" property="status"/>
+		<result column="APPLY_PICS" property="applyPics"/>
+	</resultMap>
+<!-- create RefundApply object -->
+<insert id="addRefundApply" parameterClass="refundApply">
+<![CDATA[
+		insert into emall_refund_apply
+		(ID,TID,BUY_ID,BUY_NICK,GMT_CREATE,GMT_MODIFY,NOTE,CREATER,CREATER_ID,SERVICE_NOTE,DEP_FIRST_ID,GMT_APPLY,TYPE,STATUS,APPLY_PICS )values( null,
+		#tid#,
+		#buyId#,
+		#buyNick#,
+		sysdate(),
+		sysdate(),
+		#note#,
+		#creater#,
+		#createrId#,
+		#serviceNote#,
+		#depFirstId#,
+		#gmtApply#,
+		#type#,
+		#status#,
+		#applyPics#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update RefundApply object -->
+<update id="editRefundApply" parameterClass="refundApply">
+<![CDATA[
+		update emall_refund_apply set TID = #tid#,
+		BUY_ID = #buyId#,
+		BUY_NICK = #buyNick#,
+		GMT_CREATE = #gmtCreate#,
+		GMT_MODIFY = #gmtModify#,
+		NOTE = #note#,
+		CREATER = #creater#,
+		SERVICE_NOTE = #serviceNote#,
+		DEP_FIRST_ID = #depFirstId#,
+		GMT_APPLY = #gmtApply#,
+		TYPE = #type#,
+		STATUS = #status#,
+		APPLY_PICS = #applyPics#
+		 where ID = #id#
+		
+]]>
+</update>
+<!-- delete RefundApply object -->
+<delete id="removeRefundApply" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_refund_apply where emall_refund_apply.ID = #value# 
+]]>
+</delete>
+<!-- search RefundApply object -->
+<select id="getRefundApply" parameterClass="java.lang.Long" resultMap="refundApplyResult">
+<![CDATA[
+		select emall_refund_apply.* from emall_refund_apply where emall_refund_apply.ID = #value# 
+]]>
+</select>
+<!-- searchAll RefundApply List -->
+<select id="getRefundApplys" resultMap="refundApplyResult" parameterClass="com.huaixuan.network.biz.query.RefundApplyQuery">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_refund_apply.* from emall_refund_apply where 1=1
+]]>
+         <isNotEmpty prepend="and" property="tid">
+			TID = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			STATUS = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[GMT_CREATE >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[GMT_CREATE < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			BUY_ID = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			BUY_NICK = #buyNick#
+		</isNotEmpty>
+      order by GMT_CREATE desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getRefundApplysCountParameterMap" resultClass="java.lang.Integer" parameterClass="com.huaixuan.network.biz.query.RefundApplyQuery">
+<![CDATA[
+		select count(*) from emall_refund_apply where 1=1
+]]>
+         <isNotEmpty prepend="and" property="tid">
+			TID = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			STATUS = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[GMT_CREATE >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[GMT_CREATE < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			BUY_ID = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			BUY_NICK = #buyNick#
+		</isNotEmpty>
+</select>
+<update id="updateRefundApplyStatus" parameterClass="refundApply">
+<![CDATA[
+		update emall_refund_apply set 
+		GMT_MODIFY = sysdate(),
+		CREATER = #creater#,
+		CREATER_ID = #createrId#,
+		SERVICE_NOTE = #serviceNote#,
+		GMT_APPLY = sysdate(),
+		STATUS = #status#
+		 where ID = #id#
+		
+]]>
+</update>
+
+</sqlMap>

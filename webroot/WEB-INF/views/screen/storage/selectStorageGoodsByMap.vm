@@ -1,0 +1,192 @@
+#set($layout = "layout/default.vm")
+#set($mut = ($request.getParameter('muse')=='true') )
+<div class="main">
+<form name="searchform" id="searchform" action="/storage/selectStorageGoodsByMap.html" method="post">
+		<input type="hidden" id="supplierId" name="supplierId" value="$!{supplierId}" />
+		<input type="hidden" id="locId" name="locId" value="$!{locId}" />
+		<input type="hidden" id="clickchoose" name="clickchoose" value="false"/>
+		##<input type="hidden" id="storType" name="storType" value="$!{storType}" />
+<div class="searchBox">
+	<table>
+		<tr>
+            <th>供应商：</th>
+			<td>
+				$!{storage.supplierName}
+            </td>
+            <th>一级仓库：</th>
+			<td>
+				$!{storage.depFirstName}
+            </td>
+            <th>仓库：</th>
+			<td>
+				$!{storage.depositoryName}
+            </td>
+            <th>库位：</th>
+			<td>
+				$!{storage.depLocationName}
+            </td>
+        </tr>
+        <tr>
+			<th>产品名称：</th>
+			<td>
+				#springBind("storageQuery.instanceName")
+				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+            </td>
+			<th>产品编码：</th>
+			<td>
+				#springBind("storageQuery.code")
+				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+            </td>
+            <th></th>
+			<td><button type="button" onclick="formSubmit();" class="btn">查询</button></td>
+		</tr>
+	</table>
+</div>
+
+			<div class="listBox">
+				<table>
+						<tr>
+							<th align="left">
+								<input name="anothercheckall" type="checkbox" onclick="checkAllWithName(this.form,'anothercheckall');"/>
+							</th>
+							<th width="">
+    							产品编码
+    						</th>
+    						<th width="">
+    							产品名称
+    						</th>
+    						<th width="">
+    							类目
+    						</th>
+    						<th width="">
+    							属性
+    						</th>
+    						<th width="">
+    							类型
+    						</th>
+    						<th width="">
+    							库存
+    						</th>
+							<th width="">
+								成本均价
+							</th>
+						</tr>
+						 #foreach($obj in $storageList)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+								<td>
+									<input type="checkbox" name="ids" id="gi_${velocityCount}" value="$!{obj.goodsInstanceId}"  #if("$!{obj.depType}"!="common_dep") disabled #end/>
+								</td>
+								<td height="27">
+    								$!{obj.code}
+    							</td>
+    							<td title="$!{obj.instanceName}">
+    								$!controlUtil.getNoticesTitle($!{obj.instanceName},15)
+    							</td>
+    							<td title="$!categoryManager.getCatFullNameByCatcode($obj.catCode)">
+    								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($obj.catCode),20)
+    							</td>
+    							<td title="$!attributeManager.getFullAttributeStringByAttrs($obj.attrs)">
+    								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attrs),20)
+    							</td>
+    							<td align="center">
+    								#if("$obj.storType"=="v") 暂估 #else 实际 #end
+    							</td>
+    							<td align="right">
+    								$!{obj.storageNumSum}
+    							</td>
+								<td align="right">
+    								$!moneyUtil.getFormatMoney($!{obj.averagePrice},'0.00')
+									<input type="hidden" id="averagePrice_${velocityCount}" name="averagePrice_${velocityCount}" value="$!{obj.averagePrice}" />
+    							</td>
+							</tr>
+						#end
+				</table>
+			</div>
+</form>
+	<div class="form-but">
+		<button type="button"  class="button-s4" id="btnSubmit" onClick="cmt();">确定</button>
+		<button type="button"  class="button-s4" onClick="cl();">关闭</button>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+	function cmt(){
+		var sCount = 0;
+		#if($selectGoodsCount && $selectGoodsCount != "")
+			sCount = $selectGoodsCount;
+		#end
+		var back = [];
+		var good;
+		var size = 20;
+
+		#if($storageList)
+    		size = $!storageList.size();;
+        #end
+    		for(var i=1;i<=size;i++){
+    			var cid = 'gi_'+i;
+    			var one = document.getElementById(cid);
+    			if(one && one.checked){
+    				var obj = buildGi(i);
+    				back.push(obj);
+    			}
+    		}
+		#if($selectList && $selectList.size() > 0)
+			#foreach($sid in $selectList)
+    			good = new Object();
+    			good.id = $sid;
+    			back.push(good);
+			#end
+		#end
+		if(back.length==0){
+			alert('请选择产品!');
+		} else if(back.length + sCount > 100){
+			alert('添加的产品数量不能超过100条！');
+		}else {
+			window.opener.backstorage(back);
+			self.close();
+		}
+	}
+	function buildGi(count){
+		var back = new Object();
+		back.id = document.getElementById('gi_'+count).value;
+		back.averagePrice=document.getElementById('averagePrice_'+count).value;
+		return back;
+	}
+	function cl(){
+	    window.opener.backstorage();
+		window.close();
+	}
+	
+	function checkAllWithName(theForm, allCheckName) { // check all the checkboxes in the list with the name of the all check box
+  	  var allcheck;
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if(eName==allCheckName){
+            	allcheck=e;
+            }
+        }
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if (eName != allCheckName &&
+                (e.type.indexOf("checkbox") == 0)) {
+                e.checked = allcheck.checked;
+            }
+        }
+    }
+	
+	function f() {
+	    var pageclick = document.getElementById("clickchoose").value;
+		if(pageclick == "false"){
+		   cl();
+		}else{
+		   document.getElementById("clickchoose").value = "false";
+		}
+	}
+	window.onbeforeunload = f;
+	
+	function formSubmit(){
+	   document.getElementById("clickchoose").value = "true";
+	   document.searchform.submit();
+	}
+</script>

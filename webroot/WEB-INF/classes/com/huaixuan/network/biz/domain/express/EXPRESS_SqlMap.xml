@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="express">
+<typeAlias alias="express" type="com.huaixuan.network.biz.domain.express.Express"/>
+	<resultMap class="express" id="expressResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="express_name" property="expressName"/>
+		<result column="express_code" property="expressCode"/>
+		<result column="express_desc" property="expressDesc"/>
+		<result column="express_url" property="expressUrl"/>
+		<result column="status" property="status"/>
+		<result column="interface_express_code" property="interfaceExpressCode"/>
+	</resultMap>
+	<resultMap class="express" id="expressFreightResult">
+	    <result column="account" property="account"/>
+	    <result column="tid" property="tid"/>
+	    <result column="shipping_amount" property="shippingAmount" nullValue="0"/>
+	    <result column="dep_first_name" property="depFirstName"/>
+	    <result column="express_id" property="expressId" nullValue="0"/>
+	    <result column="express_name" property="expressName" nullValue="0"/>
+	    <result column="gmt_out_dep" property="gmtOutDep"/>
+	    <result column="actual_inventory" property="actualInventory"/>
+	</resultMap>
+<!-- create Express object -->
+<insert id="addExpress" parameterClass="express">
+<![CDATA[
+		insert into ioss_express
+		(id,gmt_create,gmt_modify,express_name,express_code,express_desc,express_url,status,interface_express_code)values(
+		null,
+		#gmtCreate#,
+		#gmtModify#,
+		#expressName#,
+		#expressCode#,
+		#expressDesc#,
+		#expressUrl#,
+		#status#,
+		#interfaceExpressCode#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Express object -->
+<update id="editExpress" parameterClass="express">
+<![CDATA[
+		update ioss_express set
+		gmt_modify = #gmtModify#,
+		express_name = #expressName#,
+		express_code = #expressCode#,
+		express_desc = #expressDesc#,
+		express_url = #expressUrl#,
+		status = #status#,
+		interface_express_code=#interfaceExpressCode#
+		 where id = #id#
+]]>
+
+</update>
+<!-- delete Express object -->
+<delete id="removeExpress" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_express where ioss_express.ID = #value#
+]]>
+</delete>
+<!-- search Express object -->
+<select id="getExpress" parameterClass="java.lang.Long" resultMap="expressResult">
+<![CDATA[
+		select ioss_express.* from ioss_express where ioss_express.ID = #value#
+]]>
+</select>
+<!-- searchAll Express List -->
+<select id="getExpresss" resultMap="expressResult">
+<![CDATA[
+		select ioss_express.* from ioss_express
+]]>
+</select>
+
+<select id="getExpressByName" parameterClass="java.lang.String" resultMap="expressResult">
+	select ioss_express.* from ioss_express where ioss_express.express_name = #expressName#
+</select>
+
+<select id="getExpressByCode" parameterClass="java.lang.String" resultMap="expressResult">
+	select ioss_express.* from ioss_express where ioss_express.express_code = #expressCode#
+</select>
+
+<select id="getExpressCountByCond" resultClass="int">
+<![CDATA[
+		select count(ioss_express.id) from ioss_express where 1=1
+]]>
+		<isNotEmpty prepend="and" property="expressName">
+			express_name like CONCAT('%',#expressName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressUrl">
+			express_url like CONCAT('%',#expressUrl#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createTimeStart">
+<![CDATA[			gmt_create > STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createTimeEnd">
+<![CDATA[			gmt_create < DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</select>
+
+<select id="listExpressByCond" resultMap="expressResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_express.* from ioss_express where 1=1
+]]>
+		<isNotEmpty prepend="and" property="expressName">
+			express_name like CONCAT('%',#expressName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressUrl">
+			express_url like CONCAT('%',#expressUrl#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createTimeStart">
+<![CDATA[			gmt_create > STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createTimeEnd">
+<![CDATA[			gmt_create < DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		order by gmt_create desc,id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<update id="updateExpressStatusById" parameterClass="java.util.Map">
+	update ioss_express set gmt_modify=sysdate(),status=#status#
+	where id=#id#
+</update>
+
+<select id="getInterfaceExpressCodeByExpressId" parameterClass="java.util.Map" resultMap="expressResult">
+	select * from ioss_express where id = #id# order by id asc
+</select>
+
+<select id="getExpressIdByInterfaceExpressCode" parameterClass="java.util.Map" resultMap="expressResult">
+	select * from ioss_express where interface_express_code = #interfaceExpressCode# order by id asc LIMIT 1 
+</select>
+
+<select id="getExpressIdByExpressCode" parameterClass="java.util.Map" resultMap="expressResult">
+	select * from ioss_express where express_code = #expressCode# order by id asc LIMIT 1
+</select>
+
+<select id="listExpressByStatus" parameterClass="java.lang.String" resultMap="expressResult">
+	select * from ioss_express where status = #status# order by id asc
+</select>
+
+<select id="getFreightCountByParameterMap" resultClass="int">
+ <![CDATA[
+   select count(1) from(
+      select u.account,
+             t.tid,
+             t.shipping_amount,
+             f.dep_first_name,
+             o.gmt_out_dep,
+             t.express_id
+        from emall_trade           t,
+             emall_trade_package   p,
+             emall_users           u,
+             ioss_out_depository   o,
+             ioss_depository_first f
+       where p.merge_tid = o.relation_num
+         and t.tid = p.tid
+         and t.buy_id = u.id
+         and t.dep_first_id = f.id
+         and t.status in ('trade_finish', 'wait_buyer_confirm_goods')
+  ]]>
+  <isNotEmpty prepend="and" property="userName">
+       u.account like concat('%',#userName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="tid">
+       t.tid like concat('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depFirstId">
+       f.id = #depFirstId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="expressId">
+       t.express_id = #expressId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeStart">
+       <![CDATA[ o.gmt_out_dep >= STR_TO_DATE(#deliveryTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeEnd">
+       <![CDATA[ o.gmt_out_dep < DATE_ADD(STR_TO_DATE(#deliveryTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depfirstIds">
+	   f.id in(
+		<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+	   )
+   </isNotEmpty>
+   )
+</select>
+
+<select id="getFreightListsByParameterMap" resultMap="expressFreightResult" >
+  <include refid="pageSQLHead"/>
+  <![CDATA[
+      select u.account,
+             t.tid,
+             t.shipping_amount,
+             f.dep_first_name,
+             o.gmt_out_dep,
+             t.express_id,
+  			 (select e.express_name from ioss_express e WHERE e.id=t.express_id ) express_name,
+             t.actual_inventory
+        from emall_trade           t,
+        	 emall_trade_package   p,
+             emall_users           u,
+             ioss_out_depository   o,
+             ioss_depository_first f
+       where p.merge_tid = o.relation_num
+         and t.tid = p.tid
+         and t.buy_id = u.id
+         and t.dep_first_id = f.id
+         and t.status in ('trade_finish', 'wait_buyer_confirm_goods')
+  ]]>
+  <isNotEmpty prepend="and" property="userName">
+       u.account like concat('%',#userName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="tid">
+       t.tid like concat('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depFirstId">
+       f.id = #depFirstId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="expressId">
+       t.express_id = #expressId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeStart">
+       <![CDATA[ o.gmt_out_dep >= STR_TO_DATE(#deliveryTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeEnd">
+       <![CDATA[ o.gmt_out_dep < DATE_ADD(STR_TO_DATE(#deliveryTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depfirstIds">
+	   f.id in(
+		<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+	   )
+   </isNotEmpty>
+  order by o.gmt_out_dep desc
+  <include refid="pageSQLFoot"/>
+</select>
+
+<select id="getFreightAmountByParameterMap" resultClass="java.lang.Double">
+  <![CDATA[
+      select coalesce(sum(t.shipping_amount), 0)
+        from emall_trade           t,
+        	 emall_trade_package   p,
+             emall_users           u,
+             ioss_out_depository   o,
+             ioss_depository_first f
+       where p.merge_tid = o.relation_num
+         and t.tid = p.tid
+         and t.buy_id = u.id
+         and t.dep_first_id = f.id
+         and t.status in ('trade_finish', 'wait_buyer_confirm_goods')
+  ]]>
+ <isNotEmpty prepend="and" property="userName">
+       u.account like concat('%',#userName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="tid">
+       t.tid like concat('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depFirstId">
+       f.id = #depFirstId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="expressId">
+       t.express_id = #expressId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeStart">
+       <![CDATA[ o.gmt_out_dep >= STR_TO_DATE(#deliveryTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="deliveryTimeEnd">
+       <![CDATA[ o.gmt_out_dep < DATE_ADD(STR_TO_DATE(#deliveryTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="depfirstIds">
+	   f.id in(
+		<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+	   )
+   </isNotEmpty>
+</select>
+
+<select id="getGoodsExpressRelation" parameterClass="java.util.Map" resultMap="expressResult">
+<![CDATA[
+		select ioss_express.* from ioss_express where 1=1
+]]>
+<isNotEmpty prepend="and" property="expressIds">
+	ioss_express.id in(
+		<iterate property="expressIds" conjunction=",">#expressIds[]#</iterate>
+	)
+</isNotEmpty>
+</select>
+
+<select id="getNotGoodsExpressRelation" parameterClass="java.util.Map" resultMap="expressResult">
+<![CDATA[
+		select ioss_express.* from ioss_express where 1=1
+]]>
+<isNotEmpty prepend="and" property="expressIds">
+	ioss_express.id not in(
+		<iterate property="expressIds" conjunction=",">#expressIds[]#</iterate>
+	)
+</isNotEmpty>
+</select>
+</sqlMap>

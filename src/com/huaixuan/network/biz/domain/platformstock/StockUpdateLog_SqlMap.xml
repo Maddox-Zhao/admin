@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+       
+ <sqlMap namespace="platformstock">
+<typeAlias alias="stockUpdateLog" type="com.huaixuan.network.biz.domain.platformstock.StockUpdateLog"/>
+<resultMap id="stocksResult" class="com.huaixuan.network.biz.domain.platformstock.StockUpdateLog">
+	<result column="sku" property="sku"/>
+	<result column="location" property="location"/>  
+	<result column="psku" property="psku"/>  
+	<result column="name" property="name"/>  
+	<result column="stock" property="stock"/>  	
+	<result column="type" property="type"/>   
+	
+	<result column="update_time" property="updateTime"/> 
+</resultMap>	
+	<select id="selectStockAll" parameterClass="java.util.Map" resultMap="stocksResult">
+		select * from hx_stock_update_log 
+		where 1=1
+		<isNotEmpty prepend="and" property="sku">
+			sku =#sku#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="updateTime" >
+			update_time >=#updateTime#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="updateTime" >
+		    <![CDATA[
+			update_time <='$updateTime$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="location">
+			location=#location#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="name">
+			name=#name#
+		</isNotEmpty>			
+		ORDER BY update_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>	
+	
+	
+	<!-- 查总数 -->
+	
+	<select id="searchStockCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+        SELECT count(*)
+		FROM  hx_stock_update_log where 1=1
+		<isNotEmpty prepend="and" property="sku">
+			sku =#sku#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="updateTime" >
+			update_time >=#updateTime#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="updateTime" >
+		    <![CDATA[
+			update_time <='$updateTime$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="location">
+			location=#location#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="name">
+			name=#name#
+		</isNotEmpty>	
+		ORDER BY update_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	
+	<!-- 查所有的站点 -->
+	
+	<select id="selectAllLocation" parameterClass="java.lang.String" resultMap="stocksResult">
+			SELECT DISTINCT(location) FROM  hx_stock_update_log 
+		
+	</select>
+			
+	
+
+	
+</sqlMap>

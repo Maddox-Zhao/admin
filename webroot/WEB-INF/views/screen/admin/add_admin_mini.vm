@@ -1,0 +1,147 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>添加用户</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+          <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+ 
+ 
+<body>
+   <div id="form1"  style="margin-left:auto;margin-center:auto;margin-left:100px">
+        <table>
+             <tr>
+                <td>
+						用户名：
+                </td>
+                <td>
+					 <input id="userName" name="userName"  class="mini-textbox"   style="width:120px"   required="true"  />  
+					 
+					 <input id="site" name="site"  class="mini-textbox"   style="display:none"  />  
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label >密码：</label>
+                </td>
+                <td>
+                    <input id="password"  name="password" style="width:120px" class="mini-textbox"  value="123456"  required="true"   />
+                </td>
+            </tr>
+			<tr>
+                <td>
+                    <label>确认密码：</label>
+                </td>
+                <td>
+                      <input id="confirmPassword"  name="confirmPassword" style="width:120px" class="mini-textbox"  value="123456" required="true" />
+                </td>
+            </tr>
+		   <tr>
+                <td>                   
+                    <label>姓名：</label>
+                </td>
+                <td>
+                    <input id="name" name="name" style="width:120px" class="mini-textbox" required="true" 　 />
+                </td>
+            </tr>
+			
+            <tr>
+                <td>
+                    <label >email：</label>
+                </td>
+                <td>
+                    <input id="email"  name="email" style="width:120px" class="mini-textbox"     />
+                </td>
+            </tr>
+            
+    
+			  <tr>
+                <td>                   
+                    <label>手机：</label>
+                </td>
+                <td>
+                   <input id="mobile"  name="mobile" style="width:120px" class="mini-textbox"    />
+                </td>
+            </tr>
+			
+             <tr>
+					<td>
+						 &nbsp;&nbsp; <a class="mini-button" iconCls="icon-ok" onclick="submit()">提交</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+			 
+			 
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	
+ 
+	
+
+
+	function submit()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		
+		var formData = form.getData();//form表单填写的数据
+		mini.mask({
+            el: document.body,
+            cls: 'mini-mask-loading',
+            html: '提交中,请勿关闭...'
+        });
+		jQuery.post("/admin/insertAdminForMini.html",formData,function(text)
+		{
+		 	mini.unmask(document.body);
+			if("ok" == text)
+			{
+				CloseWindow('close');
+			}
+			else if("exists" == text)
+			{
+				mini.alert("用户名已存在")
+			}
+			else if("passwrod_error" == text)
+			{
+				mini.alert("两次密码不一致")
+			}
+			else
+			{
+				mini.alert("提交出错,联系管理员");
+			}
+		});
+		
+		
+		
+	} 
+	
+	 function SetData(data) {
+          
+        //跨页面传递的数据对象，克隆后才可以安全使用
+        idSite = mini.clone(data);
+		mini.get("site").setValue(idSite);
+		jQuery.post("/admin/getUserNameByIdSite.html",{idSite:idSite},function(text)
+		{
+			if(!text) text = 9000001;
+			mini.get("userName").setValue(text);
+		})
+		 
+	}
+	
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+</script>
+</body>
+</html>

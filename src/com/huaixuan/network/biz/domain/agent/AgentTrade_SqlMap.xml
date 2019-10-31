@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AgentTradeSQL">
+	<typeAlias alias="agentTrade"
+		type="com.huaixuan.network.biz.domain.agent.AgentTrade" />
+	<typeAlias alias="adminUser"
+		type="com.huaixuan.network.biz.domain.admin.Admin" />
+	<resultMap class="agentTrade" id="agentTradeResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="user_id" property="userId"/>
+		<result column="tid" property="tid"/>
+		<result column="order_id" property="orderId"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="price" property="price" nullValue="0"/>
+		<result column="amount" property="amount" nullValue="0"/>
+		<result column="refund_price" property="refundPrice" nullValue="0"/>
+		<result column="refund_amount" property="refundAmount" nullValue="0"/>
+		<result column="refund_type" property="refundType" nullValue=""/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="is_receive" property="isReceive"/>
+		<result column="gmt_trade_finish" property="gmtTradeFinish"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.agent.AgentTrade" id="agentTradeDetailResult">
+	   <result column="tid" property="tid"/> <!-- 订单编号 -->
+	   <result column="goodsName" property="goodsName"/> <!-- 产品实例名称 -->
+	   <result column="REFUND_PRICE" property="refundPrice"/> <!-- 退款总金额 -->
+	   <result column="factMoney" property="factMoney"/> <!-- 实际交易总金额 -->
+	   <result column="price" property="price"/> <!-- 商品价格 -->
+	   <result column="AMOUNT" property="amount"/> <!-- 商品数量 -->
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.agent.AgentTrade" id="agentTradeGroupResult">
+	   <result column="user_id" property="userId"/> <!-- 会员ID -->
+	   <result column="return_id" property="returnId"/> <!-- 返点规则ID -->
+	   <result column="factMoney" property="factMoney"/> <!-- 实际交易总金额 -->
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.agent.AgentTrade" id="agentTradeDetail">
+	   <result column="goods_sn" property="goodsSn"/>
+	   <result column="goods_photo" property="goodsPhoto"/>
+	   <result column="goods_name" property="goodsName"/>
+	   <result column="goods_agentstatus" property="goodsAgentstatus"/>
+	   <result column="price" property="price"/>
+	   <result column="user_id" property="userId"/>
+	   <result column="tid" property="tid"/>
+	   <result column="gmt_trade_finish" property="gmtTradeFinish"/>
+	   <result column="amount" property="amount" nullValue="0"/>
+	   <result column="refund_price" property="refundPrice" nullValue="0"/>
+	   <result column="refund_amount" property="refundAmount" nullValue="0"/>
+	   <result column="goods_status" property="goodsStatus"/>
+	   <result column="is_receive" property="isReceive"/>
+	   <result column="cat_code" property="catCode"/>
+	   <result column="account" property="userNick"/>
+	   <result column="gmt_create" property="gmtCreate"/>
+	   <result column="status" property="status"/>
+	   <result column="trade_id" property="tradeId"/>
+	   <result column="rule_name" property="ruleName"/>
+
+	</resultMap>
+
+	<resultMap class="com.huaixuan.network.biz.domain.agent.AgentTrade" id="searchAgentTradeDetail">
+	   <result column="goods_sn" property="goodsSn"/>
+	   <result column="goods_photo" property="goodsPhoto"/>
+	   <result column="goods_name" property="goodsName"/>
+	   <result column="goods_agentstatus" property="goodsAgentstatus"/>
+	   <result column="price" property="price"/>
+	   <result column="user_id" property="userId"/>
+	   <result column="tid" property="tid"/>
+	   <result column="gmt_trade_finish" property="gmtTradeFinish"/>
+	   <result column="amount" property="amount" nullValue="0"/>
+	   <result column="refund_price" property="refundPrice" nullValue="0"/>
+	   <result column="refund_amount" property="refundAmount" nullValue="0"/>
+	   <result column="status" property="status"/>
+	   <result column="is_receive" property="isReceive"/>
+	   <result column="cat_code" property="catCode"/>
+	   <result column="account" property="userNick"/>
+	   <result column="gmt_create" property="gmtCreate"/>
+	   <result column="agentManagerName" property="agentManagerName"/>
+	</resultMap>
+
+	<resultMap class="com.huaixuan.network.biz.domain.agent.AgentTrade" id="userAmount">
+       <result column="user_id" property="userId"/>
+       <result column="amt" property="amt" nullValue="0.0"/>
+       <result column="cat_code" property="catCode"/>
+    </resultMap>
+
+    <resultMap class="adminUser" id="adminList">
+       <result column="id" property="id" />
+       <result column="user_id" property="userId" />
+       <result column="user_name" property="userName"/>
+    </resultMap>
+
+<insert id="addAgentTrade" parameterClass="agentTrade">
+<![CDATA[
+		insert into emall_agent_trade
+		(id,gmt_create,gmt_modify,user_id,tid,order_id,cat_code,price,amount,refund_price,refund_amount,refund_type,goods_instance_id,goods_id,is_receive,gmt_trade_finish,status,return_id )values( null,
+		sysdate(),
+		sysdate(),
+		#userId#,
+		#tid#,
+		#orderId#,
+		#catCode#,
+		#price#,
+		#amount#,
+		#refundPrice#,
+		#refundAmount#,
+		#refundType#,
+		#goodsInstanceId#,
+		#goodsId#,
+		'n',
+		#gmtTradeFinish#,
+		#status#,
+		#returnId#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<update id="editAgentTrade" parameterClass="agentTrade">
+<![CDATA[
+		update emall_agent_trade set
+		gmt_modify = sysdate(),
+		user_id = #userId#,
+		tid = #tid#,
+		order_id = #orderId#,
+		cat_code = #catCode#,
+		price = #price#,
+		amount = #amount#,
+		refund_price = #refundPrice#,
+		refund_amount = #refundAmount#,
+		refund_type = #refundType#,
+		goods_instance_id = #goodsInstanceId#,
+		goods_id = #goodsId#,
+		is_receive = #isReceive#,
+		gmt_trade_finish = #gmtTradeFinish#,
+		status = #status#
+		 where id = #id#
+
+]]>
+</update>
+
+<update id="updateIsReceive" parameterClass="java.util.Map">
+<![CDATA[
+        update emall_agent_trade set
+        gmt_modify = sysdate(),
+        is_receive = #isReceive#
+        where    user_id = #userId#
+]]>
+        <isNotEmpty prepend="and" property="startTradeFinish">
+          <![CDATA[    gmt_trade_finish >= STR_TO_DATE(#startTradeFinish#,'%Y-%m-%d %H:%i:%s')  ]]>
+        </isNotEmpty>
+
+        <isNotEmpty prepend="and" property="endTradeFinish">
+           <![CDATA[gmt_trade_finish <=  DATE_ADD(STR_TO_DATE(#endTradeFinish#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="status">
+           status = #status#
+        </isNotEmpty>
+</update>
+
+
+
+	<select id="getRefund_amount" parameterClass="java.lang.String">
+		<![CDATA[
+ 	select goods_amount from emall_refund where tid=#tid#
+ 	]]>
+	</select>
+
+	<select id="goodisagent" parameterClass="map">
+		<![CDATA[
+ 	select g.is_agent from emall_goods g,emall_order o,emall_agent_goods a where g.id=o.goods_id and
+ 	a.goods_id=o.goods_id and a.user_id=#user_id#
+ 	and o.tid=#tid#
+ 	]]>
+	</select>
+	<!-- modified by chenyan 2009/11/05 start 增加了产品编码的查询 -->
+	<select id="getAgentByParameterMap" resultMap="agentTradeDetail" parameterClass="java.util.Map">
+                  <include refid="pageSQLHead"/>
+       select
+        max(b.goods_sn) as goods_sn,
+		max(b.img_small) as goods_photo,
+		max(b.title) as goods_name,
+		max(b.is_agent) as goods_agentstatus,
+		max(a.price) as price,
+		max(a.user_id) as user_id,
+		max(a.tid) as tid,
+		max(a.cat_code) as cat_code,
+		max(a.gmt_trade_finish) as gmt_trade_finish,
+		max(a.gmt_create) as gmt_create,
+		max(a.amount) as amount,
+		max(a.refund_price) as refund_price,
+		max(a.refund_amount) as refund_amount,
+		max(a.is_receive) as is_receive,
+		max(a.status) as status,
+		max(c.status) as goods_status,
+		max(d.account) as account,
+		max(e.id) as trade_id,
+    	max(p.name) rule_name
+		from emall_agent_trade a,emall_goods b,emall_agent_goods c,emall_users d,emall_trade e ,ioss_return_point p
+		<isNotEmpty prepend="" property="code">
+		,ioss_goods_instance f
+		</isNotEmpty>
+		where a.goods_id=b.id and a.user_id=c.user_id and d.id=a.user_id and d.id = c.user_id and a.tid = e.tid
+		and  p.id=a.return_id and a.status &lt;&gt; 'close'
+		<isNotEmpty prepend="and" property="code">
+			a.goods_id = f.goods_id
+			and f.code like concat('%',#code#,'%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ a.gmt_create > DATE_SUB(STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orderId">
+			a.order_id = #orderId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			a.tid = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsStatus">
+		    c.status=#goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNick">
+			d.account = #userNick#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReceive">
+			a.is_receive = #isReceive#
+		</isNotEmpty>
+		group by order_id
+		order by tid desc,goods_sn
+		  <include refid="pageSQLFoot"/>
+
+	</select>
+
+	<select id="getAgentCountByParameterMap" parameterClass="java.util.Map" resultClass="int" >
+
+	   select count(1) from
+        ( select
+        max(b.goods_sn) as goods_sn,
+		max(b.img_small) as goods_photo,
+		max(b.title) as goods_name,
+		max(b.is_agent) as goods_agentstatus,
+		max(a.price) as price,
+		max(a.user_id) as user_id,
+		max(a.tid) as tid,
+		max(a.cat_code) as cat_code,
+		max(a.gmt_trade_finish) as gmt_trade_finish,
+		max(a.gmt_create) as gmt_create,
+		max(a.amount) as amount,
+		max(a.refund_price) as refund_price,
+		max(a.refund_amount) as refund_amount,
+		max(a.is_receive) as is_receive,
+		max(a.status) as status,
+		max(c.status) as goods_status,
+		max(d.account) as account,
+		max(e.id) as trade_id,
+    	max(p.name) rule_name
+		from emall_agent_trade a,emall_goods b,emall_agent_goods c,emall_users d,emall_trade e ,ioss_return_point p
+		<isNotEmpty prepend="" property="code">
+		,ioss_goods_instance f
+		</isNotEmpty>
+		where a.goods_id=b.id and a.user_id=c.user_id and d.id=a.user_id and d.id = c.user_id
+		and  p.id=a.return_id and a.tid = e.tid and a.status &lt;&gt; 'close'
+		<isNotEmpty prepend="and" property="code">
+			a.goods_id = f.goods_id
+			and f.code like concat('%',#code#,'%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ a.gmt_create > DATE_SUB(STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="orderId">
+			a.order_id = #orderId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			a.tid = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsStatus">
+		    c.status=#goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReceive">
+			a.is_receive = #isReceive#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNick">
+			d.account = #userNick#
+		</isNotEmpty>
+		group by a.order_id
+		) aa
+
+	</select>
+	<!-- modified by chenyan 2009/11/05 end -->
+
+	<select id="getAgentTradeByTidOrderId" resultMap="agentTradeResult" parameterClass="java.util.Map">
+<![CDATA[
+		select emall_agent_trade.* from emall_agent_trade where emall_agent_trade.order_id = #orderId# and  emall_agent_trade.tid = #tid#
+]]>
+</select>
+
+ <select id="countUserAmount" resultMap="userAmount" parameterClass="java.util.Map">
+        <![CDATA[
+             select sum(price*amount-refund_price) amt,user_id,cat_code  from emall_agent_trade
+            where 1=1
+        ]]>
+         <isNotEmpty prepend="and" property="gmtTradeFinish">
+           gmt_trade_finish = #gmtTradeFinish#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="startTradeFinish">
+          <![CDATA[    gmt_trade_finish >= STR_TO_DATE(#startTradeFinish#,'%Y-%m-%d %H:%i:%s')  ]]>
+        </isNotEmpty>
+
+        <isNotEmpty prepend="and" property="endTradeFinish">
+           <![CDATA[gmt_trade_finish <=  DATE_ADD(STR_TO_DATE(#endTradeFinish#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="userId">
+           user_id = #userId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="status">
+           status = #status#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="isReceive">
+           is_receive = #isReceive#
+        </isNotEmpty>
+         group by user_id,cat_code
+</select>
+
+	<!-- modified by lincf 2009/12/07 增加拓展人员、订单状况的查询-->
+	<select id="searchAgentByParameterMap" resultMap="searchAgentTradeDetail" parameterClass="java.util.Map">
+          <include refid="pageSQLHead"/>
+        select
+        b.goods_sn,
+		b.img_small as goods_photo,
+		b.title as goods_name,
+		b.is_agent as goods_agentstatus,
+		a.price,
+		a.user_id,
+		a.tid,
+		a.cat_code,
+		a.gmt_trade_finish,
+		a.gmt_create,
+		a.amount,
+		a.refund_price,
+		a.refund_amount,
+		a.is_receive,
+		a.status,
+		d.account,
+		admin.user_name as agentManagerName
+		from emall_agent_trade a,emall_goods b,emall_users d,emall_agent_info info,emall_admin admin
+		<isNotEmpty prepend="" property="code">
+		,ioss_goods_instance f
+		</isNotEmpty>
+		where a.goods_id=b.id and d.id=a.user_id and d.id=info.user_id and admin.id=info.agent_manager_id
+		<isNotEmpty prepend="and" property="code">
+			a.goods_id = f.goods_id
+			and f.code like concat('%',#code#,'%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="agentManagerId">
+			info.agent_manager_id = #agentManagerId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNick">
+			d.account like concat('%',#userNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReceive">
+			a.is_receive = #isReceive#
+		</isNotEmpty>
+		order by a.gmt_create desc
+		  <include refid="pageSQLFoot"/>
+
+	</select>
+	<!-- modified by lincf 2009/12/07 增加拓展人员、订单状况的查询-->
+	<select id="searchAgentCountByParameterMap" parameterClass="java.util.Map" resultClass="int" >
+	   select count(1) from
+        ( select
+        b.goods_sn,
+		b.img_small as goods_photo,
+		b.title as goods_name,
+		b.is_agent as goods_agentstatus,
+		a.price,
+		a.user_id,
+		a.tid,
+		a.cat_code,
+		a.gmt_trade_finish,
+		a.gmt_create,
+		a.amount,
+		a.refund_price,
+		a.refund_amount,
+		a.is_receive,
+		a.status,
+		d.account
+		from emall_agent_trade a,emall_goods b,emall_users d,emall_agent_info info,emall_admin admin
+		<isNotEmpty prepend="" property="code">
+		,ioss_goods_instance f
+		</isNotEmpty>
+		where a.goods_id=b.id and d.id=a.user_id and d.id=info.user_id and admin.id=info.agent_manager_id
+		<isNotEmpty prepend="and" property="code">
+			a.goods_id = f.goods_id
+			and f.code like concat('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentManagerId">
+			info.agent_manager_id = #agentManagerId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNick">
+			d.account like concat('%',#userNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReceive">
+			a.is_receive = #isReceive#
+		</isNotEmpty>
+		) aa
+	</select>
+	
+	
+	
+	
+	<select id="searchAgentCountPriceByParameterMap" parameterClass="java.util.Map" resultClass="java.lang.Double" >
+	   select sum(aa.price*aa.amount-aa.refund_price) from
+        ( select
+		a.price,
+		a.amount,
+		a.refund_price,
+		a.refund_amount
+		from emall_agent_trade a,emall_goods b,emall_users d,emall_agent_info info,emall_admin admin
+		<isNotEmpty prepend="" property="code">
+		,ioss_goods_instance f
+		</isNotEmpty>
+		where a.goods_id=b.id and d.id=a.user_id and d.id=info.user_id and admin.id=info.agent_manager_id
+		<isNotEmpty prepend="and" property="code">
+			a.goods_id = f.goods_id
+			and f.code like concat('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentManagerId">
+			info.agent_manager_id = #agentManagerId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNick">
+			d.account like concat('%',#userNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReceive">
+			a.is_receive = #isReceive#
+		</isNotEmpty>
+		) aa
+	</select>
+	
+	
+  <select  id="getAdminInfoById" parameterClass="java.lang.Long" resultMap="adminList">
+       select user_name from emall_admin where id=#newAgentManagerId#
+  </select>
+
+  <update id="updateAgentTradeById" parameterClass="java.util.Map">
+  <![CDATA[
+      update emall_agent_info set agent_manager_id=#newAgentManagerId#,gmt_distribute=sysdate() where 1=1
+      ]]>
+      <isNotEmpty prepend="and" property="agentId">
+			id=#agentId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="userId">
+			user_id=#userId#
+	  </isNotEmpty>
+  </update>
+  <select id="getAdminInfo" resultMap="adminList">
+    <![CDATA[
+      select emall_agent_info.user_id,emall_admin.id,emall_admin.user_name from emall_agent_info ,emall_admin where emall_agent_info.agent_manager_id=emall_admin.id
+      ]]>
+  </select>
+  <update id="resetAgentManager" parameterClass="java.util.Map">
+      <![CDATA[
+      update emall_agent_trade set agent_manager_id=#sid# where emall_agent_trade.user_id=#userId#
+      ]]>
+  </update>
+  
+<!-- 根据用户名和规则ID查询 -->
+	<select id="getAgentTradeByParMap" resultMap="agentTradeDetailResult" parameterClass="java.util.Map">
+	<include refid="pageSQLHead"/>
+	<![CDATA[
+        select TID,PRICE,AMOUNT,REFUND_PRICE,
+        	   (select instance_name from ioss_goods_instance where id = emall_agent_trade.GOODS_INSTANCE_ID) as goodsName,
+        	   (PRICE*AMOUNT-REFUND_PRICE) as factMoney
+		from emall_agent_trade 
+		where STATUS='success'
+	]]>
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="returnId">
+			RETURN_ID = #returnId#
+		</isNotEmpty>
+		<include refid="pageSQLFoot"/>
+	</select>
+<!-- 根据用户名和规则ID查询记录数量 -->
+	<select id="getCountAgentTradeByParMap" resultClass="int" parameterClass="java.util.Map">
+        select count(id)
+		from emall_agent_trade 
+		where STATUS='success'
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="returnId">
+			RETURN_ID = #returnId#
+		</isNotEmpty>
+	</select>
+
+ <!-- 根据用户名和规则ID分组统计销售总金额 -->
+	<select id="getGroupAgentTrade" resultMap="agentTradeGroupResult">
+	<![CDATA[
+        select return_id,
+		       user_id,
+		       sum(t.amount * t.price - t.refund_price) as factMoney
+		  from emall_agent_trade t
+		 where STATUS = 'success'
+		   and t.return_id is not null
+		   and t.gmt_trade_finish >=
+		       (select IFNULL(r.gmt_start, t.gmt_trade_finish)
+		          from ioss_return_point r
+		         where r.id = t.return_id)
+		   and t.gmt_trade_finish <=
+		       (select IFNULL(r.gmt_end + 1, t.gmt_trade_finish)
+		          from ioss_return_point r
+		         where r.id = t.return_id)
+		 group by t.user_id, t.return_id
+	]]>
+	</select>
+</sqlMap>

@@ -1,0 +1,77 @@
+
+/**************************************************************
+
+	Image Menu
+	v 2.2
+
+**************************************************************/
+
+
+#imageMenu {
+	position: relative;
+	width: 740px;
+	height: 445px;
+	overflow: hidden;
+}
+
+
+
+#imageMenu ul {
+	list-style: none;
+	margin: 0px;
+	display: block;
+	height: 200px;
+	width: 750px;
+	
+	}
+
+#imageMenu ul li {
+	float: left;
+}
+
+#imageMenu ul li a {
+	text-indent: -1000px;
+	background:#FFFFFF none repeat scroll 0%;
+	border-right: 2px solid #fff;
+	cursor:pointer;
+	display:block;
+	overflow:hidden;
+	width:140px;
+	height: 445px;
+}
+
+#imageMenu ul li.album1 a {
+	background: url(../images/album1.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album2 a {
+	background: url(../images/album2.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album3 a {
+	background: url(../images/album3.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album4 a {
+	background: url(../images/album4.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album5 a {
+	background: url(../images/album5.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album6 a {
+	background: url(images/album6.jpg) repeat scroll 0%;
+}
+
+#imageMenu ul li.album7 a {
+	background: url(images/album7.jpg) repeat scroll 0%;
+	width: 150px;
+}
+
+.clear {
+	clear: both;
+}
+
+/*************************************************************/
+

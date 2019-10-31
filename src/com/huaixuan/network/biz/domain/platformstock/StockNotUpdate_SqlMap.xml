@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="platformstock">	
+    <typeAlias alias="stockNotUpdate" type="com.huaixuan.network.biz.domain.platformstock.StockNotUpdate"/>
+      
+	<resultMap id="stockNotUpdateResultMap" class="stockNotUpdate" >
+		<result column="id" property="id"/>
+		<result column="sku" property="sku"/>
+		<result column="platform" property="platform"/>
+		<result column="type" property="type"/>
+		<result column="create_user_name" property="createUserName"/>
+		<result column="create_user_id" property="createUserId"/>
+		<result column="create_time" property="createTime"/>
+	</resultMap>
+	 
+ 
+<select id="selectStockNotUpdateByMap" parameterClass="java.util.Map" resultMap="stockNotUpdateResultMap">
+	select * from
+	hx_stock_not_update
+	where 1=1
+	<isNotNull prepend="and" property="type">
+		type=#type#
+	</isNotNull>
+	<isNotNull prepend="and" property="sku">
+		sku=#sku#
+	</isNotNull>
+	<isNotNull prepend="and" property="platform">
+		platform=#platform#
+	</isNotNull>
+	
+	ORDER BY create_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+</select>
+
+	
+<select id="selectStockNotUpdateByMapCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+	select count(*) cnt from
+	hx_stock_not_update
+	where 1=1
+	<isNotNull prepend="and" property="type">
+		type=#type#
+	</isNotNull>
+	<isNotNull prepend="and" property="sku">
+		sku=#sku#
+	</isNotNull>
+	<isNotNull prepend="and" property="platform">
+		platform=#platform#
+	</isNotNull>
+</select>
+
+
+
+<insert id="insertStockNotUpdate" parameterClass="stockNotUpdate">
+		insert into hx_stock_not_update(
+ 			id,
+			sku,
+			platform,
+			type,
+			create_user_id,
+			create_user_name,
+			create_time
+		) values (
+ 			null,
+			#sku#,
+			#platform#,
+			#type#,
+			#createUserId#,
+			#createUserName#,
+			sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+ <!-- 删除 -->
+<delete id="deleteStockNotUpdateById" parameterClass="java.lang.Long">
+	delete from hx_stock_not_update
+	 where id = #id#
+</delete>
+
+
+
+ <!-- 滞空某个sku的平台sku  不更新库存到平台 -->
+ <!-- 必须要 field  sku 和type 这几个参数 -->
+<update id="updateStockUpdateSku2Null" parameterClass="java.util.Map">
+	 update hx_stock_update set $field$ = null where sku = #sku# and type = #type#
+</update>
+
+</sqlMap>
+
+

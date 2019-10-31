@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GoodsBillboard">
+<typeAlias alias="goodsBillboard" type="com.huaixuan.network.biz.domain.goods.GoodsBillboard"/>
+	<resultMap class="goodsBillboard" id="goodsBillboardResult">
+		<result column="id" property="id"/>
+		<result column="type" property="type"/>
+		<result column="cat" property="cat"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="point" property="point"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create GoodsBillboard object -->
+<insert id="GoodsBillboard.addGoodsBillboard" parameterClass="goodsBillboard">
+<![CDATA[
+insert into emall_goods_billboard
+  (id, type, cat, goods_id, point, gmt_create, gmt_modify)
+values
+  (null, #type#, #cat#, #goodsId#, #point#, sysdate(), sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update GoodsBillboard object -->
+<update id="GoodsBillboard.editGoodsBillboard" parameterClass="goodsBillboard">
+<![CDATA[
+		update emall_goods_billboard set type = #type#,
+		cat = #cat#,
+		goods_id = #goodsId#,
+		point = #point#,
+		gmt_modify = #gmtModify#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete GoodsBillboard object -->
+<delete id="GoodsBillboard.removeGoodsBillboard" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_goods_billboard where emall_goods_billboard.ID = #value#
+]]>
+</delete>
+<!-- search GoodsBillboard object -->
+<select id="GoodsBillboard.getGoodsBillboard" parameterClass="java.lang.Long" resultMap="goodsBillboardResult">
+<![CDATA[
+		select emall_goods_billboard.* from emall_goods_billboard where emall_goods_billboard.ID = #value#
+]]>
+</select>
+<!-- searchAll GoodsBillboard List -->
+<select id="GoodsBillboard.getGoodsBillboards" resultMap="goodsBillboardResult">
+<![CDATA[
+		select emall_goods_billboard.* from emall_goods_billboard
+]]>
+</select>
+
+<!-- 排行商品查询 -->
+<select id="GoodsBillboard.getRankGoodsBy" parameterClass="java.util.Map" resultMap="goodsBillboardResult">
+<![CDATA[
+        select e.* from  (select egb.* from emall_goods_billboard egb left outer join emall_goods gds on (egb.goods_id =gds.id) LIMIT #numAll#
+]]>
+             <isNotEmpty prepend="AND" property="type">
+             <![CDATA[
+		        egb.type = #type# and
+		        gds.goods_status='on_sale' and
+		        egb.gmt_modify <= sysdate() AND egb.gmt_modify >= sysdate()-60
+		     ]]>
+		     </isNotEmpty>
+             <isNotEmpty  prepend="AND" property="cat">
+              <![CDATA[
+                ( egb.cat like concat(#cat#,'%'))
+		      ]]>
+		     </isNotEmpty>
+<![CDATA[
+        order by egb.point desc) e
+        order by RAND() LIMIT #num#
+]]>
+</select>
+
+
+	<update id="GoodsBillboard.updateBilllboard">
+	<![CDATA[
+			update emall_goods_billboard set
+			point = #points#,
+			gmt_modify = sysdate()
+			where goods_id = #goodsId# and type = #type#
+	]]>
+	</update>
+
+	<insert id="GoodsBillboard.insertBilllboard" >
+      <![CDATA[
+insert into emall_goods_billboard
+  (id,type, cat, goods_id, point, gmt_create, gmt_modify)
+values
+  (null, #type#, #goodsCat#, #goodsId#, #points#, sysdate(), sysdate())
+	  ]]>
+	  <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+</sqlMap>

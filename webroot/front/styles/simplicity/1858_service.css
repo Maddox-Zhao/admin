@@ -1,0 +1,26 @@
+/*�ͷ�����*/
+
+.xl-wrapper{ height:auto; float:left;}
+.line{ height:1px; background:#d5d5d5; font-size:1px; overflow:hidden; clear:both;}
+.hide { display: none;}
+.leftside_service {	 border: #d5d5d5 1px solid; border-right: none;  float: left; width: 178px; margin:10px 0;}
+
+.leftside-phone2 {background: url(../../images/service/message-bg2.gif) no-repeat; border-bottom: #d5d5d5 1px; height: 160px;}
+
+.service-list {background: #e7e7e7; padding-bottom: 5px}
+.service-list dt.first {	background: url(../../images/service/message-bg2.gif) no-repeat left -157px; height:33px; line-height:31px; position:relative;}
+.service-list dt {border-TOP: #d5d5d5 1px solid; font-weight: bold; font-size: 13px; background: url(../../images/service/message-bg2.gif) no-repeat 12px -200px; cursor: pointer; color: #404040; text-indent: 31px; line-height: 32px; height: 32px}
+.service-list dt a{ font-size:13px;}
+.service-list dt a:hover{ color:#404040; text-decoration:none;}
+.service-list dd {padding-right: 0px; padding-left: 0px; background: #fff; padding-bottom: 5px; margin: auto; width: 168px; padding-TOP: 5px}
+.service-list dd ul li {display: block; font-size: 12px; background: url(../../images/service/d.gif) no-repeat 11px center; text-indent: 20px; line-height:20px;}
+.service-list dd ul li.selected{}
+.service-list dd ul li.selected a{color:#f60;}
+
+.xl-main-service{ border: #d5d5d5 1px solid;  padding:10px 19px 50px 19px; float: left; width: 735px; color: #333; text-indent: 0; margin:10px 0;  *height: auto !important;  *height:420px; min-height:420px;}
+.xl-main-service h1{ font-size:16px; line-height:30px; color:#f60; margin:20px 0 0px 0;}
+.xl-main-service h2{ font-size:12px; line-height:25px; margin:0 0 0px 0; padding:0;}
+.xl-main-service p{ margin:5px 0; line-height:20px; text-indent:0;}
+.xl-main-service .hlep-line{ height:3px; width:735px; font-size:0px; background:url(../../images/service/hlep_line.gif) no-repeat;}
+.xl-main-service .help_pic{ position: relative; top:-45px; left:605px; border:0;}
+.xl-main-service-c{ width:735px; position:relative; top:-20px;}

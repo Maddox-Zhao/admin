@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AvailableStockSQL">
+    <typeAlias alias="availableStock"
+        type="com.huaixuan.network.biz.domain.goods.AvailableStock" />
+        
+     <resultMap id="hxAvailableStock" class="com.huaixuan.network.biz.domain.goods.AvailableStock">
+	  <result column="id" property="id" />
+	  <result column="goods_id" property="goodsId" />
+	  <result column="goods_instance_id" property="goodsInstanceId" />
+	  <result column="site_id" property="siteId" />
+	  <result column="goods_number" property="goodsNumber" />
+	  <result column="goods_virtual_number" property="goodsVirtualNumber" />
+	  <result column="goods_sale_number" property="goodsSaleNumber" />
+	  <result column="gmt_create" property="gmtCreate" />
+	  <result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+
+<insert id="addAvailableStock" parameterClass="availableStock">
+<![CDATA[
+        insert into emall_available_stock
+  (id,
+   goods_id,
+   goods_instance_id,
+   dep_first_id,
+   goods_number,
+   gmt_create
+   )
+values
+  (null,
+   #goodsId#,
+   #goodsInstanceId#,
+   #depFirstId#,
+   #goodsNumber#,
+   sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<insert id="addClientAvailableStock" parameterClass="availableStock">
+<![CDATA[
+        insert into hx_available_stock
+  (id,
+   goods_id,
+   goods_instance_id,
+   site_id,
+   goods_number,
+   goods_virtual_number,
+   goods_sale_number,
+   gmt_create,
+   gmt_modify
+   )
+values
+  (null,
+   #goodsId#,
+   #goodsInstanceId#,
+   #siteId#,
+   #goodsNumber#,
+   #goodsVirtualNumber#,
+   #goodsSaleNumber#,
+   sysdate(),
+   sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+    <update id="editAvailableStock" parameterClass="availableStock">
+        <![CDATA[
+        update emall_available_stock
+        set goods_id = #goodsId#,
+        goods_instance_id = #goodsInstanceId#,
+        dep_first_id = #depFirstId#,
+        goods_number = #goodsNumber#,
+        gmt_modify = sysdate()
+        where id=#id#
+        ]]>
+    </update>
+   <select id="getAvailableStockById" parameterClass="java.util.Map" resultClass="availableStock">
+    select id,goods_id  goodsId,goods_instance_id  goodsInstanceId,dep_first_id  depFirstId,
+           goods_number goodsNumber,gmt_create gmtCreate,gmt_modify gmtModify
+    from emall_available_stock
+           where id=#id#
+  </select>
+
+	
+	<select id="gethxAvailableStockByPramas" parameterClass="java.util.Map" resultMap="hxAvailableStock">
+        select a.*
+        from hx_available_stock a
+          where a.site_id = #siteId# and a.goods_instance_id = #goodsInstanceId# LIMIT 1
+ 	</select>
+ 	
+ 	<update id="updateAvaiStoEsNumByPramas" parameterClass="java.util.Map">
+        <![CDATA[
+        update hx_available_stock
+             set
+          ]]>
+             <isNotEmpty property="goodsNumber" >
+              goods_number = IFNULL(goods_number, 0) + #goodsNumber# , 
+        	</isNotEmpty>
+        	<isNotEmpty property="goodsSaleNumber" >
+              goods_sale_number = IFNULL(goods_sale_number, 0) + #goodsSaleNumber# , 
+        	</isNotEmpty>
+        <![CDATA[
+             gmt_modify = sysdate()
+				where goods_instance_id = #goodsInstanceId# and site_id = #siteId#
+        ]]>
+    </update>
+    
+    <update id="updateAvaiStoEsNumZero" parameterClass="java.util.Map">
+        <![CDATA[
+        update hx_available_stock
+             set
+             goods_number = 0 , 
+             gmt_modify = sysdate()
+        ]]>
+    </update>
+    
+
+    <sql id="Available_Stock.COMMON_CONDITION">
+        <isNotEmpty property="id" prepend="and">
+              id = #id#
+        </isNotEmpty>
+        <isNotEmpty property="goodsInstanceId" prepend="and">
+              goods_instance_id = #goodsInstanceId#
+        </isNotEmpty>
+        <isNotEmpty property="depFirstId" prepend="and">
+              dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty property="goodsId" prepend="and">
+              goods_id = #goodsId#
+        </isNotEmpty>
+    </sql>
+
+   <select id="getAvailableStockByInstance" parameterClass="java.util.Map" resultClass="availableStock">
+        select a.id,a.goods_id  goodsId,a.goods_instance_id  goodsInstanceId,a.dep_first_id  depFirstId,
+           a.goods_number goodsNumber,a.gmt_create gmtCreate,a.gmt_modify gmtModify,d.dep_first_name depFirstName
+        from emall_available_stock a,ioss_depository_first d
+          where a.dep_first_id=d.id
+        <include refid="Available_Stock.COMMON_CONDITION" />
+  </select>
+  
+  <select id="gethxAvailableStockByInstance" parameterClass="java.util.Map" resultClass="availableStock">
+        select a.id,a.goods_id  goodsId,a.goods_instance_id  goodsInstanceId,d.idSite  siteId,
+           a.goods_number goodsNumber,a.gmt_create gmtCreate,a.gmt_modify gmtModify,d.name siteName
+        from hx_available_stock a,Site d
+          where a.site_id=d.idSite
+        <isNotEmpty property="goodsInstanceId" prepend="and">
+              a.goods_instance_id = #goodsInstanceId#
+       	</isNotEmpty>
+  </select>
+
+
+     <select id="getAvailableStockGroupByGoodsId" parameterClass="java.util.Map" resultClass="availableStock">
+         select a.goods_id goodsId,coalesce(sum(a.goods_number),0)  goodsNumber ,d.dep_first_name depFirstName, d.id depFirstId, d.region_code regionCode
+            from emall_available_stock a,ioss_depository_first d
+            where a.dep_first_id=d.id
+            <include refid="Available_Stock.COMMON_CONDITION" />
+            group by a.goods_id,d.dep_first_name,d.region_code,d.id
+     </select>
+     
+     <select id="gethxAvailableStockGroupByGoodsId" parameterClass="java.util.Map" resultClass="availableStock">
+         select a.goods_id goodsId,coalesce(sum(a.goods_number),0)  goodsNumber ,d.name siteName, d.idSite siteId
+            from hx_available_stock a,Site d
+            where a.site_id=d.idSite
+            <isNotEmpty property="goodsId" prepend="and">
+              a.goods_id = #goodsId#
+        	</isNotEmpty>
+            group by a.goods_id,a.site_id
+     </select>
+
+    <update id="editAvailableStockGoodsNumber" parameterClass="java.util.Map">
+        <![CDATA[
+        update emall_available_stock
+             set
+             gmt_modify = sysdate(),
+             goods_number = IFNULL(goods_number, 0) + #goodsNumber#
+         where goods_instance_id = #goodsInstanceId# and dep_first_id = #depFirstId#
+        ]]>
+    </update>
+
+	<select id="getSumGoodsNumberByGoodsId" parameterClass="java.lang.Long" resultClass="long">
+         select coalesce(sum(a.goods_number),0)
+            from emall_available_stock a
+            where a.goods_id = #value#
+            group by a.goods_id
+     </select>
+
+
+</sqlMap>

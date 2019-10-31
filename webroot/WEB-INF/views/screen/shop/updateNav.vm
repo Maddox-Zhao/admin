@@ -1,0 +1,226 @@
+#set($layout = "layout/default.vm")
+
+<script language="javascript" type="text/javascript">
+
+
+function isNull( str ){
+    if ( str == "" ) return true;
+    var regu = "^[ ]+$";
+    var re = new RegExp(regu);
+    return re.test(str);
+}
+
+
+
+function addnotice(){
+
+//	var title = document.getElementById("noticetitle");
+//	var content = document.getElementById("noticecontent");
+
+//	if(isNull(title.value) || isNull(content.value)){
+//	 	alert("请输入公告的标题和内容！");
+//	 	return false;
+//	}
+
+//	var numTitle = title.value.length;
+//	var numContent = content.value.length;
+
+
+//	if(numTitle>250 || numContent>2500){
+//		alert("公告的标题必须在250字以内，内容必须圄1�700字以内！");
+//		return false;
+//	}
+
+	document.theForm.submit();
+}
+
+function grest(){
+	var obj = document.getElementById("noticecontentstr");
+	var oFCKeditor = FCKeditorAPI.GetInstance('noticecontent') ;
+	oFCKeditor.SetHTML(obj.value) ;
+}
+
+var objcatList = new Array();
+var j=0;
+#foreach($category in $categorysList)
+objcatList[j] = new Array("$!{category.catCode}","#direct($!{category.catName})");
+ j++;
+#end
+
+
+
+var last;
+function add_main(key)
+{
+
+for(var m=0; m<j; m++){
+	if( objcatList[m][0] == key){
+		document.getElementById('title').value = objcatList[m][1];
+		document.getElementById('link').value = '/l/search.html?catCode='+objcatList[m][0];
+	}
+	last = key;
+}
+
+}
+
+function key()
+{
+    last = document.getElementById('categ').value = 's';
+}
+
+</script>
+
+#set($title = "导航管理 - 修改导航")
+		<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>修改导航</span></h3>
+	<div class="content">
+		<form  name="theForm"  action="/shop/updatenav.html" method="post" enctype="multipart/form-data">
+			#springBind("nav.id")
+			<input type="hidden" name="${status.expression}" value="$!{nav.id}" />
+			<table class="c2" id="general-table" width="100%">
+			<tbody>
+				<div class="form">
+				<ol>
+          <li>
+			<label>系统类目：</label>
+			<span class="con">
+					<ul>
+              <li>
+					    <select name="categ" onchange="add_main(this.value);"  id="categ">
+                			<option value="s">-=请选择=-</option>
+                			#foreach($category in $categorysList)
+    							<option value="$!{category.catCode}">
+    									#direct($!{category.cache})
+    									#if($!category.catName.length()>20)
+                                        <div title="$!category.catName">$!category.catName.substring(0,20)...</div>
+                        				#else
+                        					$!category.catName
+                        				#end
+    							</option>
+                			#end
+                		</select>
+				</li>
+            </ul>
+            </span>
+          </li>
+          <li>
+			<label>导航名称：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.title")
+					<input  type="text" size="30"  id="title" name="${status.expression}"  value="$!{nav.title}" onKeydown="javascript:key();" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		   <li>
+			<label>链接地址：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.link")
+					<input  type="text" size="35"  id="link" name="${status.expression}" value="$!{nav.link}"  onKeydown="javascript:key();" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>是否显示：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.isShowstr")
+				<select name="${status.expression}" value="$!{nav.isShowstr}">
+				    <option value="1" #if($!{nav.isShowstr}=='1') selected #end>是</option>
+				    <option value="-1" #if($!{nav.isShowstr}=='-1') selected #end>否</option>
+			      </select>				</li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>是否新窗口：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.isOpenstr")
+				<select name="${status.expression}" value="$!{nav.isOpenstr}">
+				    <option value="1" #if($!{nav.isOpenstr}=='1') selected #end>是</option>
+				    <option value="2" #if($!{nav.isOpenstr}=='2') selected #end>否</option>
+			      </select></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>是否新窗口：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.type")
+					<select name="${status.expression}" value="$!{nav.type}">
+				    <option value="top" #if($!{nav.type}=='top') selected #end>顶部</option>
+				    <option value="middle" #if($!{nav.type}=='middle') selected #end>中间</option>
+					<option value="bottom" #if($!{nav.type}=='bottom') selected #end>底部</option>
+			      </select></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  	<li>
+			<label>次序：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("nav.sortstr")
+					<input name="${status.expression}" id="sortstr" size="3" type="text" value="$!{nav.sortstr}" onchange="checkValue('$!{nav.sortstr}');" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  </table></form></div>
+  <div class="form-but">
+<input class="btn" value="确定" type="submit" onClick="javascript:updatenav();" > <input class="btn" value="重置" type="reset" onClick="javascript:resetnav();"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>
+<script language="javascript" type="text/javascript">
+	function updatenav(){
+	document.theForm.submit();
+	}
+		function checkValue(oldValue){
+	       var f=document.getElementById("sortstr");
+		   var c=document.getElementById("sortstr")
+			var content=jQuery.trim(document.getElementById("sortstr").value);
+		if(content!=null && content!=""){
+			if(isNaN(content)||content<0){
+			alert("出错：请输入数字.");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+		}else if(content==null||content==""){
+			alert("次序不能为空");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+
+	}
+
+	function resetnav(){
+	document.theForm.reset();
+	}
+</script>

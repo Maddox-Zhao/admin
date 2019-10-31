@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShoppingDetailGb">
+
+<typeAlias alias="shoppingDetailGb" type="com.huaixuan.network.biz.domain.stock.ShoppingDetailGb"/>
+
+<resultMap id="shoppingDetailGbResult" class="shoppingDetailGb">
+	<result column="id" property="id"/>
+	<result column="relation_id" property="relationId"/>
+	<result column="shopping_id" property="shoppingId"/>
+	<result column="goods_id" property="goodsId"/>
+	<result column="goods_instance_id" property="goodsInstanceId"/>
+	<result column="units" property="units"/>
+	<result column="amount" property="amount"/>
+	<result column="unit_price" property="unitPrice"/>
+	<result column="due_fee" property="dueFee"/>
+	<result column="fact_fee" property="factFee"/>
+	<result column="reject_num" property="rejectNum"/>
+	<result column="missing_num" property="missingNum"/>
+	<result column="receive_num" property="receiveNum"/>
+	<result column="gmt_create" property="gmtCreate"/>
+	<result column="gmt_modify" property="gmtModify"/>
+	<result column="bill_id" property="billId"/>
+</resultMap>
+
+<insert id="addShoppingDetailGb" parameterClass="shoppingDetailGb">
+<![CDATA[
+		insert into ioss_shopping_detail_gb
+		(id,relation_id,shopping_id,goods_id,goods_instance_id,units,amount,unit_price,due_fee,fact_fee,reject_num,missing_num,receive_num,gmt_create,gmt_modify,bill_id )values( null,
+		#relationId#,
+		#shoppingId#,
+		#goodsId#,
+		#goodsInstanceId#,
+		#units#,
+		#amount#,
+		#unitPrice#,
+		#dueFee#,
+		#factFee#,
+		#rejectNum#,
+		#missingNum#,
+		#receiveNum#,
+		sysdate(),
+		sysdate(),
+		#billId#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+</sqlMap>

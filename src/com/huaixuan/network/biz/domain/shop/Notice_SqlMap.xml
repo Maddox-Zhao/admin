@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Notice">
+	<cacheModel id="notice-cache" type="LRU">
+		<flushInterval hours="2"/>
+	   <flushOnExecute statement="addNotice"/>
+	   <flushOnExecute statement="editNotice"/>
+	   <flushOnExecute statement="removeNotice"/>
+	   <flushOnExecute statement="deleteNotices"/>
+	   <flushOnExecute statement="isshowNotice"/>
+	   <flushOnExecute statement="updateNotice"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+<typeAlias alias="notice" type="com.huaixuan.network.biz.domain.shop.Notice"/>
+	<resultMap class="notice" id="noticeResult">
+		<result column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="content" property="content"/>
+		<result column="notice_date" property="noticeDate"/>
+		<result column="status" property="status"/>
+		<result column="author" property="author"/>
+		<result column="is_show" property="isShow"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="notice_type" property="noticeType"/>
+	</resultMap>
+<!-- create Notice object -->
+<insert id="addNotice" parameterClass="notice">
+<![CDATA[
+insert into emall_notice
+  (id,
+   title,
+   content,
+   notice_date,
+   status,
+   author,
+   is_show,
+   gmt_create,
+   gmt_modify,
+   shop_id,
+   notice_type)
+values
+  (null,
+   #title#,
+   #content#,
+   sysdate(),
+   #status#,
+   #author#,
+   #isShow#,
+   sysdate(),
+   sysdate(),
+   #shopId#,
+   #noticeType#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Notice object -->
+<update id="editNotice" parameterClass="notice">
+<![CDATA[
+		update emall_notice set title = #title#,
+		content = #content#,
+		notice_date = #noticeDate#,
+		status = #status#,
+		author = #author#,
+		is_show = #isShow#,
+		gmt_modify =sysdate()
+		 where id = #id#
+]]>
+</update>
+<!-- delete Notice object -->
+
+<update id="removeNotice" parameterClass="java.lang.Long">
+<![CDATA[
+		update emall_notice set
+		status = 'delete',
+		is_show = 0,
+		gmt_modify =sysdate()
+		 where id = #noticeId#
+]]>
+</update>
+
+
+<!-- search Notice object -->
+<select id="getNotice" parameterClass="java.lang.Long" resultMap="noticeResult">
+<![CDATA[
+		select emall_notice.* from emall_notice where emall_notice.ID = #value#
+]]>
+</select>
+<!-- searchAll Notice List -->
+<select id="getNotices" resultMap="noticeResult">
+<![CDATA[
+		select emall_notice.* from emall_notice
+		where emall_notice.status <> 'delete'
+		order by emall_notice.gmt_modify desc
+]]>
+</select>
+
+<!-- delete notice list -->
+<update id="deleteNotices" parameterClass="java.util.Map">
+
+		update emall_notice set
+		status = 'delete',
+		is_show = 0,
+		gmt_modify =sysdate()
+		 where id in (
+		  		<iterate property="ids" conjunction=",">
+	                #ids[]#
+	            </iterate>
+		  )
+
+</update>
+
+<!-- is_show notice -->
+<update id="isshowNotice" parameterClass="notice">
+<![CDATA[
+		update emall_notice set
+		is_show = #isShow#,
+		gmt_modify =sysdate()
+		 where id = #id#
+]]>
+</update>
+
+<!-- update notice -->
+<update id="updateNotice" parameterClass="notice">
+<![CDATA[
+		update emall_notice set
+		title = #title#,
+		content = #content#,
+		notice_type = #noticeType#,
+		gmt_modify =sysdate()
+		 where id = #id#
+]]>
+</update>
+
+<select id="getNoticesCount" resultClass="java.lang.Integer" parameterClass="java.lang.Long">
+<![CDATA[
+		select count(*) from emall_notice
+		where emall_notice.status <> 'delete'
+		order by emall_notice.gmt_create desc,emall_notice.id
+]]>
+</select>
+
+<select id="getNoticesPage" parameterClass="java.util.Map"
+		resultMap="noticeResult">
+		<include refid="pageSQLHead" />
+<![CDATA[
+	select * from emall_notice a
+	where a.status <> 'delete'
+	order by  a.GMT_CREATE desc,a.id
+]]>
+<include refid="pageSQLFoot" />
+</select>
+<select id="getNoticesInfo" resultMap="noticeResult">
+<![CDATA[
+		select *
+		  from (select emall_notice.*
+		          from emall_notice
+		         where emall_notice.status <> 'delete'
+		           and emall_notice.is_show = 1
+		         order by emall_notice.gmt_create desc)
+		 where LIMIT 6
+]]>
+</select>
+
+<select id="getNoticesInfoByType" resultMap="noticeResult">
+<![CDATA[
+		select *
+		  from (select emall_notice.*
+		          from emall_notice
+		         where emall_notice.notice_type = #type#
+		           and emall_notice.status <> 'delete'
+		           and emall_notice.is_show = 1
+		         order by emall_notice.gmt_create desc)
+		 where LIMIT 7
+]]>
+</select>
+
+<select id="getNoticeNewsCount" resultClass="int">
+		select count(1)
+		          from emall_notice
+		         where emall_notice.notice_type = #type#
+		           and emall_notice.status &lt;&gt; 'delete'
+		           and emall_notice.is_show = 1
+</select>
+
+<select id="getNoticeNewsAndIndustryCount" resultClass="int">
+		select count(1)
+		          from emall_notice
+		         where emall_notice.notice_type in('news','industry')
+		           and emall_notice.status &lt;&gt; 'delete'
+		           and emall_notice.is_show = 1
+</select>
+
+<select id="getNoticeNewsAndIndustryList" resultMap="noticeResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_notice.*
+		          from emall_notice
+		         where emall_notice.notice_type in('news','industry')
+		           and emall_notice.status <> 'delete'
+		           and emall_notice.is_show = 1
+		         order by emall_notice.gmt_create desc
+]]>
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getNoticeNewsList" resultMap="noticeResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_notice.*
+		          from emall_notice
+		         where emall_notice.notice_type = #type#
+		           and emall_notice.status <> 'delete'
+		           and emall_notice.is_show = 1
+		         order by emall_notice.gmt_create desc
+]]>
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getNoticeListByCondition" parameterClass="java.util.Map" resultMap="noticeResult">
+  <include refid="pageSQLHead"/>
+  <![CDATA[
+        select emall_notice.* from emall_notice where emall_notice.status <> 'delete' and emall_notice.is_show = 1
+  ]]>
+  <isNotEmpty prepend="and" property="noticeType">
+        emall_notice.notice_type = #noticeType#
+  </isNotEmpty>
+        order by emall_notice.gmt_create desc
+  <include refid="pageSQLFoot"/>
+</select>
+
+<select id="getNoticeListByConditionCount" resultClass="int" parameterClass="java.util.Map">
+  <![CDATA[
+      select count(1) from(
+        select emall_notice.* from emall_notice where emall_notice.status <> 'delete' and emall_notice.is_show = 1
+  ]]>
+  <isNotEmpty prepend="and" property="noticeType">
+        emall_notice.notice_type = #noticeType#
+  </isNotEmpty>
+      ) a
+</select>
+</sqlMap>

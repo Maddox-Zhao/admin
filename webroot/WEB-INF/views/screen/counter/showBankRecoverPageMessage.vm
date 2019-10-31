@@ -1,0 +1,62 @@
+#set($layout = 'layout\default.vm')
+#set($title = "银行意外数据恢复")
+<div class="main">
+
+<h2>银行意外数据恢复</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>银行意外数据恢复</span></h3>
+        <form name="inputFileForm" action="showBankRecoverPage.html"  method="post">
+				<table>
+      <tr>
+                    		<td width="70" lass="sb-label">扣款时间：</td>
+                    		<td width="364" >
+                    		<input type="text" name="createDate" id="createDate" maxlength="8"  />(如果为空默认搜前一天的数据)
+                   		  </td>
+                    		<script type="text/javascript">
+                                Calendar.setup({
+                                    inputField : "createDate",
+                                    ifFormat   : "%Y-%m-%d",
+                                    align      : "Tl"
+                                });
+                            </script>
+							<td width="44">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    		<td width="80" lass="sb-label">银行类型：</td>
+                    		<td width="600">
+                    			<select name="bankType">
+                    				 <option value=""  selected="selected" >请选择</option>
+				                     <option value="ICBC" >中国工商银行</option>
+				                     <option value="CCB" >中国建设银行</option>
+				                     <option value="CMB" >招商银行</option>
+				                     <option value="ABC" >中国农业银行</option>
+				                     <option value="CIB" >兴业银行</option>
+				                     <option value="SPDB"> 上海浦东发展银行</option>
+				                     <option value="GDB" >广东发展银行</option>
+				                     <option value="SDB" >深圳发展银行</option>
+				                     <option value="CITIC" >中信银行</option>
+				                     <option value="ALIPAY" >支付宝</option>
+				                     <option value="POST" >中国邮政</option>
+				                     <option value="TENPAY">财付通</option>
+									 <option value="CHINABANK">网银在线</option>
+                    			</select>
+                    			 #set($titleMessage8=$fieldErrors.get("inputFileSearchBean.bankType"))
+					              #if($titleMessage8.size()!=0)
+					                  <br/> <font color="red"><B>$!{titleMessage8.get(0)}</B></font>
+                                  #end
+                   		  </td>
+                    		<td width="39"><input type="button" class="button" value="查找" onClick="javascript:this.form.submit();" /></td>
+							<td width="30"></td>
+                    	</tr>
+
+
+
+                    </table>
+
+
+
+
+		</form>
+
+                   </div>
+
+

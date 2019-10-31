@@ -1,0 +1,18 @@
+#set($layout = '')
+<html>
+<head>
+	<title>司库库存匹配</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" action="uploadSiKuStock.html"  enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			司库excel :<input type="file" name="siku" /><br/>
+			本地excel :<input type="file" name="location" /><br/>
+			<input type="submit" value="上传"/>
+		</form>
+</body>
+
+</html>

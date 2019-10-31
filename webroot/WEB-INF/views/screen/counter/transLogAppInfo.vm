@@ -1,0 +1,131 @@
+#set($layout = 'layout\default.vm')
+#set($title = "财务管理 - 帐务冲正信息")
+<script type="text/javascript">
+    function formSubmit(status){
+			document.getElementById("status").value = status;
+			var message = "确认冲销？";
+			if(status == "fail"){
+				message = "确认退回？";
+			}
+            if(confirm(message)){
+                document.transLogAppForm.submit();
+    		}
+    }
+</script>
+<form name="transLogAppForm" action="doAccountTransAjust.html" method="post">
+	<h3><span>帐务冲正信息</span></h3>
+	<div class="searchBox">
+#if($!transLogList.size()>0)
+	<h3><span>原事务流水账务信息 </span></h3>
+			<span style="color:red;">#if($!{message}=="success"||$!{message}=="fail")操作成功#end</span>
+			#set($transAjustLog=$!transLogList.get(0))
+			<div class="tab-div">
+			<table cellpadding="3" cellspacing="1" width="100%" align="center">
+				<tr>
+		            <td width="20%">状态</td>
+		            <td width="80%">$!transLogApp.statusName</td>
+		        </tr>
+				<tr>
+		            <td width="20%">流水号</td>
+		            <td width="80%">$!transAjustLog.id</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">交易代码</td>
+		            <td width="80%">$!transAjustLog.transCode</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">交易日期/记账日期</td>
+		            <td width="80%">$!date.format("yyyy-MM-dd HH:mm:ss",${transAjustLog.transDt})</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">发生金额</td>
+		            #set($divAmountYuan=$!{moneyUtil.div("$!{transAjustLog.transAmount}","100")})
+		            <td width="80%">￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">转出帐户</td>
+		            <td width="80%">$!transAjustLog.transAccountOut</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">转入帐户</td>
+		            <td width="80%">$!transAjustLog.transAccountIn</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">银行名称</td>
+		            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transAjustLog.bankType")</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">发生机构</td>
+		            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transAjustLog.transInstitution")</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">备注</td>
+		            <td width="80%"></td>
+		        </tr>
+			</table>
+
+			<h3><span>冲销事务流水账务信息 </span></h3>
+			#set($transAjustLog="")
+			#set($transAjustLog=$!transLogList.get(1))
+			<div class="tab-div">
+			<table cellpadding="3" cellspacing="1" width="100%" align="center">
+				<tr>
+		            <td width="20%">流水号</td>
+		            <td width="80%">$!transAjustLog.id</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">交易代码</td>
+		            <td width="80%">$!transAjustLog.transCode</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">交易日期/记账日期</td>
+		            <td width="80%">$!date.format("yyyy-MM-dd HH:mm:ss",${transAjustLog.transDt})</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">发生金额</td>
+		            #set($divAmountYuan=$!{moneyUtil.div("$!{transAjustLog.transAmount}","100")})
+		            <td width="80%">
+						#if($!transAjustLog.id)
+							￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')
+						#else
+							￥-$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')
+						#end
+					</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">转出帐户</td>
+		            <td width="80%">$!transAjustLog.transAccountOut</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">转入帐户</td>
+		            <td width="80%">$!transAjustLog.transAccountIn</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">银行名称</td>
+		            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transAjustLog.bankType")</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">发生机构</td>
+		            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transAjustLog.transInstitution")</td>
+		        </tr>
+		        <tr>
+		            <td width="20%">备注</td>
+		            <td width="80%">$!transLogApp.transMemo</td>
+		        </tr>
+			</table>
+		    <br>
+		    <input type="hidden" name="id" value="$!transLogApp.transLogId"/>
+		    <input type="hidden" name="transMemo" value="$!transLogApp.transMemo"/>
+			<input type="hidden" id="status" name="status" value="$!transLogApp.status"/>
+			<input type="hidden" name="transLogAppId" value="$!transLogApp.id"/>
+			#if($!transLogApp.status.equals("new"))
+			<input type="button" value="确定冲销" class="btn" onclick="formSubmit('success');" />
+			<input type="button" value="回退冲销" class="btn" onclick="formSubmit('fail');" />
+			#end
+ #else
+   没有结果！
+ #end
+    </div>
+   </div>
+  </div>
+</form>

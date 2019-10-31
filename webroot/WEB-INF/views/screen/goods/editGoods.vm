@@ -1,0 +1,1791 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${imageServer}/scripts/ckeditor/ckeditor.js" type="text/javascript"></script>
+<div class="main">
+	<h2>商品编辑→商品属性</h2>
+  <div class="container_list">商品类目：$!{categoryName}
+  </div>
+  #if($!taobaoMessage && $!taobaoMessage == "classnull")
+	<div class="mag-t1">
+     <label class="red">关联淘宝商品类目必须选择类目</label>
+    </div>
+  #end
+  #if($!message && $!message == "classnull")
+	<div class="mag-t1">
+     <label class="red">关联拍拍商品类目必须选择类目</label>
+    </div>
+  #end
+
+  <div class="formBox">
+	<h3><i></i><span>填写商品信息</span></h3>
+	<form  method="post" action="/goods/doeg.html" name="listForm" enctype="multipart/form-data">
+	  #springBind("goods.taobaoClassId")
+      <input type="hidden" id="taobaoClassId" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.taobaoAttr")
+      <input type="hidden" id="propHid" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.taobaoSkuProp")
+      <input type="hidden" id="skuPropHid" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.taobaoSkuPropName")
+      <input type="hidden" id="skuPropHidCzx" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.taobaoInputStr")
+      <input type="hidden" id="inputStrHid" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.taobaoInputPids")
+      <input type="hidden" id="inputPidsHid" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.paipaiAttr")
+      <input type="hidden" id="attrStr" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.paipaiClassId")
+      <input type="hidden" id="classId" name="${status.expression}" value="$!{status.value}"/>
+      <input type="hidden" id="flag" name="flag" value="1"/>
+	  #springBind("goods.checkflagTaobao")
+	  <input type="hidden" id="checkflagTaobao" name="${status.expression}" value="0"/>
+	  #springBind("goods.checkflag")
+	  <input type="hidden" id="checkflag" name="${status.expression}" value="0"/>
+	  #springBind("goods.id")
+	  <input type="hidden" id="${status.expression}" name="${status.expression}" value="$!{status.value}"/>
+	  #springBind("goods.catCode")
+	  <input type="hidden" id="${status.expression}" name="${status.expression}" value="$!{status.value}"/>
+
+		<div class="content">
+			<h5><span>商品基本信息</span></h5>
+			<div class="form">
+				<ol>
+
+          <li>
+            <label>品牌：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.brandId")
+                  <select name="${status.expression}" id="goods.brandId">
+					#foreach($brand in $brandList)
+						<option value="$brand.id" #if("$!{status.value}"=="$brand.id") selected #end>$brand.brandName</option>
+					#end
+				  </select>
+              </li>
+            </ul>
+            </span>
+          </li>
+		 #if($!attributeList&&$!attributeList.size() > 0)
+          <li>
+            <label>商品属性：</label>
+            <span class="con">
+            <div class="skin">
+			  #springBind("goods.attrValue")
+              <table class="c5" id="attrs">
+                #foreach($attribute in $!attributeList)
+                <tr>
+                  <th> $!{attribute.attrName}： </th>
+                  <td> #direct($!attribute.getEditHtml(0,$goods.attrValue))
+						#if("$!attribute.isNeed"=="1")<em>*</em>#end
+                  </td>
+                </tr>
+				#end
+              </table>
+            </div>
+            </span>
+			<label class="red">${status.errorMessage}</label>
+		  </li>
+		 #end
+
+          <li>
+            <label>商品名称：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.title")
+                <input type="text" name="${status.expression}" value ="$!{status.value}" class="inp inp-w300" />
+              </li>
+              <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>商品编码：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.goodsSn")
+                <input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" />
+              </li>
+			  <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+              <li>
+                <div class="mag-t4"><span>商品编码不能重复</span></div>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>商品重量：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.goodsWeight")
+                <input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" id="goodsWeight"/>
+                KG</li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>建议零售价：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.goodsPrice")
+                <input type="text" name="${status.expression}" id="goodsprice" value ="$!{status.value}" class="inp" />
+                                     元 </li>
+              <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>市场价：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.marketPrice")
+                <input type="text" name="${status.expression}" id="marketPrice" value ="$!{status.value}" class="inp" />
+                                     元 </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>促销价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.salesProPrice")
+                <input type="text" name="${status.expression}" id="salesProPrice" value ="$!{status.value}" class="inp" />
+                                     元 </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>是否代销：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.isAgent")
+				<select name="${status.expression}" onchange="discount(this.value)">
+					<option value="n" #if("$!{status.value}"=="n") selected #end)>否</option>
+					<option value="y" #if("$!{status.value}"=="y") selected #end)>是</option>
+				</select>
+              </li>
+            </ul>
+            </span>
+          </li>
+
+          <li>
+            <label>代销价：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.agentPrice")
+                <input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" id="agentPrice"/>
+                                     元 </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+		   <li>
+            <label>是否淘宝关联：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.isTaobao")
+				<select name="${status.expression}" onchange="changeTaobao(this.value)" id="goods.isTaobao">
+					<option value="n" #if("$!{status.value}"=="n") selected #end)>否</option>
+					<option value="y" #if("$!{status.value}"=="y") selected #end)>是</option>
+				</select>
+              </li>
+              <li>
+                <div class="mag-t4" id="productRalateTips" #if($goods.isTaobao == "y") #else style="display:none" #end><span>商品的销售属性多值组合时，请到产品编辑处关联淘宝产品</span></div>
+              </li>
+            </ul>
+            </span>
+          </li>
+
+		  #if($goods.isTaobao=="y")
+		  <li id="taobaodefault">
+			<label style="width:100px;">淘宝商品类目属性</label>
+			<span class="con">
+			 <ul>
+               <li>
+				 <a href="#" onclick="editTaobao();" >修改淘宝商品类目属性</a>
+               </li>
+             </ul>
+            </span>
+		  </li>
+		  #end
+
+		 <li>
+		 <tbody>
+            <span class="con">
+            <div class="clear"></div>
+            <div class="skin" id="taobaoRelation" style="display:none">
+              <table class="c5">
+                <tr>
+                  <td>淘宝商品类目<em>*</em></td>
+                  <td>
+				     <span id="taobaoClzPanel0"></span>
+					 <div id="ajaxPic" style="display:none;float:left;margin:2px 0px 0px 10px">属性装载中...</div>
+				  </td>
+                </tr>
+				<tr id= "trid">
+					<td>淘宝关键属性</td>
+					<td>
+						<div id="enum-one-props"></div>
+			        </td>
+		        </tr>
+				<tr>
+					<td>淘宝销售属性</td>
+					<td>
+						<div id="enum-sale-props"></div>
+					</td>
+				</tr>
+				<tr>
+					<td>淘宝非关键属性</td>
+					<td>
+						<div id="enum-multi-props"></div>
+					</td>
+		  </tr>
+              </table>
+            </div>
+            </span>
+		  </tbody>
+         </li>
+
+		   <li>
+            <label>是否拍拍关联：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.isPaipai")
+				<select name="${status.expression}" onchange="changePaipai(this.value)" id="goods.isPaipai">
+					<option value="n" #if("$!{status.value}"=="n") selected #end)>否</option>
+					<option value="y" #if("$!{status.value}"=="y") selected #end)>是</option>
+				</select>
+              </li>
+            </ul>
+            </span>
+          </li>
+
+		  #if($goods.isPaipai=="y")
+		  <li id="paipaidefault">
+			<label style="width:100px;">拍拍商品类目属性</label>
+			<span class="con">
+			 <ul>
+              <li>
+				<a href="#" onclick="editPaipai();" >修改拍拍商品类目属性</a>
+			  </li>
+             </ul>
+            </span>
+		  </li>
+		  #end
+
+		 <li>
+		 <tbody>
+            <span class="con">
+            <div class="clear"></div>
+            <div class="skin" name="paipaiRelation" id="paipaiRelation" style="display:none">
+              <table class="c5">
+                <tr>
+                  <td>拍拍商品类目 <em>*</em></td>
+                  <td>
+                      <span id="clzPanel0"></span>
+				  </td>
+                </tr>
+				<tr>
+					<td>拍拍关键属性</td>
+					<td>
+					    <ul class="list_api" id="keyAttrPanel"></ul>
+			        </td>
+		        </tr>
+				<tr>
+					<td>拍拍销售属性</td>
+					<td>
+						<ul class="list_api" id="saleAttrPanel"></ul>
+					</td>
+				</tr>
+				<tr>
+					<td>拍拍非关键属性</td>
+					<td>
+						<ul class="list_api" id="normalAttrPanel"></ul>
+					</td>
+		         </tr>
+              </table>
+            </div>
+            </span>
+		  </tbody>
+         </li>
+
+		   <li>
+            <label>单位：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.goodsUnit")
+				<select name="${status.expression}">
+					<option value="">请选择</option>
+					#foreach($u in $units)
+					    <option value="$u.name" #if("$!{status.value}" == "$u.name") selected #end>$u.name</option>
+				    #end
+				</select>
+              </li>
+			  <li><em>*</em></li>
+              <li>
+				<label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+          </li>
+
+          <li>
+            <label>商品货号：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("goods.goodsItem")
+                <input type="text" name="${status.expression}" value ="$!{status.value}" class="inp inp-w300" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>商品图片：</label>
+            <span class="con">
+            <div class="skin">
+                <table id='table1'>
+				#set($pnum = 1)
+				#set($pnum2 = 0)
+				#foreach($goodsGallery in $!goodsGalleryList)
+					#set($pnum2 = $pnum2+1)
+				#end
+				#foreach($goodsGallery  in $goodsGalleryList)
+                   <tr id="row_$goodsGallery.id"><td>
+					#if($pnum==1 && $pnum2==1)
+            		<div id="gallery_$goodsGallery.id"> <img src="${upServer}/$goodsGallery.imgSmall"><input type="button" name="delImage_$goodsGallery.id" size="35"  value="删除" onclick="removeGoodsGallery($goodsGallery.id);"/><input type="button" name="up_btn" size="35"  value="上升" onclick="changeGoodsGallerySort($goodsGallery.id,-1);" style="display:none;"/><input type="button" name="down_btn" size="35"  value="下降" onclick="changeGoodsGallerySort($goodsGallery.id,1);" style="display:none;"/></div>
+            		#end
+            		#if($pnum==1 && $pnum2>1)
+            		<div id="gallery_$goodsGallery.id"> <img src="${upServer}/$goodsGallery.imgSmall"><input type="button" name="delImage_$goodsGallery.id" size="35"  value="删除" onclick="removeGoodsGallery($goodsGallery.id);"/><input type="button" name="up_btn" size="35"  value="上升" onclick="changeGoodsGallerySort($goodsGallery.id,-1);" style="display:none;"/><input type="button" name="down_btn" size="35"  value="下降" onclick="changeGoodsGallerySort($goodsGallery.id,1);"/></div>
+            		#end
+            		#if($pnum>1 && $pnum2 > $pnum )
+            		<div id="gallery_$goodsGallery.id"> <img src="${upServer}/$goodsGallery.imgSmall"><input type="button" name="delImage_$goodsGallery.id" size="35"  value="删除" onclick="removeGoodsGallery($goodsGallery.id);"/><input type="button" name="up_btn" size="35"  value="上升" onclick="changeGoodsGallerySort($goodsGallery.id,-1);"/><input type="button" name="down_btn" size="35"  value="下降" onclick="changeGoodsGallerySort($goodsGallery.id,1);"/></div>
+            		#end
+            		#if($pnum>1 && $pnum2 == $pnum )
+            		<div id="gallery_$goodsGallery.id"> <img src="${upServer}/$goodsGallery.imgSmall"><input type="button" name="delImage_$goodsGallery.id" size="35"  value="删除" onclick="removeGoodsGallery($goodsGallery.id);"/><input type="button" name="up_btn" size="35"  value="上升" onclick="changeGoodsGallerySort($goodsGallery.id,-1);"/><input type="button" name="down_btn" size="35"  value="下降" onclick="changeGoodsGallerySort($goodsGallery.id,1);" style="display:none;"/></div>
+            		#end
+                   </td></tr>
+				   #set($pnum = $pnum+1)
+                #end
+                #set($remain=5-$goodsGalleryList.size())
+                #if($remain>0)
+                   #foreach($i   in   [1..$remain]   )
+                      <tr><td><input type="file" name="images" size="35" /><br /></td></tr>
+                   #end
+				#end
+                </table>
+			    <tr>
+                  <td colspan="5"><div class="mag-t3"><span>图片应小于200k，jpg或gif或png格式。建议为高600x宽575像素</span></div></td>
+				  <input type="hidden" id="pic_row_count" value="$!pnum"/>
+                </tr>
+            </div>
+            </span>
+			#springBind("goods.imgLarge")
+			<label class="red">${status.errorMessage}</label>
+		  </li>
+
+          <li>
+            <label>商品描述</label>
+            <span class="con">
+              <div class="skin-con">
+                <ul>
+                  <li class="ck"> #springBind("goods.goodsDesc")
+                    <textarea name="${status.expression}" id="tempGoodsDesc"  >$!{status.value}</textarea>
+                    <script type="text/javascript">
+            				CKEDITOR.replace( 'tempGoodsDesc' );
+                        </script>
+                  </li>
+				  <li><em>*</em></li>
+                  <li>
+                    <label class="red">${status.errorMessage}</label>
+                  </li>
+                </ul>
+            </div>
+            </span>
+		  </li>
+
+                </ol>
+            </div>
+        </div>
+    </form>
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onclick="checkAll();">保存</button>
+    </div>
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+    	#if(!$goods.isAgent)
+    		document.getElementById("agentPrice").readOnly=true;
+    	#elseif($goods.isAgent=="n")
+    		document.getElementById("agentPrice").readOnly=true;
+    	#else
+    		document.getElementById("agentPrice").readOnly=false;
+    	#end
+
+       function removeGoodsGallery(id){
+           if(confirm('确认执行删除操作'))
+			jQuery.get('/goods/removeGoodsGallery.html',{param:id},function(result){
+			    jQuery("#result").html(result[0]);
+				delRow(result[1]);
+				addRow();
+		    });
+       }
+
+
+       function changeGoodsGallerySort(id,step){
+           if(true)
+			jQuery.get('/goods/changeGoodsGallerySort.html?'+escape(new Date()),{param:id,step:step},function(result){
+			    alert(result[0]);
+				moveRow(id,step);
+		    });
+       }
+
+       function delRow(id){
+		   var table1 = document.getElementById("table1");
+		   var rowname = document.getElementById("row_"+id);
+		   table1.deleteRow(rowname.rowIndex);
+		   document.getElementById("pic_row_count").value = document.getElementById("pic_row_count").value-1;
+		   var rowcount = document.getElementById("pic_row_count").value-1;
+		   for(var i=0;i<rowcount;i++){
+		   	   $("input[name='down_btn']")[i].style.display="";
+		   	   $("input[name='up_btn']")[i].style.display="";
+		   }
+		   if($("input[name='up_btn']").length>0){
+		   	   $("input[name='up_btn']")[0].style.display="none";
+		   	   $("input[name='down_btn']")[rowcount-1].style.display="none";
+		   }
+       }
+       function moveRow(id,step){
+		   var table1 = document.getElementById("table1");
+		   var rowname = document.getElementById("row_"+id);
+		   var rowcount = document.getElementById("pic_row_count").value-1;
+		   table1.moveRow(rowname.rowIndex,rowname.rowIndex+step);
+		   for(var i=0;i<rowcount;i++){
+		   	   $("input[name='down_btn']")[i].style.display="";
+		   	   $("input[name='up_btn']")[i].style.display="";
+		   }
+		   $("input[name='up_btn']")[0].style.display="none";
+		   $("input[name='down_btn']")[rowcount-1].style.display="none";
+       }
+       function addRow(){
+	     var newTr = document.getElementById("table1").insertRow(document.getElementById("table1").rows.length);
+         var newTd0 = newTr.insertCell(0);
+         newTd0.innerHTML ="<input type='file' name='images' size='35' /></br>";
+       }
+
+       	function discount(flag)
+		{
+    		var discount=$discount;
+    		if(flag=="y")
+    		{
+
+        		var price=document.getElementById("goodsprice").value;
+        document.getElementById("agentPrice").value=(price*discount).toFixed(2);
+document.getElementById("agentPrice").readOnly=false;
+
+    		}else
+    		{
+        document.getElementById("agentPrice").value=0;
+        document.getElementById("agentPrice").readOnly=true;
+    		}
+		}
+
+    var numFormat=16;
+	var dirs = new Array();
+	var dirIndex=-1;
+	var attrId=null;
+	var optionId=null;
+
+window.onload=function(){
+      //loadClass(0);
+	  //loadTaobaoClass(0);
+}
+
+
+	function changeStatus(flag){
+	  if(flag=="y"){
+	    document.getElementById("goodslevel").style.display="";
+	  }else{
+	    document.getElementById("goodslevel").style.display="none";
+	  }
+	}
+
+    function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function isPriceNumber(val){
+	   	var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+		return reg.test(val);
+	}
+
+	function checkAll(){
+	 var strP=/^\d+(\.\d+)?$/;
+	 var goodsWeight = document.getElementById("goodsWeight").value;
+	 var goodsprice = document.getElementById("goodsprice").value;
+	 var marketPrice = document.getElementById("marketPrice").value;
+	 var salesProPrice = document.getElementById("salesProPrice").value;
+	 var agentPrice = document.getElementById("agentPrice").value;
+	 if(goodsWeight != ""){
+	   if(!strP.test(goodsWeight)){
+	      alert("请输入正确的重量!");
+	      return false;
+	   }
+	 }
+	 if(goodsprice == ""){
+	   	 alert("请输入商品零售价!");
+	     return false;
+	 }else{
+	   if(!strP.test(goodsprice)){
+	      alert("请输入正确的商品零售价!");
+	      return false;
+	   }
+	 }
+	 if(marketPrice != ""){
+	   if(!strP.test(marketPrice)){
+	      alert("请输入正确的市场价!");
+	      return false;
+	   }
+	 }
+	 if(salesProPrice != ""){
+	   if(!strP.test(salesProPrice)){
+	      alert("请输入正确的促销价格!");
+	      return false;
+	   }
+	 }
+	 if(agentPrice != ""){
+	   if(!strP.test(agentPrice)){
+	      alert("请输入正确的代销价格!");
+	      return false;
+	   }
+	 }
+
+	 var checkflagTaobaoValue = document.getElementById("checkflagTaobao").value;
+     var taobaostatus = document.getElementById("goods.isTaobao").value;
+     if(taobaostatus=='y' && checkflagTaobaoValue == '1'){
+	   var taobaoClassId = document.getElementById("taobaoClassId").value;
+       if(taobaoClassId == ""){
+		  alert("请选择淘宝类目!");
+		  return false;
+	   }
+	   // 关联淘宝时的必填校验与构造接口需用的属性值，返回值为是否有必填项没填
+	   var isReqNotInput = checkAllTaobao();
+	   if(isReqNotInput == "true") {
+	     alert("请填写淘宝必填属性！");
+	     return false;
+		}
+	  }
+
+ var checkflagValue = document.getElementById("checkflag").value;
+	  var paipaistatus = document.getElementById("goods.isPaipai").value;
+	  if(paipaistatus=='y' && checkflagValue == '1'){
+	    var classId = document.getElementById("classId").value;
+	    var needInputs = document.getElementsByName('paipaiInputNeed');
+		var needSelects = document.getElementsByName('paipaiSelectNeed');
+
+		if(classId == ""){
+		  alert("请选择拍拍类目!");
+		  return false;
+		}
+
+	$("tbody[name=paipaiRelation]").each(function(i){
+		$(this).find('li[name=paipaiAttr]').each(function(j){
+			$(this).find('input').each(function(j){
+				if(this.type=='checkbox'){
+					$(this).attr('xx',function(){return 0;});
+				}
+			});
+		});
+
+		$(this).find('li[name=paipaiAttr]').each(function(j){
+				var cont =$(this).find('span').html().toLowerCase();
+				// 判断是否必填
+				if($(this).attr('necessary')==1){
+					var attrName=cont.substring(cont.indexOf("</strong>")+"</strong>".length);
+					//var attrName=cont;
+					if($(this).attr('useType')=='UT_TEXT'){
+						var blank=0;
+						$(this).find('input').each(function(k){
+							if(this.value==''){
+								//alert(this.id);
+								blank=1;
+							}
+						});
+						//if(blank==1)alert(attrName+"没有填写");
+						if(blank==1){
+						   document.getElementById('flag').value = 0;
+						}
+					} else if($(this).attr('useType')=='UT_RADIO'){
+						var blank2=0;
+						$(this).find('select').each(function(k){
+							if(this.value==''){
+									blank2=1;
+							}else {
+								var otherSelected =false;
+								$(this).find("option").each(function(k){
+									if(this.selected && ($(this).text().indexOf('其他')!=-1||$(this).text().indexOf('其它')!=-1)){
+										otherSelected=true;
+									}
+								});
+								if(otherSelected && $(this).next().val()==""){
+									blank2=1;
+								}
+							}
+						});
+						//if(blank2==1)alert(attrName+"没有填写");
+						if(blank2==1){
+						  document.getElementById('flag').value = 0;
+						}
+					} else if($(this).attr('useType')=='UT_CHECKBOX'){
+						var blank3=1;
+						var otherSelected=false;
+						var otherTextIsNull=false;
+						$(this).find('input').each(function(k){
+							if(this.type=='text'&&this.value==''){
+								otherTextIsNull=true;
+							} else if(this.type=='checkbox'){
+								if(this.checked){
+									if($(this).next().text().indexOf('其他')!=-1||$(this).next().text().indexOf("其它")!=-1){// 其他
+										otherSelected=true;
+									}
+									blank3=0;
+								}
+							}
+						});
+						//if(blank3==1||(otherSelected&&otherTextIsNull))alert(attrName+"没有填写");
+						if(blank3==1||(otherSelected&&otherTextIsNull)){
+						   document.getElementById('flag').value = 0;
+						}
+					}
+				} // 必填项判断结束
+
+			});
+	    });
+
+
+	  if(document.getElementById('flag').value == 0){
+	     alert("请填写拍拍必填选择!");
+		 document.getElementById('flag').value = 1;
+		 return false;
+	  }
+
+
+		var attrString ='';
+		var custAttrString ='';
+		$("tbody[name=paipaiRelation]").each(function(i){
+			$(this).find('input').each(function(j){
+				if(this.type=='checkbox'){
+					$(this).attr('xx',function(){return 0;});// 清除计算过标记
+				}
+			});
+		});
+			$("div[name=paipaiRelation]").each(function(i){
+					var txt=0;
+					$(this).find('input[name=paipaiInput]').each(function(j){
+						if(this.type=='text'){
+							if(this.value!=''){
+								var attrId=this.id.substring(3);
+								custAttrString=custAttrString+(1*attrId).toString(numFormat)+':'+this.value+"|";
+							}
+						} else if(this.type=='checkbox'){
+							if(this.checked && $(this).attr('xx')!=1){// 被选中且没计算过才计算
+								var pAttr=(1*this.parentid).toString(numFormat)+':';
+								$(this).parent().find('input[name=paipaiInput]').each(function(k){
+									var id=this.id;
+									if(this.checked){
+										if($(this).next().text().indexOf('其他')==-1&&$(this).next().text().indexOf("其它")==-1){// 不是其他
+											txt=txt+Math.pow(2,id-1);
+											$(this).attr('xx',function(){return 1;});// 设置计算过标记
+										}
+									}
+								});
+								attrString=attrString+(1*$(this).attr('parentid')).toString(numFormat)+':'+(1*txt).toString(numFormat)+"|";
+							}
+						}
+					});
+
+					$(this).find('input[name=paipaiInputNeed]').each(function(j){
+						if(this.type=='text'){
+							if(this.value!=''){
+								var attrId=this.id.substring(3);
+								custAttrString=custAttrString+(1*attrId).toString(numFormat)+':'+this.value+"|";
+							}
+						} else if(this.type=='checkbox'){
+							if(this.checked && $(this).attr('xx')!=1){// 被选中且没计算过才计算
+								var pAttr=(1*this.parentid).toString(numFormat)+':';
+								$(this).parent().find('input[name=paipaiInput]').each(function(k){
+									var id=this.id;
+									if(this.checked){
+										if($(this).next().text().indexOf('其他')==-1&&$(this).next().text().indexOf("其它")==-1){// 不是其他
+											txt=txt+Math.pow(2,id-1);
+											$(this).attr('xx',function(){return 1;});// 设置计算过标记
+										}
+									}
+								});
+								attrString=attrString+(1*$(this).attr('parentid')).toString(numFormat)+':'+(1*txt).toString(numFormat)+"|";
+							}
+						}
+					});
+
+					$(this).find('select[name=paipaiSelect]').each(function(j){
+						if(this.value!=''){
+
+							if(this.id.indexOf('select')==-1){
+								attrString=attrString+(1*this.id).toString(numFormat)+':'+(1*this.value).toString(numFormat)+"|";
+							}
+						}
+					});
+
+					$(this).find('select[name=paipaiSelectNeed]').each(function(j){
+						if(this.value!=''){
+
+							if(this.id.indexOf('select')==-1){
+								attrString=attrString+(1*this.id).toString(numFormat)+':'+(1*this.value).toString(numFormat)+"|";
+							}
+						}
+					});
+
+
+			});
+			if(attrString!='')attrString=attrString.substring(0,attrString.length-1);
+			if(custAttrString!='')custAttrString=custAttrString.substring(0,custAttrString.length-1);
+			if(attrString=='')attrString=custAttrString;
+			else if(custAttrString!=""){
+				attrString=attrString+"^"+custAttrString;
+			}
+			document.getElementById("attrStr").value = attrString;
+	  }
+	  document.listForm.submit();
+	  document.getElementById('allcheckbutton').disabled=true;
+	}
+	jQuery(function(){
+		var imageError = jQuery("#result").prev("div");
+		if(imageError.length>0){
+			//alert(imageError.html());
+			var errors = imageError.children();
+			imageError.empty();
+			var remove = false;
+			for(var i=0;i<errors.length;i++){
+				for(var j=0;j<=i-1;j++){
+					if(errors.get(i).innerHTML==errors.get(j).innerHTML){
+						remove = true;
+					}
+				}
+				if(!remove){
+					imageError.append(errors.get(i));
+				}
+				remove = false;
+			}
+			imageError.show();
+		}
+	});
+function editPaipai(){
+        if(confirm("确认修改拍拍商品属性类目？")){
+            document.getElementById("paipaiRelation").style.display="";
+			document.getElementById("paipaidefault").style.display="none";
+			document.getElementById("checkflag").value=1;
+        }
+	}
+
+	function changePaipai(flag){
+	    #if($goods.isPaipai=="n")
+	       if(flag=="y"){
+	           document.getElementById("paipaiRelation").style.display="";
+			   document.getElementById("checkflag").value=1;
+	       }else{
+	           document.getElementById("paipaiRelation").style.display="none";
+			   document.getElementById("checkflag").value=0;
+	       }
+	    #else{
+		   if(flag=="n"){
+		       document.getElementById("paipaidefault").style.display="none";
+			   document.getElementById("paipaiRelation").style.display="none";
+			   document.getElementById("checkflag").value=0;
+		   }else{
+		       document.getElementById("paipaidefault").style.display="";
+		   }
+		}
+		#end
+	}
+
+	function loadClass(navigationId){
+		var pnl = $('#clzPanel'+(dirIndex+1));
+		pnl.text("装载中...");
+		jQuery.post('/goods/loadPaipaiClass.html',{param:navigationId},function(paipaiClassList){callBackPaipaiClass(paipaiClassList);});
+	}
+
+	function callBackPaipaiClass(paipaiClassList){
+		this.dirIndex++;
+		var combox= document.createElement("SELECT");
+		combox.id='select'+dirIndex;
+		combox.setAttribute("dirindex",dirIndex);
+		var pnl = $('#clzPanel'+dirIndex);
+		combox.onchange=selectChange;
+		pnl.text("");
+
+		pnl.append(combox);
+		var jsonObj = paipaiClassList;
+		if(jsonObj){
+		  if(jsonObj.errorCode==0){
+		    var sel=$('#select'+dirIndex);
+			var opt = document.createElement("OPTION");
+			opt.text='请选择...';
+			opt.value='';
+			sel.append(opt);
+			opt=null;
+			for(var i=0;i<jsonObj.childList.length;i++){
+			  opt = document.createElement("OPTION");
+			  sel.append(opt);
+			  var val = jsonObj.childList[i];
+			  opt.value=val.navigationId;
+			  opt.text=val.navigationName+'('+val.navigationId+')';
+			  opt.setAttribute("isclass",val.isClass);
+			  opt.setAttribute("navProp",val.navProp);
+			}
+			var pnl2 = document.createElement("SPAN");
+			dirs[dirIndex]=jsonObj;
+
+			pnl2.id='clzPanel'+(dirIndex+1);
+			pnl.append(pnl2);
+
+		  }else{
+			alert("调用失败，返回码："+jsonObj.errorCode+" 信息"+jsonObj.errorMessage);
+		  }
+		}else{
+		    alert("调用失败。");
+		}
+	}
+
+	function selectChange(evt){
+		if(evt==null)evt=event;
+		var combox = evt.srcElement ? evt.srcElement : evt.target;
+		dirIndex=1*combox.id.substring(6);
+		if(combox.value!=''){
+		    document.getElementById("classId").value = combox.value;
+			if(combox.options[combox.selectedIndex].getAttribute("isclass")!=1){
+				loadClass(combox.value);
+			} else {
+				//alert(combox.value);
+				loadAttr(combox.value);
+			}
+		}else{
+		    document.getElementById("classId").value = "";
+		}
+	}
+
+	function loadAttr(classId,attrId,optionId){
+		jQuery.post('/goods/loadPaipaiAttr.html',{param1:classId,param2:attrId,param3:optionId},function(paipaiAttrList){callBackPaipaiAttr(paipaiAttrList);});
+	}
+
+	function callBackPaipaiAttr(paipaiAttrList){
+		if(paipaiAttrList.attrId=='0'){// 处理非子属性
+			var kpnl=$('#keyAttrPanel');
+			kpnl.html("");
+			var spnl=$('#saleAttrPanel');
+			spnl.html("");
+			var npnl=$('#normalAttrPanel');
+			npnl.html("");
+			if(paipaiAttrList.errorCode==0){
+				if(paipaiAttrList.attrList.length>0){
+					$("#"+paipaiAttrList.attrId).attr("subAttr",function(){return 1;});
+					for(var i=0;i<paipaiAttrList.attrList.length;i++){
+						var attrBo =paipaiAttrList.attrList[i];
+						var panel = null;
+						if(attrBo.keyAttr==1){
+							panel =kpnl;
+						} else if(attrBo.saleAttr==1){
+							panel =spnl;
+						} else {
+							panel =npnl;
+						}
+						var div = document.createElement("li");
+						div.id='div_'+attrBo.attrId;
+						$(div).attr('name','paipaiAttr');
+						$(div).attr('useType',function(){return attrBo.useType;});
+						$(div).attr('necessary',function(){return attrBo.necessary;});
+
+						panel.append(div);
+						fillAttr2Panel(paipaiAttrList.classId,attrBo,div);
+					}
+				} else {
+					$("#"+paipaiAttrList.attrId).attr("subAttr",function(){return 0;});
+				}
+			} else {
+				kpnl.html("装载失败:"+paipaiAttrList.errorMessage);
+				spnl.html("装载失败:"+paipaiAttrList.errorMessage);
+				npnl.html("装载失败:"+paipaiAttrList.errorMessage);
+			}
+		} else { //处理子属性
+			var div = $("#subdiv_"+paipaiAttrList.attrId);
+			div.html("");
+			if(paipaiAttrList.errorCode==0){
+				if(paipaiAttrList.attrList.length>0){
+					$("#"+paipaiAttrList.attrId).attr("subAttr",function(){return 1;});
+					for(var i=0;i<paipaiAttrList.attrList.length;i++){
+						var attrBo =paipaiAttrList.attrList[i];
+						var attrDiv = document.createElement("li");
+						attrDiv.id='div_'+attrBo.attrId;
+						$(div).attr('name','paipaiAttr');
+						$(div).attr('useType',function(){return attrBo.useType;});
+						$(div).attr('necessary',function(){return attrBo.necessary;});
+						div.append(attrDiv);
+						fillAttr2Panel(paipaiAttrList.classId,attrBo,attrDiv);
+					}
+				} else {
+					$("#"+paipaiAttrList.attrId).attr("subAttr",function(){return 0;});
+				}
+			} else {
+				div.html("装载失败:"+paipaiAttrList.errorMessage);
+			}
+		}
+	}
+
+	function fillAttr2Panel(classId,attrBo,div){
+		var html="";
+		var otherOptionId='';
+		if(attrBo.useType=='UT_RADIO'){
+			html='<span>';
+			if(attrBo.necessary==1){
+			   html=html+'<strong style="color:red;">*</strong>';
+			   html=html+attrBo.attrName+'</span>:<select id='+attrBo.attrId+' clzId='+classId+' subAttr=0 name=paipaiSelectNeed><option value="">  </option>';
+			}else{
+			   html=html+attrBo.attrName+'</span>:<select id='+attrBo.attrId+' clzId='+classId+' subAttr=0 name=paipaiSelect><option value="">  </option>';
+			}
+			for(var j=0;j< attrBo.optionList.length;j++){
+				var opt=attrBo.optionList[j];
+				html=html+'<option value='+opt.optionId+'>'+opt.optionValue+'</option>';
+				if(opt.optionValue.indexOf("其他")!=-1||opt.optionValue.indexOf("其它")!=-1){
+					otherOptionId=opt.optionId;
+				}
+			}
+			html=html+'</select>';
+			if(otherOptionId!='')html=html+'<input id="ot_'+attrBo.attrId+'" name=paipaiInput>';
+			html=html+'<div id="subdiv_'+attrBo.attrId+'"></div>';
+		} else if(attrBo.useType=='UT_CHECKBOX'){
+			html='<span>';
+			if(attrBo.necessary==1)html=html+'<strong style="color:red;">*</strong>';
+			html=html+attrBo.attrName+'</span>:';
+			for(var j=0;j< attrBo.optionList.length;j++){
+				var opt=attrBo.optionList[j];
+				if(attrBo.necessary==1){
+				  html=html+'<label><input id="'+opt.optionId+'" type=checkbox parentid="'+attrBo.attrId+'" name=paipaiInputNeed><span id="s_'+opt.optionId+'">'+opt.optionValue+'</span>';
+				}else{
+				  html=html+'<label><input id="'+opt.optionId+'" type=checkbox parentid="'+attrBo.attrId+'" name=paipaiInput><span id="s_'+opt.optionId+'">'+opt.optionValue+'</span>';
+				}
+				if(opt.optionValue.indexOf("其他")!=-1||opt.optionValue.indexOf("其它")!=-1){
+					html=html+'<input id="t_'+opt.optionId+'">';
+				}
+				html=html+'</label>';
+			}
+		} else if(attrBo.useType=='UT_TEXT'){
+			html='<span>';
+			if(attrBo.necessary==1){
+                 html=html+'<strong style="color:red;">*</strong>';
+			     html=html+attrBo.attrName+'</span>:<label><input id='+attrBo.attrId+' name=paipaiInputNeed></label>';
+			}else{
+			     html=html+attrBo.attrName+'</span>:<label><input id='+attrBo.attrId+' name=paipaiInput></label>';
+			}
+		}
+		// 隐藏刚刚生成的为“其他”选项准备的文本框
+		$(div).html(html);
+		if(attrBo.useType=='UT_RADIO'){
+			$(div).find("select").each(function(i){
+				if(otherOptionId!=''){
+					$(this).next().hide();
+					$(this).change(function(){
+						if(this.value==otherOptionId){
+							$(this).next().show();
+						} else {
+							$(this).next().hide().val("");
+						}
+						loadAttr($(this).attr("clzId"),$(this).attr("id"),$(this).val());
+					});
+				} else {
+					$(this).change(function(){
+						loadAttr($(this).attr("clzId"),$(this).attr("id"),$(this).val());
+					});
+				}
+			});
+		} else if(attrBo.useType=='UT_CHECKBOX'){
+			$(div).find("input").each(function(i){
+				if($(this).next().text().indexOf('其他')!=-1||opt.optionValue.indexOf("其它")!=-1){
+					$(this).next().next().hide();
+					$(this).change(function(){
+						if(this.checked){
+							$(this).next().next().show();
+						}else {
+							$(this).next().next().hide().val("");
+						}
+					});
+				}
+			});
+		}
+
+	}
+
+	//start - 淘宝关联
+	var dirIndexTaobao = -1;
+	var props;
+	var propvalues;
+
+	var inputStr = '';
+    var inputPidsStr = '';
+    var pushArr = new Array();
+    var pushPidsArr = new Array();
+
+	function changeTaobao(flag){
+	    #if($goods.isTaobao=="n")
+	       if(flag=="y"){
+	           document.getElementById("taobaoRelation").style.display="";
+			   document.getElementById("productRalateTips").style.display="";
+			   document.getElementById("checkflagTaobao").value=1;
+	       }else{
+	           document.getElementById("taobaoRelation").style.display="none";
+			   document.getElementById("checkflagTaobao").value=0;
+	       }
+	    #else{
+		   if(flag=="n"){
+		       document.getElementById("taobaodefault").style.display="none";
+			   document.getElementById("taobaoRelation").style.display="none";
+			   document.getElementById("checkflagTaobao").value=0;
+		   }else{
+		       document.getElementById("taobaodefault").style.display="";
+			   document.getElementById("productRalateTips").style.display="";
+		   }
+		}
+		#end
+	}
+
+	function editTaobao(){
+        if(confirm("确认修改淘宝商品属性类目？")){
+            document.getElementById("taobaoRelation").style.display="";
+			document.getElementById("taobaodefault").style.display="none";
+			document.getElementById("checkflagTaobao").value=1;
+        }
+	}
+
+	function loadTaobaoClass(navigationId){
+		var pnl = $('#taobaoClzPanel'+(dirIndexTaobao+1));
+		// begin add by shenzh Nov 1, 2010 清空下拉框
+		if(navigationId=='' && dirIndexTaobao!=-1){
+			pnl.text("");
+			return;
+		}
+		// end by shenzh Nov 1, 2010
+		pnl.text("装载中...");
+		jQuery.post('/goods/loadTaobaoClass.html',{param:navigationId},function(taobaoClassList){callBackTaobaoClass(taobaoClassList);});
+	}
+
+	function callBackTaobaoClass(taobaoClassList){
+		this.dirIndexTaobao++;
+		var combox= document.createElement("SELECT");
+		combox.id='selectTaobao'+dirIndexTaobao;
+		combox.setAttribute("dirIndexTaobao",dirIndexTaobao);
+		var pnl = $('#taobaoClzPanel'+dirIndexTaobao);
+		combox.onchange=selectChangeTaobao;
+		pnl.text("");
+		pnl.append(combox);
+		if(taobaoClassList){
+		  var resRight = taobaoClassList.itemcats_get_response;
+		  if(resRight){
+		    var jsonObj = resRight.item_cats.item_cat;
+		    var sel=$('#selectTaobao'+dirIndexTaobao);
+			var opt = document.createElement("OPTION");
+			opt.text='请选择...';
+			opt.value='';
+			sel.append(opt);
+			opt=null;
+			for(var i=0;i<jsonObj.length;i++){
+			  opt = document.createElement("OPTION");
+			  sel.append(opt);
+			  var val = jsonObj[i];
+			  opt.value=val.cid;
+			  opt.text=val.name+'('+val.cid+')';
+			  opt.setAttribute("isclass",val.is_parent);
+			  //opt.setAttribute("navProp",val.navProp);
+			}
+			var pnl2 = document.createElement("SPAN");
+			//dirs[dirIndexTaobao]=jsonObj;
+
+			pnl2.id='taobaoClzPanel'+(dirIndexTaobao+1);
+			pnl.append(pnl2);
+
+		  }else{
+			alert("调用失败，返回码："+taobaoClassList.error_response.code+" 信息: "+taobaoClassList.error_response.msg);
+		  }
+		}else{
+		    alert("调用失败。");
+		}
+	}
+
+	function selectChangeTaobao(evt){
+	    document.getElementById('enum-one-props').innerHTML = '';
+	    document.getElementById('enum-multi-props').innerHTML = '';
+	    document.getElementById('enum-sale-props').innerHTML = '';
+
+		if(evt==null)evt=event;
+		var combox = evt.srcElement ? evt.srcElement : evt.target;
+		dirIndexTaobao=1*combox.id.substring(12);
+		if(combox.value!=''){
+			// begin modify by shenzh Nov 1, 2010 发生更改即重置taobaoClassId的值
+		    document.getElementById("taobaoClassId").value = "";
+			// end by shenzh Nov 1, 2010
+			if(combox.options[combox.selectedIndex].getAttribute("isclass").toString() == "true"){
+				loadTaobaoClass(combox.value);
+			} else {
+			    var pnl = $('#taobaoClzPanel'+(dirIndexTaobao+1));
+		        pnl.text("");
+				loadTaobaoAttr(combox.value);
+			}
+		}else{
+			// begin add by shenzh Nov 1, 2010 选到空选项时重置界面
+			document.getElementById("taobaoClassId").value = "";
+			loadTaobaoClass(combox.value);
+			// end by shenzh Nov 1, 2010
+		}
+	}
+
+	function loadTaobaoAttr(classId){
+	    document.getElementById('ajaxPic').style.display = '';
+	    document.getElementById('taobaoClassId').value = '';
+
+	    document.getElementById('enum-one-props').innerHTML = '';
+	    document.getElementById('enum-multi-props').innerHTML = '';
+	    document.getElementById('enum-sale-props').innerHTML = '';
+
+		jQuery.post('/goods/loadTaobaoProps.html',{param:classId},function(propsJson){
+		  props = propsJson;
+		  jQuery.post('/goods/loadTaobaoPropValues.html',{param:classId},function(propValuesJson){callBackPropValues(propValuesJson, classId); });
+		});
+	}
+
+	function callBackPropValues(propValuesJson, classId){
+	  propvalues = propValuesJson;
+	  createPropsForm(classId);
+	}
+
+   function createPropsForm(cid) {
+	document.getElementById('taobaoClassId').value = cid;
+	document.getElementById('ajaxPic').style.display = 'none';
+	props = props['itemprops_get_response']['item_props']['item_prop'];
+	propvalues = propvalues['itempropvalues_get_response']['prop_values']['prop_value'];
+	var i;
+	for (i in props) {
+		//关键属性
+		if (props[i]['is_key_prop'] == 'true' || props[i]['is_key_prop'] === true) {
+			if (props[i]['is_enum_prop'] && '0' == props[i]['parent_pid']) {
+				var sel = document.createElement('SELECT');
+				sel.setAttribute('name', 'pid_' + props[i]['pid']);
+			    sel.setAttribute('id', 'pid_' + props[i]['pid']);
+
+				var op = document.createElement('OPTION');
+				op.setAttribute('value', '');
+				op.innerHTML = '-=请选择=-';
+				sel.appendChild(op);
+
+				var j;
+				for (j in propvalues) {
+					if (props[i]['pid'] == propvalues[j]['pid']) {
+						op = document.createElement('OPTION');
+						op.setAttribute('value', propvalues[j]['pid'] + ':' + propvalues[j]['vid']);
+						op.innerHTML = propvalues[j]['name_alias'];
+						sel.appendChild(op);
+					}
+				}
+
+				if (props[i]['is_input_prop']) {
+					op = document.createElement('OPTION');
+					if (props[i]['child_template']) {
+						op.setAttribute('value', props[i]['pid'] + '_' + props[i]['child_template']);
+					} else {
+						op.setAttribute('value', props[i]['pid']);
+					}
+					op.innerHTML = '自定义';
+					sel.appendChild(op);
+				}
+
+				var propDiv = document.createElement('div');
+				propDiv.innerHTML = "<div style='width:120px;float:left;text-align:right;padding-top:5px'>" + props[i]['name']+"：</div>";
+				propDiv.id = 'pid_' + props[i]['pid'] + '_div';
+				propDiv.style.cssText = "width:100%;padding:5px 0px;float:left";
+
+				var propvaluesDiv = document.createElement('div');
+				propvaluesDiv.style.cssText = "width:380px;float:left;";
+
+				//设置必填属性
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					sel.setAttribute('must','y');
+				}
+
+				propvaluesDiv.appendChild(sel);
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					propvaluesDiv.innerHTML += '<font color=red> *</font>';
+				}
+
+				var propSpan = document.createElement('div');
+				propSpan.id = 'pid_' + props[i]['pid'] + '_span';
+				propSpan.style.cssText = "padding:2px 0px;line-height:0px";
+				propvaluesDiv.appendChild(propSpan);
+				propDiv.appendChild(propvaluesDiv);
+
+				document.getElementById('enum-one-props').appendChild(propDiv);
+				document.getElementById('pid_' + props[i]['pid']).onchange = function(){parentPropList(this)};
+			} else if ('0' == props[i]['parent_pid']) {
+				var txt = document.createElement('input');
+				txt.type = 'text';
+				txt.name = 'input_' + props[i]['pid'];
+				txt.id = 'input_' + props[i]['pid'];
+				txt.value = '';
+
+				var propDiv = document.createElement('div');
+				propDiv.innerHTML = "<div style='width:120px;float:left;text-align:right;padding-top:5px'>" + props[i]['name']+"：</div>";
+				propDiv.id = 'pid_' + props[i]['pid'] + '_div';
+				propDiv.style.cssText = "width:100%;padding:5px 0px;float:left";
+
+				var propvaluesDiv = document.createElement('div');
+				propvaluesDiv.style.cssText = "width:380px;float:left;";
+
+				//设置必填属性
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					txt.setAttribute('must','y');
+				}
+
+				propvaluesDiv.appendChild(txt);
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					propvaluesDiv.innerHTML += '<font color=red> *</font>';
+				}
+				propDiv.appendChild(propvaluesDiv);
+				document.getElementById('enum-one-props').appendChild(propDiv);
+			}
+		//销售属性
+		} else if ('true' == props[i]['is_sale_prop'] || true === props[i]['is_sale_prop']) {
+			var propDiv = document.createElement('div');
+			propDiv.innerHTML = "<div style='width:120px;float:left;text-align:right;padding-top:5px'>" + props[i]['name']+"：</div>";
+			propDiv.id = 'pid_' + props[i]['pid'] + '_div';
+			propDiv.style.cssText = "width:100%;padding:5px 0px;float:left";
+			document.getElementById('enum-sale-props').appendChild(propDiv);
+
+			var propvaluesDiv = document.createElement('div');
+			propvaluesDiv.style.cssText = "width:380px;float:left;";
+			var j;
+			for (j in propvalues) {
+				if (props[i]['pid'] == propvalues[j]['pid']) {
+					var check = window.document.createElement("input");
+		   			check.type = "checkbox";
+		   			check.name = 'pid_' + propvalues[j]['pid'];
+		   			check.id = 'pid_' + propvalues[j]['pid'];
+		   			check.value = propvalues[j]['pid'] + ':' + propvalues[j]['vid'];
+					check.title = props[i]['name'] + ":" + propvalues[j]['name_alias'];//add by czx
+
+					//设置必填属性
+			        if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+				     check.setAttribute('must','y');
+			        }
+
+		   			propvaluesDiv.appendChild(check);
+		   			var span_vname = window.document.createElement("span");
+	       			span_vname.innerHTML = propvalues[j]['name_alias'];
+
+					//add by czx
+    				span_vname.id = check.value + "_span";
+					//alert(span_vname.id);
+    				span_vname.name = props[i]['name'] + ":" + propvalues[j]['name_alias'];
+    				//alert(span_vname.name);
+    				//end by czx
+
+	       			propvaluesDiv.appendChild(span_vname);
+				}
+			}
+
+			var saleSign = window.document.createElement("input");
+			saleSign.type = "hidden";
+			saleSign.value = 'pid_' + props[i]['pid'];
+
+			propvaluesDiv.appendChild(saleSign);
+
+			if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+				propvaluesDiv.innerHTML += '<font color=red> *</font>';
+			}
+
+			propDiv.appendChild(propvaluesDiv);
+		//非关键属性
+		} else {
+			if ((props[i]['is_enum_prop'] == 'true' || props[i]['is_enum_prop'] === true) && (props[i]['multi'] == 'true' || props[i]['multi'] === true)) {
+				var propDiv = document.createElement('div');
+				propDiv.innerHTML = "<div style='width:120px;float:left;text-align:right;padding-top:5px'>" + props[i]['name']+"：</div>";
+				propDiv.id = 'pid_' + props[i]['pid'] + '_div';
+				propDiv.style.cssText = "width:100%;padding:5px 0px;float:left";
+				document.getElementById('enum-multi-props').appendChild(propDiv);
+
+				var propvaluesDiv = document.createElement('div');
+				propvaluesDiv.style.cssText = "width:380px;float:left;";
+				var j;
+				for (j in propvalues) {
+					if (props[i]['pid'] == propvalues[j]['pid']) {
+						var check = window.document.createElement("input");
+			   			check.type = "checkbox";
+			   			check.name = 'pid_' + propvalues[j]['pid'];
+			   			check.id = 'pid_' + propvalues[j]['pid'];
+			   			check.value = propvalues[j]['pid'] + ':' + propvalues[j]['vid'];
+
+						//设置必填属性
+			            if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+				          check.setAttribute('must','y');
+			            }
+
+			   			propvaluesDiv.appendChild(check);
+			   			var span_vname = window.document.createElement("span");
+		       			span_vname.innerHTML = propvalues[j]['name_alias'];
+		       			propvaluesDiv.appendChild(span_vname);
+					}
+				}
+
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					propvaluesDiv.innerHTML += '<font color=red> *</font>';
+					check.setAttribute('must','y');
+				}
+				propDiv.appendChild(propvaluesDiv);
+			} else if ((props[i]['is_enum_prop'] == 'true' || props[i]['is_enum_prop'] === true) && '0' == props[i]['parent_pid']) {
+				var sel = document.createElement('SELECT');
+				sel.setAttribute('name', 'pid_' + props[i]['pid']);
+			    sel.setAttribute('id', 'pid_' + props[i]['pid']);
+				var op = document.createElement('OPTION');
+				op.setAttribute('value', '');
+				op.innerHTML = '-=请选择=-';
+				sel.appendChild(op);
+
+				var j;
+				for (j in propvalues) {
+					if (props[i]['pid'] == propvalues[j]['pid']) {
+						op = document.createElement('OPTION');
+						op.setAttribute('value', propvalues[j]['pid'] + ':' + propvalues[j]['vid']);
+						op.innerHTML = propvalues[j]['name_alias'];
+						sel.appendChild(op);
+					}
+				}
+
+				if (props[i]['is_input_prop'] == 'true' || props[i]['is_input_prop'] === true) {
+					op = document.createElement('OPTION');
+					op.setAttribute('value', props[i]['pid']);
+					op.innerHTML = '自定义';
+					sel.appendChild(op);
+				}
+
+				var propDiv = document.createElement('div');
+				propDiv.innerHTML = "<div style='width:120px;float:left;text-align:right;padding-top:5px'>" + props[i]['name']+"：</div>";
+				propDiv.id = 'pid_' + props[i]['pid'] + '_div';
+				propDiv.style.cssText = "width:100%;padding:5px 0px;float:left";
+
+				var propvaluesDiv = document.createElement('div');
+				propvaluesDiv.style.cssText = "width:380px;float:left;";
+
+				//设置必填属性
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					sel.setAttribute('must','y');
+				}
+
+				propvaluesDiv.appendChild(sel);
+				if ((props[i]['must'] == 'true' || props[i]['must'] === true) && '0' == props[i]['parent_pid']) {
+					propvaluesDiv.innerHTML += '<font color=red> *</font>';
+					sel.setAttribute('must','y');
+				}
+
+				var propSpan = document.createElement('div');
+				propSpan.id = 'pid_' + props[i]['pid'] + '_span';
+				propSpan.style.cssText = "padding:2px 0px;line-height:0px";
+				propvaluesDiv.appendChild(propSpan);
+				propDiv.appendChild(propvaluesDiv);
+				document.getElementById('enum-multi-props').appendChild(propDiv);
+				document.getElementById('pid_' + props[i]['pid']).onchange = function(){parentPropList(this)};
+			}
+		}
+	}
+}
+
+function parentPropList(o) {
+	if ('' == o.value) {
+		document.getElementById(o.id + '_span').innerHTML = '';
+	} else {
+		var pidVidArr = o.value.split(':');
+		if (1 === pidVidArr.length && pidVidArr[0]) {
+			pidVidArr = pidVidArr[0].split('_');
+			var pid = pidVidArr[0];
+			var childName = '';
+
+			var txt = document.createElement('input');
+			txt.type = 'text';
+			txt.name = 'input_' + pid;
+			txt.id = 'input_' + pid;
+			txt.value = '';
+			document.getElementById('pid_' + pid + '_span').innerHTML = '';
+			document.getElementById('pid_' + pid + '_span').appendChild(txt);
+			if (2 == pidVidArr.length) {
+				childName = pidVidArr[1];
+				txt.onblur = function(){childTemplate(childName, pid);};
+			}
+		} else {
+			var pid = pidVidArr[0];
+			var vid = pidVidArr[1];
+			document.getElementById('pid_' + pid + '_span').innerHTML = '';
+			var i;
+			for (i in props) {
+				if (pid == props[i]['parent_pid'] && vid == props[i]['parent_vid']) {
+					var sel = document.createElement('SELECT');
+					sel.setAttribute('name', 'pid_' + props[i]['pid']);
+				    sel.setAttribute('id', 'pid_' + props[i]['pid']);
+					var op = document.createElement('OPTION');
+					op.setAttribute('value', '');
+					op.innerHTML = '-=请选择=-';
+					sel.appendChild(op);
+
+					var j;
+					for (j in propvalues) {
+						if (props[i]['pid'] == propvalues[j]['pid']) {
+							op = document.createElement('OPTION');
+							op.setAttribute('value', propvalues[j]['pid'] + ':' + propvalues[j]['vid']);
+							op.innerHTML = propvalues[j]['name_alias'];
+							sel.appendChild(op);
+						}
+					}
+
+					if (props[i]['is_input_prop']) {
+						op = document.createElement('OPTION');
+						op.setAttribute('value', props[i]['pid']);
+						op.innerHTML = '自定义';
+						sel.appendChild(op);
+					}
+
+					document.getElementById('pid_' + pid + '_span').innerHTML = props[i]['name'] + '：';
+					document.getElementById('pid_' + pid + '_span').appendChild(sel);
+					var propSpan = document.createElement('div');
+					propSpan.id = 'pid_' + props[i]['pid'] + '_span';
+					propSpan.style.cssText = "padding:2px 0px;line-height:0px";
+					document.getElementById('pid_' + pid + '_span').appendChild(propSpan);
+					document.getElementById('pid_' + props[i]['pid']).onchange = function(){childPropList(this, 'pid_' + props[i]['pid'] + '_span')};
+					return;
+				}
+			}
+		}
+	}
+}
+
+function childTemplate (childName, pid) {
+	if ('' == document.getElementById('input_' + pid).value) {
+		var txt = document.createElement('input');
+		txt.type = 'text';
+		txt.name = 'input_' + pid;
+		txt.id = 'input_' + pid;
+		txt.value = '';
+		document.getElementById('pid_' + pid + '_span').innerHTML = '';
+		document.getElementById('pid_' + pid + '_span').appendChild(txt);
+		txt.onblur = function(){childTemplate(childName, pid);};
+	} else if (!document.getElementById(childName)) {
+		var txt = document.createElement('input');
+		txt.type = 'text';
+		txt.name = childName;
+		txt.id = childName;
+		txt.value = '';
+
+		var childTempSpan = document.createElement('span');
+		childTempSpan.id = 'childTemp_' + pid;
+		childTempSpan.innerHTML = '　' + childName + '：';
+		document.getElementById('pid_' + pid + '_span').appendChild(childTempSpan);
+		document.getElementById('pid_' + pid + '_span').appendChild(txt);
+	}
+}
+
+function childPropList(o, pidSpan) {
+	var pidVidArr = o.value.split(':');
+	if (1 === pidVidArr.length && pidVidArr[0]) {
+		var pid = pidVidArr[0];
+		var txt = document.createElement('input');
+		txt.type = 'text';
+		txt.name = 'input_' + pid;
+		txt.id = 'input_' + pid;
+		txt.value = '';
+		document.getElementById(pidSpan).innerHTML = '';
+		document.getElementById(pidSpan).appendChild(txt);
+	} else {
+		var pid = pidVidArr[0];
+		var vid = pidVidArr[1];
+		document.getElementById(pidSpan).innerHTML = '';
+
+		var i;
+		for (i in props) {
+			if (pid == props[i]['parent_pid'] && vid == props[i]['parent_vid']) {
+				var sel = document.createElement('SELECT');
+				sel.setAttribute('name', 'pid_' + props[i]['pid']);
+			    sel.setAttribute('id', 'pid_' + props[i]['pid']);
+				var op = document.createElement('OPTION');
+				op.setAttribute('value', '');
+				op.innerHTML = '-=请选择=-';
+				sel.appendChild(op);
+
+				var j;
+				for (j in propvalues) {
+					if (props[i]['pid'] == propvalues[j]['pid']) {
+						op = document.createElement('OPTION');
+						op.setAttribute('value', propvalues[j]['pid'] + ':' + propvalues[j]['vid']);
+						op.innerHTML = propvalues[j]['name_alias'];
+						sel.appendChild(op);
+					}
+				}
+
+				if (props[i]['is_input_prop']) {
+					op = document.createElement('OPTION');
+					op.setAttribute('value', props[i]['pid']);
+					op.innerHTML = '自定义';
+					sel.appendChild(op);
+				}
+
+				document.getElementById(pidSpan).innerHTML = props[i]['name'] + '：';
+				document.getElementById(pidSpan).appendChild(sel);
+
+				var propSpan = document.createElement('div');
+				propSpan.id = 'pid_' + props[i]['pid'] + '_span';
+				propSpan.style.cssText = "padding:2px 0px;line-height:0px";
+				document.getElementById(pidSpan).appendChild(propSpan);
+				document.getElementById('pid_' + props[i]['pid']).onchange = function(){childPropList(this, 'pid_' + props[i]['pid'] + '_span')};
+				return;
+			}
+		}
+	}
+}
+
+// 关联淘宝时的必填校验与构造接口需用的属性值，返回值为是否有必填项没填
+function checkAllTaobao() {
+	var propStr = '';
+	var propNameStr = '';//add by czx
+	var propArr = new Array();
+	var propNameArr = new Array();//add by czx
+	var m = 0;
+	var skuNum = 0;
+	inputStr = '';
+	inputPidsStr = '';
+	 var isReqNotInput = "false";
+
+	document.getElementById('propHid').value = '';
+	document.getElementById('skuPropHid').value = '';
+	document.getElementById('skuPropHidCzx').value = '';
+	document.getElementById('inputStrHid').value = '';
+	document.getElementById('inputPidsHid').value = '';
+
+	pushArr = new Array();
+	pushPidsArr = new Array();
+
+	$("#taobaoRelation tr:gt(0)").each(function(){
+		$(this).find("input").each(function(){
+		    var e = this;
+			//用于验证必填:文本输入框的情况
+			   if(e.getAttribute("must") == 'y' && e.value == '') {
+			    isReqNotInput = "true";
+			   }
+
+    		if (e.type == 'text') {
+    			var inputArr = e.id.split('_');
+    			if (2 == inputArr.length) {
+    				var inputId = inputArr[1];
+    				inputStr = e.value + inputStr;
+    				getInputStr(inputId);
+    				inputStr = ',' + inputStr;
+    			} else {
+    				inputStr += ';' + e.id + ';' + e.value + ';';
+    			}
+    		}
+		});
+	});
+
+	inputStr = inputStr.substr(1);
+	document.getElementById('inputStrHid').value = inputStr;
+
+	for (var j=0;j<pushPidsArr.length;j++) {
+		inputPidsStr = ',' + pushPidsArr[j] + inputPidsStr;
+	}
+	inputPidsStr = inputPidsStr.substr(1);
+	document.getElementById('inputPidsHid').value = inputPidsStr;
+	$("#taobaoRelation tr:gt(0)").each(function(){
+		$(this).find("input").each(function(){
+		    var e = this;
+
+			 //用于验证必填：复选框的情况
+		  if(e.type == 'checkbox') {
+			  if(e.getAttribute("must") == 'y') {
+			    var checkboxs = document.getElementsByName(e.id);
+				var isChecked = "false";
+                for(var i=0; i<checkboxs.length;i++){
+                 if(checkboxs[i].checked){
+				   isChecked="true";
+				   break;
+				  }
+				 }
+				 if(isChecked=="false") {
+				   isReqNotInput = "true";
+				  }
+			   }
+			}
+
+    		if(e.type == 'checkbox' && e.checked) {
+    			propStr += e.value + ';';
+				//add by czx
+				var tempName = e.value + "_span";
+				//alert(document.getElementById(tempName).name);
+				if (document.getElementById(tempName))
+					propNameStr += document.getElementById(tempName).name + ';';
+				//end by czx
+    		} else if (e.type == 'hidden'){
+    			skuNum++;
+    			var c = document.getElementsByName(e.value);
+    			var c_str = '';
+				var n_str = '';//add by czx
+    			for(var j=0;j<c.length;j++) {
+    				if(c[j].checked == true) {
+						//alert(c[j].value + "                    " + c[j].title)
+    					c_str += ';' + c[j].value;
+						n_str += ';' + c[j].title;
+    				}
+    			}
+    			if ('' != c_str) {
+    				propArr[m] = c_str.substr(1);
+					propNameArr[m]= n_str.substr(1);
+    				m++;
+    			}
+    		}
+		});
+	});
+
+	$("#taobaoRelation tr:gt(0)").each(function(){
+		$(this).find("select").each(function(){
+		    var e = this;
+			//用于验证必填：下拉框的情况
+			if(e.getAttribute("must") == 'y' && e.value == '') {
+			  isReqNotInput = "true";
+			}
+
+    		 if (e.type == 'select-one' && '' != e.value) {
+    			var q = 1;
+    			for (var p=0;p<pushArr.length;p++) {
+    				if (pushArr[p] == e.id) {
+    					q = '';
+    				}
+    			}
+    			if (q) {
+    				propStr += e.value + ';';
+    			}
+    		}
+		});
+	});
+
+	document.getElementById('propHid').value = propStr;
+
+	if (1 < propArr.length) {
+
+		for (var n=0;n<propArr.length;n++) {
+			propArr[n] = propArr[n].split(';');
+			propNameArr[n]= propNameArr[n].split(';');//czx
+		}
+
+		for (var n=0;n<propArr.length-1;n++) {
+			var j = 0;
+			var p = propArr[n+1];
+			var czx  = propNameArr[n+1];//czx
+
+			propArr[n+1] = new Array();
+			propNameArr[n+1] = new Array();//czx
+
+			for (var a=0;a<propArr[n].length;a++) {
+				for (var b=0;b<p.length;b++) {
+					propArr[n+1][j] = propArr[n][a] + ';' + p[b];
+					propNameArr[n+1][j] = propNameArr[n][a] + ';' + czx[b];//czx
+					j++;
+				}
+			}
+		}
+
+		var p = propArr[propArr.length-1];
+		var czx = propNameArr[propNameArr.length-1];//Czx
+		var salePropStr = '';
+		var salePropStrCzx = '';//Czx
+		for (var c=0;c<p.length;c++) {
+			salePropStr += p[c] + ',';
+			salePropStrCzx += czx[c] + ',';//Czx
+		}
+		salePropStr = salePropStr.substr(0, salePropStr.length-1);
+		salePropStrCzx = salePropStrCzx.substr(0, salePropStrCzx.length-1);//Czx
+		document.getElementById('skuPropHid').value = salePropStr;
+		document.getElementById('skuPropHidCzx').value = salePropStrCzx;
+		//add by czx
+		//alert(document.getElementById('skuPropHid').value);
+		//alert(salePropStrCzx);
+
+		//end by czx
+	} else if (1 == skuNum) {
+		if (propArr.length) {
+			var salePropStr = propArr[0];
+			var salePropStrCzx = propNameArr[0];//czx
+			salePropStr = salePropStr.replace(/;/g, ',');
+			salePropStrCzx = salePropStrCzx.replace(/;/g, ',');//czx
+			document.getElementById('skuPropHid').value = salePropStr;
+			document.getElementById('skuPropHidCzx').value = salePropStrCzx;
+			//alert(salePropStr + "           " +salePropStrCzx);
+		}
+	}
+	return isReqNotInput;
+}
+
+//递归
+function getInputStr(inputId) {
+	for (var i in props) {
+		if ('0' != props[i]['parent_vid']) {
+			if (inputId == props[i]['pid']) {
+				inputStr = props[i]['name'] + ';' + inputStr;
+				pushArr.push('pid_' + inputId);
+
+				for (var j in propvalues) {
+					if (props[i]['parent_vid'] == propvalues[j]['vid']) {
+						inputStr = propvalues[j]['name_alias'] + ';' + inputStr;
+					}
+				}
+				getInputStr(props[i]['parent_pid']);
+			}
+		} else {
+			if (inputId == props[i]['pid']) {
+				pushArr.push('pid_' + inputId);
+				pushPidsArr.push(inputId);
+			}
+		}
+	}
+}
+	//end - 淘宝关联
+</script>

@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="InDetailSQL">
+<typeAlias alias="inDetail" type="com.huaixuan.network.biz.domain.storage.InDetail"/>
+<typeAlias alias="inDetailGoods" type="com.huaixuan.network.biz.domain.storage.InDetailGoods"/>
+<typeAlias alias="goodsForLocation" type="com.huaixuan.network.biz.domain.storage.GoodsForLocation"/>
+<typeAlias alias="inDetailBaseInfo" type="com.huaixuan.network.biz.domain.storage.InDetailBaseInfo"/>
+<typeAlias alias="gatherInDepository" type="com.huaixuan.network.biz.domain.storage.GatherInDepository"/>
+	<resultMap class="inDetail" id="inDetailResult">
+		<result column="id" property="id"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="in_depository_id" property="inDepositoryId"/>
+		<result column="amount" property="amount"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="due_fee" property="dueFee"/>
+		<result column="fact_fee" property="factFee"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="stor_type" property="storType"/>
+		<result column="stor_id" property="storId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="left_num" property="leftNum" nullValue="0"/>
+		<result column="left_dep_num" property="leftDepNum" nullValue="0"/>
+	</resultMap>
+	<resultMap class="inDetailGoods" id="inDetailGoodsResult">
+		<result column="id" property="id"/>
+		<result column="code" property="code"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="amount" property="amount"/>
+		<result column="status" property="status"/>
+		<result column="stor_id" property="storId"/>
+	</resultMap>
+	<resultMap class="gatherInDepository" id="gatherInDepositoryResult">
+		<result column="in_depository_id" property="inDepositoryId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="amount" property="amount"/>
+		<result column="sum_money" property="sumMoney"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="gmt_in_dep" property="gmtInDep"/>
+		<result column="goods_instance_code" property="goodsInstanceCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap class="goodsForLocation" id="goodsForLocationResult">
+		<result column="inDetailId" property="inDetailId"/>
+		<result column="locationId" property="locationId"/>
+		<result column="loc_name" property="locName"/>
+		<result column="dep_name" property="depName"/>
+		<result column="dep_id" property="depId"/>
+	</resultMap>
+	<resultMap class="inDetailBaseInfo" id="inDetailBaseInfoCheckResult">
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="amount" property="amount"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="name" property="supplierName"/>
+		<result column="loc_id" property="oriLocationId"/>
+		<result column="loc_name" property="oriLocationName"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="in_detail_id" property="inDetailId"/>
+		<result column="in_depository_id" property="inDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap class="inDetailBaseInfo" id="inDetailBaseInfoShoppingResult">
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="amount" property="amount"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="in_detail_id" property="inDetailId"/>
+		<result column="in_depository_id" property="inDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap class="goodsForLocation" id="salesGoodsForLocationResult">
+		<result column="loc_id" property="locationId"/>
+		<result column="loc_name" property="locName"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="name" property="supplierName"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="amount" property="oriAmount"/>
+		<result column="dep_name" property="depName"/>
+		<result column="price" property="price"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap class="goodsForLocation" id="inDetailForDisResult">
+		<result column="loc_name" property="locName"/>
+		<result column="amount" property="oriAmount"/>
+		<result column="dep_name" property="depName"/>
+	</resultMap>
+	<resultMap class="inDetailGoods" id="inDetailNotFinishInfo">
+		<result column="id" property="id"/>
+		<result column="instance_name" property="instanceName"/>
+	</resultMap>
+	<resultMap class="gatherInDepository" id="gatherFinanceInDepository">
+		<result column="id" property="inDepositoryId"/>
+		<result column="sum_money" property="sumMoney"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="gmt_in_dep" property="gmtInDep"/>
+		<result column="finance_status" property="financeStatus"/>
+	</resultMap>
+	<resultMap id="gatherFinanceInDepositoryMap" class="gatherInDepository" >
+	    <result column="count" property="count" nullValue="0"/>
+        <result column="totalSum" property="totalSum" nullValue="0.00"/>
+   </resultMap>
+   <resultMap id="forShoppingListInfoMap" class="inDetailBaseInfo">
+	   	<result column="id" property="depFirstId"/>
+	   	<result column="dep_first_name" property="depFirstName"/>
+	   	<result column="stor_type" property="storType"/>
+   </resultMap>
+<!-- create InDetail object -->
+<insert id="addInDetail" parameterClass="inDetail">
+<![CDATA[
+		insert into ioss_in_detail
+		(id,goods_instance_id,goods_id,in_depository_id,amount,unit_price,due_fee,fact_fee,gmt_create,gmt_modify,status,stor_id,left_num,stor_type,dep_first_id,left_dep_num )values( null,
+		#goodsInstanceId#,
+		#goodsId#,
+		#inDepositoryId#,
+		#amount#,
+		#unitPrice#,
+		#dueFee#,
+		#factFee#,
+		sysdate(),
+		sysdate(),
+		#status#,
+	    #storId#,
+	    #leftNum#,
+	    #storType#,
+	    #depFirstId#,
+	    #leftDepNum#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update InDetail object -->
+<update id="editInDetail" parameterClass="inDetail">
+<![CDATA[
+		update ioss_in_detail set goods_instance_id = #goodsInstanceId#,
+		goods_id = #goodsId#,
+		in_depository_id = #inDepositoryId#,
+		amount = #amount#,
+		unit_price = #unitPrice#,
+		due_fee = #dueFee#,
+		fact_fee = #factFee#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = #gmtModify#,
+		status = #status#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete InDetail object -->
+<delete id="removeInDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_in_detail where ioss_in_detail.ID = #value#
+]]>
+</delete>
+<!-- search InDetail object -->
+<select id="getInDetail" parameterClass="java.lang.Long" resultMap="inDetailResult">
+<![CDATA[
+		select ioss_in_detail.* from ioss_in_detail where ioss_in_detail.ID = #value#
+]]>
+</select>
+<!-- searchAll InDetail List -->
+<select id="getInDetails" resultMap="inDetailResult">
+<![CDATA[
+		select ioss_in_detail.* from ioss_in_detail
+]]>
+</select>
+
+<select id="getInDetailGoodsLists" resultMap="inDetailGoodsResult" parameterClass="java.lang.Long">
+<![CDATA[
+		SELECT iid.id,igi.code,iid.goods_id,iid.goods_instance_id,igi.instance_name,igi.cat_code,igi.attrs,igi.goods_unit,iid.unit_price,iid.amount,iid.status,iid.stor_id
+		FROM ioss_in_detail iid,ioss_goods_instance igi
+		WHERE iid.goods_instance_id = igi.id
+		AND iid.in_depository_id = #id#
+]]>
+</select>
+
+<select id="getLocationForGoods" resultMap="goodsForLocationResult" parameterClass="java.util.Map">
+<![CDATA[
+		SELECT a.inDetailId, a.locationId,a.loc_name,b.name as dep_name,a.dep_id
+		from (
+			SELECT iid.id as inDetailId,dl.id as locationId,dl.loc_name,dl.dep_id
+			FROM ioss_in_detail iid, ioss_goods_location gl left join ioss_dep_location dl on (gl.loc_id = dl.id)
+			WHERE gl.goods_instance_id = iid.goods_instance_id
+			AND (dl.is_check is null OR dl.is_check <> 'Y')
+			AND dl.status='1'
+			AND iid.id=#id#)a , ioss_depository b where a.dep_id=b.id and a.locationId is not null and b.dep_first_id=#depFirstId# and b.type!='out_borrow_dep'
+]]>
+</select>
+
+<select id="getLocationForGoodsNoMatch" resultMap="goodsForLocationResult" parameterClass="java.util.Map">
+<![CDATA[
+select a.inDetailId, a.locationId, a.loc_name, b.name as dep_name,a.dep_id
+  from (SELECT iid.id as inDetailId,
+               dl.id as locationId,
+               dl.loc_name,
+               dl.dep_id
+          FROM ioss_in_detail iid, ioss_dep_location dl, ioss_depository d
+         WHERE (dl.is_check is null OR dl.is_check <> 'Y')
+           AND dl.status = '1'
+           AND d.id = dl.dep_id
+           AND d.type = 'common_dep'
+           AND d.status = 'v'
+           AND iid.id = #id#
+           AND d.dep_first_id=#depFirstId#) a
+  left JOIN ioss_depository b on (a.dep_id = b.id and
+                                 a.locationId is not null and b.type!='out_borrow_dep')
+]]>
+</select>
+
+<update id="updateStatusById" parameterClass="java.util.Map">
+		update ioss_in_detail set
+		gmt_modify = #gmtModify#,
+		status = #status#
+		<isNotEmpty prepend="" property="depFirstId">
+			,dep_first_id = #depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="storType">
+			,stor_type = #storType#
+		</isNotEmpty>
+		 where id = #id#
+</update>
+
+<select id="listInDetailNotFinish" parameterClass="java.util.Map" resultMap="inDetailNotFinishInfo">
+<![CDATA[
+		select a.id,b.instance_name
+		from ioss_in_detail a left join ioss_goods_instance b on a.goods_instance_id = b.id
+		where (a.status is null or a.status <> #status#)
+		and a.in_depository_id = #inDepId#
+]]>
+</select>
+
+<select id="getCheckInDetailBaseInfo" parameterClass="java.lang.Long" resultMap="inDetailBaseInfoCheckResult">
+<![CDATA[
+		SELECT igi.code,igi.instance_name,a.amount,a.supplier_id,isr.name,a.loc_id,idl.loc_name,a.batch_num,
+				a.goods_id,a.id as in_detail_id,a.in_depository_id,a.goods_instance_id,a.dep_first_id,a.stor_type
+		FROM  (SELECT iid.in_depository_id,iid.goods_instance_id,iid.amount,iid.goods_id,iid.id,iid.stor_id,
+				ise.supplier_id,ise.loc_id,ise.batch_num,iid.dep_first_id,iid.stor_type
+		              FROM ioss_in_detail iid , ioss_storage ise
+		              WHERE iid.stor_id = ise.id
+		              AND iid.id=#inDetailId#) a,
+		ioss_goods_instance igi,ioss_supplier isr,
+		ioss_dep_location idl
+		WHERE a.goods_instance_id=igi.id
+		AND a.loc_id = idl.id
+		AND a.supplier_id = isr.id
+]]>
+</select>
+
+<select id="getShoppingOrSalesInDetailBaseInfo" parameterClass="java.util.Map" resultMap="inDetailBaseInfoShoppingResult">
+<![CDATA[
+		SELECT code,instance_name,amount,iid.goods_instance_id,iid.id as in_detail_id,iid.goods_id,iid.in_depository_id,iidd.dep_first_id
+		FROM ioss_in_detail iid, ioss_goods_instance igi,ioss_in_depository iidd
+		WHERE iid.goods_instance_id = igi.id
+		AND iid.in_depository_id = iidd.id
+		AND iid.id=#inDetailId#
+		AND iidd.type=#type#
+]]>
+</select>
+
+<select id="getSalesLocationForGoods" parameterClass="java.lang.Long" resultMap="salesGoodsForLocationResult">
+<![CDATA[
+select c.loc_id,
+       c.loc_name,
+       c.supplier_id,
+       c.name,
+       c.batch_num,
+       c.amount,
+       d.name as dep_name,
+       c.price,
+       c.stor_type
+  from (select a.loc_id,
+               idl.loc_name,
+               a.supplier_id,
+               isr.name,
+               a.batch_num,
+               a.amount,
+               idl.dep_id,
+               a.price,
+               a.stor_type
+          from (select ipro.loc_id,
+                       ipro.storage_id,
+                       ipro.amount,
+                       ise.supplier_id,
+                       ise.batch_num,
+                       ise.price,
+                       ise.stor_type
+                  from (select dd.id, aa.goods_instance_id
+                          from ioss_in_detail      aa,
+                               ioss_in_depository  bb,
+                               emall_refund        cc,
+                               ioss_out_depository dd,
+                               emall_trade_package pp
+                         where aa.in_depository_id = bb.id
+                           and bb.relation_num = cc.refund_id
+                           and cc.tid = pp.tid
+                           and dd.relation_num = pp.merge_tid
+                           and aa.id = #id#) ee,
+                       ioss_prod_relation_out ipro,
+                       ioss_storage ise
+                 where ee.id = ipro.out_dep_id
+                   and ipro.storage_id = ise.id
+                   and ee.goods_instance_id = ipro.goods_instance_id) a,
+               ioss_dep_location idl,
+               ioss_supplier isr
+         where a.loc_id = idl.id
+           and a.supplier_id = isr.id) c
+  left join ioss_depository d on (c.dep_id = d.id and c.loc_id is not null)
+]]>
+</select>
+
+<select id="getSalesLocationForGoodsChange" parameterClass="java.lang.Long" resultMap="salesGoodsForLocationResult">
+<![CDATA[
+		select c.loc_id,
+		       c.loc_name,
+		       c.supplier_id,
+		       c.name,
+		       c.batch_num,
+		       c.amount,
+		       d.name as dep_name,
+		       c.price,
+		       c.stor_type
+		  from (SELECT a.loc_id,
+		               idl.loc_name,
+		               a.supplier_id,
+		               isr.name,
+		               a.batch_num,
+		               a.amount,
+		               idl.dep_id,
+		               a.price,
+		               a.stor_type
+		          FROM (SELECT ipro.loc_id,
+		                       ipro.storage_id,
+		                       ipro.amount,
+		                       ise.supplier_id,
+		                       ise.batch_num,
+		                       ise.price,
+		                       ise.stor_type
+		                  FROM (select dd.id, aa.goods_instance_id
+		                          from ioss_in_detail      aa,
+		                               ioss_in_depository  bb,
+		                               emall_refund        cc,
+		                               ioss_out_depository dd,
+		                               emall_trade_package pp
+		                         where aa.in_depository_id = bb.id
+		                           and bb.relation_num = cc.refund_id
+		                           and cc.tid = pp.tid
+		                           and dd.relation_num = pp.merge_tid
+		                           and aa.id = #id#) ee,
+		                       ioss_prod_relation_out ipro,
+		                       ioss_storage ise
+		                 WHERE ee.id = ipro.out_dep_id
+		                   AND ipro.storage_id = ise.id
+		                   AND ee.goods_instance_id = ipro.goods_instance_id) a,
+		               ioss_dep_location idl,
+		               ioss_supplier isr
+		         WHERE a.loc_id = idl.id
+		           AND a.supplier_id = isr.id) c
+		  left JOIN ioss_depository d on (c.dep_id = d.id and c.loc_id is not null)
+
+]]>
+</select>
+
+<select id="listInDetailForDisByDetailId" parameterClass="java.lang.Long" resultMap="inDetailForDisResult">
+	SELECT c.amount,c.loc_name,d.name as dep_name
+	FROM (
+	     SELECT a.amount,a.loc_id,b.dep_id,b.loc_name
+	     FROM ioss_prod_relation_in a left join ioss_dep_location b on a.loc_id = b.id
+	     WHERE in_detail_id=#inDetailId#
+	     )c left join ioss_depository d on c.dep_id = d.id
+</select>
+
+<select id="getGoodsLocationCountByInDetailId" resultClass="int" parameterClass="java.lang.Long">
+	select count(a.id) from ioss_in_detail a , ioss_goods_location b
+	where a.goods_instance_id = b.goods_instance_id
+	and a.id=#inDetailId#
+</select>
+
+<!-- 入库单成本汇总统计查询记录数 -->
+<select id="gatherInDepositoryListsCount" resultClass="int">
+<![CDATA[
+		select count(1) from (
+		SELECT bb.in_depository_id,bb.id,SUM(bb.amount) AS amount,SUM(aa.amount*aa.self_cost)/SUM(aa.amount) AS unit_price,
+				(SUM(aa.amount*aa.self_cost)/SUM(aa.amount))*(SUM(aa.amount)) AS sum_money,bb.gmt_in_dep,bb.bill_num,
+				bb.instance_name,bb.attrs,bb.goods_instance_code,bb.dep_first_id,aa.stor_type
+        FROM ioss_prod_relation_in aa,
+		(
+		select a.in_depository_id,a.id,a.amount,b.gmt_in_dep,b.bill_num,b.dep_first_id,
+			   c.instance_name,c.attrs,c.code as goods_instance_code
+		from ioss_in_detail a,ioss_in_depository b,ioss_goods_instance c
+		where a.in_depository_id=b.id and a.goods_instance_id=c.id and b.status='in_finished'
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			b.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			c.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceCode">
+			c.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			b.gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			b.gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			        b.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		)bb
+		WHERE bb.in_depository_id=aa.in_dep_id and bb.id=aa.in_detail_id
+		<isNotEmpty prepend="and" property="storType">
+			      aa.stor_type = #storType#
+		</isNotEmpty>
+		GROUP BY bb.in_depository_id,bb.id,bb.gmt_in_dep,bb.bill_num,bb.instance_name,bb.attrs,bb.goods_instance_code,bb.dep_first_id,aa.stor_type)aaaa
+</select>
+
+
+<!-- 入库单成本汇总统计查询 -->
+<select id="gatherInDepositoryLists" resultMap="gatherInDepositoryResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		SELECT bb.in_depository_id,bb.id,SUM(bb.amount) AS amount,SUM(aa.amount*aa.self_cost)/SUM(aa.amount) AS unit_price,
+				(SUM(aa.amount*aa.self_cost)/SUM(aa.amount))*(SUM(aa.amount)) AS sum_money,bb.gmt_in_dep,bb.bill_num,
+				bb.instance_name,bb.attrs,bb.goods_instance_code,bb.dep_first_id,aa.stor_type
+        FROM ioss_prod_relation_in aa,
+		(
+		select a.in_depository_id,a.id,a.amount,b.gmt_in_dep,b.bill_num,b.dep_first_id,
+			   c.instance_name,c.attrs,c.code as goods_instance_code
+		from ioss_in_detail a,ioss_in_depository b,ioss_goods_instance c
+		where a.in_depository_id=b.id and a.goods_instance_id=c.id and b.status='in_finished'
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			b.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			c.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceCode">
+			c.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			b.gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			b.gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			        b.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		)bb
+		WHERE bb.in_depository_id=aa.in_dep_id and bb.id=aa.in_detail_id
+		<isNotEmpty prepend="and" property="storType">
+			        aa.stor_type = #storType#
+		</isNotEmpty>
+		 GROUP BY bb.in_depository_id,bb.id,bb.gmt_in_dep,bb.bill_num,bb.instance_name,bb.attrs,bb.goods_instance_code,bb.dep_first_id,aa.stor_type
+		order by bb.bill_num desc,bb.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<update id="editInDetailGoodsInfo" parameterClass="inDetailGoods">
+<![CDATA[
+		update ioss_in_detail set left_num = #leftNum#,
+		left_dep_num = #leftDepNum#
+		 where id = #id#
+]]>
+</update>
+
+
+<!-- 实际入库单财务统计查询 -->
+<select id="gatherFinanceInDepositoryCount" resultMap="gatherFinanceInDepositoryMap">
+<![CDATA[
+select count(1) as count,sum(sum_money) as totalSum from (
+		SELECT a.id,SUM(b.amount*b.unit_price) AS sum_money,a.gmt_in_dep,a.bill_num
+        FROM ioss_in_depository a,ioss_in_detail b
+        where b.in_depository_id=a.id and a.status='in_finished' and b.stor_type = 'f'
+
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_in_dep,a.bill_num ) c
+</select>
+
+
+<select id="gatherFinanceInDepositoryLists" resultMap="gatherFinanceInDepository">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		SELECT a.id,SUM(b.amount*b.unit_price) AS sum_money,a.gmt_in_dep,a.bill_num,a.finance_status
+        FROM ioss_in_depository a,ioss_in_detail b
+        where b.in_depository_id=a.id and a.status='in_finished' and b.stor_type = 'f'
+
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_in_dep,a.bill_num,a.finance_status
+		order by a.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 暂估入库单财务统计查询 -->
+<select id="estimateFinanceInDepositoryCount" resultMap="gatherFinanceInDepositoryMap">
+<![CDATA[
+select count(1) as count,sum(sum_money) as totalSum from (
+		SELECT a.id,SUM(b.amount*b.unit_price) AS sum_money,a.gmt_in_dep,a.bill_num
+        FROM ioss_in_depository a,ioss_in_detail b
+        where b.in_depository_id=a.id and a.status='in_finished' and b.stor_type = 'v'
+
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_in_dep,a.bill_num ) c
+</select>
+
+
+<select id="estimateFinanceInDepositoryLists" resultMap="gatherFinanceInDepository">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		SELECT a.id,SUM(b.amount*b.unit_price) AS sum_money,a.gmt_in_dep,a.bill_num,a.finance_status
+        FROM ioss_in_depository a,ioss_in_detail b
+        where b.in_depository_id=a.id and a.status='in_finished' and b.stor_type = 'v'
+
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_in_dep,a.bill_num,a.finance_status
+		order by a.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getInfoByInDetailIdForShoppingList" resultMap="forShoppingListInfoMap">
+	SELECT e.id, e.dep_first_name, f.stor_type
+	  FROM ioss_depository_first e,
+	       (SELECT c.dep_first_id, c.stor_type
+	          from ioss_shopping_list c,
+	               (SELECT relation_num
+	                  FROM ioss_in_depository a,
+	                       (SELECT in_depository_id
+	                          FROM ioss_in_detail
+	                         WHERE id = #inDetailId#) b
+	                 WHERE a.id = b.in_depository_id) d
+	         WHERE c.shopping_num = d.relation_num) f
+	 WHERE e.id = f.dep_first_id
+</select>
+
+<select id="getLocationForDefect" resultMap="goodsForLocationResult" parameterClass="java.util.Map">
+<![CDATA[
+select iid.id as inDetailId,
+       dl.id as locationId,
+       dl.loc_name,
+       d.name as dep_name,
+       dl.dep_id
+  from ioss_in_detail iid, ioss_dep_location dl, ioss_depository d
+ where (dl.is_check is null OR dl.is_check <> 'Y')
+   and dl.status = '1'
+   and d.type = 'defect_dep'
+   and d.status = 'v'
+   and dl.id is not null
+   and d.id = dl.dep_id
+   and iid.id = #id#
+   and dl.id = #locId#
+]]>
+</select>
+
+<select id="getInDetailListByInDepositoryId" resultMap="inDetailResult" parameterClass="java.lang.Long">
+     <![CDATA[
+        select ioss_in_detail.* from ioss_in_detail where ioss_in_detail.in_depository_id = #value#
+     ]]>
+</select>
+</sqlMap>

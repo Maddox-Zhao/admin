@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="motorTransInfo">
+<typeAlias alias="motorTransInfo" type="com.huaixuan.network.biz.domain.express.MotorTransInfo"/>
+	<resultMap class="motorTransInfo" id="motorTransInfoResult">
+		<result column="id" property="id"/>
+		<result column="gmt_express_date" property="gmtExpressDate"/>
+		<result column="tid" property="tid"/>
+		<result column="express_name" property="expressName"/>
+		<result column="express_code" property="expressCode"/>
+		<result column="express_add" property="expressAdd"/>
+		<result column="express_tel" property="expressTel"/>
+		<result column="num" property="num"/>
+		<result column="receiver" property="receiver"/>
+		<result column="receiver_add" property="receiverAdd"/>
+		<result column="receiver_tel" property="receiverTel"/>
+		<result column="fee" property="fee"/>
+		<result column="pay_type" property="payType"/>
+		<result column="status" property="status"/>
+	</resultMap>
+
+<insert id="addMotorTransInfo" parameterClass="motorTransInfo">
+<![CDATA[
+insert into emall_motor_trans_info
+  (id,
+  gmt_express_date,
+  tid,
+  express_code,
+  express_name,
+  num,
+  receiver,
+  receiver_add,
+  receiver_tel,
+  express_tel,
+  express_add,
+  fee,
+  pay_type,
+  status,
+  gmt_create,
+  gmt_modify)
+values
+  (null,
+  #gmtExpressDate#,
+  #tid#,
+  #expressCode#,
+  #expressName#,
+  #num#,
+  #receiver#,
+  #receiverAdd#,
+  #receiverTel#,
+  #expressTel#,
+  #expressAdd#,
+  #fee#,
+  #payType#,
+  'y',
+  sysdate(),
+  sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<update id="editMotorTransInfo" parameterClass="motorTransInfo">
+update emall_motor_trans_info set
+  gmt_express_date			= #gmtExpressDate#,
+  tid						= #tid#,
+  express_code				= #expressCode#,
+  express_name				= #expressName#,
+  num						= #num#,
+  receiver					= #receiver#,
+  receiver_add				= #receiverAdd#,
+  receiver_tel				= #receiverTel#,
+  express_tel				= #expressTel#,
+  express_add				= #expressAdd#,
+  fee						= #fee#,
+  pay_type					= #payType#,
+  gmt_modify				= sysdate()
+ where id = #id#
+</update>
+
+<update id="updateStatus" parameterClass="java.lang.Long">
+	<![CDATA[ update emall_motor_trans_info set status = 'n' where id = #id# ]]>
+</update>
+
+
+<select id="getMotorTransInfo" parameterClass="java.lang.Long" resultMap="motorTransInfoResult" >
+	<![CDATA[ select a.* from emall_motor_trans_info a where a.id = #id# ]]>
+</select>
+
+<select id="getMotorCountByCond" resultClass="int">
+<![CDATA[
+		select count(emall_motor_trans_info.id) from emall_motor_trans_info where status = 'y'
+]]>
+		<isNotEmpty prepend="and" property="expressName">
+			express_name like CONCAT('%',#expressName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payType">
+			pay_type like CONCAT('%',#payType#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			receiver like CONCAT('%',#receiver#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtExpressDateStart">
+<![CDATA[			gmt_express_date >= STR_TO_DATE(#gmtExpressDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtExpressDateEnd">
+<![CDATA[			gmt_express_date < DATE_ADD(STR_TO_DATE(#gmtExpressDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</select>
+
+<select id="listMotorByCond" resultMap="motorTransInfoResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_motor_trans_info.* from emall_motor_trans_info where status = 'y'
+]]>
+		<isNotEmpty prepend="and" property="expressName">
+			express_name like CONCAT('%',#expressName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payType">
+			pay_type like CONCAT('%',#payType#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			receiver like CONCAT('%',#receiver#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtExpressDateStart">
+<![CDATA[			gmt_express_date >= STR_TO_DATE(#gmtExpressDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtExpressDateEnd">
+<![CDATA[			gmt_express_date < DATE_ADD(STR_TO_DATE(#gmtExpressDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		order by gmt_create desc,id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+
+</sqlMap>

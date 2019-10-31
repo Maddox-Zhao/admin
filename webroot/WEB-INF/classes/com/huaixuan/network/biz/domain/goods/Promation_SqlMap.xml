@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PromationSQL">
+<typeAlias alias="promation" type="com.huaixuan.network.biz.domain.goods.Promation"/>
+<typeAlias alias="promationVO" type="com.huaixuan.network.biz.domain.goods.PromationVO"/>
+<typeAlias alias="promationGive" type="com.huaixuan.network.biz.domain.goods.PromationGive"/>
+	<resultMap class="promation" id="promationResult">
+		<result column="id" property="id"/>
+		<result column="mode_code" property="modeCode"/>
+		<result column="name" property="name"/>
+		<result column="is_freeze" property="isFreeze"/>
+		<result column="start_date" property="startDate"/>
+		<result column="end_date" property="endDate"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+	<resultMap class="promationVO" id="promationVOResult" extends="promationResult">
+
+	</resultMap>
+	
+	<resultMap class="promationVO" id="promationVOResult2" extends="promationResult">
+		<result column="ruleExrtaInfo" property="ruleExrtaInfo"/>
+		<result column="ruleResultValue" property="ruleResultValue"/>
+	</resultMap>
+	
+	<resultMap class="promationGive" id="promationGiveResult">
+		<result column="id" property="id"/>
+		<result column="mode_code" property="modeCode"/>
+		<result column="name" property="name"/>
+		<result column="is_freeze" property="isFreeze"/>
+		<result column="start_date" property="startDate"/>
+		<result column="end_date" property="endDate"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+	
+	<resultMap class="promationGive" id="promationGiveResultTwo">
+		<result column="id" property="id"/>
+		<result column="mode_code" property="modeCode"/>
+		<result column="name" property="name"/>
+		<result column="is_freeze" property="isFreeze"/>
+		<result column="start_date" property="startDate"/>
+		<result column="end_date" property="endDate"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="goods_instance_Id" property="goodsInstanceId"/>
+	</resultMap>
+<!-- create Promation object -->
+<insert id="addPromation" parameterClass="promation">
+<![CDATA[
+insert into emall_promation
+  (id,
+   mode_code,
+   name,
+   is_freeze,
+   start_date,
+   end_date,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #modeCode#,
+   #name#,
+   #isFreeze#,
+   #startDate#,
+   #endDate#,
+   sysdate(),
+   sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Promation object -->
+<update id="editPromation" parameterClass="promation">
+<![CDATA[
+		update emall_promation set
+		mode_code = #modeCode#,
+		name = #name#,
+		is_freeze = #isFreeze#,
+		start_date = #startDate#,
+		end_date = #endDate#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- update Promation object -->
+<update id="editPromationByDynamic" parameterClass="promation">
+		update emall_promation t
+		set gmt_modify = sysdate()
+		      <isNotNull property="modeCode" prepend=",">
+		        t.mode_code = #modeCode#
+		      </isNotNull>
+		      <isNotNull property="name" prepend=",">
+		        t.name = #name#
+		      </isNotNull>
+		      <isNotNull property="isFreeze" prepend=",">
+		       t.is_freeze = #isFreeze#
+		      </isNotNull>
+		      <isNotNull property="startDate" prepend=",">
+		        t.start_date = #startDate#
+		      </isNotNull>
+		      <isNotNull property="endDate" prepend=",">
+		        t.end_date = #endDate#
+		      </isNotNull>
+		 where id = #id#
+</update>
+<!-- delete Promation object -->
+<delete id="removePromation" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_promation where emall_promation.ID = #value#
+]]>
+</delete>
+<!-- search Promation object -->
+<select id="getPromation" parameterClass="java.lang.Long" resultMap="promationResult">
+<![CDATA[
+		select emall_promation.* from emall_promation where emall_promation.ID = #value#
+]]>
+</select>
+
+<select id="getPromationByModeCode" parameterClass="java.lang.String" resultMap="promationResult">
+<![CDATA[
+		select t.* from emall_promation t where t.mode_code = #value# and t.is_freeze ='no' and t.end_date > sysdate() LIMIT 1
+]]>
+</select>
+<!-- search Promation object -->
+<select id="getPromationsByName" parameterClass="java.lang.String" resultMap="promationResult">
+<![CDATA[
+		select emall_promation.* from emall_promation where emall_promation.name = #value#
+]]>
+</select>
+<!-- searchAll Promation List -->
+<select id="getPromations" resultMap="promationResult">
+<![CDATA[
+		select emall_promation.* from emall_promation
+]]>
+</select>
+
+<select id="getPromationsByParams" resultMap="promationVOResult">
+<![CDATA[
+		select t.* from emall_promation t where t.is_freeze ='no'
+]]>
+		  <isNotEmpty property="promationId" prepend="and">
+		        <![CDATA[	t.id = #promationId# ]]>
+		      </isNotEmpty>
+		      <isNotEmpty property="curTime" prepend="and">
+		        <![CDATA[	t.start_date <= STR_TO_DATE(#curTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		      </isNotEmpty>
+		      <isNotEmpty property="curTime" prepend="and">
+		        <![CDATA[	t.end_date > STR_TO_DATE(#curTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		      </isNotEmpty>
+		      <isNotEmpty property="promationTypes">
+					<iterate prepend="AND" property="promationTypes" open="(" close=")"
+						conjunction="or">
+						t.mode_code=#promationTypes[]#
+					</iterate>
+			  </isNotEmpty>
+</select>
+
+<!-- searchAll Goods List -->
+<sql id="PROMATIONS.COMMON_CONDITION">
+		<isNotEmpty property="id" prepend="and ">id = #id#</isNotEmpty>
+		<isNotEmpty property="modeCode" prepend="and">
+			p.mode_code = #modeCode#
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			p.name like concat('%',#name#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="isFreeze" prepend="and">
+			p.is_freeze like concat('%',#isFreeze#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="startDate" prepend="and">
+			<![CDATA[	p.start_date >= STR_TO_DATE(#startDate#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty property="endDate" prepend="and">
+			<![CDATA[	p.start_date <= STR_TO_DATE(#endDate#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty property="startDateEnd" prepend="and">
+			<![CDATA[	p.end_date >= STR_TO_DATE(#startDateEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty property="endDateEnd" prepend="and">
+			<![CDATA[	p.end_date <= STR_TO_DATE(#endDateEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+	</sql>
+
+
+
+	<select id="getPromationsByCondition" resultMap="promationResult"
+		parameterClass="map">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+		select p.* from emall_promation p  where 1=1
+]]>
+		<include refid="PROMATIONS.COMMON_CONDITION" />
+		order by id desc
+		<include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getPromationsByConditionCount" parameterClass="map"
+		resultClass="int">
+		<![CDATA[
+		select count(1) from emall_promation p where 1=1
+]]>
+		<include refid="PROMATIONS.COMMON_CONDITION" />
+	</select>
+
+	<select id="getGivePromationList" resultMap="promationVOResult2">
+	<![CDATA[
+		select t.*,r.result_value as ruleResultValue,r.exrta_info as ruleExrtaInfo
+		from emall_promation t,emall_rule r 
+		where r.promation_id=t.id AND r.rule_type='1'
+	]]>
+		      <isNotEmpty property="curTime" prepend="and">
+		        <![CDATA[	t.start_date <= STR_TO_DATE(#curTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		      </isNotEmpty>
+		      <isNotEmpty property="curTime" prepend="and">
+		        <![CDATA[	t.end_date > STR_TO_DATE(#curTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		      </isNotEmpty>
+		      <isNotEmpty property="promationTypes">
+					<iterate prepend="AND" property="promationTypes" open="(" close=")"
+						conjunction="or">
+						t.mode_code=#promationTypes[]#
+					</iterate>
+			  </isNotEmpty>
+			  <isNotEmpty property="isFreeze" prepend="and">
+		        	t.is_freeze ='no'
+		      </isNotEmpty>
+</select>
+
+
+<!-- update Promation object -->
+<update id="autoCanelFreeze" parameterClass="promation">
+	<![CDATA[
+		update emall_promation t  set t.gmt_modify = sysdate(),t.is_freeze='no'
+		 where t.end_date <= sysdate() and t.is_freeze='yes'
+	]]>
+</update>
+
+<select id="getPromationsByIds" resultMap="promationVOResult">
+	select t.* from emall_promation t
+	<dynamic prepend=" where ">
+		<iterate prepend="AND" property="ids" open="(" close=")"
+			conjunction="or">
+			t.id =#ids[]#
+		</iterate>
+	</dynamic>
+
+</select>
+
+<select id="getNewPromationVOListGive" parameterClass="java.util.Map" resultMap="promationGiveResult">
+<![CDATA[
+    select t.* from emall_promation t where t.is_freeze = 'no' and t.mode_code = 'sale_give'
+]]>
+    <isNotEmpty prepend="and" property="nowDate">
+           t.start_date &lt;= STR_TO_DATE(#"nowDate"#,'%Y-%m-%d %H:%i:%s')
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="nowDate">
+           t.end_date &gt;= STR_TO_DATE(#"nowDate"#,'%Y-%m-%d %H:%i:%s')
+    </isNotEmpty>
+</select>
+
+<select id="getGivePromation" parameterClass="java.lang.Long" resultMap="promationGiveResultTwo">
+<![CDATA[
+    select t.*,r.result_value as goods_instance_Id from emall_promation t, emall_rule r where t.id = r.promation_id and r.rule_type = 2 and t.id = #value#
+]]>
+</select>
+
+</sqlMap>

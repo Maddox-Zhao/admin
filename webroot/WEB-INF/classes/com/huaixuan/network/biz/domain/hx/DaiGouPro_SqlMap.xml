@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 表名:hx_daigou_pro -->
+<sqlMap namespace="daigouPro">
+	<typeAlias alias="DaigouPro" type="com.huaixuan.network.biz.domain.hx.DaiGouPro" />
+	<resultMap id="daigouProResult" class="DaiGouPro">
+		<result property="id" column="id" />
+		<result property="daigouId" column="daigou_id" />
+		<result property="note" column="note" />
+		<result property="amount" column="amount" />
+		<result property="paidAmount" column="paid_amount" />
+		<result property="price" column="price" />
+		<result property="highPrice" column="high_price" />
+		<result property="num" column="num" />
+		<result property="commission" column="commission" />
+		<result property="brandId" column="brand_id" />
+		<result property="seriesId" column="series_id" />
+		<result property="type" column="type" />
+		<result property="material" column="material" />
+		<result property="color" column="color" />
+		<result property="daigouCode" column="daigou_code" />
+		<result property="pic" column="pic" />
+		<result property="status" column="status" />
+		<result property="gmtCreate" column="gmt_create" />
+		<result property="gmtModify" column="gmt_modify" />
+	</resultMap>
+
+	<sql id="DaigouProFields">
+		id,daigou_id,note,amount,paid_amount,price,high_price,num,commission,brand_id,series_id,type,material,color,daigou_code,pic,status,gmt_create,gmt_modify
+	</sql>
+	
+	<!-- 根据ID获取 -->
+	<select id="selectDaigouProById" parameterClass="java.lang.Long" resultMap="daigouProResult">
+		select
+		<include refid="DaigouProFields" />
+		from hx_daigou_pro
+		where id = #id#
+	</select>
+	
+	<!-- 根据订单号得到该订单的所有产品 -->
+	<select id="selectDaiGouProListByDaiGouCode" parameterClass="java.lang.String" resultMap="daigouProResult">
+		select
+		<include refid="DaigouProFields" />
+		from hx_daigou_pro
+		where daigou_code = #daigouCode#
+	</select>
+
+	<!-- 添加 -->
+	<insert id="insertDaigouPro" parameterClass="DaigouPro">
+		insert into hx_daigou_pro(
+		id,
+		daigou_id,
+		note,
+		amount,
+		paid_amount,
+		price,
+		high_price,
+		num,
+		commission,
+		brand_id,
+		series_id,
+		type,
+		material,
+		color,
+		daigou_code,
+		pic,
+		status,
+		gmt_create,
+		gmt_modify
+		) values (
+		#id#,
+		#daigouId#,
+		#note#,
+		#amount#,
+		#paidAmount#,
+		#price#,
+		#highPrice#,
+		#num#,
+		#commission#,
+		#brandId#,
+		#seriesId#,
+		#type#,
+		#material#,
+		#color#,
+		#daigouCode#,
+		#pic#,
+		default,
+		sysdate(),
+		sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+
+	<!-- 更新 -->
+	<update id="updateDaigouProByNotNull" parameterClass="DaigouPro">
+		update hx_daigou_pro
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="id">
+				id=#id#
+			</isNotNull>
+			<isNotNull prepend="," property="daigouId">
+				daigou_id=#daigouId#
+			</isNotNull>
+			<isNotNull prepend="," property="note">
+				note=#note#
+			</isNotNull>
+			<isNotNull prepend="," property="amount">
+				amount=#amount#
+			</isNotNull>
+			<isNotNull prepend="," property="paidAmount">
+				paid_amount=#paidAmount#
+			</isNotNull>
+			<isNotNull prepend="," property="price">
+				price=#price#
+			</isNotNull>
+			<isNotNull prepend="," property="highPrice">
+				high_price=#highPrice#
+			</isNotNull>
+			<isNotNull prepend="," property="num">
+				num=#num#
+			</isNotNull>
+			<isNotNull prepend="," property="commission">
+				commission=#commission#
+			</isNotNull>
+			<isNotNull prepend="," property="brandId">
+				brand_id=#brandId#
+			</isNotNull>
+			<isNotNull prepend="," property="seriesId">
+				series_id=#seriesId#
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				type=#type#
+			</isNotNull>
+			<isNotNull prepend="," property="material">
+				material=#material#
+			</isNotNull>
+			<isNotNull prepend="," property="color">
+				color=#color#
+			</isNotNull>
+			<isNotNull prepend="," property="daigouCode">
+				daigou_code=#daigouCode#
+			</isNotNull>
+			<isNotNull prepend="," property="pic">
+				pic=#pic#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+				status=#status#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtCreate">
+				gmt_create=#gmtCreate#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify=#gmtModify#
+			</isNotNull>
+			where id = #id#
+		</dynamic>
+	</update>
+
+
+	<!-- 删除 -->
+	<delete id="deleteDaigouProById" parameterClass="java.lang.Long">
+		delete from
+		hx_daigou_pro
+		where id = #id#
+	</delete>
+	
+	
+</sqlMap>
+
+
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BankSQL">
+
+<typeAlias alias="payaccount" type="com.huaixuan.network.biz.domain.shop.Payaccount"/>
+<typeAlias alias="proxyagency" type="com.huaixuan.network.biz.domain.shop.Proxyagency"/>
+
+<resultMap id="bankResult" class="payaccount">
+	<result property="idPayAccount" column="idPayAccount"/>
+	<result property="name" column="name"/>
+	<result property="number" column="number"/>
+	<result property="idCurrency" column="idCurrency"/>
+</resultMap>
+
+<resultMap id="proxyagencyResult" class="proxyagency">
+	<result property="idProxyAgency" column="idProxyAgency"/>
+	<result property="name" column="name"/>
+</resultMap>
+
+<select id="getBankbyBankName"  resultMap="bankResult">
+	SELECT * FROM payaccount
+	
+</select>
+
+<select id="getCompany"  resultMap="proxyagencyResult">
+	SELECT * FROM proxyagency
+</select>
+</sqlMap>

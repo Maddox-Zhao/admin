@@ -1,0 +1,96 @@
+#set($layout = 'layout\default.vm')
+
+<div class="main">
+	<h2>CRM系统 - 销售人员销售排行 </h2>
+	<!-- 搜索模块 -->
+	<div class="searchBox">
+		<h3><span>搜索销售人员销售排行</span></h3>
+		<form action="crmSalesmanRank.html" name="searchForm" id="searchForm" method="post">
+			<table>
+				<tr>
+					<th>销售人员名称：</th>
+					#springBind("crmSalesmanRankQuery.saleName")
+					<td><input  type="text" id="saleName"  name="${status.expression}" value="$!{status.value}" /></td>
+					<th>统计时间：从</th>
+					<td>
+						#springBind("crmSalesmanRankQuery.gmtOptTimeStart")
+						<input type="text" id="gmtOptTimeStart" name="${status.expression}" value="$!{status.value}" size="8" readonly="true"/>
+						到
+						#springBind("crmSalesmanRankQuery.gmtOptTimeEnd")
+						<input type="text" id="gmtOptTimeEnd" name="${status.expression}" value="$!{status.value}" size="8" readonly="true"/>
+						<script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "gmtOptTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "gmtOptTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        				</script>
+					</td>
+					<th>&nbsp;</th>
+					<td>
+						<input type="button" class="btn" value=" 查询  "  onclick="formSubmit();"/>
+					</td>	
+				</tr>
+			</table>
+        </form>
+  	</div>
+
+	<!-- 订单列表 -->
+	<div class="listBox"> 
+		<table>
+			<tr>
+                <th>销售排名</th>
+        		<th>销售人员ID</th>
+                <th>累计销售订单</th>
+        		<th>累计销售金额</th>
+        		<th>累计退货金额</th>
+                <th>联系电话</th>
+			</tr>
+			#foreach($userSales in $query.items)
+			  <tr>
+        		<td  align="center">&nbsp;第$userSales.rankNum 名</td>
+                <td  align="center">&nbsp;$!userSales.saleName</td>
+        		<td  align="center">&nbsp;$!userSales.tradeNum</td>
+        		<td  align="center">&nbsp;$!userSales.salesAmount</td>
+        		<td  align="center">&nbsp;$!userSales.refundAmount</td>
+                <td  align="center">&nbsp;$!userSales.phone</td>
+        	  </tr>
+			#end
+		</table>
+		<!-- 分页 -->
+		<div class="pages-box" >
+			#if($query.items.size()>0)
+				$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/crm/crmSalesmanRank.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+			#else
+				没有结果！
+			#end
+		</div>
+	</div>
+</div>
+<script language="javascript" type="text/javascript">	
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+	
+    function formSubmit(){
+			var dateStart1=document.getElementById("gmtOptTimeStart").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("gmtOptTimeEnd").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+    		if(e_date1 < b_date1){
+    			alert("统计起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("saleName").value=document.getElementById("saleName").value.trim();
+        	document.forms[0].submit();
+	 }
+</script>

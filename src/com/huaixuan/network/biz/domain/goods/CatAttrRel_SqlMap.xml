@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CatAttrRelSQL">
+	<typeAlias alias="catAttrRel"
+		type="com.huaixuan.network.biz.domain.goods.CatAttrRel" />
+	<typeAlias alias="attributeDTO"
+		type="com.huaixuan.network.biz.domain.goods.AttributeDTO" />
+	<resultMap class="catAttrRel" id="catAttrRelResult">
+		<result column="id" property="id" />
+		<result column="show_name" property="showName" />
+		<result column="cat_code" property="catCode" />
+		<result column="attr_code" property="attrCode" />
+		<result column="sort_order" property="sortOrder" />
+		<result column="enable" property="enable" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+	<resultMap class="catAttrRel" id="catAttrRelResultEXT"
+		extends="catAttrRelResult">
+		<result column="attr_name" property="attrName" />
+		<result column="attr_value" property="attrValue" />
+		<result column="cateGory_name" property="categoryName" />
+	</resultMap>
+
+
+	<resultMap class="attributeDTO" id="attributeDTOResult">
+		<result column="id" property="id" />
+		<result column="attr_name" property="attrName" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="attr_code" property="attrCode" />
+		<result column="group_id" property="groupId" />
+		<result column="input_type" property="inputType" />
+		<result column="attr_values" property="attrValues" />
+		<result column="status" property="status" />
+		<result column="is_index" property="isIndex" />
+		<result column="is_guide" property="isGuide" />
+		<result column="is_need" property="isNeed" />
+		<result column="is_buyer_choose" property="isBuyerChoose" />
+		<result column="is_instance" property="isInstance" />
+	</resultMap>
+	<!-- create CatAttrRel object -->
+	<insert id="addCatAttrRel" parameterClass="catAttrRel">
+		<![CDATA[
+		insert into emall_cat_attr_rel
+		(id,cat_code,attr_code,sort_order,enable,gmt_create,gmt_modify )values(
+		null,
+		#catCode#,
+		#attrCode#,
+		#sortOrder#,
+		1,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update CatAttrRel object -->
+	<update id="editCatAttrRel" parameterClass="catAttrRel">
+		<![CDATA[
+		update emall_cat_attr_rel set show_name = #showName#,
+		cat_code = #catCode#,
+		attr_code = #attrCode#,
+		sort_order = #sortOrder#,
+		enable = #enable#,
+		gmt_modify = sysdate()
+		 where id = #id#
+]]>
+	</update>
+	<!-- delete CatAttrRel object -->
+	<update id="removeCatAttrRel" parameterClass="java.lang.Long">
+		<![CDATA[
+		update emall_cat_attr_rel ec set ec.enable=0,ec.gmt_modify = sysdate() where ec.ID = #value#
+]]>
+	</update>
+
+	<update id="removeCatAttrRelByVatCode" parameterClass="string">
+		<![CDATA[
+		update emall_cat_attr_rel ec set ec.enable=0,ec.gmt_modify = sysdate() where ec.cat_code = #catCode#
+]]>
+	</update>
+
+
+	<delete id="removeCatAttrRelAll">
+		<![CDATA[
+		delete from emall_cat_attr_rel
+]]>
+	</delete>
+
+	<!-- search CatAttrRel object -->
+	<select id="getCatAttrRel" parameterClass="java.lang.Long"
+		resultMap="catAttrRelResult">
+		<![CDATA[
+		select emall_cat_attr_rel.* from emall_cat_attr_rel where emall_cat_attr_rel.ID = #value#
+]]>
+	</select>
+
+	<select id="getCatAttrRelByName" parameterClass="string"
+		resultMap="catAttrRelResult">
+		<![CDATA[
+		select emall_cat_attr_rel.* from emall_cat_attr_rel where emall_cat_attr_rel.show_name = #value#
+]]>
+	</select>
+
+	<!-- searchAll CatAttrRel List -->
+	<select id="getCatAttrRels" resultMap="catAttrRelResult">
+		<![CDATA[
+		select emall_cat_attr_rel.* from emall_cat_attr_rel
+]]>
+	</select>
+
+	<select id="getRelAcountOfTheCategory" resultClass="int"
+		parameterClass="catAttrRel">
+		<![CDATA[
+		select count(*) from emall_cat_attr_rel  ec where  ec.cat_code=#catCode#
+	]]>
+	</select>
+
+	<select id="getAttributeInfoOfTheCategory"
+		resultMap="catAttrRelResultEXT" parameterClass="string">
+		<![CDATA[
+		select  distinct aa.* from (
+		select   e.* , ea.attr_name  as  attr_name , ea.attr_values as attr_value,ca.cat_name as cateGory_name
+		from emall_cat_attr_rel e , emall_attribute ea ,emall_category ca
+		where e.cat_code=#catCode#  and e.enable=1 and ea.attr_code=e.attr_code and  e.cat_code=ca.cat_code and ea.status=1
+		order by e.sort_order asc
+		) aa
+		]]>
+	</select>
+
+	<select id="getAttributeDTOByCatCode" resultMap="attributeDTOResult" parameterClass="java.util.List">
+		select a.id,
+       a.attr_name,
+       a.attr_desc,
+       a.attr_code,
+       a.group_id,
+       a.input_type,
+       a.attr_values,
+       a.is_index,
+       a.is_guide,
+       a.is_need,
+       a.status,
+       a.is_buyer_choose,
+       a.is_instance
+      from (select e.cat_code, ea.*
+          from emall_cat_attr_rel e, emall_attribute ea
+         where e.attr_code = ea.attr_code
+           and e.enable = 1
+           and ea.status = 1
+           and e.cat_code in 
+           <iterate open = "(" close = ")" conjunction = ",">#value[]#</iterate>
+         order by e.sort_order asc, ea.attr_name, e.cat_code desc) a
+       
+       order by a.cat_code
+
+	</select>
+
+
+	<select id="getBeforeRecord" parameterClass="catAttrRel"
+		resultMap="catAttrRelResult">
+		<![CDATA[
+		select ee.*
+          from (select *
+                  from emall_cat_attr_rel e
+                 where e.cat_code = #catCode#
+                   and e.sort_order < #sortOrder#
+                   and e.enable = 1) ee
+         order by ee.sort_order desc LIMIT 1
+
+	]]>
+	</select>
+
+	<select id="getAfterRecord" parameterClass="catAttrRel"
+		resultMap="catAttrRelResult">
+		<![CDATA[
+		select ee.*
+          from (select *
+                  from emall_cat_attr_rel e
+                 where e.cat_code = #catCode#
+                   and e.sort_order > #sortOrder#
+                   and e.enable = 1) ee
+         order by ee.sort_order asc LIMIT 1
+	]]>
+	</select>
+
+	<update id="modifyTheSortOrder" parameterClass="catAttrRel">
+		<![CDATA[
+		update emall_cat_attr_rel ec set ec.sort_order=#sortOrder#  ,ec.gmt_modify= sysdate()  where ec.id=#id#
+	]]>
+	</update>
+
+	<select id="getCatAttrRelCountByAttrCode" parameterClass="string" resultClass="int">
+		<![CDATA[
+		select count(1) from emall_cat_attr_rel where emall_cat_attr_rel.attr_code = #attrCode# and emall_cat_attr_rel.enable = 1
+        ]]>
+	</select>
+
+<select id="getCatAttrRelByCondition" parameterClass="java.util.Map" resultMap="catAttrRelResult">
+  <![CDATA[
+      select emall_cat_attr_rel.* from emall_cat_attr_rel where emall_cat_attr_rel.enable = 1
+  ]]>
+  <isNotEmpty prepend="and" property="catCode">
+      emall_cat_attr_rel.cat_code = #catCode#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="attrCode">
+      emall_cat_attr_rel.attr_code = #attrCode#
+  </isNotEmpty>
+  order by emall_cat_attr_rel.sort_order asc
+</select>
+</sqlMap>

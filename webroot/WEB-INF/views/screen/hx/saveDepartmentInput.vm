@@ -1,0 +1,41 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+
+	<div class="main">
+    	 <h2>添加新部门</h2>	 
+		 <center>
+		 <form action="add.html" name="saveDpartment" method="post" >
+			部门名称：
+				#springBind("department.name")
+			  <input type="text" name="$!{status.expression}" value="$!{status.value}"  maxlength="10" class="inp inp-w105" onblur="javascript:if(this.value.replace(/(^\s*)|(\s*$)/g, ' ')== ' ') alert('部门名称必须填写') "/><span class="red">*</span><br/><br/>
+			  
+			上级部门：&nbsp;&nbsp;
+			 #springBind("department.parentCode")
+			    <select name="$!{status.expression}">
+					#foreach($departmentView in $list)
+						<option value="$!{departmentView.depCode}" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!departmentView.name </option>
+					#end
+				</select>
+			  
+			  <br/><br/>
+			  #springBind("department.status")
+			  <input type="hidden" name="${status.expression}" value="open"  maxlength="10" class="inp inp-w105" />
+			  
+			  备注：
+			  #springBind("department.note")
+			  <textarea cols="30" rows="3" name="${status.expression}" id="note">$!{status.value}</textarea><br/><br/>
+
+			  
+				
+		<div class="form-but">
+    		<button type="submit" id="allcheckbutton" class="button-s4" >添加</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" >重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='list.html'">返回 </button>
+		</div>
+		 
+		 </form>
+
+		 </center>
+    </div>

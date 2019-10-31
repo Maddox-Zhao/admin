@@ -1,0 +1,303 @@
+#set($layout = "layout/default.vm")
+#set($title = "批量更新物流范围")
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+	<div class="formBox">
+		<h3><span>批量更新物流范围</span></h3>
+		<div class="content">
+            <form name="addForm" action="batchModifyExpressDist.html" method="post">
+            	<input type="hidden" name="optType" id="optType" value=""/>
+            	<input type="hidden" name="initOpt" id="initOpt" value=""/>
+            	<h1>
+            		<span class="action-span1"><a href="$request.getContextPath()/igc/index.html">管理中心</a>- 批量更新物流范围 </span>
+            		#if($addDistMap.expressId && $addDistMap.expressId != "")
+            			<span class="action-span"><a href="searchExpressDist.html">返回</a></span>
+            		#end
+            		<div style="clear: both;"></div>
+            		#if($successInfo && $successInfo != "")<div class="success_min" id="modifySuccess">$!successInfo #if($isAddOpt)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="addExpressDist.html?eid=$!{expressIdForDis}">点击继续添加</a>#end</div>#end
+            		#if($errorInfo && $errorInfo != "")<div class="warning_min" id="modifyError">$!errorInfo</div>#end
+            	</h1>
+            <div class="list-div" style="margin-bottom: 5px">
+            	<table id="general-table" width="100%">
+            		<tr>
+            			<td></td>
+            			<td>
+            				<span>
+            					<font color="red">
+            						<B>$!message</B>
+            					</font>
+            				</span>
+            			</td>
+            		</tr>
+            	</table>
+            	<div class="title">物流公司范围信息</div>
+            	<table  id="listTable" name="listTable"  class="c2">
+            		<tr >
+            			<td class="label">物流名称：</td>
+            			<td>
+            				<select id="addDistMap.selExpressId" name="addDistMap.selExpressId">
+            					#foreach($expressInfo in $expressInfoList)
+            						<option #if(${addDistMap.selExpressId} && "${addDistMap.selExpressId}"=="$!{expressInfo.id}") selected #end value="$!{expressInfo.id}">$!{expressInfo.expressName}</option>
+            					#end
+            				</select>
+            			</td>
+            		</tr>
+            		<tr >
+            		    <td class="label">物流始发地：</td>
+            			<td>
+            				#if($addDistMap.expressId && $addDistMap.expressId != "")
+            					#foreach($province in $provinceList)
+            						#if(${addDistMap.regionCodeProvinceStart} && ${addDistMap.regionCodeProvinceStart}==$!{province.code}) $!{province.regionName} #end
+            			        #end
+            					#foreach($city in $cityListInit)
+            		                #if(${addDistMap.regionCodeCityStart} && ${addDistMap.regionCodeCityStart}==$!{city.code}) $!{city.regionName} #end
+            		            #end
+            					#foreach($district in $distincListInit)
+            		                #if(${addDistMap.regionCodeDistinctStart} && ${addDistMap.regionCodeDistinctStart}==$!{district.code}) $!{district.regionName} #end
+            		            #end
+            					<input type="hidden" name="addDistMap.regionCodeProvinceStart" id="s1" value="$!addDistMap.regionCodeProvinceStart" />
+            					<input type="hidden" name="addDistMap.regionCodeCityStart" id="cityStart" value="$addDistMap.regionCodeCityStart" />
+            					<input type="hidden" name="addDistMap.regionCodeDistinctStart" id="districtStart" value="$addDistMap.regionCodeDistinctStart" />
+            				#else
+            					<select id="s1" name="addDistMap.regionCodeProvinceStart" onchange="selectCity(this.value,'cityStart','districtStart');">
+                			        <option value="">请选择</option>
+                			        #foreach($province in $provinceList)
+                			          <option value="$!{province.code}" #if(${addDistMap.regionCodeProvinceStart} && ${addDistMap.regionCodeProvinceStart}==$!{province.code}) selected #end>$!{province.regionName}</option>
+                			        #end
+                				</select>
+                				<select id="cityStart"  name="addDistMap.regionCodeCityStart" onchange="selectDistinc(this.value,'districtStart');">
+                					<option value="">请选择</option>
+                		            #foreach($city in $cityListInit)
+                		                <option value="$!{city.code}" #if(${addDistMap.regionCodeCityStart} && ${addDistMap.regionCodeCityStart}==$!{city.code}) selected #end>$!{city.regionName}</option>
+                		            #end
+                		        </select>
+                		        <select id="districtStart"  name="addDistMap.regionCodeDistinctStart">
+                		            <option value="">请选择</option>
+                		            #foreach($district in $distincListInit)
+                		                <option value="$!{district.code}" #if(${addDistMap.regionCodeDistinctStart} && ${addDistMap.regionCodeDistinctStart}==$!{district.code}) selected #end>$!{district.regionName}</option>
+                		            #end
+                		        </select>
+            				#end
+            			</td>
+            		</tr>
+            		<tr >
+            	        <td class="label">物流目的地：</td>
+            				<td>
+            					#if($addDistMap.expressId && $addDistMap.expressId != "")
+            						#foreach($provinceEnd in $provinceList)
+            							#if(${addDistMap.regionCodeProvinceEnd} && ${addDistMap.regionCodeProvinceEnd}==$!{provinceEnd.code}) $!{provinceEnd.regionName} #end
+            						#end
+            						#foreach($cityEnd in $cityEndListInit)
+                		                #if(${addDistMap.regionCodeCityEnd} && ${addDistMap.regionCodeCityEnd}==$!{cityEnd.code}) $!{cityEnd.regionName} #end
+            						#end
+            						#foreach($districtEnd in $distincEndListInit)
+            							#if(${addDistMap.regionCodeDistinctEnd} && ${addDistMap.regionCodeDistinctEnd}==$!{districtEnd.code}) $!{districtEnd.regionName} #end
+                		            #end
+            						<input type="hidden" name="addDistMap.regionCodeProvinceEnd" id="s2" value="$!addDistMap.regionCodeProvinceEnd" />
+            						<input type="hidden" name="addDistMap.regionCodeCityEnd" id="cityEnd" value="$addDistMap.regionCodeCityEnd" />
+            						<input type="hidden" name="addDistMap.regionCodeDistinctEnd" id="districtEnd" value="$addDistMap.regionCodeDistinctEnd" />
+            					#else
+                    				<select id="s2"  name="addDistMap.regionCodeProvinceEnd" onchange="selectCity(this.value,'cityEnd','districtEnd');">
+                    			        <option value="">请选择</option>
+                    			        #foreach($provinceEnd in $provinceList)
+                    			          <option value="$!{provinceEnd.code}" #if(${addDistMap.regionCodeProvinceEnd} && ${addDistMap.regionCodeProvinceEnd}==$!{provinceEnd.code}) selected #end>$!{provinceEnd.regionName}</option>
+                    			        #end
+                    				</select>
+                    				<select id="cityEnd"  name="addDistMap.regionCodeCityEnd" onchange="selectDistinc(this.value,'districtEnd');">
+                    					<option value="">请选择</option>
+                    		            #foreach($cityEnd in $cityEndListInit)
+                    		                <option value="$!{cityEnd.code}" #if(${addDistMap.regionCodeCityEnd} && ${addDistMap.regionCodeCityEnd}==$!{cityEnd.code}) selected #end>$!{cityEnd.regionName}</option>
+                    		            #end
+                    		        </select>
+                    		        <select id="districtEnd"  name="addDistMap.regionCodeDistinctEnd">
+                    		            <option value="">请选择</option>
+                    		            #foreach($districtEnd in $distincEndListInit)
+                    		                <option value="$!{districtEnd.code}" #if(${addDistMap.regionCodeDistinctEnd} && ${addDistMap.regionCodeDistinctEnd}==$!{districtEnd.code}) selected #end>$!{districtEnd.regionName}</option>
+                    		            #end
+                    		        </select>
+            					#end
+            			</td>
+            	    </tr>
+            		<tr >
+            			<td class="label">支付方式：</td>
+            			<td>
+            				#sselect("name=addDistMap.payment" "id=addDistMap.payment" "list=expressDistPaymentPartMap" "listKey=key" "listValue=value" "theme=simple" "headerKey=" )
+            			</td>
+            		</tr>
+            		<tr >
+                        <td class="label">送货时间：</td>
+            			<td>
+            				<input id="addDistMap.spendTimeFrom" size="10" name="addDistMap.spendTimeFrom" type="text" value="$!addDistMap.spendTimeFrom"/>-
+            				<input id="addDistMap.spendTimeTo" size="10" name="addDistMap.spendTimeTo" type="text" value="$!addDistMap.spendTimeTo"/>天
+            			</td>
+                    </tr>
+            		<tr >
+                        <td class="label">首重重量(千克)：</td>
+            			<td ><input id="addDistMap.weightFirst" size="20" name="addDistMap.weightFirst" type="text" value="$!addDistMap.weightFirst"/></td>
+            		</tr>
+            		<tr>
+            			<td class="label">首重费用(元)：</td>
+            			<td ><input id="addDistMap.weightFirstMoney" size="20" name="addDistMap.weightFirstMoney" type="text" value="$!addDistMap.weightFirstMoney"/></td>
+            		</tr>
+            		<tr>
+                        <td class="label">续重重量(千克)：</td>
+            			<td ><input id="addDistMap.weightNext" size="20" name="addDistMap.weightNext" type="text" value="$!addDistMap.weightNext"/></td>
+            		</tr>
+            		<tr>
+            			<td class="label">续重费用(元)：</td>
+            			<td ><input id="addDistMap.weightNextMoney" size="20" name="addDistMap.weightNextMoney" type="text" value="$!addDistMap.weightNextMoney"/></td>
+            		</tr>
+            		<tr >
+                        <td class="label">备注：</td>
+            			<td><textarea id="addDistMap.memo" name="addDistMap.memo" rows="5" cols="62">$!addDistMap.memo</textarea></td>
+                    </tr>
+            		<tr >
+                        <td class="label">状态：</td>
+            			<td>
+            				#sselect("name=addDistMap.status" "id=addDistMap.status" "list=expressDistStatusMap" "listKey=key" "listValue=value" "theme=simple" "headerKey=" )
+            			</td>
+                    </tr>
+            	</table>
+
+            		<div class="form-but">
+            			<input type="button" value=" 提 交 "  onclick="javaScript:return valid_from('update');"/>
+                    </div>
+            	</div>
+            </form>
+		</div>
+	</div>
+<script language="javascript" type="text/javascript">
+var objCityList = new Array();
+        var objDistincList = new Array();
+		var j=0;
+        var i=0;
+        #foreach($objCity in $cityList)
+            objCityList[j] = new Array("$!{objCity.code}","$!{objCity.parentCode}","$!{objCity.regionName}");
+            j++;
+        #end
+		#foreach($objDistinc in $distincList)
+            objDistincList[i] = new Array("$!{objDistinc.code}","$!{objDistinc.parentCode}","$!{objDistinc.regionName}");
+            i++;
+        #end
+		var count=j;
+		var num=i;
+		function selectCity(code,cityVar,districtVar){
+            var obj = document.getElementById(cityVar);
+            var length = obj.length = 0;
+    		obj.options[length++] = new Option("请选择", "");
+            for(var m=0; m<count; m++){
+                if( objCityList[m][1] == code){
+                    obj.options[length] = new Option(objCityList[m][2], objCityList[m][0]);
+                    length++;
+                }
+            }
+            var obj2 = document.getElementById(districtVar);
+            var length2 = obj2.length = 0;
+            obj2.options[length2] = new Option("请选择", "");
+        }
+        function selectDistinc(code,districtVar){
+            var obj = document.getElementById(districtVar);
+            var length = obj.length = 0;
+			obj.options[length++] = new Option("请选择", "");
+            for(var m=0; m<num; m++){
+                if( objDistincList[m][1] == code){
+                    obj.options[length] = new Option(objDistincList[m][2], objDistincList[m][0]);
+                    length++;
+                }
+             }
+         }
+
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function isNumberNoDot(val)
+	{
+	  var reg = /^\+?[1-9][0-9]*$/;
+	  return reg.test(val);
+	}
+	function isNumber(val)
+	{
+	  var reg = /^[0-9]+.?[0-9]?[0-9]?[0-9]?$/;
+	  return reg.test(val);
+	}
+	function isPriceNumber(val)
+	{
+	  var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	  return reg.test(val);
+	}
+	function selExpress(){
+		$("initOpt").value="selectFinish";
+		if($("selExpressId").value.length == 0) {
+			alert("请首先选择物流公司");
+			return false;
+		}
+		document.forms[0].submit();
+		$("initOpt").value="";
+	}
+function valid_from(typeOpt){
+	$("optType").value = typeOpt;
+	$("s1").value=$("s1").value.trim();
+	$("s2").value=$("s2").value.trim();
+	$("addDistMap.spendTimeFrom").value=$("addDistMap.spendTimeFrom").value.trim();
+	$("addDistMap.spendTimeTo").value=$("addDistMap.spendTimeTo").value.trim();
+	$("addDistMap.weightFirst").value=$("addDistMap.weightFirst").value.trim();
+	$("addDistMap.weightFirstMoney").value=$("addDistMap.weightFirstMoney").value.trim();
+	$("addDistMap.weightNext").value=$("addDistMap.weightNext").value.trim();
+	$("addDistMap.weightNextMoney").value=$("addDistMap.weightNextMoney").value.trim();
+	$("addDistMap.memo").value=$("addDistMap.memo").value.trim();
+	if($("s1").value.length == 0) {
+		alert("请选择物流始发地");
+		return false;
+	} else if($("s2").value.length == 0){
+		alert("请选择物流目的地");
+		return false;
+	} else if($("addDistMap.spendTimeFrom").value.length > 0 && !isNumberNoDot($("addDistMap.spendTimeFrom").value)){
+		alert("送货时间请输入正整数");
+		return false;
+	} else if($("addDistMap.spendTimeTo").value.length > 0 && !isNumberNoDot($("addDistMap.spendTimeTo").value)){
+		alert("送货时间请输入正整数");
+		return false;
+	} else if($("addDistMap.spendTimeFrom").value > 1000){
+		alert("送货时间过长，请确认后重新输入");
+		return false;
+	} else if($("addDistMap.spendTimeTo").value > 1000){
+		alert("送货时间过长，请确认后重新输入");
+		return false;
+	} else if($("addDistMap.spendTimeFrom").value.length > 0 && $("addDistMap.spendTimeTo").value.length > 0
+			&& $("addDistMap.spendTimeFrom").value * 1 > $("addDistMap.spendTimeTo").value){
+
+		alert("送货时间输入错误");
+		return false;
+	} else if($("addDistMap.weightFirst").value.length > 0 &&
+			(!isNumber($("addDistMap.weightFirst").value) || $("addDistMap.weightFirst").value > 100000)){
+		alert("首重重量输入错误");
+		return false;
+	} else if($("addDistMap.weightFirstMoney").value.length > 0 &&
+			(!isPriceNumber($("addDistMap.weightFirstMoney").value) || $("addDistMap.weightFirstMoney").value > 100000)){
+		alert("首重费用输入错误");
+		return false;
+	} else if($("addDistMap.weightNext").value.length > 0 &&
+			(!isNumber($("addDistMap.weightNext").value) || $("addDistMap.weightNext").value > 100000)){
+		alert("续重重量输入错误");
+		return false;
+	} else if($("addDistMap.weightNextMoney").value.length > 0 &&
+			(!isPriceNumber($("addDistMap.weightNextMoney").value) || $("addDistMap.weightNextMoney").value > 100000)){
+		alert("续重费用输入错误");
+		return false;
+	} else if($("addDistMap.memo").value.length > 0 && $("addDistMap.memo").value.length > 200){
+		alert("备注输入过长，请控制在200字以下");
+		return false;
+	} else {
+		if($("addDistMap.payment").value == 'all'){
+			if(confirm('确认支付方式为全部支持？')){
+				document.forms[0].submit();
+			}
+		} else {
+			document.forms[0].submit();
+		}
+	}
+	$("optType").value = "";
+}
+</script>
+</div>

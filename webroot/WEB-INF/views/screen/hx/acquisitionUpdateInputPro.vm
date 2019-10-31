@@ -1,0 +1,96 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>修改收购产品信息</h2>
+		 
+		 #if($!message)
+		 <div class="mag-t2">
+			$!message
+		 </div>
+		 #end
+		 <center>
+		 <form action="update.html" name="updateacquisitionPro" method="post" enctype="multipart/form-data">
+			
+			#springBind("acquisitionPro.id")
+			<input type="hidden" name="${status.expression}" value="$!{status.value}" theme="simple" class="inp inp-w105"/>
+			
+			#springBind("acquisitionPro.acqId")
+			 <input type="hidden" name="${status.expression}"  value="$!{status.value}" readonly="true" theme="simple" class="inp inp-w105"/><br/><br/>
+			  
+			  收购编号：
+			  #springBind("acquisitionPro.acqCode")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" readonly="true" theme="simple" class="inp inp-w105"/><br/><br/>			   
+			  
+			   品&nbsp;&nbsp;&nbsp;&nbsp;名：
+			  #springBind("acquisitionPro.seriesId")
+			  <select name="${status.expression}">
+					#foreach($series in ${seriesList.entrySet()})
+							<option value="$!series.key" #if($!series.key == $!{acquisitionPro.seriesId}) selected="selected" #end class="inp inp-w105" size="10">&nbsp;&nbsp;$!{series.value}&nbsp;&nbsp;</option>
+					#end
+			  </select><br/><br/>
+			  
+			 品牌：
+			  #springBind("acquisitionPro.brandId")
+			  <select name="${status.expression}">
+					#foreach($brand in $brandList.entrySet())
+							<option value="$!brand.key" #if($!brand.key == $!{acquisitionPro.brandId}) selected="selected" #end class="inp inp-w105" size="10">$!brand.value</option>
+					#end
+			  </select><br/><br/>
+			  
+			  材质：
+			  #springBind("acquisitionPro.material")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			  型号：
+			  #springBind("acquisitionPro.type")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			  
+			  颜色：
+			  #springBind("acquisitionPro.color")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			    
+			  价钱：
+			  #springBind("acquisitionPro.amount")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" readOnly="true" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			  已取金额:
+			  #springBind("acquisitionPro.paidAmount")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple"  readOnly="true" class="inp inp-w105" maxlength="7"/><br/><br/>
+			    
+			  uuid：
+			  #springBind("acquisitionPro.uuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="10"/><br/><br/>
+			  
+			    
+			  auuid：
+			  #springBind("acquisitionPro.auuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="10"/><br/><br/>
+			  
+			    
+			  等级：
+			  #springBind("acquisitionPro.level")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105"/><br/><br/>
+			  
+			 
+			  产品图片：
+			  <input type="file" name="img" />
+				
+			  <br/><br/>
+	</form>
+			 
+		<div class="form-but">
+    		#if($!acquisitionPro.status.equals("wait_sell"))<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.updateacquisitionPro.submit()">确定#end</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.updateacquisitionPro.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/acquisition/detail.html?id=$!{acquisitionPro.acqId}';">返回 </button>
+		</div>
+
+		 </center>
+    </div>

@@ -1,0 +1,158 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心——退换货申请列表")
+
+<body>
+<div class="main">
+	<h2>管理中心——退换货申请列表</h2>
+
+	#if($message)<div class="mag-t2">$message</div>#end
+
+	<form action="$appServer.get("/igc/refundApplySearch.html")" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索订单</span></h3>
+			<table>
+				<tr>
+					<th>订单编号：</th>
+					<td>
+						#springBind("query.tid")
+						<input type="text" name="${status.expression}" id="query.tid" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()"/>
+					</td>
+					<th>买家昵称：</th>
+					<td>
+						#springBind("query.buyNick")
+						<input type="text" name="${status.expression}" id="query.buyNick" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()"/>
+					</td>
+					<th>状态：</th>
+					<td>
+						#springBind("query.status")
+						<select id="query.status" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							<option value="n" #if("$!{query.status}" == "n") selected="selected" #end>新建</option>
+							<option value="p" #if("$!{query.status}" == "p") selected="selected" #end>申请通过</option>
+							<option value="u" #if("$!{query.status}" == "u") selected="selected" #end>申请失败</option>
+							<option value="c" #if("$!{query.status}" == "c") selected="selected" #end>取消</option>
+						</select>
+					</td>
+					<th>申请时间：</th>
+					<td>
+						#springBind("query.dateStart")
+						<input type="text" id="query.dateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.dateEnd")
+						<input type="text" id="query.dateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.dateStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.dateEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="8">
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+						<button type="button" class="btn" onclick="clean();">重置</button>
+					</td>
+				</tr>
+            </table>
+        </div>
+	</form>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+				<th>用户名</th>
+				<th>申请编号</th>
+				<th>订单编号</th>
+				<th>申请时间</th>
+				<th>操作员</th>
+				<th>审批时间</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		#foreach($refundApply in $page.items)
+			<tr #if($velocityCount % 2 == 0) class="bg" #end>
+				<td>
+					$!{refundApply.buyNick}
+				</td>
+				<td>
+					$!{refundApply.id}
+				</td>
+				<td>
+					<a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", ${refundApply.tid})">$!{refundApply.tid}</a>
+				</td>
+				<td>
+					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $refundApply.gmtCreate)
+				</td>
+				<td>
+					$!{refundApply.creater}
+				</td>
+				<td>
+					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $refundApply.gmtApply)
+				</td>
+				<td>
+					$!enumRefundApplyStatusMap.get($!refundApply.status)
+				</td>
+				<td>
+					#if("$!refundApply.status" == "n")
+						<a href="$appServer.get("/igc/refundApplyDetail.html").addQueryData("applyId", $refundApply.id)">处理申请</a>
+					#else
+						<a href="$appServer.get("/igc/refundApplyDetail.html").addQueryData("applyId", $refundApply.id).addQueryData("detail", "yes")">查看</a>
+					#end
+				</td>
+			</tr>
+		#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/igc/refundApplySearch.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function formSubmit(){
+		if(!checkDate('query.dateStart','query.dateEnd'))
+			return false;
+		else
+			document.searchForm.submit();
+	}
+
+	function checkDate(begin,end){
+		var dateStart=document.getElementById(begin).value.replace(/-/g, "/");
+		var dateEnd=document.getElementById(end).value.replace(/-/g, "/");
+		var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		return true;
+	}
+
+	function clean(){
+		document.getElementById('query.tid').value='';
+		document.getElementById('query.buyNick').value='';
+		document.getElementById('query.status').value='';
+		document.getElementById('query.dateStart').value='';
+		document.getElementById('query.dateEnd').value='';
+	}
+</script>
+</body>

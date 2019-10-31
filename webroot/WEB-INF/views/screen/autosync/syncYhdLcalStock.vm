@@ -1,0 +1,17 @@
+#set($layout = '')
+<html>
+<head>
+	<title>1号店库存匹配</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" action="/timetask/yhd/syncStock.html"  enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			1号店excel :<input type="file" name="yhd" /><br/>
+			<input type="submit" value="上传"/>
+		</form>
+</body>
+
+</html>

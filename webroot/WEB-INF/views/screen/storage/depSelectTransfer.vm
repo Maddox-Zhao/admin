@@ -1,0 +1,121 @@
+#set($layout = "")
+
+          <th>一级仓库：</th>
+		  <td>
+    			<select name="depfirstId" id="depfirstId" style="width:100px;" onchange="selectDep(this.value);">
+					#if($depositoryFirstList.size() > 1 )
+					<option value="">-=请选择=-</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+    				<option value="$depfirst.id" #if("$depfirst.id"==$queryObject.depfirstId) selected #end>$depfirst.depFirstName</option>
+    				#end
+    			</select>
+		  </td>
+         <th>仓库：</th>
+		 <td>
+    			<select name="depId" id="depId" style="width:100px;" onchange="selectLoc(this.value);">
+    				<option value="">-=请选择=-</option>
+					#foreach($st in $depositoryList)
+					<option value="$st.id" #if("$st.id"==$queryObject.depId) selected #end>$st.name</option>
+					#end
+    			</select>
+         </td>
+        <th>库位：</th>
+		<td >
+		        <select id="locId"  name="locId">
+                     <option value="">-=请选择=-</option>
+                     #foreach($depLocation in $depLocationLists)
+                     <option value="$!{depLocation.id}" #if("$!{queryObject.locId}"=="$!{depLocation.id}") selected #end>$!{depLocation.locName}</option>
+                    #end
+                 </select>
+		</td>
+
+<script language="javascript" type="text/javascript">
+	function load()
+    {
+	   var obj3 = document.getElementById("depfirstId");
+	#if($!depositoryFirstList)
+	  #if($!depositoryFirstList.size()==0)
+		      var length3 = obj3.length3 = 0;
+	          obj3.options[length3++] = new Option("您没有权限", "");
+      #else
+	   var obj = document.getElementById("depId");
+	   if(obj.value == ""){
+	   var obj2 = document.getElementById("locId");
+	   var length = obj.length = 0;
+	   var length2 = obj2.length = 0;
+	   obj.style.display='';
+	   obj2.style.display='';
+       obj.options[length++] = new Option("-=请选择=-", "");
+	   obj2.options[length2] = new Option("-=请选择=-", "");
+	    #if($depositoryFirstList.size()==1)
+	     #foreach($st in $depositoryFirstList)
+		   var code = $st.id;
+		 #end
+		   jQuery.post('selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   for(var i=0;i<list.length;i++){
+		     var dep=list[i];
+			 #if(${moveName}=="外借")
+			 if(dep.type == "out_borrow_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+			 #else
+			 if(dep.type == "common_dep"||dep.type == "defect_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+			 #end
+		    }
+		   },'json');
+	    #end
+       }
+	  #end
+	#else
+	   var length3 = obj3.length3 = 0;
+	   obj3.options[length3++] = new Option("您没有权限", "");
+	#end
+	 }
+
+function selectDep(code){
+    var obj = document.getElementById("depId");
+	var obj2 = document.getElementById("locId");
+	var length = obj.length = 0;
+
+		obj.style.display='';
+		obj2.style.display='';
+		obj.options[length++] = new Option("-=请选择=-", "");
+		jQuery.post('selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   for(var i=0;i<list.length;i++){
+		     var dep=list[i];
+			 #if(${moveName}=="外借")
+			 if(dep.type == "out_borrow_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+			 #else
+			 if(dep.type == "common_dep"||dep.type == "defect_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+			 #end
+		   }
+		},'json');
+
+	    var obj2 = document.getElementById("locId");
+    	var length2 = obj2.length = 0;
+    	obj2.options[length2] = new Option("-=请选择=-", "");
+}
+
+function selectLoc(code){
+    var obj = document.getElementById("locId");
+	var length = obj.length = 0;
+	obj.options[length++] = new Option("-=请选择=-", "");
+	jQuery.post('selectLoc.html',{param:code},function(selectloclist){
+		   var list=selectloclist;
+		   obj.style.display='';
+		   for(var i=0;i<list.length;i++){
+		     var loc=list[i];
+			 obj.options[length++] = new Option(loc.locName, loc.id);
+		   }
+		},'json');
+}
+</script>

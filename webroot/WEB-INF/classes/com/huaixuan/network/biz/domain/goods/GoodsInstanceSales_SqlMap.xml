@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="GoodsInstanceSales">
+	<resultMap id="goodsInstanceSalesResult" class="com.huaixuan.network.biz.domain.goods.GoodsInstanceSales">
+         <result column="id" property="id"/>
+         <result column="goods_instance_id" property="goodsInstanceId"/>
+         <result column="goods_instance_name" property="goodsInstanceName"/>
+         <result column="goods_instance_code" property="goodsInstanceCode"/>
+         <result column="opt_time" property="optTime"/>
+         <result column="sales_amount" property="salesAmount"/>
+         <result column="refund_amount" property="refundAmount"/>
+	</resultMap>
+	<resultMap id="goodsInstanceSalesRecordResult" class="com.huaixuan.network.biz.domain.goods.GoodsInstanceSales">
+	     <result column="goods_instance_id" property="goodsInstanceId"/>
+         <result column="goods_instance_code" property="goodsInstanceCode"/>
+         <result column="sales_amount" property="salesAmount"/>
+         <result column="refund_amount" property="refundAmount"/>
+         <result column="rankNum" property="rankNum"/>
+	</resultMap>
+
+	<insert id="addGoodsInstanceSales" parameterClass="com.huaixuan.network.biz.domain.goods.GoodsInstanceSales">
+	
+	<![CDATA[
+	insert into emall_goodsInstance_sales
+	  (id,
+	   goods_instance_id,
+	   goods_instance_name,
+	   goods_instance_code,
+	   opt_time,
+	   sales_amount,
+	   refund_amount)
+	values
+	  (null,
+	   #goodsInstanceId#,
+	   #goodsInstanceName#,
+	   #goodsInstanceCode#,
+	   #optTime#,
+	   #salesAmount#,
+	   #refundAmount#)
+	]]>
+	<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+<select id="getSalesAmountInfo" parameterClass="java.util.Map" resultClass="java.lang.Double">
+  <![CDATA[
+     select coalesce(sum(b.amount * t.goods_price),0)
+     from emall_order            t,
+          emall_trade            s,
+          emall_trade_package    p,
+          ioss_out_depository    a,
+          ioss_prod_relation_out b
+     where t.tid = s.tid
+       and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+       and a.relation_num = p.merge_tid
+       and s.tid = p.tid
+       and a.status = 'out_finished'
+       and b.out_dep_id = a.id
+       and a.type = 'out_sales'
+  ]]>
+  <isNotEmpty prepend="and" property="goodsInstanceId">
+       t.goods_instance_id = #goodsInstanceId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_out_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+
+<select id="getRefundAmountInfo" parameterClass="java.util.Map" resultClass="java.lang.Double">
+  <![CDATA[
+     select coalesce(sum(er.fact_fee), 0)
+     from ioss_in_depository a, emall_refund r, emall_refund_order er
+     where r.refund_id = er.refund_id
+       and r.status = 'success'
+       and a.relation_num = r.refund_id
+       and a.status = 'in_finished'
+       and a.type = 'in_sales_refund'
+  ]]>
+  <isNotEmpty prepend="and" property="goodsInstanceId">
+      er.goods_instance_id = #goodsInstanceId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_in_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+
+<select id="getProductListsByParameterMap" parameterClass="java.util.Map" resultMap="goodsInstanceSalesRecordResult">
+<include refid="pageSQLHead"/>
+  <![CDATA[
+select es.goods_instance_id,
+       es.goods_instance_code,
+       coalesce(sum(es.sales_amount), 0) as sales_amount,
+       coalesce(sum(es.refund_amount), 0) as refund_amount
+  from emall_goodsinstance_sales es where 1=1
+  ]]>
+  <isNotEmpty prepend="and" property="productName">
+     es.goods_instance_name like concat('%',#productName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="productCode">
+     es.goods_instance_code like concat('%',#productCode#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ es.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ es.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+ group by es.goods_instance_id,
+          es.goods_instance_name,
+          es.goods_instance_code
+ order by coalesce(sum(es.sales_amount), 0) desc
+ 
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getProductByParameterMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+  select count(1) from
+     (select es.goods_instance_id,
+       es.goods_instance_code,
+       coalesce(sum(es.sales_amount), 0) as sales_amount,
+       coalesce(sum(es.refund_amount), 0) as refund_amount
+  from emall_goodsinstance_sales es where 1=1
+  ]]>
+  <isNotEmpty prepend="and" property="productName">
+     es.goods_instance_name like concat('%',#productName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="productCode">
+     es.goods_instance_code like concat('%',#productCode#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ es.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ es.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+ group by es.goods_instance_id,
+          es.goods_instance_name,
+          es.goods_instance_code) cc
+</select>
+
+<delete id="deleteProductByParameterMap" parameterClass="java.util.Map">
+  <![CDATA[
+      delete from emall_goodsinstance_sales es where 1=1
+  ]]>
+    <isNotEmpty prepend="and" property="searchDay">
+       <![CDATA[ es.opt_time = STR_TO_DATE(#searchDay#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+</delete>
+
+<select id="getGoodsSearchDayByMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+  select count(1) from(
+   select * from emall_goodsinstance_sales where 1=1
+   ]]>
+  <isNotEmpty prepend="and" property="searchDay">
+       <![CDATA[ emall_goodsinstance_sales.opt_time = STR_TO_DATE(#searchDay#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  )aa
+</select>
+</sqlMap>

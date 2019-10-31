@@ -1,0 +1,182 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>魅力惠发货通知</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+    <form target="iframeName" action="/plartFromOrderRecord/orderExecl.html" enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+     <div style="width:50%" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="1">
+                <tr>
+					<td style="width:100px">
+                        <a class="mini-button" iconCls="icon-ok" onclick="noctiy()">发货通知</a> 
+                    </td>
+					
+					
+					<td style="padding-left:70px;">
+                    <!--<a class="mini-button" iconCls="icon-download"  onclick="iport()">导入</a> -->
+						  <input type="submit" value="导入"/>
+                    </td>
+					
+					<td colspan="2">
+                        <input type="file" name="Mlh"/>
+                    </td>
+				
+                </tr>
+				<tr>
+				  <td class="form-label" style="width:60px;">创建时间：</td>
+                    <td style="width:60px" colspan="3">
+                        <input id="createDateStart" name="createDateStart" class="mini-datepicker"    format="yyyy-MM-dd"  />
+                        ~
+                        <input id="createDateEnd"  name="createDateEnd" class="mini-datepicker"    format="yyyy-MM-dd" />
+                    </td>
+		        	 <td>
+                        <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>
+					</td>
+				</tr>
+                <tr>
+					<td style="width:60px">订单号:</td>
+				    <td>
+						<input name="orderId" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td style="width:60px" colspan="2"></td>
+					<td colspan="2">
+					    <a class="mini-button" iconCls="icon-download" onclick="exportEms()">导出</a>
+                     </td>
+				</tr>
+            </table>
+        </div>
+    </div>
+ </form>  
+ <iframe id="iframeName" name="iframeName" style="display:none;"></iframe>
+    <div id="datagrid1" class="mini-datagrid" style="width:50%;height:450px;" allowResize="true"  allowCellEdit="true" allowCellSelect="true" 
+        url="searchOrderId.html"  idField="id" multiSelect="true"  pageSize="50" showPager="true">
+        <div property="columns">
+			<div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>	
+			<div field="orderId"    width="210" headerAlign="center" align="center" allowSort="true">订单号:</div>
+			<div field="emsCode"    width="150" headerAlign="center" align="center" allowSort="true">快递单号:</div>
+			<div field="emsCompany" width="80" headerAlign="center" align="center" allowSort="true">快递公司:</div> 
+        </div>
+    </div>
+    <script type="text/javascript"> 
+		
+		var statusData = [{id:1,value:'考拉'},{id:2,value:'寺库'},{id:3,value:'珍品'},{id:4,value:'1号店'}
+						,{id:5,value:'天猫'},{id:6,value:'higo'},{id:7,value:'分期类'},{id:8,value:'拼多多'}
+						,{id:9,value:'魅力惠'}];
+	 	mini.parse();
+		var grid = mini.get("datagrid1");
+		search();
+		
+		
+		
+       function search() {		
+            var form = new mini.Form("#form1");
+            var data = form.getData();//获取表单多个控件的数据
+			
+				//处理日期
+			if(!data.createDateStart){
+			  delete data.createDateStart;
+			}
+			if(!data.createDateEnd){
+			  delete data.createDateEnd;
+			}
+			
+			if(!data.orderId){
+			delete data.orderId;
+			}
+			  var date = mini.get("createDateStart").getValue();
+            if (date instanceof Date) {
+                data.createDateStart = formatDate(date);
+            }
+            var date = mini.get("createDateEnd").getValue();
+            if (date instanceof Date) {
+                data.createDateEnd = formatDate(date);
+            }
+		 grid.load(data);	
+     } 
+	 //发货通知
+		function noctiy(){
+		 var rows = grid.getSelecteds();
+		   if (rows.length > 0) {
+		    var ids = [];
+			 for (var i = 0, l = rows.length; i < l; i++) {
+				 var r = rows[i];
+				  ids.push(r.orderId);
+			 }
+			  var id = ids.join(',');
+			
+			 jQuery.ajax({
+                        url: "/plartFromOrderRecord/order/shipped.html",
+						type: 'POST',
+						data: {orderId:id},
+                        success: function(text) {
+						if(text==true){
+						 mini.unmask();
+                            grid.reload();
+						mini.alert("推送成功");
+						}else if(text==false){
+                            grid.reload();
+							mini.alert("推送失败");
+						}
+						   
+                        },
+                        error: function(text) {}
+                    });
+		   }else{
+                mini.alert("请选中一条记录");
+            }
+		}
+	
+
+	 //处理时间
+		 function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+
+//导出快递单号和快递公司
+   function exportEms(){
+   var rows = grid.getSelecteds();
+  
+   if(rows.length==0){
+      var excelForm = document.getElementById("uploadForm");
+      excelForm.action = "/plartFromOrderRecord/orderOutExecl.html";
+       excelForm.submit();
+   }else {
+  
+	var orderIdAndEms ="";
+    for(var i=0;i<rows.length;i++){
+	   var r = rows[i];
+	   var orderId = r.orderId;
+	   var emsCode = r.emsCode;
+	   var emsCompany= r.emsCompany;
+	   
+	   orderIdAndEms = orderIdAndEms+orderId+":"+emsCode+":"+emsCompany+":"+" ;";
+	
+	}
+	location.href = "/plartFromOrderRecord/orderOutCheckExecl.html?orderIdAndEms="+orderIdAndEms;
+   }
+   
+   }
+
+</script>
+</body>
+</html>

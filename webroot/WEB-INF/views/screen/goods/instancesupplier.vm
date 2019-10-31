@@ -1,0 +1,125 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>产品供应商</h2>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>商品名称:</th>
+           <td>$!{goods.title}</td>
+		   <th>编码:</th>
+           <td>$!{goods.goodsSn}</td>
+		   <th>品牌:</th>
+           <td>$!{goods.brandName}</td>
+		   <th>单位:</th>
+           <td>$!{goods.goodsUnit}</td>
+           <th>类目:</th>
+           <td>$!{goods.catName}</td>
+        </tr>
+    </table>
+  </div>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>产品名称:</th>
+           <td>$!{instance.instanceName}</td>
+		   <th>产品编码:</th>
+           <td>$!{instance.code}</td>
+        </tr>
+    </table>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "editsuccess")
+		产品供应商修改成功！
+	#end
+	#if($!message == "removesuccess")
+		产品供应商删除成功！
+	#end
+	#if($!message == "addsuccess")
+		产品供应商添加成功！
+	#end
+</div>
+ #end
+ 
+ 
+       <div class="tool">
+
+            <span><a href="$appServer.get('/instance/add_instance_supplier.html').addQueryData('id',$!{instance.id}).addQueryData('gid',$!{goods.id})" hidefocus="true" class="bt_add">新增供应商</a></span>
+
+        </div>
+ 
+        <div class="clear"></div>
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品库位列表</span></h3>
+            <table >
+                <tr>
+                   <th>供应商名称</th>
+                   <th>供应商产品编码</th>
+			       <th>供货价格</th>
+			       <th>操作</th>
+                </tr>
+				 #foreach($lo in $suppliers)
+				<form name="sp_${lo.id}" action="/instance/update_instance_supplier.html" method="post">
+				    <input type="hidden" name="id" value="$!{instance.id}"/>
+				    <input type="hidden" name="gid" value="$!{goods.id}"/>
+				    <input type="hidden" name="supplier.id" value="$!{lo.id}"/>
+                 <tr>
+                    <td align="center">$!{lo.supplierName}</td>
+                	<td align="center">
+					  <input type="text" name="supplier.supplierCode" id="sp_${lo.id}_supplierCode" value="$!{lo.supplierCode}" maxLength="30"/>
+					</td>
+                    <td align="center">
+					  <input type="text" name="supplier.consultPrice" id="sp_${lo.id}_consultPrice" value="$!{moneyUtil.getFormatMoney($lo.consultPrice,'0.00')}"/>
+					</td>
+					<td align="center">
+					  <input type="button" id="btnSubmit" value="修改" class="button" onclick="upsp('sp_${lo.id}')"/>
+					  <input type="button" id="btnSubmit" value="删除" class="button" onclick="delsp('sp_${lo.id}')"/>
+					</td>
+                 </tr>
+                </form>
+				 #end
+            </table>
+      </div>
+</div>
+<script type="text/javascript">
+	function upsp(formname){
+		var scodeid = formname+'_supplierCode';
+		var cpid = formname+'_consultPrice';
+		var supplierCode = document.getElementById(scodeid).value;
+		supplierCode = jQuery.trim(supplierCode);
+		if(supplierCode.length > 30){
+			alert("供应商产品编码超长");
+			return;
+		}
+		var codePatrn=/^[A-Za-z0-9-]+$/;
+		if(!codePatrn.exec(supplierCode)){
+			alert("供应商产品编码格式不正确（限字母，'-'和数字）");
+			return;
+		}
+		var consultPrice = document.getElementById(cpid).value;
+		consultPrice = jQuery.trim(consultPrice);
+		var patrn=/^\d{1,6}(\.\d{1,2})?$/;
+		if (!patrn.exec(consultPrice)) {
+			alert("供货价格格式不正确");
+			return;
+		}
+		var price = parseFloat(consultPrice);
+		if(isNaN(price)){
+			alert("供货价格不是数字");
+			return;
+		}
+		document.forms[formname].action = '/instance/update_instance_supplier.html';
+		document.forms[formname].submit();
+	}
+	function delsp(formname){
+		if(confirm('确认删除?')){
+			document.forms[formname].action = '/instance/remove_instance_supplier.html';
+			document.forms[formname].submit();
+		}
+	}
+</script>

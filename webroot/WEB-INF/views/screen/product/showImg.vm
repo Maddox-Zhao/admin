@@ -1,0 +1,29 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>显示图片</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	 
+   <img id="img" width="250" height="250"/>
+  <script type="text/javascript">
+ 
+	
+	 function SetData(url) {
+        url = mini.clone(url);
+		jQuery("#img").attr("src",url);
+		
+    }
+	 
+ 
+	
+	 
+</script>
+</body>
+</html>

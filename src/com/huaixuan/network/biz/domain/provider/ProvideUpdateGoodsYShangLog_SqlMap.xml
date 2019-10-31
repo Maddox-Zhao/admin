@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">
+	<typeAlias alias="provideUpdateGoodsYShangLog" type="com.huaixuan.network.biz.domain.provider.ProvideUpdateGoodsYShangLog" />
+	<resultMap id="provideGoodsYShangResult"  class="com.huaixuan.network.biz.domain.provider.ProvideUpdateGoodsYShangLog">
+		<result column="id" property="id" />
+		<result column="sku_id" property="skuId" />
+		<result column="our_sku" property="ourSku" />
+		<result column="product_name" property="productName" />
+		
+		<result column="stock" property="stock" />
+		<result column="old_cost" property="oldCost" />
+		<result column="new_cost" property="newCost" />
+		<result column="old_our_price" property="oldOurPrice" />
+		
+		<result column="new_our_price" property="newOurPrice" />
+		<result column="cost_change_time" property="costChangeTime" />
+		<result column="price_change_time" property="priceChangeTime" />
+		<result column="insert_time" property="insertTime" />
+	</resultMap>
+	<insert id="insertYShangProductlog" parameterClass="provideUpdateGoodsYShangLog">
+		insert into provide_update_goods_yshang_log (sku_id,our_sku,product_name,stock,old_cost,new_cost,old_our_price,new_our_price,cost_change_time,price_change_time,insert_time) values(#skuId#,#ourSku#,#productName#,#stock#,#oldCost#,#newCost#,#oldOurPrice#,#newOurPrice#,#costChangeTime#,#priceChangeTime#,now())
+	</insert>
+	
+	<select id="getYShangSaleInfoLogCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select COUNT(*)FROM provide_update_goods_yshang_log where 1=1
+		<isNotNull prepend="and" property="skuId">
+		<![CDATA[ sku_id=#skuId# ]]>
+	   </isNotNull>
+		order by id DESC
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT $startRow$,$endRow$]]>
+			</isNotEmpty>
+		</isNotEmpty> 
+	
+	</select>
+	
+	<select id="getYShangSaleInfoLogList" resultMap="provideGoodsYShangResult" parameterClass="java.util.Map">
+		select * from provide_update_goods_yshang_log where 1=1 
+			<isNotNull prepend="and" property="skuId">
+				<![CDATA[ sku_id=#skuId# ]]>
+			</isNotNull>
+			order by id DESC
+			<isNotEmpty property="startRow">
+				<isNotEmpty property="endRow">
+					<![CDATA[ LIMIT $startRow$,$endRow$]]>
+				</isNotEmpty>
+			</isNotEmpty> 	
+	</select>
+	
+	
+	<insert  id ="insertYShangLogList"   parameterClass ="java.util.List"> 
+	     <![CDATA[
+	      insert into provide_update_goods_yshang_log(id,sku_id,our_sku,product_name,stock,old_cost,new_cost,old_our_price,new_our_price,cost_change_time,price_change_time,insert_time) values       
+	    ]]> 
+	    <iterate  conjunction =","  > 
+	     <![CDATA[
+	            (null,#pgList[].skuId#,#pgList[].ourSku#,#pgList[].productName#,#pgList[].stock#,#pgList[].oldCost#,#pgList[].newCost#,#pgList[].oldOurPrice#,#pgList[].newOurPrice#,#pgList[].costChangeTime#,#pgList[].priceChangeTime#,sysdate()
+	            )         
+	       ]]> 
+	        
+	    </iterate> 
+    </insert>
+	
+	
+	
+</sqlMap>

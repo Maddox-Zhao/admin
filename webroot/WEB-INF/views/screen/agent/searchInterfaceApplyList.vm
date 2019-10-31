@@ -1,0 +1,231 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>拍拍网店接入申请查询</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>拍拍网店接入申请查询</span></h3>
+  <form action="searchInterfaceApplyList.html" name="searchForm" method="post">
+  <table>
+  <tr>
+
+    <th>参数一：</th>
+	<td>
+		#springBind("interfaceApplyQuery.paramOne")
+	<input  type="text" name="${status.expression}"  value="$!{status.value}" id="paramOne" size="10"/></td>
+ <th>用户名：</th>
+		<td>
+				#springBind("interfaceApplyQuery.account")
+		<input  type="text" name="${status.expression}"  value="$!{status.value}" id="account" size="10"/></td>
+ <th>状态</th>
+			<td>
+							#springBind("interfaceApplyQuery.status")
+							<select name="${status.expression}">
+							<option value="" #if(""==$!{status.value})selected#end>-=请选择=-</option>
+														<option value="new" #if("new"==$!{status.value})selected#end>待审核</option>
+																					<option value="pass" #if("pass"==$!{status.value})selected#end>审核通过</option>
+																												<option value="fail" #if("fail"==$!{status.value})selected#end>审核不通过</option>
+</td>
+<th>创建日期：</th>
+											<td>
+											#springBind("interfaceApplyQuery.gmtCreateStart")
+											<input name="${status.expression}"  id="gmtCreateStart" value="$!{status.value}"  size="6" readonly="true"/>到
+			#springBind("interfaceApplyQuery.gmtCreateEnd")
+			<input  name="${status.expression}" id="gmtCreateEnd" value="$!{status.value}"   size="6" readonly="true"/>
+			</td>
+		<script type="text/javascript">
+		      Calendar.setup({
+		          inputField : "gmtCreateStart",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		      Calendar.setup({
+		          inputField : "gmtCreateEnd",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		</script>
+		<td>
+	<input name="chaxun" value="查询" class="button" type="button" onclick="return sumbitForm();" />
+</td>
+<script language="javascript" type="text/javascript">
+
+function sumbitForm(){
+         document.getElementById("result").style.display="none";
+        var dateStart=document.getElementById("gmtCreateStart").value.replace(/-/g, "/");
+        var dateEnd=document.getElementById("gmtCreateEnd").value.replace(/-/g, "/");
+        var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+        if(e_date < b_date){
+            alert("起始时间不能大于结束时间！");
+            return false;
+        }
+		document.getElementById("paramOne").value=document.getElementById("paramOne").value.trim();
+		document.getElementById("account").value=document.getElementById("account").value.trim();
+        document.searchForm.submit();
+    }
+
+
+</script>
+</table>
+</div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+#if($!message)<div class="mag-t2"> $!message </div>#end
+<div id="result" class="mag-t2" style="display:none">$!message</div>
+
+   <div class="listBox">
+          <h3><span>申请列表</span></h3>
+    <table>
+      <tr>
+         <th>参数一</th>
+		 <th>接入方式</th>
+		 <th>用户名</th>
+         <th>店铺地址</th>
+         <th>店铺类型</th>
+		 <th>平邮价格</th>
+		 <th>EMS价格</th>
+		 <th>快递价格</th>
+		 <th>创建时间</th>
+		 <th>状态</th>
+		 <th>操作</th>
+      </tr>
+            #foreach($obj in $query.items)
+        	<tr #if($velocityCount%2==0) class="bg" #end>
+        		<td>$obj.paramOne</td>
+				<td align="center">$enumInterfaceTypeMap.get("$obj.type")</td>
+
+				<td>$obj.account</td>
+				<td title="$obj.shopUrl"><a href="$obj.shopUrl" target="_blank">
+
+						$obj.shopUrl
+
+				</a></td>
+												<td align="center">
+					<select name="interfaceShopType_$!{obj.id}" id="interfaceShopType_$!{obj.id}" onchange="doModifyShopType($!{obj.id});">
+                        #foreach($enumInterfaceShopType in $enumInterfaceShopType.entrySet())
+							<option value="$!enumInterfaceShopType.key" #if($!obj.shopType == $!enumInterfaceShopType.key) selected="true" #end>$!enumInterfaceShopType.value</option>
+                        #end
+					</select>
+</td>
+				<td align="right">$!moneyUtil.getFormatMoney($obj.postNormal,'0.00')</td>
+                <td align="right">$!moneyUtil.getFormatMoney($obj.postEms,'0.00')</td>
+				<td align="right">$!moneyUtil.getFormatMoney($obj.postExpress,'0.00')</td>
+				<td align="center">$!dateUtil.convertDateToString('yyyy-MM-dd',${obj.gmtCreate})</td>
+				<td align="center">
+					<span id="${obj.id}userStatus">
+						#if("$obj.status"=="pass")
+							已连接
+						#else
+							断开
+						#end
+					</span>
+					<input type="hidden" id="${obj.id}statusText" value="${obj.status}"/>
+				</td>
+				<td align="center">
+					<input id="${obj.id}opbutton" name="${obj.id}opbutton" type="button" value="#if(${obj.status}=='pass') 断开 #else 连接 #end" onclick="chooseOperate('$obj.id');"/>
+				</td>
+            </tr>
+            #end
+
+    </table>
+	<!-- 分页 -->
+	</form>
+    <!-- 分页 -->
+   <div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/agent/searchInterfaceApplyList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	var statusTextId;
+	var opbuttonId;
+	var userStatusId;
+
+    function chooseOperate(id){
+    	statusTextId=id+"statusText";
+		opbuttonId=id+"opbutton";
+		userStatusId=id+"userStatus";
+    	var status= document.getElementById(statusTextId).value;
+		var op;
+    	if(status == 'pass'){
+		    op = "fail";
+		     					jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/agent/editInterfaceApplyByJQuery.html')",
+            			data :{param1:id,param2:op},
+    			        success:function(data){
+    			         if(data.indexOf("success") > -1){
+				    document.getElementById(opbuttonId).value = " 连接 ";
+			        var userStatus = document.getElementById(userStatusId);
+			        userStatus.innerHTML = "断开";
+			        document.getElementById(statusTextId).value = "fail";
+			        jQuery("#result").html("断开成功！");
+				 }else{
+			        jQuery("#result").html("断开失败！");
+				 }
+    			   }
+			    });
+    	}
+
+    else{
+
+    					jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/agent/tryInterfaceByJson.html')",
+            			data :{param:id},
+    			        success:function(data){
+    			         if(data.indexOf("success") > -1){
+				                  var msgType = data.substring(data.indexOf("\'") + 1, data.indexOf("\',"));
+		                  var msgValue = data.substring(data.indexOf("\',\'") + 3, data.lastIndexOf("\']"));
+		                     if (msgType == 'true') {
+			                                alert("连接成功！");
+					                                document.getElementById(opbuttonId).value = " 断开 ";
+					                                var userStatus = document.getElementById(userStatusId);
+			                                userStatus.innerHTML = "已连接";
+					                                document.getElementById(statusTextId).value = "pass";
+					                                var result = document.getElementById("result");
+					                                result.style.display="";
+					                                result.innerHTML ="连接成功！";
+		                     } else if(data.indexOf("fail") > -1){
+				                                alert("连接失败！");
+					                                var result = document.getElementById("result");
+					                                result.style.display="";
+					                                result.innerHTML ="连接失败！";
+				                      }else{
+			                                alert("连接失败："+msgValue);
+					                                var result = document.getElementById("result");
+					                                result.style.display="";
+					                                result.innerHTML ="连接失败："+msgValue;
+		                     }
+		              }}
+		        });
+     }
+
+    }
+    
+    
+    
+    function doModifyShopType(objId){
+        var shopType=document.getElementById("interfaceShopType_"+objId).value;
+        if(confirm("确定要更换店铺类型吗？")){
+            jQuery.post('$appServer.get("/agent/modifyInterfaceShopTypeByJson.html")',{param1:objId,param2:shopType},function(message){
+    			alert("修改店铺类型成功！");
+    		});
+		}
+    }
+</script>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CustomerClient">
+	<resultMap class="com.huaixuan.network.biz.domain.customer.Customer" id="customerClientMap">
+		<result column="idCustomer" property="idCustomer"    />
+		<result column="name" property="name"  />
+		<result column="type" property="type"  />
+		<result column="vipNum" property="vipNum"  />
+		<result column="integral" property="integral"  />
+		<result column="phone" property="phone"  />
+		<result column="address" property="address"  />
+		<result column="email" property="email"  />
+		<result column="password" property="password"  />
+		<result column="remark" property="remark"  />
+		<result column="province" property="province"  />
+		<result column="mangerName" property="manager"  />
+		<result column="managerId" property="managerId"  />
+	</resultMap>
+	<resultMap class="com.huaixuan.network.biz.domain.order.Orderdetails" id="OrderResult">
+			<result property="idorder" column="idorder"/>
+			<result property="customername" column="customername"/>
+			<result property="sellchannelname" column="sellchannelname"/>
+			<result property="sitename" column="sitename"/>
+			<result property="deliverymeno" column="deliverymeno"/>
+			<result property="date" column="date"/>
+			<result property="remark" column="remark"/>
+			<result property="idPayment" column="idPayment"/>
+			<result property="subTotal" column="subTotal"/>
+			<result property="amountCash" column="amountCash"/>
+			<result property="amountCard" column="amountCard"/>					
+			<result property="deliverystatus" column="deliverystatus"/>
+			<result property="employeename" column="employeename"/>
+			<result property="currencyname" column="currencyname"/>
+			<result property="idCurrency" column="idCurrency"/>
+			<result property="paymentname" column="paymentname"/>
+			<result property="gmtpay" column="gmtpay"/>
+			<result property="deliverydate" column="deliverydate"/>
+			<result property="idEmployee" column="idEmployee"/>
+			<result property="idSite" column="idSite"/>
+			<result property="status" column="status"/>
+			<result property="idCustomer" column="idCustomer"/>
+			<result property="idSellChannel" column="idSellChannel"/>
+			<result property="customerManager" column="customerManager"/>
+		</resultMap>
+	
+<select id="searchCustomer" parameterClass="java.util.Map" resultMap="customerClientMap">
+	SELECT 
+	c.*,ea.name mangerName,ea.user_name managerId
+	FROM
+	customer  c,emall_admin ea
+	WHERE c.customer_operate = ea.user_name
+	<isNotNull property="name" prepend="and">
+	(
+			c.name like '%$name$%' or
+			c.phone like '%$name$%' or
+			c.idCustomer =  '$name$' or
+			vipnum like '%$name$%'
+	)
+	</isNotNull> 
+	<isEqual  property="notSearchAll" compareValue="true" >
+			AND customer_operate  in
+			(
+				SELECT user_name FROM emall_admin WHERE user_name = #userName#
+				
+				UNION ALL 
+				
+				SELECT user_name FROM emall_admin WHERE higher_user_name = #userName#
+
+				UNION ALL 
+				
+				SELECT user_name FROM emall_admin WHERE higher_user_name IN( SELECT user_name FROM emall_admin WHERE higher_user_name = #userName#)
+			)
+	</isEqual>
+	<isNotEmpty property="idCustomer"   >
+			AND idCustomer =  $idCustomer$
+	</isNotEmpty>
+	order by idCustomer desc
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+</select>
+
+ <select id="searchOrderByidCustomer" parameterClass="java.util.Map" resultMap="OrderResult">
+ 
+ 	SELECT c.idOrder idOrder,c.date DATE,c.subTotal subTotal
+	FROM customerorder c,customer cust 
+	WHERE c.idCustomer = cust.idCustomer
+	AND c.idCustomer = $idCustomer$
+ 	
+ </select>
+
+<select id="searchCustomerCount" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	select count(*) total from customer where 1=1
+	<isNotNull property="name" prepend="and">
+	(
+			name like '%$name$%' or
+			phone like '%$name$%' or
+			idCustomer =  '$name$' or
+			vipnum like '%$name$%'
+	)
+	</isNotNull> 
+	<isEqual  property="notSearchAll" compareValue="true" >
+			AND customer_operate  in
+			(
+				SELECT user_name FROM emall_admin WHERE user_name = #userName#
+				
+				UNION ALL 
+				
+				SELECT user_name FROM emall_admin WHERE higher_user_name = #userName#
+
+				UNION ALL 
+				
+				SELECT user_name FROM emall_admin WHERE higher_user_name IN( SELECT user_name FROM emall_admin WHERE higher_user_name = #userName#)
+			)
+	</isEqual>
+	<isNotNull  property="phone"   >
+			AND phone = #phone#
+	</isNotNull>
+	<isNotNull  property="email"   >
+			AND email = #email#
+	</isNotNull>
+	
+</select>
+
+
+
+
+<insert id="insertCustomer" parameterClass="com.huaixuan.network.biz.domain.customer.Customer" >
+	insert into Customer(name,type,vipnum,phone,address,email,password,customer_operate,province,remark)
+	values(#name#,#type#,#vipNum#,#phone#,#address#,#email#,#password#,#managerId#,#province#,#remark#)
+	<selectKey resultClass="java.lang.Long" keyProperty="idCustomer" >
+	      SELECT LAST_INSERT_ID()
+	 </selectKey>
+</insert>
+
+
+<update id="updateCustomer" parameterClass="com.huaixuan.network.biz.domain.customer.Customer">
+update customer
+set idCustomer = idCustomer
+<isNotEmpty prepend="," property="name">
+		name = #name#
+</isNotEmpty>
+<isNotEmpty prepend="," property="type">
+		type = #type#
+</isNotEmpty>
+<isNotEmpty prepend="," property="vipNum">
+	VIPnum = #vipNum#
+</isNotEmpty>
+<isNotEmpty prepend="," property="integral">
+	integral = #integral#
+</isNotEmpty>
+<isNotEmpty prepend="," property="phone">
+	phone = #phone#
+</isNotEmpty>
+<isNotEmpty prepend="," property="address">
+	address = #address#
+</isNotEmpty>
+<isNotEmpty prepend="," property="email">
+	email = #email#
+</isNotEmpty>
+<isNotEmpty prepend="," property="password">
+	email = #email#
+</isNotEmpty>
+<isNotEmpty prepend="," property="remark">
+	remark = #remark#
+</isNotEmpty>
+
+<isNotEmpty prepend="," property="province">
+	province = #province#
+</isNotEmpty>
+
+<isNotEmpty prepend="," property="managerId">
+	customer_operate = #managerId#
+</isNotEmpty>
+where idCustomer = #idCustomer#
+</update>
+
+</sqlMap>

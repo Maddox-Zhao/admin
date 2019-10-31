@@ -1,0 +1,115 @@
+<?xml version="1.0"  encoding="gb2312"?>
+
+<project name="hana" basedir="." default="usage">
+	<property file="server.properties" />
+
+	<property name="name" value="ocean" />
+	<property name="root.dir" value=".." />
+	<property name="war.dir" value="${root.dir}/webroot" />
+	<property name="src.dir" value="${root.dir}/src" />
+	<property name="release.dir" value="${root.dir}/deploy" />
+	<property name="build.dir" value="${release.dir}/classes" />
+	<property name="weblib.dir" value="${war.dir}/WEB-INF/lib" />
+	<property name="work.dir" value="${release.dir}/deploy" />
+	<property name="dist.dir" value="${release.dir}/dist" />
+	<property name="webclass.dir" value="${work.dir}/WEB-INF/classes" />
+	<property name="servlet.api" value="${root.dir}/extlib" />
+
+	<property name="source.dir" value="../" />
+
+	<path id="master-classpath">
+		<fileset dir="${servlet.api}/">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${weblib.dir}/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="usage">
+		<tstamp>
+			<format property="today" pattern="yyyy-MM-dd hh:mm:ss" />
+		</tstamp>
+		<echo message="${today}" />
+		<echo message="" />
+		<echo message="product nezha website build file" />
+		<echo message="------------------------------------------------------" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="clean    --> 清除编译目录" />
+		<echo message="build    --> 编译" />
+		<echo message="release   --> web工程打包" />
+		<echo message="resouce   --> web静态资源打包" />
+		<echo message="" />
+
+	</target>
+
+	<target name="clean" description="Clean output dirs (build, weblib, dist)">
+		<echo message="" />
+		<echo message="================delete start=================" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${work.dir}" />
+		<echo message="==================delete finish===================" />
+	</target>
+
+
+	<target name="build" description="Compile main source tree java files into class files, generate jar files">
+		<echo message="=================src compile start==================" />
+		<mkdir dir="${build.dir}" />
+
+		<javac destdir="${build.dir}" debug="true" deprecation="false" optimize="false" failonerror="true" encoding="GB18030">
+		<!--<javac destdir="${build.dir}" debug="true" deprecation="false" optimize="false" failonerror="true" >-->
+			<src path="${src.dir}" />
+			<classpath refid="master-classpath" />
+		</javac>
+		<copy todir="${build.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+		<echo message="===============src compile finish================" />
+	</target>
+
+	<target name="warfile" depends="build" description="package">
+		<echo message="================package start=================" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${work.dir}" />
+		
+		<copy todir="${work.dir}/" preservelastmodified="true">
+			<fileset dir="${war.dir}">
+				<exclude name="WEB-INF/log/**"/>
+			</fileset>
+		</copy>
+		<delete file="${work.dir}/WEB-INF/conf/server.properties" />
+		<delete file="${work.dir}/WEB-INF/conf/log4j.properties" />
+		<copy todir="${work.dir}/WEB-INF/conf/" preservelastmodified="false">
+			<fileset dir="${release.dir}">
+				<include name="server.properties" />
+				<include name="log4j.properties" />
+				<include name="mail.properties" />
+			</fileset>
+		</copy>
+		<mkdir dir="${webclass.dir}/" />
+		<copy todir="${webclass.dir}/" preservelastmodified="true">
+			<fileset dir="${build.dir}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<war warfile="${dist.dir}/${name}.war" basedir="${work.dir}" webxml="${work.dir}/WEB-INF/web.xml">
+			<include name="**" />
+		</war>
+		<tar destfile="${dist.dir}/${name}.tar.gz" compression="gzip">
+			<tarfileset dir="${work.dir}">
+    		<include name="**/**"/>
+			</tarfileset>
+		</tar>
+		<echo message="/*********************************************/" />
+		<echo message="package finish,goto ${dist.dir} to get ${name}.war,${name}.tar.gz" />
+		<echo message="/*********************************************/" />
+	</target>
+
+	<target name="release" depends="clean,build,warfile" description="clean,build,warfile" />
+
+</project>

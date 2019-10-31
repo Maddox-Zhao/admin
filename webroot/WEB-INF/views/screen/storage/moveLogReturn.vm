@@ -1,0 +1,270 @@
+#if($!storageMoveLog.type =="1")
+	#set($printType="move")
+	#set($name="移库")
+#elseif($!storageMoveLog.type =="3" && $!storageMoveLog.depType=="common_dep")
+	#set($printType="transfer")
+	#set($name="外借")
+#elseif($!storageMoveLog.type =="3" && $!storageMoveLog.depType=="out_borrow_dep")
+	#set($printType="transferReturn")
+	#set($name="外借归还")
+#end
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 外借回调详情")
+<div class="main">
+	<h2>管理中心 - 外借回调详情</h2>
+
+	<div class="tool">
+			<span class="action-span"><a href="javascript:history.go(-1);" hidefocus="true" class="bt_wu">返 回</a></span>
+        	#if($!storageMoveLog.type == "3")
+        	<span class="action-span"><a href="javascript:printReturn();" hidefocus="true" class="bt_wu">打印外借归还单</a></span>
+        	#end
+        	<span class="action-span"><a href="javascript:preview();" hidefocus="true" class="bt_wu">打印${name}单据</a></span>
+	</div>
+
+	<form name="searchform" id="searchform" action="$appServer/storage/moveLogReturn.html" method="post">
+		<input type="hidden" name="count" id="count" value="$!count"/>
+		<input type="hidden" name="moveCode" id="moveCode" value="$!{storageMoveLog.moveCode}"/>
+		<div id="print">
+			<center ><div id="result" style="color:red;">
+					#if($!message=="amount_error")要归还的库位产品数量不相符，操作失败！
+					#elseif($!message=="stauts_error")请选择未归还状态的记录进行归还！
+					#elseif($!message=="returnpageover")超过100条不能执行！
+					#elseif($!message=="not_right")请选择外借记录进行操作！
+					#elseif($!message=="not_number")填写的数量有非数字记录！
+					#elseif($!message=="success") 归还成功！
+					#elseif($!message=="null") 无要归还的记录!
+					#elseif($!message=="olddepfirst") 调出的一级仓库不存在！
+					#elseif($!message=="newdepfirst") 调入的一级仓库不存在！
+					#elseif($!message=="dep") 仓库不存在或已失效！
+					#elseif($!message=="check") 库位已删除或在盘点中！
+					#elseif($!message=="number") 调入仓库数量小于归还数量！
+					#elseif($!si.message=="db")数据库操作失败！
+					#end
+			        </div>
+			</center>
+		<div class="searchBox" style="margin-bottom: 5px">
+            <table width="100%" cellpadding="3" cellspacing="1">
+                <tr>
+					<th>${name}编号：</th>
+					<td>&nbsp;$!{storageMoveLog.moveCode}</td>
+			 		<th>类型：</th>
+					<td>&nbsp;${name}</td>
+				</tr>
+
+                <tr>
+				    <th>调入一级仓库：</th>
+					<td>&nbsp;$!{storageMoveLog.depFirstName}</td>
+			        <th></th>
+					<td></td>
+				</tr>
+
+				<tr>
+					<th>调入仓库：</th>
+					<td>&nbsp;$!{storageMoveLog.depositoryName}</td>
+			 		<th>调入库位：</th>
+					<td>&nbsp;$!{storageMoveLog.depLocationName}</td>
+				</tr>
+
+				<tr>
+					<th>操作人：</th>
+					<td>&nbsp;$!{storageMoveLog.creater}</td>
+					<th>操作时间：</th>
+					<td>&nbsp;$!date.format('yyyy-MM-dd',${storageMoveLog.gmtCreate})</td>
+				</tr>
+				#if($!{storageMoveLog.memo})
+                <tr>
+				    <th>备注：</th>
+					<td>&nbsp;$!{storageMoveLog.memo}</td>
+			        <th></th>
+					<td></td>
+				</tr>
+				#end
+			</table>
+    	</div>
+
+		<div class="listBox" style="margin-bottom: 5px">
+			<h3><span>产品列表</span></h3>
+				<table width="100%" cellpadding="3" cellspacing="1">
+			#if($storageMoveLogList.size() > 0)
+					<tr>
+						<th colspan="14" align="left">
+							#if($!storageMoveLog.type == "3")
+							<input id="batReturn" type="button" name="Submit4" value="批量归还" class="button" onclick="bachReturn();"/>
+							#end
+							<font size='3'><strong><label>【 ${name}产品:</label></strong></font><font size='3' color="red"><strong><label>$!{page.totalRowsAmount}</label></strong></font><font size='3'><strong><label>
+				; 合计总数量: </label></strong></font><font size='3' color="red"><strong><label>$!{sumNum}</label></strong></font><font size='3'><strong><label> 】</label></strong></font>
+						</th>
+					</tr>
+			#end
+				<tbody>
+					   <tr>
+						<th width="">
+							产品编码
+						</th>
+						<th width="">
+							产品名称
+						</th>
+						<th width="">
+							供应商
+						</th>
+						<th width="">
+							调出一级仓库
+						</th>
+						<th width="">
+							调出仓库
+						</th>
+						<th width="">
+							调出库位
+						</th>
+						<th width="">
+							调入一级仓库
+						</th>
+						<th width="">
+							调入仓库
+						</th>
+						<th width="">
+							调入库位
+						</th>
+						#if($!storageMoveLog.type != "3")
+						<th width="">
+						          调入库位目前数量
+						</th>
+						#end
+						<th width="">
+							${name}数量
+						</th>
+						#if($!storageMoveLog.type == "3")
+						<th width="">
+							已归还数量
+						</th>
+						<th width="">
+							归还数量
+						</th>
+						#end
+					</tr>
+					 #foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td height="27">
+								$!{gi.code}
+							</td>
+							<td title="$!{gi.instanceName}">
+								$!controlUtil.getNoticesTitle($!{gi.instanceName},15)
+							</td>
+							<td>
+                                $!controlUtil.getNoticesTitle($!{gi.supplierName},10)
+							</td>
+							<td>
+							    $!{gi.oldDepFirstName}
+							</td>
+							<td>
+							    $!{gi.oldDepositoryName}
+							</td>
+							<td>
+							    $!{gi.oldDepLocationName}
+							</td>
+							<td>
+								$!{gi.depFirstName}
+							</td>
+							<td>
+								$!{gi.depositoryName}
+							</td>
+							<td>
+								$!{gi.depLocationName}
+							</td>
+							#if($!storageMoveLog.type != "3")
+							<td align="center">
+								$!{gi.newNum}
+							</td>
+							#end
+							<td align="center">
+								$!{gi.moveNum}
+							</td>
+							#if($!storageMoveLog.type == "3")
+							<td align="center">
+								$!{gi.returnNum}
+							</td>
+							<td align="center">
+								<input type="hidden" name="ids" id="ids" value="$!gi.id"/>
+							    <input #if($!{gi.moveNum}==$!{gi.returnNum}) readonly #end type="text" name="returnNum" value="" id="returnNum_$velocityCount" onchange="javascript:checkNum(${velocityCount},$!{gi.moveNum},$!{gi.returnNum});" size="8" maxLength="20"/>
+							</td>
+							#end
+						</tr>
+					#end
+                    </tbody>
+             </table>
+
+			 #if($query.items.size() > 0)
+					#if($!storageMoveLog.type == "3")
+					<input id="batReturn" type="button" name="Submit4" value="批量归还" class="button" onclick="bachReturn();" />
+					#end
+					<!-- 分页 -->
+					##$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"$appServer/storage/moveLogReturn.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+			#else
+				没有查询结果！
+			#end
+			</div>
+    	 </div>
+    </form>
+</div>
+<script language="javascript" type="text/javascript">
+	function preview(){
+		window.showModalDialog("$appServer/storage/printBorrow.html?moveCode=$!{storageMoveLog.moveCode}&printType=$printType&countNum=$!{sumNum}",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+
+	function printReturn(){
+		window.showModalDialog("$appServer/storage/moveLogReturn.html?moveCode=$!{storageMoveLog.moveCode}&isPrint=true",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+
+    String.prototype.trim= function()
+    {
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+    function checkNum(count_no,moveNum,backNum){
+    	var obj_returnNum=document.getElementById('returnNum_' + count_no);
+    	var returnNum = obj_returnNum.value;
+		var leavNum = Number(returnNum)+Number(backNum);
+    	if(!isIntNumber(returnNum)){
+    		alert("出错：您输入了不正确的数量！");
+    		obj_returnNum.value = "";
+    		obj_returnNum.select();
+            obj_returnNum.focus();
+    		return false;
+    	}
+		if(leavNum > moveNum){
+			alert("出错：您输入的归还数量大于剩余归还数量！");
+    		obj_returnNum.value = "";
+    		obj_returnNum.select();
+            obj_returnNum.focus();
+    		return false;
+		}
+		return true;
+	}
+
+	function bachReturn(){
+		var obj_returnNum;
+		var returnNum;
+		var isNull = true;
+		#if($query.items.size()>0)
+			#foreach($obj in $query.items)
+				obj_returnNum=document.getElementById('returnNum_' + $velocityCount);
+    			returnNum = obj_returnNum.value.trim();
+				if(returnNum != ""){
+					isNull = false;
+				}
+			#end
+		#end
+		if(isNull){
+			alert("请至少填写一个归还数量！");
+			return false;
+		}
+		document.getElementById('searchform').action="doReturnBat.html";
+    	document.getElementById('searchform').submit();
+	}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+</script>

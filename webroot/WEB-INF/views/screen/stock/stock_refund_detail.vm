@@ -1,0 +1,94 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+<h2>采购管理 - 采购退货单明细</h2>
+
+    <div class="tool">
+    	<h1>
+    		<span class="action-span"><a href="search_stock_detail.html?stockId=$!stockId" class="bt_wu">返回</a></span>
+    		#if("${shoppingRefund.status}"=="stock_finished")
+    			<span class="action-span"><a href="javascript:preview();" class="bt_wu">打印退货单</a></span>
+    		#end
+    		<div style="clear: both;"></div>
+    	</h1>
+    </div>
+
+	<div class="formBox">
+		<h3><i></i><span>采购退货单信息</span></h3>
+		<div class="content">
+			<table class="c6">
+    			<tr>
+    				<td class="label">退货单编号</td>
+    				<td>
+    					$!shoppingRefund.refNum
+    				</td>
+    				<td class="label">退货类型</td>
+    				<td>
+    					$!enumShoppingRefund.get("${shoppingRefund.type}")
+    				</td>
+    			</tr>
+
+
+    			<tr>
+    				<td class="label">供应商</td>
+    				<td>
+    					$!shoppingRefund.supplierName
+    				</td>
+    				<td class="label">创建人</td>
+    				<td>
+    					$!shoppingRefund.creater
+    				</td>
+    			</tr>
+
+    			<tr>
+    			    <td class="label">退货时间</td>
+    				<td>
+    					&nbsp;$!dateUtil.convertDateToString("yyyy-MM-dd",$!shoppingRefund.refTime)&nbsp;
+    				</td>
+    				<td class="label">退货状态</td>
+    				<td>
+    				    $!enumShopRefundMap.get("${shoppingRefund.status}")
+    				</td>
+    			</tr>
+			</table>
+		</div>
+    </div>
+
+    <div class="listBox" id="listDiv">
+       <table width="100%" cellpadding="3" cellspacing="1">
+       <tr><th colspan="9"  scope="col">采购退货单商品信息</th></tr>
+          <tr>
+            <th>产品名称</th>
+            <th>产品编码</th>
+            <th>采购数量</th>
+            <th>采购单价</th>
+            <th>退货数量</th>
+            <th>退货单价</th>
+            <th>应收金额</th>
+            <th>实收金额</th>
+            <th>退货原因</th>
+          </tr>
+
+          #foreach($shoppingRefundDetail in $shoppingRefundDetailLists)
+    	  <tr>
+    		 <td>&nbsp;$!shoppingRefundDetail.instanceName</td>
+    		 <td>&nbsp;$!shoppingRefundDetail.code</td>
+    		 <td>&nbsp;$!shoppingRefundDetail.amount</td>
+    		 <td>&nbsp;￥$!shoppingRefundDetail.unitPrice</td>
+    		 <td>&nbsp;$!shoppingRefundDetail.refNum</td>
+    		 <td>&nbsp;￥$!shoppingRefundDetail.refPrice</td>
+    		 <td>&nbsp;￥$!shoppingRefundDetail.dueFee</td>
+    		 <td>&nbsp;￥$!shoppingRefundDetail.factFee</td>
+    		 <td>&nbsp;$!enumShoppingRefundReason.get("${shoppingRefundDetail.reason}")</td>
+          </tr>
+    	  #end
+       </table>
+    </div>
+</div>
+	<script language="javascript" type="text/javascript">
+	function preview(){
+		window.showModalDialog("$!appServer/stock/refund/printRefundBill.html?id=$!{shoppingRefund.id}&type=ct",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+</script>

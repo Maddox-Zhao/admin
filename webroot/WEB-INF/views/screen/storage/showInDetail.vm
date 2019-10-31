@@ -1,0 +1,136 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 入库单管理")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 入库单管理</h2>
+	
+	#if($disPage)
+
+    	#if($succFlag)
+    		<div class="mag-t2" id="modifySuccess">入库成功</div>
+    	#end
+    	#if($errorInfo && $errorInfo != "")
+    		<div class="mag-t1" id="modifyError">$errorInfo</div>
+    	#end
+
+    	<div class="tool">
+    		<span><a href="addInDepository.html?init=true" hidefocus="true" class="bt_ren">返回</a></span>
+    		#if("$!{inDepositoryDispaly.status}" == "in_finished")
+    			<span><a href="javascript:preview();" hidefocus="true" class="bt_par">打印$!inDepositoryTypeMap.get("$!{inDepositoryDispaly.type}")单</a></span>
+    		#end
+    	</div>
+
+		<div id="print">
+			<!-- 表单模块 -->
+			<form name="form1" action="showInDetail.html?iId=$!{inDepositoryDispaly.id}" method="post">
+				<input type="hidden" name="optType" id="optType" value=""/>
+				<div class="formBox"> 
+					<h3><i></i><span>入库单信息</span></h3>
+    				<div class="content">
+    					<table class="c6">
+    						<tr>
+    							<th>单据编号</th>
+    							<td>$!{inDepositoryDispaly.billNum}</td>
+    							<th>类型</th>
+    							<td>$!inDepositoryTypeMap.get("$!{inDepositoryDispaly.type}")</td>
+    						</tr>
+    						<tr>
+    							<th>关联单据号</th>
+    							<td>$!{inDepositoryDispaly.relationNum}</td>
+    							<th>状态</th>
+    							<td>$!inDepositoryStatusMap.get("$!{inDepositoryDispaly.status}")</td>
+    						</tr>
+    						<tr>
+    							<th>操作人</th>
+    							<td>$!{inDepositoryDispaly.creater}</td>
+    							<th>操作时间</th>
+    							<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${inDepositoryDispaly.gmtModify})</td>
+    						</tr>
+    						<tr>
+    							<th>入库时间</th>
+    							<td>
+    								#if($currDate)
+    									#if(${inDepositoryDispaly.status} == 'in_finished')
+    										<input name="inDepositoryTime" id="inDepositoryTime" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${inDepositoryDispaly.gmtInDep})" disabled class="inp"/>
+    									#else
+    										<input name="inDepositoryTime" id="inDepositoryTime" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${currDate})" disabled class="inp"/>
+    									#end
+    								#else
+    									#if(${inDepositoryDispaly.status} == 'in_finished')
+    										<input name="inDepositoryTime" id="inDepositoryTime" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${inDepositoryDispaly.gmtInDep})" disabled class="inp" />
+    									#else
+    										<input name="inDepositoryTime" id="inDepositoryTime" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${currDate})" disabled class="inp"/>
+    									#end
+    								#end
+    								<script type="text/javascript">
+    									Calendar.setup({
+    										inputField : "inDepositoryTime",
+    										ifFormat   : "%Y-%m-%d",
+    										align      : "BR"
+    									});
+                        			</script>
+    							</td>
+    							<th>一级仓库</th>
+    							<td>$!{inDepositoryDispaly.depFirstName}</td>
+    						</tr>
+    					</table>
+    				</div>
+				</div>
+			</form>
+
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>入库产品列表</span></h3>
+				<table>
+					<tr>
+						<th>产品编码</th>
+						<th>产品名称</th>
+						<th>类目</th>
+						<th>属性</th>
+						<th>单位</th>
+						<th>单价</th>
+						<th>数量</th>
+						<th>操作</th>
+					</tr>
+					#if($inDetailGoodsLists)
+						#foreach($inDetailGoodsInfo in $inDetailGoodsLists)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>$!inDetailGoodsInfo.code</td>
+								<td>$!inDetailGoodsInfo.instanceName</td>
+								<td>$!inDetailGoodsInfo.catName</td>
+								<td>$!inDetailGoodsInfo.attributeName</td>
+								<td>$!inDetailGoodsInfo.goodsUnit</td>
+								<td>￥$!moneyUtil.getFormatMoney($!inDetailGoodsInfo.unitPrice, '0.00')</td>
+								<td>$!inDetailGoodsInfo.amount</td>
+								<td><a href="inDepositoryOpt.html?optId=$!inDetailGoodsInfo.id&optType=$!{inDepositoryDispaly.type}&dfi=$!{inDepositoryDispaly.depFirstId}" target="_blank">#if(!$notAllowEdit) 分配库位 #else 查看库位分配信息 #end</a></td>
+							</tr>
+						#end
+					#end
+				</table>
+			</div>
+		</div>
+
+		#if(!$notAllowEdit && $inDetailGoodsLists && $inDetailGoodsLists.size()>0)
+			<div class="formBox">
+				<div class="form-but">
+					<button type="button" class="button-s4" onclick="javascript:subFinish();">完成</button>
+				</div>
+			</div>
+		#end
+
+	#else
+		对不起，您没有查看此页面的权限！
+	#end
+</div>
+</body>
+
+<script >
+	function preview(){
+		window.showModalDialog("$appServer/storage/printInDep.html?id=$!{inDepositoryDispaly.id}",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+
+	function subFinish(){
+		document.getElementById("optType").value = "finishOpt";
+		document.forms[0].submit();
+	}
+</script>

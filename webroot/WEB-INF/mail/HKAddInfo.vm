@@ -1,0 +1,43 @@
+
+<table width="745"  border="0" align="center"  style="border:1px #CCCCCC">
+ #set($count = -1)
+  #foreach($sendGoodsInfo in $list)
+	#if($count == -1)
+    	<tr>
+        <td width="120" align="center">图片</td>
+		#if(("$sendGoodsInfo.userRank" == "e" || "$sendGoodsInfo.userRank" == "s") && $sendGoodsInfo.userType == 2)
+        <td width="65" align="center">特惠价</td>
+        <td width="85" align="center">shangshang价</td>
+    	#end
+        <td width="100" align="center">品牌</td>
+        <td width="66" align="center">品名</td>
+       	<td width="109" align="center">型号</td>
+        <td width="100" align="center">材质</td>
+        <td width="100" align="center">颜色</td>
+      </tr>
+	  #set($count = 0)
+  #end
+  <tr>
+	<td align="center">
+		#if($!sendGoodsInfo.middleImg)
+			<img src="$upServer/$!sendGoodsInfo.middleImg"   width="120" height="120"/></td>
+		#else
+			<img src="../images/noimage_275_287.jpg"  width="100" height="100"/></td>
+		#end
+	#if(("$sendGoodsInfo.userRank" == "e" || "$sendGoodsInfo.userRank" == "s") && $sendGoodsInfo.userType == 2)
+	<td align="center">$!sendGoodsInfo.discountPrice</td>
+    <td align="center">$!sendGoodsInfo.hkPrice</td>
+	#end
+	<td align="center">$!sendGoodsInfo.brand</td>
+	<td align="center">$!sendGoodsInfo.series</td>
+	<td align="center">$!sendGoodsInfo.type</td>
+    <td align="center">$!sendGoodsInfo.material</td>
+    <td align="center">$!sendGoodsInfo.color</td>
+</tr>
+  #end
+</table>
+
+
+
+
+

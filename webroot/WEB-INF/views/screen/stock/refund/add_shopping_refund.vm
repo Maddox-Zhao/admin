@@ -1,0 +1,107 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>退货订单管理 - 新增退货订单</h2>
+	<div class="tool">
+        <span><a href="javascript:history.back(1);" hidefocus="true" class="bt_add" >返回</a></span>
+    </div>
+	<div class="formBox">
+		<h3><i></i><span> 新增退货单</span></h3>
+		<div class="content">
+		<form id="form1" name="addSRefund"  action="$appServer/stock/refund/add_shopping_refund.html" method="post">
+			<span class="require-field" align="center" > $!{errorMsg}</span>
+                <table width="100%" cellpadding="3" cellspacing="1">
+                    <tr>
+                        <th><span class="red">*</span>一级仓库名称</th>
+                        <td>
+                            <select name="depFirstId" id="depFirstId" >
+                            <option value="">-=请选择=-</option>
+                            #**
+                            #foreach($userInfo in $userLists)
+                                <option value="$!{userInfo.account}" #if("$!{depository.leader}" == "${userInfo.account}") selected="true" #end>$!{userInfo.account}</option>
+                            #end
+                            *#
+                            #foreach($depFirst in $depositoryFirstList)
+                                <option value="$!{depFirst.id}" #if("$!{depository.depFirstId}" == "${depFirst.id}") selected="true" #end>$!{depFirst.depFirstName}</option>
+                            #end
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="label"><span class="red">*</span>采购退货单编号</th>
+                        <td>
+                            <input  type="text" name="shoppingId"  value="$!{stockId}" readonly=true />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="red">*</span>供应商名称</th>
+                        <td>
+                            <select name="supplierId" id="supplierId">
+                                <option value=''>请选择</option>
+                                #foreach($supplier in $supplierLists)
+                                <option value="$!{supplier.id}" #if($!{shoppingList.supplierId} == $!{supplier.id}) selected #end>$!{supplier.name}</option>
+                                #end
+                            </select>
+                            ##showerror($fieldErrors.get("shoppingList.supplierId"))
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span class="red">*</span>采购退货时间</th>
+                        <td>
+        					<input type="text" name="gmtStart_str" id="gmtStart_str" size="10" theme="simple" readonly="true" />
+                                 <script type="text/javascript">
+                                   Calendar.setup({
+                                      inputField : "gmtStart_str",
+                                      ifFormat   : "%Y-%m-%d",
+                                      align      : "BR"
+                                 });
+
+                                 </script>
+                        </td>
+                    </tr>
+    			</table>
+			</div>
+			<div class="form-but">
+
+				<input type="button" value=" 确定 " class="bnt"  onclick="formSubmit();"/>
+				<input class="button" value=" 重置 " type="reset">
+				<input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+			</div>
+  		</form>
+  	</div>
+</div>
+<script language="javascript" type="text/javascript">
+    String.prototype.trim = function() {
+        // 用正则表达式将前后空格
+        // 用空字符串替代。
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+    function formSubmit(){
+        var supplierId=document.getElementById("supplierId").value;
+         var depFirstId=document.getElementById("depFirstId").value;
+        var gmtRefTime=document.getElementById("gmtStart_str").value.replace(/-/g, "/");
+        if(supplierId==""){
+        alert("供应商不能为空");
+        return ;
+        }
+        if(depFirstId==""){
+        alert("一级仓库名称不能为空");
+        return ;
+        }
+
+        if(gmtRefTime == ""){
+         alert("退货时间不能为空");
+         return;
+        }
+            document.addSRefund.submit();
+
+        }
+    function selectid(){
+        var id = document.getElementById("idstr").value;
+        var obj = document.getElementById("adPositionIdstr");
+        obj.value=id;
+    }
+</script>

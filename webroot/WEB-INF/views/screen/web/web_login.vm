@@ -1,0 +1,37 @@
+#set($layout = '')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>登录</title>
+  <!-- Sets initial viewport load and disables zooming  -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet.min.css">
+  <link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet-theme-ios.css">
+  <link rel="stylesheet" href="${imageServer}/wap//style/index.css">
+  <script src="${imageServer}/wap//bower_components/ratchet/dist/js/ratchet.min.js"></script>
+</head>
+<body>
+  <header class="bar bar-nav">
+    <a class="icon icon-left-nav pull-left"></a>
+    <h1 class="title">登录</h1>
+  </header>
+  <div class="container">
+
+    <form class="p10">
+      <h3>尚上帐号登录</h3>
+      <input type="text" placeholder="请输入账号">
+      <input type="password" placeholder="请输入密码">
+      <div class="clearfix mb20">    
+        <a href="" class="red pull-right">忘记密码</a>
+        <button class="btn btn-negative">登录</button>
+        <button class="btn">立即注册</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

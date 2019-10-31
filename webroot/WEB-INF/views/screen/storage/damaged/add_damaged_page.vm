@@ -1,0 +1,219 @@
+#set($layout = "layout/default.vm")
+<head>
+<title>管理中心 - 新增报残单 </title>
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="${ctx}/scripts/jquery.js"></script>
+
+
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+</head>
+
+<body onload="load()";>
+			<div class="main">
+		<div class="formBox">
+				<h3><i></i><span> 新增报残单</span></h3>
+	<div class="content">
+	<script src="images/calendar" type="text/javascript"></script>
+	<link href="styles/calendar.css" type="text/css" rel="stylesheet">
+		<form  name="addDamaged"  action="addDamaged.html" method="post">
+			<input type="hidden" id="flag" name="flag" value="add" />
+			<table width="100%" cellpadding="3" cellspacing="1">
+			<tbody>
+				<div class="form">
+				<ol>
+					         <li>
+			<label>报残单号：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("damaged.damagedCode")
+					<input  type="text" name="${status.expression}" id="damagedCode" value="$!{damagedId}" readonly=true />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>仓库：</label>
+				<span class="con">
+					<ul>
+              <li>
+
+
+<script language="javascript" type="text/javascript">
+	function load()
+    {
+	   var obj2 = document.getElementById("depfirstId");
+	   var obj = document.getElementById("depId");
+	   if(obj.value == ""&& obj2.value != ""){
+	   var length = obj.length = 0;
+	   obj.style.display='';
+       obj.options[length++] = new Option("请选择", "");
+	   var code = obj2.value;
+		   jQuery.post('${appServer}/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   for(var i=0;i<list.length;i++){
+		     var dep=list[i];
+			 if(dep.type != "defect_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+		    }
+		   },'json');
+       }
+	 }
+
+function selectDep(code){
+    var obj = document.getElementById("depId");
+	var length = obj.length = 0;
+
+
+		obj.options[length++] = new Option("请选择", "");
+		jQuery.post('${appServer}/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   for(var i=0;i<list.length;i++){
+		     var dep=list[i];
+			 if(dep.type != "defect_dep"){
+			 obj.options[length++] = new Option(dep.name, dep.id);
+			 }
+		   }
+		},'json');
+}
+
+</script>
+
+	#springBind("damaged.depfirstId")
+    			<select name="${status.expression}" id="depfirstId" style="width:100px;" onchange="selectDep(this.value);">
+					#if(!$depositoryFirstList||$depositoryFirstList.size() == 0 )
+										<option value="">请选择</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+    				<option value="$depfirst.id" #if("$depfirst.id"=="$damaged.depfirstId") selected #end>$depfirst.depFirstName</option>
+    				#end
+    			</select>
+				#springBind("damaged.depId")
+    			<select name="${status.expression}" id="depId" style="width:100px;" >
+    				<option value="">请选择</option>
+					#foreach($st in $depositoryList)
+    				<option value="$st.id" #if("$st.id"=="$damaged.depId") selected #end>$st.name</option>
+    				#end
+    			</select>
+</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>制单人：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("damaged.creater")
+					<select name="${status.expression}" id="creater" >
+						<option value="">-=请选择=-</option>
+						#**
+                    #foreach($userInfo in $userLists)
+                    	<option value="$!{userInfo.account}" #if("$!{damaged.creater}" == "${userInfo.account}")selected="true" #end>$!{userInfo.account}</option>
+					#end
+					*#
+					#foreach($userInfo in $userList)
+						<option value="$!{userInfo.userName}" #if("$!{parMap.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+					#end
+            		</select>
+			</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>经手人：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("damaged.agent")
+					<select name="${status.expression}" id="agent" >
+						<option value="">-=请选择=-</option>
+                    ##foreach($userInfo in $userLists)
+                    ##	<option value="$!{userInfo.account}" #if("$!{damaged.agent}" == "${userInfo.account}")selected="true" #end>$!{userInfo.account}</option>
+                    ##end
+					#foreach($userInfo in $userList)
+						<option value="$!{userInfo.userName}" #if("$!{damaged.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+					#end
+            		</select>
+			</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>报残日期：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("damaged.gmtDamaged_str")
+					<input type="text" name="${status.expression}" id="gmtDamaged_str" value="$!damaged.gmtDamaged_str" size="10" theme="simple" readonly="true" />
+			    <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "gmtDamaged_str",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+				</script>
+			</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>备注：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("damaged.remark")
+					<textarea cols="50" rows="3" id="remark" name="${status.expression}"  onKeyUp="textLimitCheck(this,200);">$!{damaged.remark}</textarea>
+			</li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		</table></form></div>
+  <div class="form-but">
+    <input class="btn" value=" 下一步 " type="button"  onclick="formSubmit();">
+			 <input class="btn" value=" 重 置 " type="reset"><input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var depId=document.getElementById("depId").value.replace(/-/g, "/");
+			var gmtDamaged=document.getElementById("gmtDamaged_str").value.replace(/-/g, "/");
+
+			if(depId==""){
+				alert("仓库必须选择！");
+    			return false;
+			}
+    		if(gmtDamaged == ""){
+    			alert("报残时间不能为空！");
+    			return false;
+    		}
+        	document.forms[0].submit();
+	    }
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+</script>
+</body>

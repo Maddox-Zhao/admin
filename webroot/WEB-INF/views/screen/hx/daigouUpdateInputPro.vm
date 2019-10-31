@@ -1,0 +1,94 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>修改产品信息</h2>
+		#if($!message)
+			<div class="mag-t2">
+					图片格式不正确或大于了200K！
+			</div>
+		#end
+		
+		 <center>
+		 <form action="update.html" name="updateDaiGouPro" method="post" enctype="multipart/form-data">
+			  代购编号：
+			  #springBind("daigouPro.daigouCode")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" readonly="true" class="inp inp-w105" /><br/><br/>
+			   #springBind("daigouPro.id")
+			  <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+			  #springBind("daigouPro.daigouId")
+			  <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+			   品&nbsp;&nbsp;&nbsp;&nbsp;名：
+			  #springBind("daigouPro.seriesId")
+			  <select name="${status.expression}">
+					#foreach($series in ${seriesList.entrySet()})
+							<option  #if($!series.key == $!{daigouPro.seriesId}) selected="selected" #end value="$!series.key"  class="inp inp-w105" size="10">&nbsp;&nbsp;$!{series.value}&nbsp;&nbsp;</option>
+					#end
+			  </select><br/><br/>
+			  
+			  品牌：
+			  #springBind("daigouPro.brandId")
+			  <select name="${status.expression}">
+					#foreach($brand in $brandList.entrySet())
+							<option value="$!brand.key"  #if($!brand.key == $!{daigouPro.brandId}) selected="selected" #end class="inp inp-w105" size="10">$!brand.value</option>
+					#end
+			  </select><br/><br/>
+			  
+			 
+			  
+			  材质：
+			  #springBind("daigouPro.material")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  maxlength="7"/><br/><br/>
+			  
+			  型号：
+			  #springBind("daigouPro.type")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  maxlength="7"/><br/><br/>
+			  
+			  
+			  颜色：
+			  #springBind("daigouPro.color")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  maxlength="7"/><br/><br/>
+			  
+			    
+			  单价：
+			  #springBind("daigouPro.price")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  onkeyup="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			  
+			  数量：
+			  #springBind("daigouPro.num")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  onkeyup="value=value.replace(/[^\d]/g,'')" onblur="javascript:document.saveDaiGouPro.amount.value = document.saveDaiGouPro.price.value*this.value" /><br/><br/>
+			  
+			  小计金额
+			  #springBind("daigouPro.amount")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105" readonly="true" onkeyup="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			  
+			  
+			 已付定金：
+			  #springBind("daigouPro.paidAmount")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  onkeydown="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			  
+			  最高承受单价：
+			  #springBind("daigouPro.highPrice")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  onkeydown="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			 
+			  图片：
+			  <input type="file" name="img"/><br/><br/>
+			    
+		<div class="form-but">
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.updateDaiGouPro.submit()">确定</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.updateDaiGouPro.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1)">返回 </button>
+		</div>
+		
+</form>
+		 
+		 
+		 <br/>
+
+		 </center>
+    </div>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ExpressAnalysisSQL">
+<typeAlias alias="expressAnalysis" type="com.huaixuan.network.biz.domain.express.ExpressAnalysis"/>
+	<resultMap class="expressAnalysis" id="expressAnalysisByExpResult">
+		<result column="express_id" property="expressId"/>
+		<result column="outDepSum"  property="outDepSum"/>
+		<result column="gmtOutDep" property="gmtOutDep"/>
+		<result column="actualInventorySum" property="actualInventorySum"/>
+		<result column="shippingAmountSum" property="shippingAmountSum"/>
+	</resultMap>
+	<resultMap class="expressAnalysis" id="expressAnalysisByProResult">
+		<result column="regionCode" property="regionCode"/>
+		<result column="outDepSum"  property="outDepSum"/>
+		<result column="gmtOutDep" property="gmtOutDep"/>
+		<result column="actualInventorySum" property="actualInventorySum"/>
+		<result column="shippingAmountSum" property="shippingAmountSum"/>
+	</resultMap>
+<select id="getExpressAnalysisByExp" resultMap="expressAnalysisByExpResult">
+<![CDATA[
+	 select a.express_id,
+	  count(distinct a.id) outDepSum,
+       substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m'), 1, 7) gmtOutDep,
+       IFNULL(sum(a.ACTUAL_INVENTORY),0) actualInventorySum,
+       sum(a.SHIPPING_AMOUNT) shippingAmountSum
+  from emall_trade a, ioss_out_depository b, emall_trade_package c
+ where a.tid = c.tid
+   and b.relation_num = c.merge_tid
+   and b.gmt_out_dep between STR_TO_DATE(#gmtOutDepStart#,'%Y-%m') and
+  DATE_ADD(LAST_DAY(STR_TO_DATE(#gmtOutDepEnd#,'%Y-%m')),INTERVAL 1 DAY)  ]]>
+  and a.is_wholesale ='n'
+  <isNotEmpty prepend="and" property="expressId">
+  	a.express_id=#expressId#
+  </isNotEmpty>
+  <![CDATA[
+ group by a.express_id, substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m'), 1, 7)
+ order by express_id,gmtOutDep
+ ]]>
+ </select>
+<select id="getExpressAnalysisByPro" resultMap="expressAnalysisByProResult">
+<![CDATA[
+	 select a.province regionCode,
+	 count(distinct a.id) outDepSum,
+       substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m'), 1, 7) gmtOutDep,
+       IFNULL(sum(a.ACTUAL_INVENTORY),0) actualInventorySum,
+       sum(a.SHIPPING_AMOUNT) shippingAmountSum
+  from emall_trade a, ioss_out_depository b, emall_trade_package c
+ where a.tid = c.tid
+   and b.relation_num = c.merge_tid
+   and b.gmt_out_dep between STR_TO_DATE(#gmtOutDepStart#,'%Y-%m') and
+   DATE_ADD(LAST_DAY(STR_TO_DATE(#gmtOutDepEnd#,'%Y-%m')),INTERVAL 1 DAY)  ]]>
+   and a.is_wholesale ='n'
+  <isNotEmpty prepend="and" property="regionCode">
+  	a.province=#regionCode#
+  </isNotEmpty>
+  <![CDATA[
+ group by a.province, substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m'), 1, 7)
+ order by regionCode,gmtOutDep
+ ]]>
+ </select>
+</sqlMap>

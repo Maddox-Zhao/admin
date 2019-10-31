@@ -1,0 +1,94 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>产品变动记录</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	<div  id="form1"> 
+  
+     <div style="padding-left:10px;padding-bottom:5px;"> 
+      <table cellpadding="3"> 
+       <tbody>
+        <tr> 
+         <td >idProduct：</td> 
+         <td ><input name="idProduct" id="idProduct"  onenter="search()"  class="mini-textbox" emptytext="idProduct"  /></td>
+		 <td >类型：</td> 
+         <td > <input  name="type" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+					data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>    </td>
+		 <td>
+             <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>
+			 <a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')" >关闭</a>
+         </td>
+        </tr> 
+       </tbody>
+      </table> 
+ 
+    </div> 
+   </div>
+	
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:900px;height:400px;" allowResize="true" 
+        url="/product/getProductUpdateLog.html"  idField="id" multiSelect="false"  pageSize="100"  >
+        <div property="columns">
+            <div field="idProduct" width="120" headerAlign="center" align="center" allowSort="true">idProduct</div>
+			<div field="type" width="120" headerAlign="center" align="center" allowSort="true" renderer="renderType">类型</div>
+            <div field="beforActivePrice" width="80" headerAlign="center" align="center"  allowSort="true">前活动价</div>
+			<div field="nowActivePrice" width="80" headerAlign="center" align="center"  allowSort="true">现活动价</div>
+			<div field="updateUserName" width="80" headerAlign="center" align="center"  allowSort="true">操作人</div>
+			<div field="updateTime" width="120" headerAlign="center" align="center"  allowSort="true">日期</div>
+			<div field="beforSku" width="80" headerAlign="center" align="center"  allowSort="true">前sku</div>
+			<div field="nowSku" width="80" headerAlign="center" align="center"  allowSort="true">现sku</div>
+			<div field="beforType" width="80" headerAlign="center" align="center"  allowSort="true">前型号</div>
+			<div field="nowType" width="80" headerAlign="center" align="center"  allowSort="true">现型号</div>
+			<div field="beforMaterial" width="80" headerAlign="center" align="center"  allowSort="true">前材质</div>
+			<div field="nowMaterial" width="80" headerAlign="center" align="center"  allowSort="true">现材质</div>
+			<div field="beforColor" width="80" headerAlign="center" align="center"  allowSort="true">前颜色</div>
+			<div field="nowColor" width="80" headerAlign="center" align="center"  allowSort="true">现颜色</div>
+			<div field="beforSize" width="80" headerAlign="center" align="center"  allowSort="true">前大小</div>
+			<div field="nowSize" width="80" headerAlign="center" align="center"  allowSort="true">现大小</div>
+			
+        </div>
+    </div>
+    <script type="text/javascript">
+	    var statusData = [{id: 1,value: "活动价变动"  },  { id: 2, value: "sku变动" } ] ;
+		mini.parse();
+        var grid = mini.get("datagrid1");
+
+		function setData(data)
+		{
+			var idProduct = data.idProduct;
+			mini.get("idProduct").setValue(idProduct);
+			search();
+			//grid.load({idProduct:idProduct});
+		}
+		
+		function CloseWindow(action) 
+		{            
+            if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+            else window.close();            
+   		 }
+		 
+		 //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            grid.load(data);
+        }
+		 
+		 function renderType(row) {
+            if (!row.value) return "";
+           else if(row.value == 2) return "sku变动";
+		   else if(row.value == 1) return "活动价变动";
+        }
+		
+		 
+
+</script>
+</body>
+</html>

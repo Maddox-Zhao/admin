@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ArticleSQL">
+<cacheModel id="article-cache" type="LRU">
+		<flushInterval hours="24"/>
+	   <flushOnExecute statement="addArticle"/>
+	   <flushOnExecute statement="editArticle"/>
+	   <flushOnExecute statement="removeArticle"/>
+	   <flushOnExecute statement="updateShow"/>
+	   <flushOnExecute statement="updateTop"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+<typeAlias alias="article" type="com.huaixuan.network.biz.domain.shop.Article"/>
+	<resultMap class="article" id="articleResult">
+		<result column="id" property="id"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="title" property="title"/>
+		<result column="digest" property="digest"/>
+		<result column="content" property="content"/>
+		<result column="author" property="author"/>
+		<result column="keywords" property="keywords"/>
+		<result column="is_top" property="isTop"/>
+		<result column="is_show" property="isShow"/>
+		<result column="source" property="source"/>
+		<result column="source_url" property="sourceUrl"/>
+		<result column="click_count" property="clickCount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+
+
+	<resultMap class="article" id="articleResultPage">
+		<result column="id" property="id"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="title" property="title"/>
+		<result column="digest" property="digest"/>
+		<result column="content" property="content"/>
+		<result column="author" property="author"/>
+		<result column="keywords" property="keywords"/>
+		<result column="is_top" property="isTop"/>
+		<result column="is_show" property="isShow"/>
+		<result column="source" property="source"/>
+		<result column="source_url" property="sourceUrl"/>
+		<result column="click_count" property="clickCount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="cat_name" property="catName"/>
+	</resultMap>
+
+<!-- create Article object -->
+<insert id="addArticle" parameterClass="article">
+<![CDATA[
+		insert into emall_article
+		(id,cat_code,title,digest,content,author,keywords,is_top,is_show,source,source_url,click_count,gmt_create,gmt_modify )values(
+		null,
+		#catCode#,
+		#title#,
+		#digest#,
+		#content#,
+		#author#,
+		#keywords#,
+		#isTop#,
+		#isShow#,
+		#source#,
+		#sourceUrl#,
+		#clickCount#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Article object -->
+<update id="editArticle" parameterClass="article">
+<![CDATA[
+		update emall_article set cat_code = #catCode#,
+		title = #title#,
+		digest = #digest#,
+		content = #content#,
+		keywords = #keywords#,
+		source = #source#,
+		source_url = #sourceUrl#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Article object -->
+<delete id="removeArticle" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_article where emall_article.ID = #value#
+]]>
+</delete>
+<!-- search Article object -->
+<select id="getArticle" parameterClass="java.lang.Long" resultMap="articleResult">
+<![CDATA[
+		select emall_article.* from emall_article where emall_article.ID = #value#
+]]>
+</select>
+<!-- searchAll Article List -->
+<select id="getArticles" resultMap="articleResult">
+<![CDATA[
+		select emall_article.* from emall_article  order by gmt_modify desc
+]]>
+</select>
+<select id="getArticleTop5" resultMap="articleResult">
+<![CDATA[
+		select a.* from emall_article  a  order by a.gmt_create desc
+]]>
+</select>
+
+<select id="getArticlesCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from emall_article
+]]>
+</select>
+
+<select id="getArticlesPage" resultMap="articleResultPage">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select
+			a.id,
+			a.cat_code,
+			a.title,
+			a.digest,
+			a.content,
+			a.author,
+			a.keywords,
+			a.is_top,
+			a.is_show,
+			a.source,
+			a.source_url,
+			a.click_count,
+			a.gmt_create,
+			a.gmt_modify,
+			b.cat_name
+		from emall_article a left join emall_article_cat b on a.cat_code = b.code
+		order by a.gmt_create desc
+]]>
+ <include refid="pageSQLFoot"/>
+</select>
+
+<update id="updateShow" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_article set
+		is_show = #isShow#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+
+<update id="updateTop" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_article set
+		is_top = #isTop#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<select id="getArticleIndex" resultMap="articleResult" cacheModel="article-cache">
+<![CDATA[
+		
+        select t.* from emall_article t where  t.is_show=1 and t.cat_code='zixun' order by t.gmt_modify LIMIT 0,5
+]]>
+</select>
+</sqlMap>

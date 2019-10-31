@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap >
+<typeAlias alias="shoppingRefundDetail" type="com.huaixuan.network.biz.domain.stock.ShoppingRefundDetail"/>
+<typeAlias alias="paramMap" type="java.util.Map"/>
+<typeAlias alias="shoppingRefundDetailSearch" type="com.huaixuan.network.biz.domain.stock.ShoppingRefundDetailSearch"/>
+
+<resultMap class="shoppingRefundDetail" id="shoppingRefundDetailResult">
+	<result column="id" property="id"/>
+	<result column="goods_id" property="goodsId"/>
+	<result column="goods_instance_id" property="goodsInstanceId"/>
+	<result column="loc_id" property="locId"/>
+	<result column="shop_ref_id" property="shopRefId"/>
+	<result column="shopping_id" property="shoppingId"/>
+	<result column="goods_code" property="goodsCode"/>
+	<result column="ref_price" property="refPrice"/>
+	<result column="ref_num" property="refNum"/>
+	<result column="due_fee" property="dueFee"/>
+	<result column="fact_fee" property="factFee"/>
+	<result column="reason" property="reason"/>
+	<result column="remark" property="remark"/>
+	<result column="units" property="units"/>
+	<result column="damaged_num" property="damagedNum"/>
+
+</resultMap>
+<resultMap class="shoppingRefundDetailSearch" id="shoppingRefundDetailSearchResult">
+	<result column="refund_num" property="refundNum"/>  <!-- 退货单号 -->
+	<result column="supplier_id" property="supplierId"/> <!-- 供货商ID -->
+	<result column="supplier_name" property="supplierName"/><!-- 供货商名称 -->
+	<result column="goods_code" property="goodsCode"/><!-- 产品编码 -->
+	<result column="instance_name" property="instanceName"/><!-- 产品名称 -->
+	<result column="ref_time" property="refTime"/><!-- 退货时间 -->
+	<result column="cat_code" property="catCode"/><!-- 类目 -->
+	<result column="attrs" property="attrs"/><!-- 属性 -->
+	<result column="units" property="units"/><!-- 单位 -->
+	<result column="ref_price" property="refPrice"/><!-- 退货单价 -->
+	<result column="ref_num" property="refNum"/><!-- 退货数量 -->
+	<result column="due_fee" property="dueFee"/><!-- 应收金额 -->
+	<result column="fact_fee" property="factFee"/><!-- 实收金额 -->
+       <result column="stor_type" property="storType"/>
+       <result column="dep_first_id" property="depFirstId"/>
+</resultMap>
+<resultMap class="shoppingRefundDetail" id="shoppingRefundDetailBatchNumResult">
+    <result column="batch_Num" property="batchNum"/>
+</resultMap>
+
+<typeAlias alias="shoppingRefundGatherSearch" type="com.huaixuan.network.biz.domain.stock.ShoppingRefundGatherSearch"/>
+	<resultMap class="shoppingRefundGatherSearch" id="shoppingRefundGatherSearchResult">
+
+		<result column="goods_code" property="goodsCode"/><!-- 产品编码 -->
+		<result column="instance_name" property="instanceName"/><!-- 产品名称 -->
+		<result column="cat_code" property="catCode"/><!-- 类目 -->
+		<result column="attrs" property="attrs"/><!-- 属性 -->
+		<result column="units" property="units"/><!-- 单位 -->
+		<result column="damaged_num" property="damagedNum"/> <!-- 退货残品数量 -->
+		<result column="ref_num" property="refNum"/><!-- 退货正品数量 -->
+		<result column="due_fee" property="dueFee"/><!-- 应收金额 -->
+		<result column="fact_fee" property="factFee"/><!-- 实收金额 -->
+       <result column="stor_type" property="storType"/>
+        <result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+
+<typeAlias alias="shoppingRefundSearch" type="com.huaixuan.network.biz.domain.stock.ShoppingRefundSearch"/>
+    <resultMap class="shoppingRefundSearch" id="shoppingRefundSearchResult">
+               <result column="shopping_num" property="shoppingNum"/>
+    </resultMap>
+
+<!-- 采购退货单汇总查询——结果集  -->
+<select id="getShoppingRefundGatherSearchList" resultClass="shoppingRefundGatherSearch">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+    select t.goods_code as goodsCode,
+        t.instance_name as instanceName,t.attrs as attrs ,
+        t.cat_code as catCode,t.units as units,
+                      sum(t.damaged_num) as damagedNum,
+                      sum(t.ref_num) as refNum,
+                      sum(t.due_fee) as dueFee,
+                      sum(t.fact_fee) as factFee,
+                      t.dep_first_id as depFirstId,
+                      t.stor_type as storType
+              from (select b.code  as goods_code,
+                           b.instance_name as instance_name,
+                           b.cat_code as cat_code,
+                           b.attrs as attrs,
+                           a.units as units,
+                           a.damaged_num as damaged_num,
+                           a.ref_num as ref_num,
+                           a.due_fee as due_fee,
+                           a.fact_fee as fact_fee,
+                           d.dep_first_id as dep_first_id,
+                           l.stor_type stor_type
+                    from ioss_goods_instance b,
+                         ioss_shopping_refund_detail a,
+                         ioss_shopping_refund d,
+                         ioss_shopping_list l
+                    where b.id=a.goods_instance_id
+                      and d.id=a.shop_ref_id
+                      and a.shopping_id=l.id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			d.ref_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			d.ref_time < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+
+          <isNotEmpty prepend="and" property="depfirstIds" >
+            d.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+          </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId" >
+            d.DEP_FIRST_ID = #depFirstId#
+        </isNotEmpty>
+	         ) t
+             group by t.goods_code,t.instance_name,t.attrs,t.cat_code,t.units,t.dep_first_id,t.stor_type
+		order by t.goods_code
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购退货单汇总查询——数量  -->
+<select id="getShoppingRefundGatherSearchCount" resultClass="java.lang.Integer">
+<![CDATA[
+    select count(1)
+        from (select t.goods_code as goodsCode,
+        t.instance_name as instanceName,t.attrs as attrs ,
+        t.cat_code as catCode,t.units as units
+              from (select b.code  as goods_code,
+                           b.instance_name as instance_name,
+                           b.cat_code as cat_code,
+                           b.attrs as attrs,
+                           a.units as units,
+                           a.damaged_num as damaged_num,
+                           a.ref_num as ref_num,
+                           a.due_fee as due_fee,
+                           a.fact_fee as fact_fee,
+                           d.dep_first_id as dep_first_id,
+                           l.stor_type stor_type
+                    from ioss_goods_instance b,
+                         ioss_shopping_refund_detail a,
+                         ioss_shopping_refund d,
+                         ioss_shopping_list l
+                    where b.id=a.goods_instance_id
+                      and d.id=a.shop_ref_id
+                      and a.shopping_id=l.id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			d.ref_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			d.ref_time < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+           <isNotEmpty prepend="and" property="depfirstIds" >
+            d.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+          </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId" >
+            d.DEP_FIRST_ID = #depFirstId#
+        </isNotEmpty>
+	         ) t
+            group by t.goods_code,t.instance_name,t.attrs,t.cat_code,t.units,t.dep_first_id,t.stor_type) yy
+</select>
+
+
+<!-- 采购退货单明细查询——结果集   -->
+<select id="getShoppingRefundDetailSearchList" resultMap="shoppingRefundDetailSearchResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+    select d.ref_num as refund_num,
+               d.supplier_id,
+               (select s.name from ioss_supplier s where s.id=d.supplier_id) supplier_name,
+               a.goods_code,
+               b.instance_name,
+                   d.ref_time,
+               b.cat_code,
+                    b.attrs,
+               a.units,
+               a.ref_num+a.damaged_num as ref_num,
+               a.ref_price,
+               a.due_fee,
+               a.fact_fee,
+             l.stor_type,
+             d.dep_first_id
+        from ioss_goods_instance  b,
+             ioss_shopping_refund_detail  a,
+             ioss_shopping_refund  d,
+           ioss_shopping_list    l
+        where b.id=a.goods_instance_id
+              and d.id=a.shop_ref_id
+            and l.id=a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			d.ref_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			d.ref_time < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+           <isNotEmpty prepend="and" property="depfirstIds" >
+            d.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+          </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId" >
+            d.DEP_FIRST_ID = #depFirstId#
+        </isNotEmpty>
+		order by a.shop_ref_id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购退货单明细查询——数量  -->
+<select id="getShoppingRefundDetailSearchCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1)
+		from ioss_goods_instance  b,
+	         ioss_shopping_refund_detail  a,
+	         ioss_shopping_refund  d,
+           ioss_shopping_list    l
+        where b.id=a.goods_instance_id
+	          and d.id=a.shop_ref_id
+	           and l.id=a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			d.ref_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			d.ref_time < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+          <isNotEmpty prepend="and" property="depfirstIds" >
+			d.DEP_FIRST_ID in(
+           	<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+           	)
+          </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId" >
+            d.DEP_FIRST_ID = #depFirstId#
+        </isNotEmpty>
+</select>
+
+<!-- create ShoppingRefundDetail object -->
+
+<insert id="addShoppingRefundDetail" parameterClass="shoppingRefundDetail">
+<![CDATA[
+		insert into ioss_shopping_refund_detail
+		(id,goods_id,goods_instance_id,loc_id,shop_ref_id,shopping_id,goods_code,ref_price,ref_num,due_fee,fact_fee,reason,remark,damaged_num,units )values(
+		null,
+		#goodsId#,
+		#goodsInstanceId#,
+		#locId#,
+		#shopRefId#,
+		#shoppingId#,
+		#goodsCode#,
+		#refPrice#,
+		#refNum#,
+		#dueFee#,
+		#factFee#,
+		#reason#,
+		#remark#,
+		#damagedNum#,
+		#units#
+		)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<update id="editShoppingRefundDetail" parameterClass="shoppingRefundDetail">
+<![CDATA[
+		update ioss_shopping_refund_detail set goods_id = #goodsId#,
+		goods_instance_id = #goodsInstanceId#,
+		loc_id = #locId#,
+		shop_ref_id = #shopRefId#,
+		shopping_id = #shoppingId#,
+		goods_code = #goodsCode#,
+		ref_price = #refPrice#,
+		ref_num = #refNum#,
+		due_fee = #dueFee#,
+		fact_fee = #factFee#,
+		reason = #reason#,
+		remark = #remark#,
+		damaged_num=#damagedNum#,
+		units=#units#
+		where id = #id#
+
+]]>
+</update>
+<!-- delete ShoppingRefundDetail object -->
+<delete id="removeShoppingRefundDetail"  parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_shopping_refund_detail where ioss_shopping_refund_detail.ID = #value#
+]]>
+</delete>
+<!-- search ShoppingRefundDetail object -->
+<select id="getShoppingRefundDetail"  parameterClass="java.lang.Long" resultMap="shoppingRefundDetailResult">
+<![CDATA[
+		select ioss_shopping_refund_detail.* from ioss_shopping_refund_detail where ioss_shopping_refund_detail.ID = #value#
+]]>
+</select>
+<!-- searchAll ShoppingRefundDetail List -->
+<select id="getShoppingRefundDetails" resultMap="shoppingRefundDetailResult" parameterClass="java.lang.Long">
+<![CDATA[
+		select ioss_shopping_refund_detail.* from ioss_shopping_refund_detail
+]]>
+</select>
+<!-- searchAll ShoppingRefundDetail List -->
+<select id="getShoppingRefundDetailes" resultMap="shoppingRefundDetailResult" parameterClass="java.lang.Long">
+<![CDATA[
+		select ioss_shopping_refund_detail.* from ioss_shopping_refund_detail where ioss_shopping_refund_detail.shop_ref_id = #value#
+]]>
+</select>
+
+<sql id="countRefundDetailParam">
+        <isNotEmpty prepend="and" property="goodsInstanceId">
+            goods_instance_id=#goodsInstanceId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="shoppingId">
+            shopping_id=#shoppingId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="shopRefId">
+            shop_ref_id=#shopRefId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="type">
+            a.type=#type#
+        </isNotEmpty>
+</sql>
+<!-- 根据采购单id,产品id统计退货的数量   -->
+<select id="sumRefundDetailsByShoppingId" resultClass="shoppingRefundDetail">
+<![CDATA[
+  select shopping_id as shoppingId,goods_instance_id as goodsInstanceId,
+    sum(ioss_shopping_refund_detail.ref_num) as refNum, sum(damaged_num)  as damagedNum
+     from ioss_shopping_refund a,ioss_shopping_refund_detail
+     where shop_ref_id=a.id and a.status = 'stock_new'
+  ]]>
+  <include refid="countRefundDetailParam"/>
+    GROUP by shopping_id,goods_instance_id
+</select>
+
+<select id="countShoppingRefundDetailes" resultClass="int">
+<![CDATA[
+        select count(1) from ioss_shopping_refund_detail
+        where 1=1
+]]>
+<include refid="countRefundDetailParam"/>
+</select>
+
+<!-- 采购退货单明细条件  -->
+<sql id="refundDetailParam">
+		<isNotEmpty prepend="and" property="InstanceName">
+			gi.instance_name=#InstanceName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingId">
+			re.shopping_id=#shoppingId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shopRefId">
+			re.shop_ref_id=#shopRefId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingNum">
+		    sl.shopping_num=#shoppingNum#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+		    re.goods_instance_id=#goodsInstanceId#
+		</isNotEmpty>
+</sql>
+
+
+<!-- 通过退货id 查询采购退货单明细  -->
+<select id="getRefundDetail" resultClass="shoppingRefundDetail" >
+<![CDATA[
+    	select gi.instance_name as instanceName,gi.code as code,
+		sd.amount as amount,sd.unit_price as unitPrice,gi.cat_code as catCode,
+		gi.attr_desc as attrDesc,gi.attrs as attrs,
+		re.id as id,
+		re.goods_id as goodsId,
+		re.goods_instance_id as instanceId,
+		re.loc_id as locId,
+		re.shop_ref_id as shopRefId,
+		re.shopping_id as shoppingId,
+		re.goods_code as goodsCode,
+		re.ref_price as refPrice,
+		re.ref_num as refNum,
+		re.due_fee as dueFee,
+		re.fact_fee as factFee,
+		re.reason as reason,
+		re.remark as remark,
+		gi.goods_unit as units,
+        re.damaged_num  as damagedNum,
+        sl.shopping_num as shoppingNum
+		from ioss_shopping_refund_detail  re
+            ,ioss_goods_instance gi
+            ,ioss_shopping_detail sd
+            ,ioss_shopping_list sl
+        where re.goods_instance_id=gi.id
+         and re.shopping_id= sd.shopping_id
+         and re.goods_instance_id=sd.goods_instance_id
+         and re.shopping_id = sl.id
+]]>
+<include refid="refundDetailParam"/>
+</select>
+
+<!-- 通过退货id 查询库存退货单明细  -->
+<select id="getStorageRefundDetails" resultClass="shoppingRefundDetail" >
+<![CDATA[
+    	select gi.instance_name as instanceName,gi.code as code,
+		gi.cat_code as catCode,
+		gi.attr_desc as attrDesc,gi.attrs as attrs,
+        gi.goods_unit as units,
+		re.id as id,
+		re.goods_id as goodsId,
+		re.goods_instance_id as instanceId,
+		re.loc_id as locId,
+		re.shop_ref_id as shopRefId,
+		re.shopping_id as shoppingId,
+		re.goods_code as goodsCode,
+		re.ref_price as refPrice,
+		re.ref_num as refNum,
+		re.due_fee as dueFee,
+		re.fact_fee as factFee,
+		re.reason as reason,
+		re.remark as remark,
+        re.damaged_num  as damagedNum
+		from ioss_shopping_refund_detail  re
+            ,ioss_goods_instance gi
+        where re.goods_instance_id=gi.id
+]]>
+<include refid="refundDetailParam"/>
+</select>
+
+
+<!-- searchAll ShoppingRefundDetail List -->
+<select id="getShoppingRefundNum" resultMap="shoppingRefundSearchResult" parameterClass="java.lang.Long">
+<![CDATA[
+		select distinct shopping_num  from
+		ioss_shopping_refund_detail ,ioss_shopping_list
+		where ioss_shopping_refund_detail.shop_ref_id = #value# and ioss_shopping_refund_detail.shopping_id = ioss_shopping_list.id
+]]>
+</select>
+	<!-- 根据采购订单号和退货类型查询退货记录数 -->
+<select id="getCountRefundByShoppingIdAndStatus" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1)
+		from ioss_shopping_refund  b,
+	         ioss_shopping_refund_detail  a
+        where a.shop_ref_id=b.id
+]]>
+		<isNotEmpty prepend="and" property="shoppingId">
+			a.shopping_id = #shoppingId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			b.type = #type#
+		</isNotEmpty>
+</select>
+
+<!-- 根据关联单号找入库批次  -->
+<select id="getBatchNumByRelationNum" parameterClass="java.lang.String" resultMap="shoppingRefundDetailBatchNumResult">
+   <![CDATA[
+      select distinct(d.batch_Num)
+        from
+        ioss_shopping_refund a,ioss_shopping_refund_detail b,ioss_shopping_list c,ioss_in_depository d
+      where a.id = b.shop_ref_id and b.shopping_id = c.id and c.shopping_num = d.relation_num
+      and a.ref_num = #relationNum#
+   ]]>
+</select>
+
+<!-- 根据主表id找明细表记录  -->
+<select id="getShoppingRefundDetailByShoppingRefundId" parameterClass="java.lang.Long" resultMap="shoppingRefundDetailResult">
+  <![CDATA[
+     select b.*
+       from
+     ioss_shopping_refund a,ioss_shopping_refund_detail b
+       where a.id = b.shop_ref_id and a.id = #value#
+  ]]>
+</select>
+</sqlMap>

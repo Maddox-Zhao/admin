@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RegionSQL">
+<typeAlias alias="region" type="com.huaixuan.network.biz.domain.express.Region"/>
+	<resultMap class="region" id="regionResult">
+		<result column="id" property="id"/>
+		<result column="code" property="code"/>
+		<result column="parent_code" property="parentCode"/>
+		<result column="region_name" property="regionName"/>
+		<result column="region_type" property="regionType"/>
+	</resultMap>
+<!-- create Region object -->
+<insert id="addRegion" parameterClass="region">
+<![CDATA[
+insert into emall_region
+  (id, code, parent_code, region_name, region_type)
+values
+  (null, #code#, #parentCode#, #regionName#, #regionType#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Region object -->
+<update id="editRegion" parameterClass="region">
+<![CDATA[
+		update emall_region set code = #code#,
+		parent_code = #parentCode#,
+		region_name = #regionName#,
+		region_type = #regionType#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Region object -->
+<delete id="removeRegion" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_region where emall_region.ID = #value#
+]]>
+</delete>
+<!-- search Region object -->
+<select id="getRegion" parameterClass="java.lang.Long" resultMap="regionResult">
+<![CDATA[
+		select emall_region.* from emall_region where emall_region.ID = #value#
+]]>
+</select>
+<select id="getRegionByParams" parameterClass="region" resultMap="regionResult">
+      select emall_region.* from emall_region
+        <dynamic prepend=" where ">
+            <isGreaterThan prepend=" and " property="code" compareValue="0">
+				<![CDATA[emall_region.code = #code#]]>
+			</isGreaterThan>
+			<isGreaterThan prepend=" and " property="regionType" compareValue="0">
+				<![CDATA[emall_region.region_type = #regionType#]]>
+			</isGreaterThan>
+			<isNotNull prepend=" and " property="parentCode">
+				<![CDATA[emall_region.parent_code = #parentCode#]]>
+			</isNotNull>
+			<isNotNull prepend=" and " property="regionName">
+				<![CDATA[emall_region.region_name = #regionName#]]>
+			</isNotNull>
+		</dynamic>
+		order by emall_region.code
+</select>
+<!-- searchAll Region List -->
+<select id="getRegions" resultMap="regionResult">
+<![CDATA[
+		select emall_region.* from emall_region
+]]>
+</select>
+
+<select id="getRegionByCode" parameterClass="java.lang.String" resultMap="regionResult">
+	select emall_region.* from emall_region where code=#code#
+</select>
+
+<select id="getRegionByName" parameterClass="java.lang.String" resultMap="regionResult">
+	select emall_region.* from emall_region where instr(region_name,#regionName#)>0  LIMIT 1
+</select>
+
+<!--added by chenhang 2011-05-18 started  -->
+<select id="getRegionByNameAndType" parameterClass="java.util.Map" resultMap="regionResult">
+	select emall_region.* from emall_region where region_name=#regionName#
+	 and region_type=#regionType#
+</select>
+<!--added by chenhang 2011-05-18 ended  -->
+
+<!--added by chenhang 2011-05-13 started  -->
+<select id="getRegionByNameAndTypeAndCode" parameterClass="java.util.Map" resultMap="regionResult">
+	select emall_region.* from emall_region where
+	region_name like concat(#regionName#,'%')
+	and region_type=#regionType#
+	 <isNotEmpty prepend="and" property="parentCode">
+		parent_code=#parentCode#
+	 </isNotEmpty>
+	LIMIT 1
+</select>
+<!--added by chenhang 2011-05-13 ended  -->
+
+<select id="listRegionCodeByParentCode" parameterClass="java.lang.String" resultClass="java.lang.String">
+	select code from emall_region where parent_code=#parentCode#
+</select>
+
+<select id="listTwoRegionCodeByParentCode" parameterClass="java.lang.String" resultClass="java.lang.String">
+	SELECT IFNULL(b.code, a.code) as code
+	FROM (SELECT code,parent_code
+	             FROM  emall_region
+	             WHERE parent_code= #parentCode#)a
+	      left join emall_region b on a.code = b.parent_code
+</select>
+
+
+<select id="getRegionByFirstDepositoryId" parameterClass="java.lang.String" resultMap="regionResult">
+	SELECT *
+    FROM emall_region
+    START WITH CODE = (SELECT REGION_CODE
+                       FROM ioss_depository_first
+                       WHERE ID = #value#
+                       LIMIT 1 )
+    CONNECT BY CODE = PRIOR PARENT_CODE
+</select>
+
+<select id="getSpecialRegion" parameterClass="java.util.Map" resultMap="regionResult">
+    select a.id,
+           a.code,
+           a.parent_code,
+           a.region_name,
+           a.region_type
+    from emall_region a where (a.region_name like ('%市') or a.region_name like ('%县'))
+    <isNotEmpty prepend="and" property="specialCodes">
+       exists(select 1 from (
+          select b.code from emall_region b
+            where b.parent_code in(
+              <iterate property="specialCodes" conjunction=",">#specialCodes[]#</iterate>
+            )
+          ) c
+       where a.parent_code = c.code
+       )
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="district">
+	     a.code = #district#
+	</isNotEmpty>
+</select>
+</sqlMap>

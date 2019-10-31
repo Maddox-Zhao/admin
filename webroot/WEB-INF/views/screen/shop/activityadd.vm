@@ -1,0 +1,267 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+
+function checksubmit(){
+	var validateTitle = document.getElementById("validateTitle").innerHTML="";
+	var validateTime = document.getElementById("validateTime").innerHTML="";
+	var validateContext = document.getElementById("validateContext").innerHTML="";
+    var nowValue = document.getElementById("title").value;
+
+    if(nowValue.length == 0){
+		document.getElementById("validateTitle").innerHTML="<font color='red'>活动名称必须填写</font>" ;
+		document.theForm.title.focus();
+        return false;
+    }
+    if(nowValue.length > 32){
+    	document.getElementById("validateTitle").innerHTML="<font color='red'>活动名称不能超过32个字符</font>" ;
+    	document.theForm.title.focus();
+		return false;
+    }
+
+    var nowValue1 = document.getElementById("activity.gmtStart_str").value;
+    var nowValue2 = document.getElementById("activity.gmtEnd_str").value;
+    if(nowValue1.length == 0 ||nowValue2.length == 0 ){
+		document.getElementById("validateTime").innerHTML="<font color='red'>活动开始时间结束时间必须填写</font>" ;
+        return false;
+    }
+
+	var nowValue3 = document.getElementById("img_first_small").value;
+	if(nowValue3.length == 0){
+	    document.getElementById("validateImages3").innerHTML="<font color='red'>必须上传图片</font>" ;
+     	document.theForm.img.focus();
+        return false;
+	}
+    
+    if (nowValue3.length != 0 && !isAllowedAttach(nowValue3)){
+    	document.getElementById("validateImages3").innerHTML="<font color='red'>上传的图片类型有误,请选择jpeg .gif .jpg .png格式的图片</font>" ;
+    	return false;
+    }
+    var nowValue = document.getElementById("context").value;
+    if(nowValue.length == 0){
+    	document.getElementById("validateContext").innerHTML="<font color='red'>活动内容必须填写</font>" ;
+    	document.theForm.context.focus();
+        return false;
+    }
+    if(nowValue.length > 1024){
+    	document.getElementById("validateContext").innerHTML="<font color='red'>活动内容不能超过1024字符</font>" ;
+    	document.theForm.context.focus();
+        return false;
+    }
+
+	var dateStart1str = document.getElementById("activity.gmtStart_str").value;
+		    var dateEnd1str = document.getElementById("activity.gmtEnd_str").value;
+		    var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(dateStart1));
+            var e_date=new Date(Date.parse(dateEnd1));
+			if(dateStart1str==""||dateEnd1str==""){
+				alert("请选择时间");
+				return  false;
+			}else if(e_date < b_date){
+    				   alert("起始时间不能大于结束时间！");
+    			   return false;
+    		}
+			
+	var position = document.getElementById("activityPosition");
+	if(position == 9){
+		alert("请选择图片位置");
+	}
+	document.theForm.submit();
+}
+
+//判断图片格式
+    function isAllowedAttach(sFile)
+    {
+         var sUploadImagesExt = " .jpeg .gif .jpg .png ";
+         var sExt = sFile.match( /\.[^\.]*$/ ) ;
+         if (sExt) {
+          sExt = sExt[0].toLowerCase();
+         } else {
+          return false;
+         }
+         if ( sUploadImagesExt.indexOf( sExt ) != -1 ) {
+          return true;
+         }
+         return false;
+    }
+
+
+    //判断图片象素大小
+    function isRightSize(){
+        var obj = document.getElementById("img");
+    	var sUrl = getFullPath(obj);
+            var myImage = new Image();
+            myImage.src = sUrl;
+    	var imgwith =  myImage.width ;
+    	var imgheight =  myImage.height ;
+    /*	if("950" !=imgwith || "200" !=imgheight){
+    	    return false;
+    	}else{
+    	    return true;
+    	}
+    */
+    	 return true;
+    }
+    //获取图片全路径（不同的浏览器）
+    function getFullPath(obj) {
+        if(obj){
+            //ie
+            if (window.navigator.userAgent.indexOf("MSIE")>=1)
+            {
+                obj.select();
+                return document.selection.createRange().text;
+            }
+            //firefox
+            else if(window.navigator.userAgent.indexOf("Firefox")>=1)
+            {
+                if(obj.files)
+                {
+                    return obj.files.item(0).getAsDataURL();
+                }
+                return obj.value;
+            }
+            return obj.value;
+        }
+    }
+
+	function resetnav(){
+	document.theForm.reset();
+	}
+</script>
+	<script src="images/calendar" type="text/javascript"></script>
+	<link href="styles/calendar.css" type="text/css" rel="stylesheet">
+
+#set($title = "专场管理 - 新增专场")
+<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>新增专场</span></h3>
+	<div class="content">
+		<form  name="theForm"  action="/shop/insertActivity.html" method="post" enctype="multipart/form-data">
+			<input type="hidden" id="flagpage" name="flagpage" value="addImg" />
+			<table id="general-table" width="100%">
+			<tbody id="newtr">
+<div class="form">
+		<ol>
+          <li>
+			<label>活动名称：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.title")
+					<input type="text" id="title" name="${status.expression}" value="$!activity.title" size="24"/>
+				</li>
+						<li><em>*</em></li>
+				<li id="validateTitle">
+				</li>
+            </ul>
+            </span>
+          </li>
+		  
+		  <li>
+			<label>图片位置：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.activityPosition")
+			<select id="activityPosition" name="activityPosition">
+				<option value="无">请选择</option>
+				<option value="indexSwiper">首页轮播</option>
+				<option value="indexNew">首页最新上线</option>
+				<option value="discountTop">特惠上方</option>
+				<option value="discountLeftMiddle">特惠左侧中间</option>
+				<option value="discountLeftBottom">特惠左下角</option>
+				<option value="discountRight">特惠右侧</option>
+            </select>
+				</li>
+						<li><em>*</em></li>
+            </ul>
+            </span>
+          </li>
+		  
+          <li>
+			<label>活动时间：</label>
+				<span class="con">
+					<ul>
+              <li>
+				#springBind("activity.gmtStart_str")
+					<input type="text" name="${status.expression}" id="activity.gmtStart_str" size="10" theme="simple" readonly="true" value="$!{activity.gmtStart_str}"/>
+			            <script type="text/javascript">
+			               Calendar.setup({
+			                  inputField : "activity.gmtStart_str",
+			                  ifFormat   : "%Y-%m-%d",
+			                  align      : "BR"
+			             });
+                        </script>
+					 #springBind("activity.gmtEnd_str")
+					 <input type="text" name="${status.expression}" id="activity.gmtEnd_str" size="10" theme="simple" readonly="true" value="$!{activity.gmtEnd_str}"/>
+			             <script type="text/javascript">
+			              Calendar.setup({
+			                 inputField : "activity.gmtEnd_str",
+			                 ifFormat   : "%Y-%m-%d",
+			                 align      : "BR"
+			              });
+			             </script>
+</li>
+						<li><em>*</em></li>
+				<li id="validateTime">
+				</li>
+            </ul>
+            </span>
+          </li>
+		  
+         
+	
+		
+		 
+      
+		
+	
+		 
+		           <li>
+			<label>首页小图：</label>
+    				<span class="con">
+					<ul>
+              <li>
+    					<input type="file" id="img_first_small" name="images"/>
+				</li>
+				<li id="validateImages3">
+					 #springBind("activity.imgHomeSamll")
+					 <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<ul>
+    				<li class="label"></li>
+    				<li>
+						<font color="red"><B>（必须上传jpeg .gif .jpg .png格式，小于200K的图片。设置小图后将在首页专场专区显示）</B></font>
+    				</li>
+    				<li id="validateImages">
+					</li>
+			</ul>
+		 </li>
+          <li>
+			<label>活动内容：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.context")
+    					<textarea id="context" name="${status.expression}" cols="35" rows="5">$!activity.context</textarea>
+				</li>
+						<li><em>*</em></li>
+				<li id="validateContext">
+				</li>
+            </ul>
+            </span>
+				</li>
+		</ol>
+	   </div>
+		</tbody>
+		</table>
+		</form>
+		</div>
+  <div class="form-but">
+    <input class="button" value=" 确定 " type="button" onclick="return checksubmit();"> <input class="button" value=" 重置 " type="reset"  onclick="javascript:resetnav()"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></div></div>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PackageSQL">
+	<typeAlias alias="package" type="com.huaixuan.network.biz.domain.trade.PackageTrade"/>
+	<resultMap class="package" id="packageResult">
+		<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="name" property="name"/>
+		<result column="goods_amount" property="goodsAmount"/>
+		<result column="package_amount" property="packageAmount"/>
+		<result column="number" property="number"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create Package object -->
+<insert id="addPackage" parameterClass="package">
+<![CDATA[
+insert into emall_package
+  (id,
+   tid,
+   name,
+   goods_amount,
+   package_amount,
+   number,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #tid#,
+   #name#,
+   #goodsAmount#,
+   #packageAmount#,
+   #number#,
+   sysdate(),
+   sysdate())
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Package object -->
+<update id="editPackage" parameterClass="package">
+<![CDATA[
+		update emall_package set tid = #tid#,
+		name = #name#,
+		goods_amount = #goodsAmount#,
+		package_amount = #packageAmount#,
+		number = #number#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Package object -->
+<delete id="removePackage" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_package where emall_package.ID = #value#
+]]>
+</delete>
+<!-- search Package object -->
+<select id="getPackage" parameterClass="java.lang.Long" resultMap="packageResult">
+<![CDATA[
+		select emall_package.* from emall_package where emall_package.ID = #value#
+]]>
+</select>
+<!-- searchAll Package List -->
+<select id="getPackages" resultMap="packageResult">
+<![CDATA[
+		select emall_package.* from emall_package
+]]>
+</select>
+
+<select id="getPackagesByTid" resultMap="packageResult" parameterClass="string">
+	select p.*
+	  from emall_package p
+	 where p.tid = #value#
+	 order by p.gmt_create desc
+</select>
+</sqlMap>

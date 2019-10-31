@@ -1,0 +1,109 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+
+	function deleteBrand(id){
+ 		var obj = document.getElementById("brandId");
+	  	obj.value = id;
+  		var	mymes=confirm("确定删除这个品牌？");
+		 if(true==mymes){
+	  		document.listForm.action = "/shop/deletebr.html";
+			document.listForm.submit();
+	  	}else {
+
+	  	}
+	}
+
+	function updateBrandPage(id){
+ 		var obj = document.getElementById("brandId");
+	  	obj.value = id;
+  		document.listForm.action = "/shop/updatebrp.html";
+		document.listForm.submit();
+	}
+
+	function searchCategory(id){
+	   var obj = document.getElementById("brandId");
+	   obj.value = id;
+	   document.listForm.action = "/shop/searchbrandcategory.html";
+	   document.listForm.submit();
+	}
+
+</script>
+#set($title = "品牌管理 - 品牌管理列表")
+<form name="listForm" action="" method="post"><!-- start ads list -->
+	<input type="hidden" id="brandId" name="brandId" value="" />
+<div class="list-div" id="listDiv">
+	<div class="tool">
+            <span><a href="/shop/addbrp.html" hidefocus="true" class="bt_add">添加品牌</a></span>
+        </div>
+#if($message=="y")
+	<div class="mag-t1">
+     <label class="red">品牌删除失败，该品牌下面有商品存在！</label>
+    </div>
+#end
+			<div class="listBox">
+			<h3><span>品牌管理列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>品牌名称$!message</th>
+      <th>URL</th>
+      <th>品牌Logo</th>
+      <th>描述</th>
+	  <th>是否显示</th>
+      <th>操作</th>
+    </tr>
+	#foreach($brand in ${query.items})
+   <tr align="center">
+      <td>#if($!brand.brandName.length()>12)
+                <div title="$!brand.brandName">$!brand.brandName.substring(0,12)...</div>
+				#else
+					$!brand.brandName
+				#end</td>
+      <td><a href="$!{brand.link}"  target="_blank">
+			#if($!brand.link.length()>40)
+                <div title="$!brand.link">$!brand.link.substring(0,40)...</div>
+			#else
+				$!brand.link
+			#end
+			</a>
+	  </td>
+      <td>
+		#if($!{brand.brandLogo})
+		<img src="${upServer}/$!{brand.brandLogo}" width="47" height="50" />
+		#else
+		<img src="$request.getContextPath()/images/nomiage-min.gif"  width="47" height="50" />
+		#end
+	  </td>
+      <td>#if($!brand.brandDesc.length()>20)
+            <div title="$!brand.brandDesc">$!brand.brandDesc.substring(0,20)...</div>
+		#else
+			$!brand.brandDesc
+		#end
+	  </td>
+	  <td>
+		#if($!{brand.isShow}==0)
+		否
+		#else
+		是
+		#end
+	  </td>
+      <td><a href="javascript:deleteBrand('$!{brand.id}')">删除</a> <a href="javascript:updateBrandPage('$!{brand.id}')">修改</a>
+      <a href="javascript:searchCategory('$!{brand.id}')">关联类目</a>
+      ##<a href="relReturnPoint.html?brandId=$!{brand.id}">鍏宠仈杩旂偣瑙勫垯</a>
+      </td>
+    </tr>
+	#end
+  </table>
+  </div>
+    </form>
+  #if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/blist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>
+

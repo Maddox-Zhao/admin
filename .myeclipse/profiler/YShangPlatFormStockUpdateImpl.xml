@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="profiler.settings.instrument.empty.methods">true</entry>
+<entry key="ProfilerCPUSettings_profile_runnables">true</entry>
+<entry key="ProfilerCPUSettings_filter_type">2</entry>
+<entry key="ProfilerMemorySettings_track_every">10</entry>
+<entry key="ProfilerMemorySettings_mode">4</entry>
+<entry key="ProfilerCPUSettings_root_classes">com.autocreate.**
+com.huaixuan.network.biz.dao.**
+com.huaixuan.network.biz.domain.**
+com.huaixuan.network.biz.enums.**
+com.huaixuan.network.biz.exception.**
+com.huaixuan.network.biz.query.**
+com.huaixuan.network.biz.service.account.**
+com.huaixuan.network.biz.service.active.**
+com.huaixuan.network.biz.service.admin.**
+com.huaixuan.network.biz.service.agent.**
+com.huaixuan.network.biz.service.api.**
+com.huaixuan.network.biz.service.autosyn.**
+com.huaixuan.network.biz.service.base.**
+com.huaixuan.network.biz.service.common.**
+com.huaixuan.network.biz.service.counter.**
+com.huaixuan.network.biz.service.crm.**
+com.huaixuan.network.biz.service.customer.**
+com.huaixuan.network.biz.service.express.**
+com.huaixuan.network.biz.service.goods.**
+com.huaixuan.network.biz.service.hx.**
+com.huaixuan.network.biz.service.hy.**
+com.huaixuan.network.biz.service.order.**
+com.huaixuan.network.biz.service.pic.**
+com.huaixuan.network.biz.service.platformstock.**
+com.huaixuan.network.biz.service.product.**
+com.huaixuan.network.biz.service.provider.**
+com.huaixuan.network.biz.service.purchase.**
+com.huaixuan.network.biz.service.remote.**
+com.huaixuan.network.biz.service.reserved.**
+com.huaixuan.network.biz.service.shop.**
+com.huaixuan.network.biz.service.statistics.**
+com.huaixuan.network.biz.service.stock.**
+com.huaixuan.network.biz.service.storage.**
+com.huaixuan.network.biz.service.supplier.**
+com.huaixuan.network.biz.service.trade.**
+com.huaixuan.network.biz.service.user.**
+com.huaixuan.network.biz.util.**
+com.huaixuan.network.common.util.**
+com.huaixuan.network.web.action.**
+com.huaixuan.network.web.resolve.**
+com.huaixuan.network.web.validator.admin.**
+com.huaixuan.network.web.validator.category.**
+com.huaixuan.network.web.validator.goods.**
+com.huaixuan.network.web.validator.shop.**
+</entry>
+<entry key="ProfilerCPUSettings_filter_value">com.autocreate.*,
+com.huaixuan.network.biz.dao.*,
+com.huaixuan.network.biz.domain.*,
+com.huaixuan.network.biz.enums.*,
+com.huaixuan.network.biz.exception.*,
+com.huaixuan.network.biz.query.*,
+com.huaixuan.network.biz.service.account.*,
+com.huaixuan.network.biz.service.active.*,
+com.huaixuan.network.biz.service.admin.*,
+com.huaixuan.network.biz.service.agent.*,
+com.huaixuan.network.biz.service.api.*,
+com.huaixuan.network.biz.service.autosyn.*,
+com.huaixuan.network.biz.service.base.*,
+com.huaixuan.network.biz.service.common.*,
+com.huaixuan.network.biz.service.counter.*,
+com.huaixuan.network.biz.service.crm.*,
+com.huaixuan.network.biz.service.customer.*,
+com.huaixuan.network.biz.service.express.*,
+com.huaixuan.network.biz.service.goods.*,
+com.huaixuan.network.biz.service.hx.*,
+com.huaixuan.network.biz.service.hy.*,
+com.huaixuan.network.biz.service.order.*,
+com.huaixuan.network.biz.service.pic.*,
+com.huaixuan.network.biz.service.platformstock.*,
+com.huaixuan.network.biz.service.product.*,
+com.huaixuan.network.biz.service.provider.*,
+com.huaixuan.network.biz.service.purchase.*,
+com.huaixuan.network.biz.service.remote.*,
+com.huaixuan.network.biz.service.reserved.*,
+com.huaixuan.network.biz.service.shop.*,
+com.huaixuan.network.biz.service.statistics.*,
+com.huaixuan.network.biz.service.stock.*,
+com.huaixuan.network.biz.service.storage.*,
+com.huaixuan.network.biz.service.supplier.*,
+com.huaixuan.network.biz.service.trade.*,
+com.huaixuan.network.biz.service.user.*,
+com.huaixuan.network.biz.util.*,
+com.huaixuan.network.common.util.*,
+com.huaixuan.network.web.action.*,
+com.huaixuan.network.web.resolve.*,
+com.huaixuan.network.web.validator.admin.*,
+com.huaixuan.network.web.validator.category.*,
+com.huaixuan.network.web.validator.goods.*,
+com.huaixuan.network.web.validator.shop.*</entry>
+<entry key="profiler.settings.istrument.getter.setter.methods">true</entry>
+<entry key="myeclipse.profiling.mode">0</entry>
+<entry key="ProfilerMemorySettings_stacktraces">-1</entry>
+</properties>

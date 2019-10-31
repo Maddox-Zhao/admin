@@ -1,0 +1,137 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 分配库位")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 分配库位</h2>
+
+	#if($succFlag)
+		<div class="mag-t2" id="modifySuccess">分配库位成功</div>
+	#end
+	#if($errorInfo && $errorInfo != "")
+		<div class="mag-t1" id="modifyError">$errorInfo</div>
+	#end
+
+	<!-- 表单模块 -->
+	<form name="form1" action="inDepositoryOpt.html?optId=$!{optId}&optType=$!{optType}&dfi=$!{dfi}&actionType=true" method="post">
+		<div class="formBox"> 
+			<h3><i></i><span>
+					#if($!{inDetailBaseInfo.type} == "in_move_storage")
+						移库基本信息 
+					#elseif($!{inDetailBaseInfo.type} == "in_borrow_storage")
+						外借基本信息
+					#elseif($!{inDetailBaseInfo.type} == "in_back_storage")
+						归还基本信息
+					#else
+						盘点基本信息
+					#end
+			</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>产品编号</th>
+						<td>&nbsp;$!{inDetailBaseInfo.code}</td>
+						<th>产品名称</th>
+						<td>&nbsp;$!{inDetailBaseInfo.instanceName}</td>
+					</tr>
+					<tr>
+						<th>供应商名称</th>
+						<td>&nbsp;$!{inDetailBaseInfo.supplierName}</td>
+						<th>原库位</th>
+						<td>&nbsp;$!{inDetailBaseInfo.oriLocationName}</td>
+					</tr>
+					<tr>
+						<th>一级仓库</th>
+						<td>&nbsp;$!{inDetailBaseInfo.depFirstName}</td>
+						<th>库存类型</th>
+						<td>&nbsp;$!storTypeMap.get($!{inDetailBaseInfo.storType})</td>
+					</tr>
+					<tr>
+						<th>数量</th>
+						<td>&nbsp;$!{inDetailBaseInfo.amount}</td>
+						<th>批次</th>
+						<td>&nbsp;$!{inDetailBaseInfo.batchNum}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>分配库位列表</span></h3>
+			#if(!$notAllowEdit)
+				<table>
+					<tr>
+						<th>库位名称</th>
+						<th>仓库名称</th>
+						<th>分配数量</th>
+					</tr>
+					#if($goodsForLocationLists)
+						#foreach($goodsForLocationInfo in $goodsForLocationLists)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>&nbsp;$!goodsForLocationInfo.locName</td>
+								<td>&nbsp;$!goodsForLocationInfo.depName</td>
+								<td><input type="text" name="disCount" id="disCount_${velocityCount}" value="$!goodsForLocationInfo.oriAmountForDis" size="6" onblur="javascript:isNumber(this.value,'请输入大于0的正整数！');"/></td>
+								<input type="hidden" name="locationNum" id="locationNum_${velocityCount}" value="$!goodsForLocationInfo.locationId"/>
+							</tr>
+						#end
+					#end
+				</table>
+				#if($goodsForLocationLists.size() == 0)
+					没有可分配的仓库！
+				#end
+			#else
+				<table>
+					<tr>
+						<th>库位名称</th>
+						<th>仓库名称</th>
+						<th>分配数量</th>
+					</tr>
+					#if($inDetailInfoForDisList)
+						#foreach($inDetailInfoForDisInfo in $inDetailInfoForDisList)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>&nbsp;$!inDetailInfoForDisInfo.locName</td>
+								<td>&nbsp;$!inDetailInfoForDisInfo.depName</td>
+								<td>&nbsp;$!inDetailInfoForDisInfo.oriAmount</td>
+							</tr>
+						#end
+					#end
+				</table>
+				#if(!$inDetailInfoForDisList || $inDetailInfoForDisList.size() == 0)
+					没有可分配的仓库！
+				#end
+			#end
+		</div>
+
+		<div class="formBox">
+			<div class="form-but">
+				#if(!$notAllowEdit)
+					<button type="button" class="button-s4" onclick="javascript:finishOpt();">完成</button>
+				#end
+				<button type="button" class="button-s4" onclick="javascript:window.close();">关闭</button>
+			</div>
+		</div>
+	</form>
+	
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+		// 用正则表达式将前后空格
+		// 用空字符串替代。
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function finishOpt(){
+		document.form1.submit();
+	}
+
+	function isNumber(val,errMsg) {
+		if(val != ""){
+			var reg = /^[\d|\.|,]+$/;
+			if(!reg.test(val)){
+				alert(errMsg);
+			}
+		}
+	}
+</script>

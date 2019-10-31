@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RefundOrderSQL">
+<typeAlias alias="refundOrder" type="com.huaixuan.network.biz.domain.trade.RefundOrder"/>
+	<resultMap class="refundOrder" id="refundOrderResult">
+		<result column="id" property="id"/>
+		<result column="refund_id" property="refundId"/>
+		<result column="customer_id" property="customerId"/>
+		<result column="customer_name" property="customerName"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="ref_amount" property="refAmount"/>
+		<result column="price" property="price"/>
+		<result column="due_fee" property="dueFee"/>
+		<result column="fact_fee" property="factFee"/>
+		<result column="reason" property="reason"/>
+		<result column="creater" property="create"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="remark" property="remark"/>
+		<result column="order_id" property="orderId"/>
+		<result column="ref_amount_left" property="refAmountLeft" nullValue="0"/>
+		<result column="refund_order_id" property="refundOrderId" nullValue="-1"/>
+	</resultMap>
+<!-- create RefundOrder object -->
+<insert id="addRefundOrder" parameterClass="refundOrder">
+<![CDATA[
+insert into emall_refund_order
+  (id,
+   refund_id,
+   customer_id,
+   customer_name,
+   goods_id,
+   goods_instance_id,
+   ref_amount,
+   price,
+   due_fee,
+   fact_fee,
+   reason,
+   gmt_modify,
+   gmt_create,
+   remark,
+   order_id,
+   ref_amount_left,
+   refund_order_id)
+values
+  (null,
+   #refundId#,
+   #customerId#,
+   #customerName#,
+   #goodsId#,
+   #goodsInstanceId#,
+   #refAmount#,
+   #price#,
+   #dueFee#,
+   #factFee#,
+   #reason#,
+   sysdate(),
+   sysdate(),
+   #remark#,
+   #orderId#,
+   #refAmount#,
+   #refundOrderId#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update RefundOrder object -->
+<update id="editRefundOrder" parameterClass="refundOrder">
+<![CDATA[
+		update emall_refund_order set 
+		ref_amount_left = #refAmountLeft#,
+		
+		gmt_modify = sysdate()
+	
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete RefundOrder object -->
+<delete id="removeRefundOrder" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_refund_order where emall_refund_order.ID = #value#
+]]>
+</delete>
+<!-- search RefundOrder object -->
+<select id="getRefundOrder" parameterClass="java.lang.Long" resultMap="refundOrderResult">
+<![CDATA[
+		select emall_refund_order.* from emall_refund_order where emall_refund_order.ID = #value#
+]]>
+</select>
+<!-- searchAll RefundOrder List -->
+<select id="getRefundOrders" resultMap="refundOrderResult">
+<![CDATA[
+		select emall_refund_order.* from emall_refund_order
+]]>
+</select>
+
+<!-- search RefundOrder object -->
+<select id="getRefundOrderByRefundId" parameterClass="java.lang.String" resultMap="refundOrderResult">
+<![CDATA[
+      select emall_refund_order.* from emall_refund_order where emall_refund_order.refund_id = #value#
+]]>
+</select>
+
+<!-- delete RefundOrderByrefund_id object -->
+<delete id="removeRefundOrderByRefund" parameterClass="java.lang.String">
+<![CDATA[
+      delete from emall_refund_order where emall_refund_order.refund_id = #value#
+]]>
+</delete>
+</sqlMap>

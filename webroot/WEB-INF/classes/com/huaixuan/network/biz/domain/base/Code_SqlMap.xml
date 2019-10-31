@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CodeSQL">
+<typeAlias alias="code" type="com.huaixuan.network.biz.domain.Code"/>
+	<resultMap class="code" id="codeResult">
+		<result column="id" property="id"/>
+		<result column="code_type" property="codeType"/>
+		<result column="code_date" property="codeDate"/>
+		<result column="cur_value" property="curValue"/>
+		<result column="code_length" property="codeLength"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create Code object -->
+<insert id="addCode" parameterClass="code">
+<![CDATA[
+		insert into emall_code
+		(id,code_type,code_date,cur_value,code_length,gmt_create,gmt_modify )values(
+		null,
+		#codeType#,
+		#codeDate#,
+		#curValue#,
+		#codeLength#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Code object -->
+<update id="editCode" parameterClass="code">
+<![CDATA[
+		update emall_code set code_type = #codeType#,
+		code_date = #codeDate#,
+		cur_value = #curValue#,
+		code_length = #codeLength#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+
+<!-- search Code object -->
+<select id="getCode" parameterClass="java.lang.Long" resultMap="codeResult">
+<![CDATA[
+		select emall_code.* from emall_code where emall_code.ID = #value#
+]]>
+</select>
+<select id="getCodeByType" parameterClass="int" resultMap="codeResult">
+<![CDATA[
+		select emall_code.* from emall_code where emall_code.code_type = #value#
+]]>
+</select>
+
+</sqlMap>

@@ -1,0 +1,59 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>安全技术类别</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+    
+   
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			京东Excel导入:<input type="file" name="secku" id="uploadFile"/><br/>
+			##<input type="submit" value="上传"/>
+			<a class="mini-button" id="chuan"  onclick="uploadFile()">上传</a>
+		</form>
+		
+		
+		
+		<script type="text/javascript">
+		function uploadFile(){          
+		   var form = new FormData(document.getElementById("uploadForm"));
+           mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿刷新...'
+                    });
+		    jQuery.ajax({  
+             url : "/timetask/jdExcelStockFile.html",  
+             type : "POST",  
+             data :form,  
+			 contentType: false,
+			 processData: false,
+             success : function(data) {  
+			 mini.unmask();
+			   if(data == "error"){
+			     mini.alert("请联系管理员"); 
+				 return;
+			   }else{
+			     mini.alert("本次更新"+data+"条数据");
+				 return;
+			   }
+                
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+	}
+  </script>
+</body>
+   
+</html>

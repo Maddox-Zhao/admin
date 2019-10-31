@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="consignmentViewDAO">
+	<typeAlias alias="ConsignmentView" type="com.huaixuan.network.biz.domain.hx.ConsignmentView" />
+	<resultMap id="ConsignmentViewResult" class="com.huaixuan.network.biz.domain.hx.ConsignmentView">
+		<result column="id" property="id" />
+		<result column="con_code" property="conCode" />
+		<result column="status" property="status" />
+		<result column="note" property="note" />
+		<result column="operator_id" property="operatorId" />
+		<result column="amount" property="amount" />
+		<result column="paid_amount" property="paidAmount" />
+		<result column="customer_id" property="customerId" />
+		<result column="idcards_image" property="idcardsImage" />
+		<result column="con_image" property="conImage" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="idcards" property="idcards"/>
+	</resultMap>
+
+	<sql id="consignmentView">
+		con_code,status,note,operator_id,amount,paid_amount,customer_id,idcards_image,con_image,gmt_create,gmt_modify
+	</sql>
+
+	<select id="getConsignmentViewByConditionWithPage" resultMap="ConsignmentViewResult" parameterClass="java.util.Map">
+	   select
+	   c.*
+	   from hx_consignment c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[ c.gmt_create <= #dateEnd# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+				c.status = #status#
+			</isNotEmpty>
+		</dynamic>
+		order by gmt_create desc
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+
+	<select id="getConsignmentViewByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(c.id) from hx_consignment c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= date_add(#dateStart#,interval 1 day) ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  c.gmt_create <= date_add(#dateEnd# ,interval 1 day)]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+				c.status = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+	<insert id="addConsignmentView" parameterClass="ConsignmentView">
+		insert into hx_consignment(
+		con_code,status,note,operator_id,amount,paid_amount,customer_id,idcards,idcards_image,con_image,gmt_create,gmt_modify
+		) values
+		(#conCode#,default,#note#,#operatorId#,0,0,#customerId#,#idcards#,#idcardsImage#,#conImage#,sysdate(),null)
+		<selectKey resultClass="int" keyProperty="id">
+			select
+			last_insert_id() as id from hx_consignment limit 1
+		</selectKey>
+	</insert>
+
+	<update id="updateConsignmentView" parameterClass="ConsignmentView">
+		update hx_consignment
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="note">
+				note=#note#
+			</isNotNull>
+			<isNotNull prepend="," property="idcardsImage">
+				idcards_image=#idcardsImage#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+				status=#status#
+			</isNotNull>
+			<isNotNull prepend="," property="conImage">
+				con_image=#conImage#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify=sysdate()
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+
+	<select id="getOneConsignmentView" parameterClass="java.lang.String" resultMap="ConsignmentViewResult">
+		select * from hx_consignment where id = #id#
+	</select>
+	
+	
+	<select id="getOneConsignmentViewByConCode" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select count(id) 
+		from 
+			hx_consignment
+		where 
+			con_code = #conCode#
+	</select>
+	
+	<delete id="deleteOneConsignmentView" parameterClass="java.lang.String">
+		delete from  hx_consignment where id = #id# 
+	</delete>
+	
+
+	<select id="getAmount" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select amount
+		from
+			hx_consignment
+		where 
+			id = #id#
+	</select>
+
+	<update id="updateAmount" parameterClass="java.util.Map">
+		update hx_consignment set amount = #amount# 
+		where id = #id#
+	</update>
+
+
+	<select id="getPaidAmount" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select paid_amount
+		from
+			hx_consignment
+		where 
+			id = #id#
+	</select>
+	
+	<update id="updatePaidAmount" parameterClass="java.util.Map">
+		update hx_consignment  
+		set paid_amount = #paidAmount# , status = #status#
+ 		where id = #id#
+	</update>
+	
+	
+	<update id="uploadIdcardImage" parameterClass="java.util.Map">
+		update
+			 hx_consignment 
+		set 
+			idcards_image = #idcardImage# 
+		where 
+			id =#id#
+	</update>
+	
+	<update id="uploadConImage" parameterClass="java.util.Map">
+		update
+			 hx_consignment 
+		set 
+			con_image = #conImage#
+		where 
+			id =#id#
+	</update>
+	
+	
+</sqlMap>

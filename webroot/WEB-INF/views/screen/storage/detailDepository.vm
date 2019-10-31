@@ -1,0 +1,58 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 仓库详情")
+
+<body>
+<div class="main">
+	<h2>管理中心-仓库详情</h2>
+
+	<div class="tool">
+		<span><a href="searchDepository.html" hidefocus="true" class="bt_ren">返回</a></span>
+		<span><a href="addDepositoryPage.html?depositoryId=$!{depository.id}&actionType=edit" hidefocus="true" class="bt_edit">编辑</a></span>
+	</div>
+	
+#if($message && $message != "")
+	<div class="mag-t2">${message}</div>
+#end
+
+	<div class="formBox">
+		<h3><i></i><span>仓库信息</span></h3>
+		<div class="content">
+			<table class="c6">
+           		<tr>
+					<th>仓库名称</th>
+					<td>$!{depository.name}</td>
+					<th>仓库类型</th>
+					<td>$!enumDepositoryType.get("$!{depository.type}")</td>
+				</tr>
+				<tr>
+					<th>负责人</th>
+					<td>$!{depository.leader}</td>
+					<th>联系电话</th>
+					<td>$!{depository.tel}</td>
+				</tr>
+				<tr>
+					<th>创建时间</th>
+					<td>$!dateUtil.convertDateToString('yyyy-MM-dd',$!{depository.gmtCreate})</td>
+					<th>修改时间</th>
+					<td>$!dateUtil.convertDateToString('yyyy-MM-dd',$!{depository.gmtModify})</td>
+				</tr>
+				<tr>
+					<th>状态</th>
+					<td>#if("$!{depository.status}"=="v") 激活 #else 失效 #end</td>
+					<th>一级仓库名称</th>
+					<td>$!{depository.depFirstName}</td>
+				</tr>
+				<tr>
+					<th>仓库地址</th>
+					<td colspan="3">$!{depository.address}</td>
+				</tr>
+				<tr>
+					<th>备注</th>
+					<td colspan="3"><textarea cols="70" rows="5" id="depository.remark" name="depository.remark" readonly="readonly">$!{depository.remark}</textarea></td>
+				</tr>
+    		 </table>
+    	</div>
+	</div>
+
+</div>
+</body>

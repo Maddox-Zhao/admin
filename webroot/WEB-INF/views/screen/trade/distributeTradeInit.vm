@@ -1,0 +1,1289 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 订单备货")
+
+#set($wholesaleshipping = ($trade.status && $trade.status == "wait_buyer_pay" && $trade.wholesaleStatus && $trade.wholesaleStatus =="wait_confirm" && $trade.payStatus && $trade.payStatus != 'paid'))
+
+<body>
+<div class="main">
+
+	<h2>管理中心-订单备货</h2>
+
+	<div class="tool">
+		<span><a href="$!appServer.get("/trade/showl.html")" hidefocus="true" class="bt_ren">返回</a></span>
+		##<span><a href="javascript:preview(1);" hidefocus="true" class="bt_par">打印</a></span>
+		<span><a href="$!appServer.get("/feedback/fdedit.html?toUserId=$trade.buyId")" hidefocus="true" class="bt_all">发送留言</a></span>
+	</div>
+
+	#if($success && $message)
+		<div class="mag-t2">${message}</div>
+	#elseif($message)
+		<div class="mag-t1">${message}</div>
+	#end
+	
+	#if($receivemessage)
+		<div class="mag-t2">修改收货人信息成功</div>
+	#end
+	#set($currency = "HKD")
+    				#if($trade.tradeType == "13")
+    					#set($currency = "RMB")
+    				#else
+						#set($currency = "HKD")
+    				#end
+	<form name="form1" id="form1" method="post">
+    	<input type="hidden" name="invoice" id="invoice" value=""/>
+    	<input type="hidden" name="tradedepId" id="tradedepId" value="$!trade.depFirstId"/>
+		<input type="hidden" id="tid" size="24" name="tid" value="$!{trade.tid}">
+
+		<span id="print">
+    	<div class="formBox">
+    		<h3><i></i><span>订单信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>订单号：</th>
+        			    <td style="width:240px;">$!trade.tid</td>
+        			    <th>订单金额：</th>
+        			    <td style="width:240px;"> $currency <span id="amountFirstSpan">$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount,$!trade.shippingAmount),'0.00')</span></td>
+    				</tr>
+    				<tr>
+    					<th>订单状态：</th>
+        			    <td>$!enumTradeStatusMap.get("$!trade.status")</td>
+        			    <th>支付状态：</th>
+        			    <td>
+    						#if("$trade.payStatus" == "no_pay")
+    							未付款 
+    						#elseif("$trade.payStatus" == "paid")
+    							已付款
+    						#end
+    					</td>
+    				</tr>
+    				<tr>
+    					<th>下单时间：</th>
+    					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.gmtCreate)</td>
+    					<th>支付时间：</th>
+    					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.payTime)</td>
+    				</tr>
+					<tr>
+    					<th >订单类型：</th>
+    					<td>#if($trade.tradeType == "13")代销订单#elseif($trade.tradeType == "14")特惠订单#else 现货订单 #end</td>
+						<th ></th>
+    					<td></td>
+    				</tr>
+					#*
+    				<tr>
+                        <th>使用积分：</th>
+        			    <td>$!trade.userPoint</td>
+    					<th>
+    						#if(${trade.interTid})
+    							外部订单号：
+    						#else
+    							赠送积分：
+    						#end
+    					</th>
+    					<td>
+    						#if(${trade.interTid})
+    							$!{trade.interTid}
+    						#else
+    							$!trade.sendPoint
+    						#end
+    					</td>
+    				</tr>
+					
+    				<tr>
+    					<th>索要发票：</th>
+    					<td colspan="3">
+    						#if(${trade.status} == "trade_finish" || ${trade.status} == "trade_close")
+    							<input name="trade.invoice" id="trade.invoice" type="checkbox" value="trade.invoice" #if($!trade.invoice=="y") checked="true" #end disabled="disabled"/>
+    						#else
+    							<input name="trade.invoice" id="trade.invoice" type="checkbox" value="trade.invoice" #if($!trade.invoice=="y") checked="true" #end onclick="modifyInvoice()">
+    						#end
+                        </td>
+    					#if($adminAccess.has("A_ORDER_DEPFIRST_MODIFY") && "$!trade.stockoutStatus" == "y")
+    						<th>一级仓库：</th>
+    						<td>
+    							<select name="depfirstId" id="depfirstId" style="width:100px;">
+    								#foreach($depfirst in $newDepositoryFirstList)
+    								<option value="$depfirst.id" #if("$depfirst.id" == "$!trade.depFirstId") selected #end>$depfirst.depFirstName</option>
+    								#end
+    							</select>
+    							<input type="button" value="确定" onclick="updateTradeDepfirstId($!trade.id)"/>
+    						</td>
+    					#else
+    					##	<td>&nbsp;</td>
+    					##	<td>&nbsp;</td>
+    					#end
+    				</tr>
+    				
+    				<tr>
+    					<th>使用点卷：</th>
+    					<td>$!trade.ticketAmount</td>
+    					<th>点卷优惠金额：</th>
+    					<td>$!math.mul($!trade.ticketAmount,$!rate)</td>
+    				</tr>
+    				*#
+    			</table>
+    		</div>
+
+    		<h4><span>商品列表</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+    				<tr>
+    					<th style="width:150px;text-align:center;">商品名称</th>
+    				##	<th>编码</th>
+    					<th style="text-align:center;">选购属性</th>
+						<th style="text-align:center;">原价</th>
+    					<th style="width:250px;text-align:center;" >售价</th>
+    					<th style="width:120px;text-align:center;">购买数量</th>
+    					<th style="text-align:center;">小计</th>
+    					<th style="text-align:center;">商品库存</th>
+						<th style="width:200px;text-align:center;" colspan="2">操作</th>
+    				#*
+    				#if("$trade.type" == "2" && "$trade.expressPayment" == "goods_first")
+    					<th>代收金额</th>
+    				#else
+    					<th>&nbsp;</th>
+    				#end
+    				*#
+    				</tr>
+    			#set($goodsPriceAcount = 0)
+    			#set($marketPriceAcount = 0)
+    			#foreach($order in $orderList)
+    				#set($goodsAcount = $moneyUtil.mul($order.goodsNumber, $order.goodsPrice))
+    				#set($goodsPriceAcount = $moneyUtil.add($goodsPriceAcount, $goodsAcount))
+    				#set($marketPriceAcount = $moneyUtil.add($marketPriceAcount, $moneyUtil.mul($order.goodsNumber, $order.goodsPriceSc)))
+    				<tr  id="sc_tr_$!order.id" class="sc_tr">
+    					<td>
+    						<a href="$!{liangpin99Server}/l/gdetail_$!{order.goodsId}.htm" target="_blank">$!order.goodsTitle</a>
+    					</td>
+    			##		<td>$!order.goodsSn</td>
+    					<td style="text-align:center;">$!order.buyAttr</td>
+						<td style="text-align:center;"> $!moneyUtil.getFormatMoney($!order.goodsPriceSc,'0.00')</td>
+						
+    			##	#if($trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods") && $trade.payStatus && $trade.payStatus != 'paid')
+    					<td style="text-align:center;width:150px">
+    						$currency
+    						<input type="text" name="goodsPrice_${order.id}" id="goodsPrice_${order.id}" value="$!moneyUtil.getFormatMoney($!order.goodsPrice,'0.00')" onblur="javascript:isPriceNumber(this.value);" size="8"/>
+    						&nbsp;&nbsp;&nbsp;&nbsp;
+    						<input type="button" value="修改商品价格" onclick="javascript:modifyOrderPrice($!order.id,$trade.tid);"/>
+    					</td>
+    			##	#else
+				
+						
+    				##	<td style="text-align:center;" style="color:red;"> $!moneyUtil.getFormatMoney($!order.goodsPrice,'0.00')</td>
+    			##	#end
+    			##	#if($trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods") && $trade.payStatus && $trade.payStatus != 'paid')
+    					<td class="r">
+    						<input type="text" name="goodsNumber_${order.id}" id="goodsNumber_${order.id}" value="$!order.goodsNumber" size="2"/>
+    						<input type="button" value="修改数量" onclick="javascript:modifyGoodsNumber('$!order.id');"/>
+    					</td>
+    			##	#else
+    			##		<td style="text-align:center;">$!order.goodsNumber (件|个)</td>
+    			##	#end
+    					<td style="text-align:center;" style="color:red"> <span id="goodsPriceDis_${order.id}" style="color:red;">$!moneyUtil.getFormatMoney($math.mul($order.goodsPrice,$order.goodsNumber),'0.00')</span></td>
+    					<td style="text-align:center;" id="stock_$order.id">
+						#*  songfy 库存改造注释
+    					#foreach($storage in ${order.storagelist})
+    						$!depositoryNameMap.get($!storage.depFirstId) -&gt; $!storage.depositoryName ($!storage.storageNumSum)<br/>
+    					#end
+						*#
+						$!order.instanceHkExistNum
+    					</td>
+    					#*
+    					<td align="center" class="r">
+    					#if($!order.agentSellPrice)
+    						￥$!moneyUtil.getFormatMoney($!order.agentSellPrice,'0.00')
+    					#end
+    					</td>
+    					*#
+						<td style="width:200px;text-align:center;"> 
+							<input type="text" name="sc_product_id" id="sc_product_id_$!order.id" value="" size="14"  onkeyup="javascript:submitAddProduct($!order.id,$!order.goodsNumber,$!order.goodsInstanceId,$!order.id)" /> 
+							<input type="hidden" name="save_product_id_order_$!order.id" id="save_product_id_order_$!order.id" value="" size="4" /> 
+							<input type="button"  value="添加产品" onclick="javascript:addProduct($!order.id,$!order.goodsNumber,$!order.goodsInstanceId,$!order.id)"/>
+							<input type="hidden" id="number_$!order.id" value="$order.goodsNumber"/>
+  					</td>
+					<td style="width:50px;text-align:center;">
+						<input type="button" value="删除产品" onclick="javascript:deleteProduct($!order.id,$trade.tid)"/>
+					</td>
+    				</tr>
+					#foreach($product in $order.products)
+					<tr name="p_$order.id" id="order_$product.idProduct">
+						<td style="color:#8080FF;height:24px;">产品id：$product.idProduct</td>
+						<input type="hidden" value="$product.idProduct" id="idProduct_$order.id"/>
+						<td style="color:#8080FF;height:24px;"  colspan="2">品牌：$product.brandname</td>
+						<td style="color:#8080FF;height:24px;">品名：$product.seriesname</td>
+						<td style="color:#8080FF;height:24px;">材质：$product.type</td>
+						<td style="color:#8080FF;height:24px;">颜色：$product.color</td>
+						<td style="color:#8080FF;height:24px;" colspan="3">尺寸：$product.size   <input type="button" value="删除" onclick="javascript:deleteOrderProduct($product.idProduct,$order.id)"/></td>
+						<input type="hidden" name="save_all_product_ids" value="$product.idProduct:$order.id"/>
+					</tr>
+					#end
+    			#end
+    			</table>
+            </div>
+			
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th style="width:120px;">产品原总价$currency：</th>
+    					<td><span id="goodsAmountDis">$!moneyUtil.getFormatMoney($!marketPriceAcount, '0.00')</span></td>
+    					<th style="width:120px;">实际总金额$currency：</th>
+    					<td><span id="amountTwoSpan" style="color:red;">$!moneyUtil.getFormatMoney($!trade.amount, '0.00')</span></td>
+    					#*
+    					#if("$!trade.type" == "2" && "$trade.expressPayment" == "goods_first")
+    					<th>代收总金额:</th>
+    					<td>￥<span id="amountAgent">$!moneyUtil.getFormatMoney($moneyUtil.add($trade.agentSellAmount, $trade.shippingAmount), '0.00')</span></td>
+    					#end
+    					*#
+    				</tr>
+    			</table>
+    		</div>
+			
+		<div class="form-but">
+			<input type="hidden" name="save_product_ids" id="save_product_ids" value="" />
+			<button type="button" class="button-s4" onclick="javascript:saveProductId();">完成备货</button>
+		</div>
+
+		<div id="modifyRA">
+    		<h4>
+				<span>收货人信息</span>
+			</h4>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>收货人：</th>
+    					<td>$!trade.receiver</td>
+    					<th>地址：</th>
+    					<td>$!{address}</td>
+    				</tr>
+    				<tr>
+    					<th>邮编：</th>
+    					<td>$!{trade.zipcode}</td>
+    					<th>移动电话：</th>
+    					<td>$!{trade.mobile}</td>
+    				</tr>
+                </table>
+            </div>
+		#if($!adminAccess.has('A_ORDER_RECEIVE_MODIFY'))
+    	   #if($trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods"))
+            <input class="btn"  type="button" onclick="modifyReceiveAddress();" value="修改收货人信息"/>
+		   #end
+		#end
+        </div>
+		
+		<div id="newRA" class="content" style="display:none;">
+			    #springBind("trade.id")
+				<input type="hidden" id="trade.id" name="${status.expression}" value="$!{status.value}">
+			    #springBind("trade.mobileRewrite")
+				<input type="hidden" id="mobileRewrite" name="${status.expression}" value="$!{status.value}">	
+			<h4><span>修改收货人信息</span></h4>
+			<div class="form">
+            <ol>
+			  <li>
+				<label>地区：</label>
+                <span class="con">
+					<ul>
+						<li>
+							#springBind("trade.province")
+							<select id="s1"  name="${status.expression}" onchange="selectCity(this.value);">
+								<option value="">请选择</option>
+								#foreach($province in $provinceList)
+									<option value="$!{province.code}" #if($!{status.value}==$!{province.code}) selected #end>$!{province.regionName}</option>
+								#end
+							</select>
+							#springBind("trade.city")
+							<select id="city"  name="${status.expression}" onchange="selectDistinc(this.value);">
+								<option value="">请选择</option>
+								#foreach($city in $cityList)
+									<option value="$!{city.code}" #if($!{status.value}==$!{city.code}) selected #end>$!{city.regionName}</option>
+								#end
+							</select>
+							#springBind("trade.district")
+							<select id="district"  name="${status.expression}">
+								<option value="">请选择</option>
+								#foreach($district in $districtList)
+									<option value="$!{district.code}" #if($!{status.value}==$!{district.code}) selected #end>$!{district.regionName}</option>
+								#end
+							</select>
+						</li>
+						<li><em>*</em></li>
+					</ul>
+				</span>
+              </li>
+			  
+			  <li>
+				<label>邮政编码：</label>
+				<span class="con">
+					<ul>
+						<li>
+							#springBind("trade.zipcode")
+							<input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" id="zipcode"/>
+						</li>
+						<li><em>*</em></li>
+					</ul>
+				</span>
+			  </li>
+			  
+			  <li>
+				<label>详细地址：</label>
+				<span class="con">
+					<ul>
+						<li>
+							#springBind("trade.address")
+							<input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" id="tradeAddress" maxlength="255"/>
+						</li>
+						<li><em>*</em></li>
+					</ul>
+				</span>
+			  </li>
+			  
+			  <li>
+				<label>收货人姓名：</label>
+				<span class="con">
+					<ul>
+						<li>
+							#springBind("trade.receiver")
+							<input type="text" name="${status.expression}" value ="$!{status.value}" class="inp" id="receiver" maxlength="32"/>
+						</li>
+						<li><em>*</em></li>
+					</ul>
+				</span>
+			  </li>
+			 
+			  <li>
+				<label>电话：</label>
+				<span class="con">
+					<ul>
+						<li>
+							<input type="text" value="$!trade.mobile" id="mobile" class="inp"/>
+						</li>
+						<li><em>*</em></li>
+                        <li>请填写手机或固定电话</li>
+					</ul>
+				</span>
+			  </li>
+			  
+			  <li>
+				<label></label>
+				<span class="con">
+					<ul>
+						<li>
+							<input class="btn"  type="button" onclick="checkReceiveAddress();" value="修改"/>
+							<input class="btn"  type="button" onclick="returnRA();" value="返回"/>
+						</li>
+					</ul>
+                </span>
+              </li>
+			</ol>
+           </div>
+        </div>
+			
+			<h4><span>支付信息</span></h4>
+    		<div class="content">
+				<table class="c6">
+    				<tr>
+    					<th>支付方式：</th>
+    					<td style="width:250px;">
+    						#if("$trade.expressPayment" == "goods_first")
+    							货到付款
+    						#elseif("$trade.expressPayment" == "period_pay")
+    							周期结算
+    						#else
+    							网上支付
+    						#end
+    					</td>
+    					<th>支付平台：</th>
+    					<td style="width:250px;">
+    						#if("$trade.payment.toLowerCase()" == "alipay")
+    							支付宝
+    						#elseif("$trade.payment.toLowerCase()" == "chinabank")
+    							网银在线
+    						#elseif("$trade.payment.toLowerCase()" == "tenpay")
+    							财付通
+    						#elseif("$trade.payment.toLowerCase()" == "payease")
+    							首信易
+    						#elseif("$trade.payment.toLowerCase()" == "icbc")
+    							工商银行
+    						#elseif("$trade.payment.toLowerCase()" == "yezf")
+    							余额支付
+    						#end
+    					</td>
+    				</tr>
+                </table>
+            </div>
+			
+			<h4><span>其他信息</span></h4>
+			<div class="content">
+				<table class="c6">
+    				<tr>
+    					<th style="width:120px;">买家订单备注：</th>
+    					<td style="width:250px;">$!trade.buyerNote</td>
+    				</tr>
+    				<tr>
+    					<th>客服订单备注：</th>
+    					<td>
+    						<textarea cols="70" rows="5" name="csMessage" id="csMessage">$!trade.seviceNote</textarea>
+    					</td>
+       				</tr>
+    			</table>
+    		</div>
+    	</div>
+		</span>
+		
+		<div class="form-but">
+			<button type="button" class="button-s4" onclick="javascript:confirmMessage();">保存留言</button>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script type="text/javascript">
+    var alertMsg = {
+	"wscomfirm":"您确定要修改批发订单物流费用？",
+	"shippingAmountValid":"请输入有效的批发订单物流价格",
+	"shippingAmountMax":"您输入的批发订单物流费用过大  请核对后再修改",
+	"wsModifySucess":"批发订单物流费用已成功修改",
+	"ws_priceError":"总金额小于点卷折扣金额，请重新输入",
+	"wsErrorOther":"无法修改物流费用，请重新登录后再修改",
+	"ws_tradeIdNotNum":"订单号不是数字",
+	"ws_depFirstIdNotNum":"一级仓库ID非法",
+	"ws_depFirstIdIsNull":"请选择一级仓库",
+	"ws_depositoryIsNull":"选择的一级仓库不存在",
+	"ws_depositoryNotW":"选择的一级仓库不是批发类型",
+	"ws_numberError":"输入的运费不符合规范"
+	}
+	function submitAddProduct(id,number,goodsInstanceId,orderId){
+		if(typeof(event)=="undefined"){
+			return false;
+		}
+	   if (event !=null && event.keyCode != 13){
+	   	 return false;
+	   }
+	   
+	   addProduct(id,number,goodsInstanceId,orderId);
+	}
+	
+	
+	function addProduct(id,number,goodsInstanceId,orderId){
+	
+		//获取输入的productId
+		var productId = document.getElementById("sc_product_id_" + id).value;
+		var productIdAllsaved = document.getElementById("save_product_ids").value;
+		var productIdsaved = document.getElementById("save_product_id_order_"+id).value;
+		
+		var order_products = document.getElementsByName(orderId);
+		
+		var trs = jQuery("tr[name=p_" + orderId + "]");
+		var goodsNumber = jQuery("#number_"+orderId).val();
+		var realyGoodsNumber = trs.length;
+		if(realyGoodsNumber >= parseInt(goodsNumber))
+		{
+			alert("添加产品数量已经等于购买数量，不能继续添加！");
+			return;
+		}
+		var product_id = jQuery("#sc_product_id_" + orderId).val();
+		jQuery("#idProduct_"+orderId).each(function()
+		{
+			if(jQuery(this).val() == product_id)
+			{
+				alert('这个产品ID已经添加过，不能重复添加！');
+				return;
+			}
+		
+		});
+		/*
+		if(productIdsaved != null && productIdsaved!=""){
+			var idArray = productIdsaved.split(";");
+			
+			for (i=0;i<idArray.length;i++){
+				var item = idArray[0].split(":");
+				if(item[1]==productId){
+					alert("这个产品ID已经添加过，不能重复添加！");
+					return false;
+				}
+			}
+			if(idArray.length >= parseInt(number)){
+				alert("添加产品数量已经等于购买数量，不能继续添加！");
+				document.getElementById("sc_product_id_"+id).value="";
+				return false;
+			}
+		}
+		*/
+		//请求
+		jQuery.get('$!{appServer}/trade/findProductJson.html?time='+new Date().getTime(),{productId:productId,"orderId":orderId,"goodsInstanceId":goodsInstanceId},function(obj){
+			if (obj == null || obj=='') {
+				alert("产品ID输入有误，没有对应的产品！");
+			}
+			else if(obj.instanceId==null || obj.instanceId=="" || obj.instanceId != goodsInstanceId){
+				alert("输入的产品Id不是订单中所需要的款式！");
+			}
+			else if(obj.type == "false")
+			{
+				alert("产品型号不对应！");
+			}
+			else if(obj.idStatus == 100)
+			{
+				alert("该产品不是可售状态！");
+			}
+			else{
+			
+				var currRowIndex = document.getElementById("sc_tr_" + id).rowIndex;
+        		//alert(document.getElementById("sc_tr_" + id).innerHTML);
+        		var newTr = document.getElementById("sc_tr_table").insertRow(currRowIndex+1);
+        		//可以通过setAttribute 给对象设置控件属性
+        		//newTr.setAttribute("id","tr"+i);
+				newTr.setAttribute("style","color:#8080FF;height:24px;");
+				newTr.setAttribute("id","order_"+obj.idProduct)
+				newTr.setAttribute("name","p_"+orderId);
+        		var newTd0 = newTr.insertCell(0);
+				var newTd1 = newTr.insertCell(1);
+				var newTd2 = newTr.insertCell(2);
+				var newTd3 = newTr.insertCell(3);
+				var newTd4 = newTr.insertCell(4);
+				var newTd5 = newTr.insertCell(5);
+                newTd0.innerHTML = "产品id："+obj.idProduct;
+				newTd1.innerHTML = "品牌："+ obj.brandname; 
+				newTd2.innerHTML = "品名：" + obj.seriesname;
+				newTd3.innerHTML = "材质：" + obj.material;
+				newTd4.innerHTML = "颜色：" + obj.color;
+				var fn = "<input type='button' value='删除' onclick='deleteOrderProduct(" + obj.idProduct + "," + orderId + ")'/>";
+				newTd5.innerHTML = "尺寸：" + obj.size + fn + "<input type='hidden' name='save_all_product_ids' value='" + obj.idProduct + ":"  + id + "'/>";
+        		newTd5.setAttribute("colspan","3");
+				newTd0.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+				newTd1.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+				newTd1.setAttribute("colspan","2");
+				newTd2.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+				newTd3.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+				newTd4.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+				newTd5.setAttribute("style","text-align:right;font-family: Arial,Helvetica,taho;");
+	
+				if(productIdsaved != null && productIdsaved!=""){
+					document.getElementById("save_product_id_order_"+id).value=productIdsaved+";"+id+":"+obj.idProduct;
+				}else{
+					document.getElementById("save_product_id_order_"+id).value=id+":"+obj.idProduct;
+				}
+				
+				if(productIdAllsaved != null && productIdAllsaved!=""){
+					document.getElementById("save_product_ids").value=productIdAllsaved+";"+id+":"+obj.idProduct;
+				}else{
+					document.getElementById("save_product_ids").value=id+":"+obj.idProduct;
+				}
+				document.getElementById("sc_product_id_"+id).value="";
+				
+				
+			}
+		});
+	}
+	
+	function deleteOrderProduct(idProduct,orderId)
+	{
+		if(confirm("确定删除？"))
+		{
+    		jQuery.post('$appServer/trade/deleteOrderProduct.html',{'productId':idProduct,'orderId':orderId},function(obj){
+    			if(obj == "true")
+    			{
+    				//document.getElementById("order_" + idProduct).style.display  = 'none';
+					jQuery("#order_" + idProduct).remove()
+    			}
+    			else
+    			{
+    				alert("删除失败。");
+    			}
+    		
+    		});
+		}
+		
+	}
+	function saveProductId(){
+		//获取输入的productId
+		var productIds = document.getElementById("save_product_ids").value;
+		
+		var items = jQuery(".sc_tr");
+		var flag = "true";
+		items.each(function()
+		{
+			var tr = jQuery(this);
+			var str = tr.attr("id");
+			var it = str.split("_");
+			var name = "number_" + it[2];
+			var goodsNumber = jQuery("#"+name).val();
+			name = "p_"+it[2];
+			var realyGoodsNumber = jQuery("tr[name =" + name +"]").length;;
+			if(parseInt(goodsNumber)>realyGoodsNumber)
+			{
+				alert(tr.children().eq(0).text().trim() + " 的产品未添加完毕");
+				flag = "false";
+				return false; //跳出循环
+			}
+			else if(parseInt(goodsNumber)<realyGoodsNumber)
+			{
+				alert(tr.children().eq(0).text().trim() + " 添加的产品不能大于购买数量");
+				flag = "false";
+				return false;
+			}
+		});
+		
+		if(flag == "false")
+		{
+			return;
+		}
+		
+		var all_products = jQuery("input[name='save_all_product_ids']");
+		productIds = "";
+		all_products.each(function()
+		{
+			if(productIds=="")
+			{
+				var arry = this.value.split(":")
+				productIds = arry[1] + ":" + arry[0];
+			}
+			else
+			{
+				var arry = this.value.split(":")
+				productIds= productIds + ";" + arry[1] + ":" + arry[0];
+			}
+		});
+		
+		//请求
+		jQuery.post('$!{appServer}/trade/saveProductIds.html',{productIds:productIds},function(obj){
+			var msgType = obj.substring(obj.indexOf("\'") + 1, obj.indexOf("\',"));
+			var message = obj.substring(obj.indexOf("\',")+3,obj.indexOf("\']"));
+			if (msgType == 'false') {
+				if(confirm(message)){
+				 	return false;
+				}else{
+					return false;
+				}
+			}else{
+				document.getElementById("save_product_ids").value="";
+				alert("产品保存成功!");
+			}
+		},"json");
+	
+	}
+
+	function preview(oper){
+        var bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+        var prnhtml = document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML = prnhtml;
+        window.print();
+        window.document.body.innerHTML = bdhtml;
+	}
+
+	function confirmMessage(){
+       var tradeId = $!trade.tid;
+       var smessage=document.getElementById("csMessage").value;
+       if( null==smessage||smessage=='')
+       {
+    	   alert("提交之前请输入您的留言信息");
+    	   return;
+       }
+       if(smessage.length>200)
+       {
+       	alert("您输入的留言太长");
+       	return
+       }
+	    document.form1.action="$appServer.get("/trade/messageConserve.html")";
+        document.form1.submit();
+	}
+
+	function modifyInvoice() {
+    	var tradeId = $!trade.tid;
+    	var flag = document.getElementById("trade.invoice").checked;
+    	if(confirm("确认修改？")) {
+    		if(flag){
+    			document.getElementById("invoice").value = "y";
+    		}else{
+    			document.getElementById("invoice").value = "n";
+    		}
+    		document.form1.action='$appServer.get("/trade/modifyInvoice.html")';
+            document.form1.submit();
+    	} else {
+			document.getElementById("trade.invoice").checked = !flag;
+		}
+	}
+	
+	
+	
+	function modifyOrderPrice(id,tid){
+		var modify_price = jQuery("#goodsPrice_"+id).val();
+		if(isNaN(modify_price))
+		{
+			alert("输入价钱必须为数字!");
+			return;
+		}
+    	if(confirm("您确定要修改出售价格？")){		
+        		jQuery.post('$!{appServer}/trade/udtpp.html?time='+new Date().getTime(),{orderId:id,tid:tid,price:modify_price},function(obj){
+    				var msgType = obj.jsonMsgType;
+        			var message = obj.jsonMessage;
+        			if (msgType == 'false') {
+        				alert(message);
+        			}else{
+        				var price = obj.jsonTradeAmount;
+        				document.getElementById("amountTwoSpan").innerHTML=price+".00";
+        				document.getElementById("amountFirstSpan").innerHTML=price+".00";
+        				//document.getElementById("goodsPriceOrderAll_"+id).innerHTML=obj.jsonOrderPriceAll+".00";
+						var goodsNum = jQuery("#goodsNumber_"+id).val()
+        				jQuery("#goodsPriceDis_"+id).html(parseInt(goodsNum)*parseInt(modify_price) + ".00");
+        				alert(message);
+        			}
+        		},"json");
+			}
+	}
+
+
+##	function modifyGoodsPrice(id,goodsCount){
+##	var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+##	   var errMsg = '价格出错，请核对后再输入';
+##		if(confirm("您确定要修改商品价格？")){
+##			var afterModify = 				document.getElementById('goodsPrice_'+id).value;
+##			if(!reg.test(afterModify)){
+##				alert(errMsg);
+##				return;
+##			} else if (afterModify > 100000000) {
+##				alert("您输入的商品价格过大，请核对后再修改");
+##				return;
+##			}
+##
+##									jQuery.get('modifyGoodsPriceJson.html',{param1:afterModify,param2:id},function(message){
+##            var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+##		            var msgValueAmount = message.substring(message.indexOf("\',\'amount:") + 10, message.lastIndexOf(";goodsAmount:"));
+##		            var msgValueGoodsAmount = message.substring(message.indexOf(";goodsAmount:") + 13, message.lastIndexOf(";tradeAmount:"));
+##		            var msgValueTradeAmount = message.substring(message.indexOf(";tradeAmount:") + 13, message.lastIndexOf("\']"));
+##            		if((msgType != null) && (msgType != '') && (msgType=='true')){
+##			            var amountFirstSpan = document.getElementById('amountFirstSpan');
+##			            var amountTwoSpan = document.getElementById('amountTwoSpan');
+##
+##			            if (msgValueAmount == null || msgValueAmount == '') {
+##    			             amountFirstSpan.innerHTML="0.00";
+##    			             amountTwoSpan.innerHTML="0.00";
+##        } else {
+##				                 amountFirstSpan.innerHTML=msgValueTradeAmount;
+##    			             amountTwoSpan.innerHTML=msgValueAmount;
+##            }
+##					            var goodsAmountDis = document.getElementById('goodsAmountDis');
+##			            if (msgValueGoodsAmount == null || msgValueGoodsAmount == '') {
+##				                goodsAmountDis.innerHTML="0.00";
+##			           } else {
+##				                goodsAmountDis.innerHTML=msgValueGoodsAmount;
+##			           }
+##			           var goodsPrice = document.getElementById('goodsPriceDis_' + id);
+##			           goodsPrice.innerHTML=(document.getElementById('goodsPrice_'+id).value * goodsCount).toFixed(2);;
+##			           alert("商品价格已成功修改");
+##		          }
+##		            else if(msgType='numfalse'){
+##		            alert("修改后价格不能低于成本价");
+##		          }
+##		          else if (msgType=='numberError'){
+##			           alert(errMsg);
+##		          } else if(msgType=='priceError'){
+##		            alert("总金额小于点卷折扣金额，请重新输入");
+##		          }else {
+##			          alert("无法修改商品价格，请重新登录后再修改");
+##	          }
+##
+##		    },'json');
+##
+##		 //	TradeAction.modifyGoodsPriceDwr(afterModify,id,function(msg){callBackModifyGoodsPrice(msg,goodsCount,id);});
+##		}
+##}
+
+
+	function modifyExpress(tid){
+    	if(confirm("您确定要修改物流？")){
+    		var afterModify=document.getElementById('expressId').value;
+			jQuery.get('$!{appServer}/trade/modifyExpressJson.html?time='+new Date().getTime(),{param1:afterModify,param2:tid},function(message){
+				var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+				if (msgType == 'false') {
+					alert("修改物流失败!");
+				}
+			});
+		}
+	}
+
+	function modifyShippingAmount(id){
+		if(confirm("您确定要修改物流费用？")) {
+			var afterModify = document.getElementById('shippingAmount').value;
+			var reg = /^[0-9]+.?[0-9]?$/;
+			var errMsg = '请输入有效的物流价格';
+			if(!reg.test(afterModify)){
+				alert(errMsg);
+				return;
+			} else if (afterModify > 100000000) {
+				alert("您输入的物流费用过大，请核对后再修改");
+				return;
+			}
+			jQuery.get('$appServer.get("/trade/modifyShippingAmountJson.html")',{param1:afterModify,param2:id},function(message) {
+				callBackModifyShippingAmount(message);
+			});
+		}
+	}
+	function callBackModifyShippingAmount(msg){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValueAmount = msg.substring(msg.indexOf("\',\'amount:") + 10, msg.lastIndexOf(";goodsPriceAcount:"));
+		var msgValueGoodsAmount = msg.substring(msg.indexOf(";goodsPriceAcount:") + 18, msg.lastIndexOf(";agentPrice:"));
+		var msgValueAgentAmount = msg.substring(msg.indexOf(";agentPrice:") + 11, msg.lastIndexOf("\']"));
+		if((msgType != null) && (msgType != '') && (msgType=='true')){
+			var amountFirstSpan = document.getElementById('amountFirstSpan');
+			var amountTwoSpan = document.getElementById('amountTwoSpan');
+			 var amountAgent = document.getElementById('amountAgent');
+			if (msgValueAmount == null || msgValueAmount == '') {
+    			amountFirstSpan.innerHTML="0.00";
+    			amountTwoSpan.innerHTML="0.00";
+            } else {
+				amountFirstSpan.innerHTML=msgValueGoodsAmount;
+    			amountTwoSpan.innerHTML=msgValueAmount;
+            }
+            if(amountAgent!=null){
+            	amountAgent.innerHTML=msgValueAgentAmount;
+            }
+			alert("物流费用已成功修改");
+		} else if (msgType=='numberError'){
+			alert(errMsg);
+		} else if(msgType=='priceError'){
+		    alert("总金额小于点卷折扣金额，请重新输入");
+		} else {
+			alert("无法修改物流费用，请重新登录后再修改");
+		}
+	}
+
+	function isPriceNumber(val)
+	{
+	   	var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	   var errMsg = '价格出错，请核对后再输入';
+	  if(!reg.test(val)){
+	  	alert(errMsg);
+	  }
+	}
+
+	function isPriceNumberTwo(val)
+	{
+	   var reg = /^[0-9]+.?[0-9]?$/;
+	   var errMsg = '请输入有效的物流价格';
+	  if(!reg.test(val)){
+	  	alert(errMsg);
+	  }
+	}
+
+	function modifyWsShippingAmount(id){//修改批发订单的一级仓库和运费
+		if(confirm(alertMsg.wscomfirm)){
+    		var afterModify = document.getElementById('wsShippingAmount').value;
+    		var depFirstId= document.getElementById('trade.depFirstId').value;
+    		var reg = /^[0-9]+.?[0-9]?$/;
+    		if(!reg.test(afterModify)){
+    			alert(alertMsg.shippingAmountValid);
+    			return;
+    		} else if (afterModify > 100000000) {
+    			alert(alertMsg.shippingAmountMax);
+    			return;
+    		}
+
+    		if(depFirstId==null || depFirstId==''){
+    		    alert(alertMsg.ws_depFirstIdIsNull);
+    			return;
+    		}
+
+    		var tradeId = id;
+    		var regInt = /^[0-9]+$/;
+    		if(!reg.test(tradeId)){
+    			alert(alertMsg.shippingAmountValid);
+    			return;
+    		}
+
+			jQuery.get('$appServer.get("/trade/modifyWsShippingAmountJson.html")',{modifyAmount:afterModify,tradeId:id,depFirstId:depFirstId},function(message){
+				callBackWsShippingModify(message);
+			});
+		}
+	}
+
+	function callBackWsShippingModify(msg){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValueAmount = msg.substring(msg.indexOf("\',\'amount:") + 10, msg.lastIndexOf(";goodsPriceAcount:"));
+		var msgValueGoodsAmount = msg.substring(msg.indexOf(";goodsPriceAcount:") + 18, msg.lastIndexOf(";agentPrice:"));
+				var msgValueAgentAmount = msg.substring(msg.indexOf(";agentPrice:") + 11, msg.lastIndexOf("\']"));
+		if((msgType != null) && (msgType != '') && (msgType=='true')){
+			var amountFirstSpan = document.getElementById('amountFirstSpan');
+			var amountTwoSpan = document.getElementById('amountTwoSpan');
+			 var amountAgent = document.getElementById('amountAgent');
+			if (msgValueAmount == null || msgValueAmount == '') {
+    			amountFirstSpan.innerHTML="0.00";
+    			amountTwoSpan.innerHTML="0.00";
+            } else {
+				amountFirstSpan.innerHTML=msgValueGoodsAmount;
+    			amountTwoSpan.innerHTML=msgValueAmount;
+            }
+       if(amountAgent!=null){
+          amountAgent.innerHTML=msgValueAgentAmount;
+        }
+			alert(alertMsg.wsModifySucess);
+		} else if(msgType=='false'){
+			alert(alertMsg.wsErrorOther);
+		} else {
+		   var msgTitle = getMsgTitle(msgType);
+		   alert(msgTitle);
+		}
+	}
+
+	function getMsgTitle(msg){
+	  var msgTitle = msg;
+	  msgTitle = alertMsg['ws_'+msgTitle];
+	  return msgTitle;
+	}
+
+	function modifyGoodsNumber(orderId){
+		var goodsModify = document.getElementById('goodsNumber_'+orderId).value;
+	    if (isNaN(goodsModify) || goodsModify < 1) {
+		     alert('商品的数量必须是数字！并且商品的数量必须大于0！');
+		     return;
+	    }
+		if(parseInt(jQuery("#stock_"+orderId).html().trim())<parseInt(goodsModify))
+		{
+			alert("不能大于实际库存数！");
+			return;
+		}
+		var orderIdLong = parseInt(orderId);
+		if(confirm("您确定要修改商品数量？")){
+		  jQuery.post('$appServer.get("/trade/checkGoodsNumber.html")',{orderId:orderIdLong,tid:$trade.tid,goodsNumber:goodsModify},function(obj){
+		  	var msgType = obj.jsonMsgType;
+			var message = obj.jsonMessage;
+			if (msgType == 'false') {
+				alert(message);
+			}else{
+						var price = obj.jsonTradeAmount;
+        				document.getElementById("amountTwoSpan").innerHTML=price+".00";
+        				document.getElementById("amountFirstSpan").innerHTML=price+".00";
+        				//document.getElementById("goodsPriceOrderAll_"+id).innerHTML=obj.jsonOrderPriceAll+".00";
+						var goodsNum = jQuery("#goodsNumber_"+orderId).val()
+        				jQuery("#goodsPriceDis_"+orderId).html(parseInt(jQuery("#goodsNumber_"+orderId).val())*parseInt(jQuery("#goodsPrice_"+orderId).val()) + ".00");
+        				alert(message);
+			}
+		  
+		  });
+
+		}
+	}
+	
+	
+
+	jQuery(function(){
+		jQuery("#logistics").click(function(){
+			var params="regionCodeEndSel=$!trade.district&paymentTempSel=payment_first&goodsWeightTotal=&depositoryFirstId=$!trade.depFirstId&tradeId=$!trade.id";
+			jQuery.ajax({
+		         type:"get",
+		         url: 'disExpressSel.html',
+		         dataType: "json",
+		         data:params,
+		         success:function(data){
+		         	if(data!=""){
+			         	if(data.error!="error"){
+				         	$("#log").html("");
+				         	for(var i = 0 ; i < data.length; i++){
+				         		$("#log").append("<div><input type=\"radio\" id=\"rad\" name=\"rad\" value=\""+data[i].expressId+"\" />"+data[i].expressName+"</div>");
+				         	}
+				         	$("#saveExpress").attr("disabled","");
+			         	}else{
+			         		alert(data.msg);
+			         	}
+			        }
+		         }
+			});
+		});
+
+		jQuery("#saveExpress").click(function(){
+			var rad = jQuery(":radio:checked");
+			if(rad.val()!=undefined){
+				jQuery.ajax({
+			         type:"get",
+			         url: 'saveExpress.html',
+			         dataType: "json",
+			         data:"tradeId=$!trade.id&expressId="+rad.val(),
+			         success:function(data){
+			         	if(data.success=="success"){
+			         	 	alert(data.msg);
+			         	 	$("#log").html($(rad).parent().text());
+			         	 	$("#saveExpress").attr("disabled","disabled");
+			         	 	$("#logistics").attr("disabled","disabled");
+			         	}else if(data.error=="error"){
+				         	alert(data.msg);
+			         	}
+			         }
+				});
+			}else{
+				alert("请选择物流!");
+			}
+		});
+
+	});
+	
+	
+	
+	function deleteProduct(orderId,tid)
+	{
+		if(confirm("确定删除？")){
+		  jQuery.post('$appServer.get("/trade/deleteGoodsNumberToZero.html")',{orderId:orderId,tid:tid},function(obj){
+           
+			//window.location.href = '$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)';
+			var msgType = obj.jsonMsgType;
+			var message = obj.jsonMessage;
+			if (msgType == 'false') {
+				alert(message);
+			}else{
+				var amountTwoSpan =  document.getElementById("amountTwoSpan");
+				var goodsAmountDis = document.getElementById("goodsAmountDis");
+    			amountTwoSpan.innerHTML=obj.jsonTradeAmount;
+    			goodsAmountDis.innerHTML=  parseInt(goodsAmountDis.innerHTML) - obj.jsonComSc;
+				var tr = "sc_tr_" + orderId;
+				document.getElementById(tr).style.display = "none";
+				var tids = document.getElementsByName("p_" + orderId);
+				for(var i =0;i<tids.length;i++)
+				{
+					jQuery(tids[i]).remove();
+				}
+			}
+		  });
+		 }
+	}
+
+	function updateTradeDepfirstId(tradeId) {
+		var depfirstId = document.getElementById("depfirstId").value;
+		if(depfirstId == ""){
+			alert("请选择一级仓库!");
+			return false;
+		}
+		if(tradeId == ""){
+			alert("订单不存在!");
+			return false;
+		}
+		if(confirm("您确定要修改一级仓库？")) {
+			jQuery.post('$appServer.get("/trade/updateTradeDepfirstId.html")', {param1:tradeId,param2:depfirstId},
+				function(message) {
+					if(message.indexOf("success") > -1){
+						var count=jQuery("#depfirstId option").length;
+						document.getElementById("tradedepId").value = depfirstId;
+						for(var i=0;i<count;i++) {
+							if(jQuery("#depfirstId").get(0).options[i].value == depfirstId) {
+								jQuery("#depfirstId").get(0).options[i].selected = true;
+								break;
+							}
+						}
+						alert("修改成功！");
+					} else if(message.indexOf("notradeId") > -1) {
+						var depId = document.getElementById("tradedepId").value;
+						var count=jQuery("#depfirstId option").length;
+						for(var i=0;i<count;i++){
+							if(jQuery("#depfirstId").get(0).options[i].value == depId){
+								jQuery("#depfirstId").get(0).options[i].selected = true;
+								break;
+							}
+						}
+						alert("订单不存在！");
+					} else if(message.indexOf("nodepfirstId") > -1) {
+						var depId = document.getElementById("tradedepId").value;
+						var count=jQuery("#depfirstId option").length;
+						for(var i=0;i<count;i++){
+							if(jQuery("#depfirstId").get(0).options[i].value == depId){
+								jQuery("#depfirstId").get(0).options[i].selected = true;
+								break;
+							}
+						}
+						alert("一级仓库不存在！");
+					} else if(message.indexOf("statusWrong") > -1) {
+						var depId = document.getElementById("tradedepId").value;
+						var count=jQuery("#depfirstId option").length;
+						for(var i=0;i<count;i++){
+							if(jQuery("#depfirstId").get(0).options[i].value == depId) {
+								jQuery("#depfirstId").get(0).options[i].selected = true;
+								break;
+							}
+						}
+						alert("订单状态已经发生改变！");
+					} else if(message.indexOf("noexpress") > -1) {
+						var depId = document.getElementById("tradedepId").value;
+						var count=jQuery("#depfirstId option").length;
+						for(var i=0;i<count;i++) {
+							if(jQuery("#depfirstId").get(0).options[i].value == depId) {
+								jQuery("#depfirstId").get(0).options[i].selected = true;
+								break;
+							}
+						}
+						alert("支付方式为空！");
+					}
+				});
+		}
+	}
+	
+	function modifyReceiveAddress(){
+		if(!confirm("确认修改收货人信息？")){
+			return false;
+	    }
+		document.getElementById("modifyRA").style.display = "none";
+		document.getElementById("newRA").style.display = "";
+	}
+	
+	function returnRA(){
+	   	document.getElementById("modifyRA").style.display = "";
+		document.getElementById("newRA").style.display = "none";
+	}
+	
+    function selectCity(code){
+            var obj = document.getElementById("city");
+            var obj2 = document.getElementById("district");
+            var length = obj.length = 0;
+
+            obj.style.display='';
+            obj2.style.display='';
+            jQuery.ajax({
+		          type:"post",
+		          url: '/user/getBackRightCitys.html',
+		          dataType: "json",
+		          data:"code="+code,
+		          success:function(json){
+			          var tempid=0;
+			          var array=json.array;
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(array,
+				          function(){
+							  obj.options[tempid] = new Option(array[tempid-1].regionName,array[tempid-1].code);
+							  tempid=tempid+1;
+
+			          	 }
+		          	 )
+		          }
+		        });
+            var obj2 = document.getElementById("district");
+            var length2 = obj2.length = 0;
+            obj2.options[length2] = new Option("请选择", "");
+
+
+       }
+
+        function selectDistinc(code){
+	        var obj = document.getElementById("district");
+	            var length = obj.length = 0;
+	            jQuery.ajax({
+		          type:"post",
+		          url: '/user/getBackRightDistincs.html',
+		          dataType: "json",
+		          data:"code="+code,
+		         success:function(json)
+				 {
+			          var tempid=0;
+			          var array=json.array;
+			          if(array[0]==null)
+					  {
+                          jQuery("#district").hide();
+			          }else
+					  {
+			          	jQuery("#district").show();
+			          }
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(array,
+				          function()
+						  {
+							  obj.options[tempid] = new Option(array[tempid-1].regionName,array[tempid-1].code);
+							  tempid=tempid+1;
+				          }
+			         	)
+		          }
+		        });
+
+         }
+		 
+     function checkReceiveAddress(){
+		 var s1 = document.getElementById("s1");
+         var provinceCode= jQuery("#s1").val();
+         var city = document.getElementById("city");
+         var district = document.getElementById("district");
+         var zipcode = jQuery.trim(document.getElementById("zipcode").value);
+         var tradeAddress = jQuery.trim(document.getElementById("tradeAddress").value);
+         var receiver = jQuery.trim(document.getElementById("receiver").value);
+         var mobile = jQuery.trim(document.getElementById("mobile").value);
+
+            if(s1.options[s1.selectedIndex].text=="请选择"){
+                alert("请选择省份!");
+                return false;
+            }
+
+            if(provinceCode != '990000' && provinceCode != '810000'&& provinceCode != '820000'){
+                if(city.options[city.selectedIndex].text=="请选择"){
+                   alert("请选择城市!");
+                   return false;
+                }
+
+			}
+
+            if(zipcode==null||zipcode.length==0){
+                alert("请输入邮政编码!");
+                return false;
+             }else if(!zipCodeCheck(zipcode)){
+                return false;
+             }
+
+            if(tradeAddress==null|| jQuery.trim(document.getElementById("tradeAddress").value).length == 0 ){
+                alert("请输入详细地址!");
+                return false;
+             }
+
+            if(receiver==null|| jQuery.trim(document.getElementById("receiver").value).length == 0){
+                alert("请输入收货人姓名!");
+                return false;
+            }else if(!recieverCheck(jQuery.trim(document.getElementById("receiver").value))){
+                return false;
+            }
+
+            if(mobile==null||jQuery.trim(document.getElementById("mobile").value).length == 0){
+                alert("请输入电话号码!");
+                return false;
+            }else if(!mobileCheck(mobile)){
+                return false;
+            }
+			document.getElementById('mobileRewrite').value= mobile;
+			document.getElementById('form1').action="/trade/modifyReceiveAddress.html";
+			document.getElementById('form1').submit();
+			document.getElementById('form1').action="";
+     }
+	 
+       function zipCodeCheck(code){
+            var msg='邮政编码格式不正确';
+            var reg= /^[0-9]\d{5}(?!\d)$/;
+            if(!reg.test(code)){
+                alert(msg);
+                return false;
+            }
+			
+            return true;
+        }
+
+        function recieverCheck(str){
+            var msg='收货人姓名长度为3到32个字符';
+            var intLength=0;
+            var reg=/[\u4E00-\u9FA5]/;
+            for (var i=0;i<str.length;i++){
+              var obj = str.substring(i,i+1);
+              if (reg.test(obj)){
+                intLength=intLength+2;
+                }
+              else{
+                intLength=intLength+1;
+                }
+            }
+            if(intLength<3 || intLength>32){
+                alert(msg);
+                return false;
+            }
+
+            return true;
+        }
+
+        function mobileCheck(code){
+            var msg='电话号码格式不正确';
+            var reg = /^((((13|15|18)[0-9]{1}))+\d{8})$/;
+            var _reg = /^[\d-]{7,13}$/;
+            if(!_reg.test(code) && !reg.test(code)){
+                alert(msg);
+                return false;
+            }
+
+            return true;
+        }
+</script>

@@ -1,0 +1,121 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>销售入库</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+          <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+   <div id="form1"  style="margin-left:auto;margin-center:auto;margin-left:100px">
+        <table>
+            
+            <tr>
+                <td>
+                    <label >退款总金额：</label>
+                </td>
+                <td>
+					<input id="totalPrice"  name="subTotal" style="width:80px" class="mini-textbox"  readOnly="true"/> <label id="currencyName"></label>
+					<input id="idProduct"  name="idProduct" style="display:none" class="mini-textbox"   />  
+                </td>
+            </tr>
+			 
+            <tr id="paymentTr">
+                <td>
+                    <label >退款方式：</label>
+                </td>
+                <td>
+                       <input id="idPayment" name="idPayment"  class="mini-combobox"   style="width:100px" textField="name" valueField="id" emptyText="请选择..." 
+						url="/sell/getAllPayment.html"  allowInput="false"  value="1" />  
+                </td>
+            </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+			 <tr>  <td> </td>  <td>  </td>  </tr>
+             <tr>
+					<td>
+						 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a class="mini-button" iconCls="icon-ok" onclick="submit()">提交</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+			 
+			 
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	var data; //保存页面传过来的开单数据 [idProduct:idProduct]
+ 
+	
+	 function setData(data1) {
+        //跨页面传递的数据对象，克隆后才可以安全使用
+        data = mini.clone(data1);
+		 
+		
+		var resultData = {idproduct:data.idProduct};
+		jQuery.post("/product/getProduct.html",resultData,function(text)
+		{
+			mini.get("totalPrice").setValue(text.salePrice);
+			jQuery("#currencyName").html(text.salePriceCurrencyName);
+			jQuery("#idProduct").val(text.idProduct);
+		});
+ 
+    }
+	  
+	function submit()
+	{
+		var idProduct = jQuery("#idProduct").val();
+		if(!idProduct)
+		{
+			mini.alert("数据错误");
+			return ;
+		}
+		var idPayment = mini.get("idPayment").getValue();
+		if(!idPayment)
+		{
+			mini.alert("请选择退款方式");
+			return;
+		}
+		var data = {idProduct:idProduct,idPayment:idPayment};
+ 
+		mini.mask({
+            el: document.body,
+            cls: 'mini-mask-loading',
+            html: '提交中,请勿关闭...'
+        });
+		jQuery.post("/order1/saleInStockByIdProduct.html",data,function(text)
+		{
+		 	mini.unmask(document.body);
+			if("ok" == text)
+			{
+				CloseWindow('success');
+			}
+			else
+			{
+				mini.alert("提交出错,联系管理员");
+			}
+		});
+		
+		
+		
+	}
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+</script>
+</body>
+</html>

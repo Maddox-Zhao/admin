@@ -1,0 +1,51 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<link rel="stylesheet" type="text/css" href="${imageServer}/styles/tree.css" />
+<script type="text/javascript" src="${imageServer}/scripts/tree.js"></script>
+<script>
+$(document).ready(function(){
+	$('#save').click(function(){
+    		var s=$("#tree").getTSVs();
+        if(s !=null)
+    		$('#ids').val(s);
+    	$('#form1').submit();
+	});
+	  var o = { showcheck: true};
+  o.data = eval('#direct($!{data})');
+  $("#tree").treeview(o);
+});
+</script>
+    <div class="main">
+        <div class="formBox">
+			<form action="$appServer.get('/role/modifyRoleAuthority.html')" id="form1" method="post" >
+				<input type="hidden" id="ids" name="ids" value=""/>
+	            <input type="hidden" id="roleId" name="roleId" value="$!roleId"/>
+        	<h3><i></i><span>编辑角色权限</span></h3>
+        	<div class="content">
+        		<table>
+                            <tbody>
+								<tr>
+                                	<th>权限:</th>
+                                	<td>
+            							<div>
+                                            <div id="tree"></div>
+                                        </div>
+									</td>
+                                </tr>
+                            </tbody>
+
+              </table>
+			</div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="submit" class="button-s4" id="save">修改</button>
+                <button type="button" class="button-s4" onclick="#if(!$!{url})history.go(-1)#else javascript:location.href= '$!{appServer}$!{url}' #end">取消</button>
+
+          	</div><!-- 表单按钮区 END -->
+
+            </form>
+        </div> <!-- 表单模块 END -->
+
+    </div>

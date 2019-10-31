@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="INTERFACEUSERTRADE">
+<typeAlias alias="interfaceUserTrade" type="com.huaixuan.network.biz.domain.agent.InterfaceUserTrade"/>
+	<resultMap class="interfaceUserTrade" id="interfaceUserTradeResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="TRADE_ID" property="tradeId"/>
+		<result column="PAIPAI_TRADE_ID" property="paipaiTradeId"/>
+		<result column="GMT_PAIPAI_CREATE" property="gmtPaipaiCreate"/>
+		<result column="GMT_PAIPAI_PAIED" property="gmtPaipaiPaied"/>
+		<result column="REASON" property="reason"/>
+	</resultMap>
+
+	<resultMap class="interfaceUserTrade" id="interfaceUserTradeResult1">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="TRADE_ID" property="tradeId"/>
+		<result column="PAIPAI_TRADE_ID" property="paipaiTradeId"/>
+		<result column="GMT_PAIPAI_CREATE" property="gmtPaipaiCreate"/>
+		<result column="GMT_PAIPAI_PAIED" property="gmtPaipaiPaied"/>
+		<result column="REASON" property="reason"/>
+		<result column="USER_NAME" property="userName"/>
+	</resultMap>
+
+
+<!-- create InterfaceUserTrade object -->
+<insert id="addInterfaceUserTrade" parameterClass="interfaceUserTrade">
+<![CDATA[
+		insert into interface_user_trade
+		(ID,GMT_CREATE,GMT_MODIFY,USER_ID,TRADE_ID,PAIPAI_TRADE_ID,GMT_PAIPAI_CREATE,GMT_PAIPAI_PAIED,REASON )values( null,
+		sysdate(),
+		sysdate(),
+		#userId#,
+		#tradeId#,
+		#paipaiTradeId#,
+		#gmtPaipaiCreate#,
+		#gmtPaipaiPaied#,
+		SUBSTRING(#reason#,1,1500)
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update InterfaceUserTrade object -->
+<update id="editInterfaceUserTrade" parameterClass="interfaceUserTrade">
+<![CDATA[
+		update interface_user_trade set
+		GMT_MODIFY = sysdate(),
+		USER_ID = #userId#,
+		TRADE_ID = #tradeId#,
+		PAIPAI_TRADE_ID = #paipaiTradeId#,
+		GMT_PAIPAI_CREATE = #gmtPaipaiCreate#,
+		GMT_PAIPAI_PAIED = #gmtPaipaiPaied#,
+		REASON = SUBSTRING(#reason#,1,1500)
+		 where ID = #id#
+
+]]>
+</update>
+
+<update id="editInterfaceUserTradeByDealCode" parameterClass="interfaceUserTrade">
+<![CDATA[
+		update interface_user_trade set
+		GMT_MODIFY = sysdate(),
+		TRADE_ID = #tradeId#
+		 where PAIPAI_TRADE_ID = #paipaiTradeId#
+]]>
+</update>
+<!-- delete InterfaceUserTrade object -->
+<delete id="removeInterfaceUserTrade" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from interface_user_trade where interface_user_trade.ID = #value#
+]]>
+</delete>
+<!-- search InterfaceUserTrade object -->
+<select id="getInterfaceUserTrade" parameterClass="java.lang.Long" resultMap="interfaceUserTradeResult">
+<![CDATA[
+		select interface_user_trade.* from interface_user_trade where interface_user_trade.ID = #value#
+]]>
+</select>
+
+<select id="getInterfaceUserTradeByTid" parameterClass="java.lang.String" resultMap="interfaceUserTradeResult">
+<![CDATA[
+		select interface_user_trade.* from interface_user_trade where interface_user_trade.TRADE_ID = #value#  LIMIT 1
+]]>
+</select>
+
+<!--added by chenhang 2011-5-17 started  -->
+<select id="getInterfaceUserTradeByPaipaiTradeId" parameterClass="java.lang.String" resultMap="interfaceUserTradeResult">
+<![CDATA[
+		select interface_user_trade.* from interface_user_trade where interface_user_trade.PAIPAI_TRADE_ID = #paipaiTradeId#  LIMIT 1
+]]>
+</select>
+<!--added by chenhang 2011-5-17 ended  -->
+
+<select id="getInterfaceUserTradeByDealId" parameterClass="java.lang.String" resultMap="interfaceUserTradeResult">
+<![CDATA[
+		select interface_user_trade.* from interface_user_trade where interface_user_trade.PAIPAI_TRADE_ID = #value# LIMIT 1
+]]>
+</select>
+<!-- searchAll InterfaceUserTrade List -->
+<select id="getInterfaceUserTrades" resultMap="interfaceUserTradeResult">
+<![CDATA[
+		select interface_user_trade.* from interface_user_trade
+]]>
+</select>
+
+
+     <select id="searchInterfaceByParameterMap" resultMap="interfaceUserTradeResult1" parameterClass="java.util.Map">
+        <include refid="pageSQLHead"/>
+<![CDATA[
+		select t.*,t1.account as USER_NAME from interface_user_trade t,emall_users t1
+		where t.user_id = t1.id
+]]>
+     <isNotEmpty prepend="and" property="userName">
+            t1.account like CONCAT('%',#userName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			t.TRADE_ID like CONCAT('%',#tradeId#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ t.GMT_CREATE >= STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ t.GMT_CREATE < DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="interfaceCode">
+			t.PAIPAI_TRADE_ID like CONCAT('%',#interfaceCode#,'%')
+		</isNotEmpty>
+        order by t.gmt_create desc
+		<include refid="pageSQLFoot"/>
+     </select>
+
+<select id="searchInterfaceCountByParameterMap" parameterClass="java.util.Map" resultClass="int">
+<![CDATA[
+		 select count(1) from interface_user_trade t,emall_users t1
+		 where t.user_id = t1.id
+]]>
+        <isNotEmpty prepend="and" property="userName">
+            t1.account like CONCAT('%',#userName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			t.TRADE_ID like CONCAT('%',#tradeId#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+			<![CDATA[ t.GMT_CREATE >= STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+			<![CDATA[ t.GMT_CREATE < DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="interfaceCode">
+			t.PAIPAI_TRADE_ID like CONCAT('%',#interfaceCode#,'%')
+		</isNotEmpty>
+</select>
+</sqlMap>

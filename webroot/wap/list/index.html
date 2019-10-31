@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<title>html5手机端信息筛选条件代码 - 站长素材</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="x-rim-auto-match" content="none"/>
+<meta name="HandheldFriendly" content="true"/>
+<link type="text/css" rel="stylesheet" href="css/demo.css">
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/demo.js"></script>
+</head>
+<body>
+<!-- screening -->
+<div class="screening">
+    <ul>
+    	<li class="meishi">品牌</li>
+        <li class="Regional">品类</li>
+        <li class="Sort">排序</li>
+        <li class="Brand">筛选</li>
+    </ul>
+</div>
+<!-- End screening -->
+<!-- grade -->
+<div class="meishi22">
+    <ul class="meishia-w" id="meishia">
+        <li onclick="meishia(this)"><div  class="all">全部品牌</div></li>
+        <li onclick="meishia(this)"><div  class="1">PRADA</span></div></li>
+        <li onclick="meishia(this)"><div  class="2">GUCCI</span></div></li>
+        <li onclick="meishia(this)"><div  class="3">MIU MIU</div></li>
+        <li onclick="meishia(this)"><div  class="4">CK</div></li>       
+    </ul>
+</div>
+
+
+
+
+<div class="grade-eject">
+    <ul class="grade-w" id="gradew">
+        <li onclick="grade1(this)">包包 </li>
+        <li onclick="grade1(this)">鞋履 </li>
+        <li onclick="grade1(this)">配饰</li>
+        <li onclick="grade1(this)">衣服</li>
+        
+    </ul>
+    
+</div>
+<!-- End grade -->
+<!-- Category -->
+<div class="Sort-eject Sort-height">
+    <ul class="Sort-Sort" id="Sort-Sort">
+        <li onclick="Sorts(this)">新品优先</li>
+        <li onclick="Sorts(this)">价格从低到高</li>
+        <li onclick="Sorts(this)">价格从高到低</li>
+    </ul>
+</div>
+<!-- End Category -->
+<!-- Category -->
+<script src="js/truck.23648f77.js"></script>
+<div class="Category-eject">
+    <ul class="Category-w" id="Categorytw">
+        <li onclick="Categorytw(this)">
+        	国内
+        	<span><div class="wrap">
+              <input type="checkbox" id="s5">
+              <label class="slider-v3" for="s5"></label>
+			</div></span>
+        </li>
+        <li onclick="Categorytw(this)">
+        	海外
+        	<span><div class="wrap">
+              <input type="checkbox" id="s6">
+              <label class="slider-v3" for="s6"></label>
+			</div></span>
+        
+        </li>
+        <li onclick="Categorytw(this)">
+        	特惠
+        	<span><div class="wrap">
+              <input type="checkbox" id="s7">
+              <label class="slider-v3" for="s7"></label>
+			</div></span>
+         
+        </li>
+
+    </ul>
+</div>
+<script type="text/javascript">
+$(function(){   
+	$('.choosebox li a').click(function(){
+		var thisToggle = $(this).is('.size_radioToggle') ? $(this) : $(this).prev();
+		var checkBox = thisToggle.prev();
+		checkBox.trigger('click');
+		$('.size_radioToggle').removeClass('current');
+		thisToggle.addClass('current');
+		return false;
+	});		
+});
+
+$(".choosebox li a").click(function(){
+	var text = $(this).html();
+	$(".choosetext span").html(text);
+	$("#result").html("" + getSelectedValue("dress-size"));
+});
+			
+function getSelectedValue(id){
+	return 
+	$("#" + id).find(".choosetext span.value").html();
+}
+</script>
+<!-- End Category -->
+
+<!-- demo-content -->
+<div class="demo-content">Content</div>
+<!-- End demo-content -->
+
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+<p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+<p>来源：<a href="http://sc.chinaz.com/" target="_blank">站长素材</a></p>
+</div>
+</body>
+</html>

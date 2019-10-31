@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BrandCategorySQL">
+<typeAlias alias="brandCategory" type="com.huaixuan.network.biz.domain.shop.BrandCategory"/>
+	<resultMap class="brandCategory" id="brandCategoryResult">
+		<result column="id" property="id"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="status" property="status"/>
+	</resultMap>
+
+<!-- create Brand object -->
+<insert id="addBrandCategory" parameterClass="brandCategory">
+<![CDATA[
+		insert into emall_brand_category(id,brand_id,cat_code)
+		values(null,#brandId#,#catCode#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<select id="getCategoryBybrandId" parameterClass="java.lang.Long" resultMap="brandCategoryResult">
+   <![CDATA[
+    select emall_brand_category.* from emall_brand_category where emall_brand_category.status = 'y' and emall_brand_category.brand_id = #value#
+   ]]>
+</select>
+
+<select id="getBrandCategoryById" parameterClass="java.lang.Long" resultMap="brandCategoryResult">
+  <![CDATA[
+	select emall_brand_category.* from emall_brand_category where emall_brand_category.ID = #value#
+  ]]>
+</select>
+
+<update id="updateBrandCategoryStatusById" parameterClass="brandCategory">
+ 		update emall_brand_category set status = #status#
+		 where id = #id#
+</update>
+
+<select id="getBrandCategoryByMap" resultMap="brandCategoryResult" parameterClass="java.util.Map">
+  <![CDATA[
+      select emall_brand_category.* from emall_brand_category where 1=1
+  ]]>
+  <isNotEmpty prepend="and" property="catCode">
+      emall_brand_category.cat_code = #catCode#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="brandId">
+      emall_brand_category.brand_id = #brandId#
+  </isNotEmpty>
+</select>
+
+<select id="getBrandByCateGory" resultMap="brandCategoryResult" parameterClass="java.lang.String">
+ <![CDATA[
+     select emall_brand_category.* from emall_brand_category where emall_brand_category.CAT_CODE = #value# and emall_brand_category.STATUS = 'y'
+ ]]>
+</select>
+</sqlMap>

@@ -1,0 +1,363 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+<script language="javascript" type="text/javascript">
+
+	function selectid(){
+ 		var id = document.getElementById("idstr").value;
+	  	var obj = document.getElementById("adPositionIdstr");
+		obj.value=id;
+	}
+
+	function grest(){
+		var obj = document.getElementById("articlecontentstr");
+		var oFCKeditor = FCKeditorAPI.GetInstance('articlecontent') ;
+		oFCKeditor.SetHTML(obj.value) ;
+		document.theForm.reset();
+	}
+
+	function newdialog(url)
+    {
+		window.open(url, 'window', '');
+    }
+
+	function setgifts(ss){		
+		if(ss!=''){
+			var pps = document.getElementById("goodsInfoStr").value;
+			if(pps!=''){
+				ss = pps+"~@~"+ss;
+			}
+        	var vstr = ss.split("~@~");
+
+
+        	var ggg = document.getElementById("addgifts");
+			document.getElementById("goodsInfoStr").value=ss;
+        	var gstr="";
+        	var ids="";
+        	gstr = "<table width=\"100%\">";
+
+        	for(var i=0 ; i<vstr.length ; i++){
+        		var tstr = vstr[i].split("~!~");
+				var goodsidarry;
+				var tag = false;
+				if(ids !=null){
+					 goodsidarry = ids.split(";");
+				}
+				if(goodsidarry!='' && goodsidarry.length > 0){
+					for(var x=0 ; x<goodsidarry.length ; x++){
+						if(tstr[0] == goodsidarry[x]){
+							tag = true;
+						}
+					}
+				}
+				if(tag){
+
+				}else{
+    		        strHtml = "<tr><td width=\"20%\"><img src=\"${upServer}/";
+    		        strHtml +=tstr[3];
+    		        strHtml +="\" width=\"40\" height=\"40\" /> </td><td width=\"20%\">";
+    		        strHtml += tstr[2];
+			        strHtml +="</td><td width=\"20%\">";
+			        strHtml += tstr[4];
+    		        strHtml += "</td><td width=\"20%\">"+tstr[1]+"元</td><td width=\"20%\">";
+					strHtml += "<a href=\"javascript:deleteGoodsInstance(\'"+tstr[0]+"\')\">删除</a></td></tr>";
+    		        gstr = gstr+strHtml;
+            		if(ids==""){
+            			ids = tstr[0];
+            		}else{
+            			ids = ids + ";" + tstr[0];
+            		}
+				}
+        	}
+        	gstr = gstr+"</table>";
+        	ggg.innerHTML = gstr;
+        	document.getElementById("giftGoodsIds").value=ids;
+    	}
+	}
+	
+	function deleteGoodsInstance(goodsInstanceId){
+
+		var ss = document.getElementById("goodsInfoStr").value;
+		if(ss==''){
+			return false;
+		}
+    	var vstr = ss.split("~@~");
+
+
+    	var ggg = document.getElementById("addgifts");
+		document.getElementById("goodsInfoStr").value=ss;
+    	var gstr="";
+    	var ids="";
+		var newGoodsInfoStr="";
+    	gstr = "<table width=\"100%\">";
+
+    	for(var i=0 ; i<vstr.length ; i++){
+    		var tstr = vstr[i].split("~!~");
+			var goodsidarry;
+			var tag = false;
+			if(tstr[0]!=goodsInstanceId){
+    			if(ids !=null){
+    				 goodsidarry = ids.split(";");
+    			}
+    			if(goodsidarry!='' && goodsidarry.length > 0){
+    				for(var x=0 ; x<goodsidarry.length ; x++){
+    					if(tstr[0] == goodsidarry[x]){
+    						tag = true;
+    					}
+    				}
+    			}
+    			if(tag){
+
+    			}else{
+    		        strHtml = "<tr><td width=\"20%\"><img src=\"${upServer}/";
+    		        strHtml +=tstr[3];
+    		        strHtml +="\" width=\"40\" height=\"40\" /> </td><td width=\"20%\">";
+    		        strHtml += tstr[2];
+			        strHtml +="</td><td width=\"20%\">";
+			        strHtml += tstr[4];
+    		        strHtml += "</td><td width=\"20%\">"+tstr[1]+"元</td><td width=\"20%\">";
+					strHtml += "<a href=\"javascript:deleteGoodsInstance(\'"+tstr[0]+"\')\">删除</a></td></tr>";
+            		gstr = gstr+strHtml;
+            		if(ids==""){
+            			ids = tstr[0];
+            		}else{
+            			ids = ids + ";" + tstr[0];
+            		}
+    			}
+				if(newGoodsInfoStr==''){
+					newGoodsInfoStr = vstr[i];
+				}else{
+					newGoodsInfoStr = newGoodsInfoStr + "~@~"+vstr[i];
+				}
+			}
+    	}
+    	gstr = gstr+"</table>";
+    	ggg.innerHTML = gstr;
+    	document.getElementById("giftGoodsIds").value=ids;
+		document.getElementById("goodsInfoStr").value = newGoodsInfoStr;
+
+	}
+
+	function setbuygoods(ss){
+    	var vstr = ss.split("~@~");
+    	var ggg = document.getElementById("addgoods");
+    	var gstr="";
+    	var ids="";
+    	gstr = "<table width=\"100%\">"
+    	if(vstr.length > 0){
+    		var tstr = vstr[0].split("~!~");
+    		strHtml = "<tr><td width=\"20%\"><img src=\"${upServer}/";
+    		strHtml +=tstr[3];
+    		strHtml +="\" width=\"40\" height=\"40\" /> </td><td width=\"30%\">";
+    		strHtml += tstr[2];
+    		strHtml += "</td><td width=\"50%\">"+tstr[1]+"元</td></tr>";
+    		gstr = gstr+strHtml;
+
+    		ids = tstr[0];
+
+    	}
+    	gstr = gstr+"</table>";
+    	ggg.innerHTML = gstr;
+    	document.getElementById("buyGoodsId").value=ids;
+	}
+	
+		function submitOpt(){
+	        var name=jQuery.trim(document.getElementById("name").value);
+			if(name==""){
+			    alert("套餐名称不能为空！");
+				return false;
+			}
+		
+			var buyGoodsId=jQuery.trim(document.getElementById("buyGoodsId").value);
+		    if(buyGoodsId==""){
+				alert("购买商品不能为空！");
+				return false;
+			}
+			
+			var giftGoodsIds=jQuery.trim(document.getElementById("giftGoodsIds").value);
+		    if(giftGoodsIds==""){
+				alert("赠送商品不能为空！");
+				return false;
+			}
+		
+			var dateStart1=document.getElementById("datestart").value;
+    		var dateEnd1=document.getElementById("dateend").value;
+			
+			if(dateStart1==""){
+			    alert("起始时间不能为空！");
+				return false;
+			}
+			
+			if(dateEnd1==""){
+			    alert("结束时间不能为空！");
+				return false;
+			}
+    		
+    		if(dateEnd1 < dateStart1){
+    			alert("套餐起始时间不能大于结束时间！");
+    			return false;
+    		} else if (dateEnd1 != '' && (dateEnd1 == dateStart1)) {
+				var hourStart = document.getElementById("promationStartHour");
+                hourStartTemp = hourStart.options[hourStart.selectedIndex].value;
+				var hourEnd = document.getElementById("promationEndHour");
+                hourEndTemp = hourEnd.options[hourEnd.selectedIndex].value;
+				if (hourEndTemp < hourStartTemp){
+					alert("套餐起始时间不能大于结束时间！");
+    				return false;
+				} else {
+					document.forms[0].submit();
+				}
+			} else {
+				document.forms[0].submit();
+			}
+		}
+
+</script>
+
+	<div class="main">
+	  <div class="formBox">
+		<form __unmht_action="#" name="theForm"  action="/goods/updategift.html" method="post" enctype="multipart/form-data">
+			<div class="content">
+			<input type="hidden" id="buyGoodsId" name="buyGoodsId" value="$!buyGoodsId" />
+			<input type="hidden" id="giftGoodsIds" name="giftGoodsIds" value="$!giftGoodsIds" />
+			#springBind("promation.id")
+            <input type="hidden" id="promation.id" name="${status.expression}" value ="$!{status.value}" >
+			<input type="hidden" id="operateDo" name="operateDo" value="update" />
+			<input type="hidden" id="adPositionIdstr" name="ad.adPositionIdstr" value="$!{ad.adPositionIdstr}" />
+			<input type="hidden"  id="articlecontentstr" name="articlecontentstr" value="$!stringEscapeUtil.escapeHtml($!{article.content})" />
+			<input type="hidden" id="goodsInfoStr" name="goodsInfoStr" value="$!goodsInfoStr" />
+			<table id="general-table" width="100%">
+			<tbody>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span></span>
+					套餐类型
+				</td>
+				<td>买就赠
+				</td>
+				</tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐名称</td>
+				<td>
+			        #springBind("promation.name")
+                    <input type="text" name="${status.expression}" id="name" value="$!{status.value}" />
+		            <label class="red">${status.errorMessage}</label>
+				</td></tr>
+
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐时间</td>
+				<td>
+					#springBind("promation.startDate_str")
+					<input name="${status.expression}" id="datestart" size="15" readonly="true" value="$!{status.value}"/>
+					#springBind("promation.startDate_hour")
+					<select name="${status.expression}" id="promationStartHour">
+						<option #if("$!{status.value}" == "0") selected #end value='0'>  0</option>
+						<option #if("$!{status.value}" == "1") selected #end value='1'>  1</option>
+						<option #if("$!{status.value}" == "2") selected #end value='2'>  2</option>
+						<option #if("$!{status.value}" == "3") selected #end value='3'>  3</option>
+						<option #if("$!{status.value}" == "4") selected #end value='4'>  4</option>
+						<option #if("$!{status.value}" == "5") selected #end value='5'>  5</option>
+						<option #if("$!{status.value}" == "6") selected #end value='6'>  6</option>
+						<option #if("$!{status.value}" == "7") selected #end value='7'>  7</option>
+						<option #if("$!{status.value}" == "8") selected #end value='8'>  8</option>
+						<option #if("$!{status.value}" == "9") selected #end value='9'>  9</option>
+						<option #if("$!{status.value}" == "10") selected #end value='10'>  10</option>
+						<option #if("$!{status.value}" == "11") selected #end value='11'>  11</option>
+						<option #if("$!{status.value}" == "12") selected #end value='12'>  12</option>
+						<option #if("$!{status.value}" == "13") selected #end value='13'>  13</option>
+						<option #if("$!{status.value}" == "14") selected #end value='14'>  14</option>
+						<option #if("$!{status.value}" == "15") selected #end value='15'>  15</option>
+						<option #if("$!{status.value}" == "16") selected #end value='16'>  16</option>
+						<option #if("$!{status.value}" == "17") selected #end value='17'>  17</option>
+						<option #if("$!{status.value}" == "18") selected #end value='18'>  18</option>
+						<option #if("$!{status.value}" == "19") selected #end value='19'>  19</option>
+						<option #if("$!{status.value}" == "20") selected #end value='20'>  20</option>
+						<option #if("$!{status.value}" == "21") selected #end value='21'>  21</option>
+						<option #if("$!{status.value}" == "22") selected #end value='22'>  22</option>
+						<option #if("$!{status.value}" == "23") selected #end value='23'>  23</option>
+                    </select>
+					<label>到</label>
+					#springBind("promation.endDate_str")
+					<input name="${status.expression}" id="dateend" size="15" readonly="true" value="$!{status.value}"/>
+					#springBind("promation.endDate_hour")
+					<select  name="${status.expression}" id="promationEndHour">
+						<option #if("$!{status.value}" == "0") selected #end value='0'>  0</option>
+						<option #if("$!{status.value}" == "1") selected #end value='1'>  1</option>
+						<option #if("$!{status.value}" == "2") selected #end value='2'>  2</option>
+						<option #if("$!{status.value}" == "3") selected #end value='3'>  3</option>
+						<option #if("$!{status.value}" == "4") selected #end value='4'>  4</option>
+						<option #if("$!{status.value}" == "5") selected #end value='5'>  5</option>
+						<option #if("$!{status.value}" == "6") selected #end value='6'>  6</option>
+						<option #if("$!{status.value}" == "7") selected #end value='7'>  7</option>
+						<option #if("$!{status.value}" == "8") selected #end value='8'>  8</option>
+						<option #if("$!{status.value}" == "9") selected #end value='9'>  9</option>
+						<option #if("$!{status.value}" == "10") selected #end value='10'>  10</option>
+						<option #if("$!{status.value}" == "11") selected #end value='11'>  11</option>
+						<option #if("$!{status.value}" == "12") selected #end value='12'>  12</option>
+						<option #if("$!{status.value}" == "13") selected #end value='13'>  13</option>
+						<option #if("$!{status.value}" == "14") selected #end value='14'>  14</option>
+						<option #if("$!{status.value}" == "15") selected #end value='15'>  15</option>
+						<option #if("$!{status.value}" == "16") selected #end value='16'>  16</option>
+						<option #if("$!{status.value}" == "17") selected #end value='17'>  17</option>
+						<option #if("$!{status.value}" == "18") selected #end value='18'>  18</option>
+						<option #if("$!{status.value}" == "19") selected #end value='19'>  19</option>
+						<option #if("$!{status.value}" == "20") selected #end value='20'>  20</option>
+						<option #if("$!{status.value}" == "21") selected #end value='21'>  21</option>
+						<option #if("$!{status.value}" == "22") selected #end value='22'>  22</option>
+						<option #if("$!{status.value}" == "23") selected #end value='23'>  23</option>
+                    </select>
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "datestart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "dateend",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			</script>
+				</td></tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>购买商品</td>
+				<td>
+					<input  value=" 选择商品 " type="button" onclick="javascript:newdialog('$appServer/goods/addsalegoods.html?chtype=setbuygoods');">（选一件商品）
+						<div id="addgoods">
+							#if($!buyGoods)
+								<table width="100%">
+                                  <tr><td width="20%"><img src="${upServer}/${buyGoods.imgSmall}" width="40" height="40" /> </td><td width="30%">$buyGoods.title</td><td width="50%">$!{buyGoods.goodsPrice}  元</td></tr>
+                                </table>
+							#end
+                        </div>
+				</td></tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>赠送产品</td>
+				<td>
+					<input  value=" 选择产品 " type="button" onclick="javascript:newdialog('$appServer/instance/addGiftInstanceGoods.html?type=setgifts');">（选择产品）
+						<div id="addgifts">
+							#if($!giftsGoodsList)
+								<table width="100%">
+                                #foreach($giftsGoods in $giftsGoodsList)
+                                  <tr><td width="20%"><img src="${imageServer}/${giftsGoods.imgSmall}" width="40" height="40" /> </td><td width="20%">$!giftsGoods.instanceName</td><td width="20%">$!giftsGoods.attrDesc</td><td width="20%">$!{giftsGoods.goodsPrice}  元</td><td width="20%"><a href="javascript:deleteGoodsInstance('$!{giftsGoods.id}')">删除</a></td></tr>
+								#end
+								</table>
+							#end
+                        </div>
+				</td></tr>
+ </tbody>
+</table>
+</div>
+</form>
+	<div class="form-but">
+		<button type="button"  class="button-s4" onClick="javascript:submitOpt();">确定</button>
+		<button type="button"  class="button-s4" onClick="javascript:grest();">重置</button>
+		<input value="insert" name="act" type="hidden"> 
+		<input name="id" type="hidden">
+    </div>
+</div>
+</div>

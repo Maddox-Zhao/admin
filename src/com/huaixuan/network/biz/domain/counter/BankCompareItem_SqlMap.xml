@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BankCompareItemSQL">
+<typeAlias alias="BankCompareItem" type="com.huaixuan.network.biz.domain.counter.BankCompareItem"/>
+	<resultMap class="BankCompareItem" id="BankCompareItemResult">
+		<result column="ID" property="id"/>
+		<result column="BATCH_ID" property="batchId"/>
+		<result column="PAY_DATE" property="payDate"/>
+		<result column="BANK_TYPE" property="bankType"/>
+		<result column="BANK_BILL_NO" property="bankBillNo"/>
+		<result column="PAY_AMOUNT" property="payAmount"/>
+		<result column="BANK_SERIAL_NO" property="bankSerialNo"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+	</resultMap>
+	
+<!-- 删除银行对账文件，5天以前的数据 -->
+<delete id="delBeforeFiveDaysBankCompareItem">
+<![CDATA[
+		delete from ep_bank_compare_item a where a.GMT_CREATE <= DATE_SUB(STR_TO_DATE(DATE_FORMAT(SYSDATE(),'%Y%m%d'), '%Y%m%d %H%i%s'),INTERVAL 5 DAY) 
+]]>
+</delete>		
+	
+	
+	
+<!-- create BankCompareItem object -->
+<insert id="addBankCompareItem" parameterClass="BankCompareItem">
+<![CDATA[
+		insert into ep_bank_compare_item
+		(ID,BATCH_ID,PAY_DATE,BANK_TYPE,BANK_BILL_NO,PAY_AMOUNT,BANK_SERIAL_NO,GMT_CREATE )values( null,
+		#batchId#,
+		#payDate#,
+		#bankType#,
+		#bankBillNo#,
+		#payAmount#,
+		#bankSerialNo#,
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update BankCompareItem object -->
+<update id="editBankCompareItem" parameterClass="BankCompareItem">
+<![CDATA[
+		update ep_bank_compare_item set BATCH_ID = #batchId#,
+		PAY_DATE = #payDate#,
+		BANK_TYPE = #bankType#,
+		BANK_BILL_NO = #bankBillNo#,
+		PAY_AMOUNT = #payAmount#,
+		BANK_SERIAL_NO = #bankSerialNo#,
+		GMT_CREATE = #gmtCreate#
+		 where ID = #id#
+		
+]]>
+</update>
+<!-- delete BankCompareItem object -->
+<delete id="removeBankCompareItem" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ep_bank_compare_item where ep_bank_compare_item.ID = #value# 
+]]>
+</delete>
+<!-- search BankCompareItem object -->
+<select id="getBankCompareItem" parameterClass="java.lang.Long" resultMap="BankCompareItemResult">
+<![CDATA[
+		select ep_bank_compare_item.* from ep_bank_compare_item where ep_bank_compare_item.ID = #value# 
+]]>
+</select>
+<!-- searchAll BankCompareItem List -->
+<select id="getBankCompareItems" resultMap="BankCompareItemResult">
+<![CDATA[
+		select ep_bank_compare_item.* from ep_bank_compare_item
+]]>
+</select>
+</sqlMap>

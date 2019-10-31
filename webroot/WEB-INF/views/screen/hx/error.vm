@@ -1,0 +1,10 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+
+<div class="main">
+    	 <h2>错误</h2>
+<center>
+		 出错了....
+</div>

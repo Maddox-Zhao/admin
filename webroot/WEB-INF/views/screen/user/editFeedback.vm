@@ -1,0 +1,82 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 发送留言")
+
+<body>
+<div class="main">
+
+	<h2>管理中心 - 发送留言</h2>
+
+	<form name="addForm" action="$!appServer.get("/feedback/sendfb.html")" method="post" onsubmit="return checkSubmit();">
+		#springBind("feedback.toUserId")
+		<input type="hidden" name="${status.expression}" value="$!{status.value}" />
+		<div class="formBox">
+			<h3><i></i><span>留言信息</span></h3>
+			<div class="content">
+				<table class="c2">
+					<tr>
+						<th>用户名:</th>
+						<td>$!feedback.toUserNick</td>
+					</tr>
+					<tr>
+						<th>留言标题:</th>
+						<td>
+							#springBind("feedback.msgTitle")
+							<input type="text" id="msgTitle" name="${status.expression}" value="$!{status.value}" class="inp"/>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>留言内容:</th>
+						<td>
+							#springBind("feedback.msgContent")
+							<textarea id="msgContent" name="${status.expression}" cols="50" rows="4" wrap="VIRTUAL" class="textarea">$!{status.value}</textarea>
+							<span class="red">*</span>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+			<!-- 表单按钮区 -->
+			<div class="form-but">
+				<button type="submit" class="button-s4">发送留言</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script type="text/javascript">
+var checkSubmitFlg = false;
+
+function checkSubmit() {
+	var msgTitle = jQuery.trim(jQuery("#msgTitle").val());
+	var msgContent = jQuery.trim(jQuery("#msgContent").val());
+	
+	if(msgTitle.length == 0) {
+		alert('必须填写标题');
+		return false;
+	}
+	
+	if(msgContent.length == 0) {
+		alert('必须填写内容');
+		return false;
+	}
+	
+	if(msgTitle.length > 30) {
+		alert('标题不得超过30个字符');
+		return false;
+	}
+	
+	if(msgContent.length > 800) {
+		alert('内容不得超过800个字符');
+		return false;
+	}
+
+	if (checkSubmitFlg == true) {
+		return false;
+	}
+	checkSubmitFlg = true;
+	return true;
+}
+</script>

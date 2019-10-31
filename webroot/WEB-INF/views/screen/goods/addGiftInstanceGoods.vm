@@ -1,0 +1,156 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+    <h3><span>选择产品</span></h3>
+<form name="listForm" id="listForm" action="/instance/addGiftInstanceGoods.html" method="post">
+	<input type="hidden" name="type" id="type" value="$!type"/>
+	<div class="searchBox">
+	<table>
+		<tr>
+            <th>产品编码：</th>
+			<td>
+				#springBind("instance.code")
+				<input type="text" name="${status.expression}" value="$!{status.value}" id="code" class="inp"/>
+			</td>
+			<th>产品名称：</th>
+			<td>
+				#springBind("instance.instanceName")
+				<input type="text" name="${status.expression}" value="$!{status.value}" id="instanceName" class="inp"/>
+			</td>
+			<th>产品类目：</th>
+			<td>
+				#springBind("instance.catCode")
+			<select name="${status.expression}" class="select" id="catCode">
+				<option value="">-=请选择=-</option>
+				#foreach($cat in $catList)
+				<option value="$cat.catCode" #if("$cat.catCode"=="$!{status.value}") selected #end>$cat.catName</option>
+				#end
+			</select>
+			</td>
+		</tr>
+		    <th></th>
+		    <td><button type="button" onclick="doSearch();" class="btn">查询产品</button></td>
+        <tr>
+
+		</tr>
+	</table>
+</div>
+			<div class="listBox">
+				<h3><span>产品列表</span></h3>
+				<table>
+						<tr>
+							<th><input type="checkbox" id="allbox" />全选</th>
+							<th>
+								产品编码
+							</th>
+							<th>
+							          产品名称
+							</th>
+    						<th>
+    							产品属性
+    						</th>
+							<th>
+								产品价格（元）
+    						</th>
+						</tr>
+						#if($query && $query.items.size()>0)
+				         #foreach($gi in $query.items)
+						<tr>
+								<td>
+									<input name="ids" type="checkbox" value="$!gi.id~!~$!gi.goodsPrice~!~$!gi.instanceName~!~$!gi.imgSmall~!~$!gi.attrDesc"/>
+								</td>
+								<td>$!gi.code</td>
+								<td><a href="$!{liangpin99Server}/l/gdetail_$!{gi.goodsId}.htm" target="blank">$!gi.instanceName</a></td>
+								<td>$!gi.attrDesc</td>
+								<td>$!number.format('####0.00',$gi.goodsPrice)</td>
+							</tr>
+						 #end
+						#end
+				</table>
+				<table cellpadding="4" cellspacing="0">
+                <tr>
+                  <td><input type="button" id="btnSubmit" value="选择产品" class="button" onclick="javascript:goback('$!type');"/></td>
+				  <td><input type="button" id="btnSubmit" value="关闭" class="button" onclick="cl();"/></td>
+                </tr>
+              </table>
+			</div>
+</form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/instance/addGiftInstanceGoods.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+      </div>
+<script language="javascript" type="text/javascript">
+
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+function goback(type)
+{
+	var prama = isgoodsChecked(type);
+	if(!prama){
+		return false;
+	}else{
+    	window.opener.$type(prama);
+        self.close();
+	}
+}
+
+
+function isgoodsChecked(type){
+	var prama = "";
+	if(type=='setgifts' || type=='fullGive'){
+		var num=0;
+    	var elements=document.getElementsByName("ids");
+		for(var i=0 ; i<elements.length ; i++){
+			if(elements[i].checked == true){
+				num = num+1;
+			}
+		}
+		if(num<1){
+		 	alert("必须选择一个产品");
+			return false;
+		}
+
+		if(type=='fullGive'){
+			if(num>1){
+    		 	alert("只能选择一个产品");
+    			return false;
+    		}
+		}
+
+		var j=0;
+    	 for( var i=0 ; i<elements.length; i++){
+    		if(elements[i].checked == true){
+    			if(prama==""){
+    				prama = elements[i].value;
+    			}else{
+    				prama = prama +"~@~"+ elements[i].value;
+    			}
+				j=j+1;
+    		}
+    	 }
+	}
+	return prama;
+}
+
+	function cl(){
+		window.close();
+	}
+
+function doSearch(){
+	var form1=document.getElementById("listForm");
+	document.getElementById("code").value=jQuery.trim(document.getElementById("code").value);
+	document.getElementById("instanceName").value=jQuery.trim(document.getElementById("instanceName").value);
+	document.getElementById("catCode").value=jQuery.trim(document.getElementById("catCode").value);
+	form1.action="/instance/addGiftInstanceGoods.html";
+	form1.submit();
+}
+</script>

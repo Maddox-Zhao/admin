@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ProdRelationOutSQL">
+<typeAlias alias="prodRelationOut" type="com.huaixuan.network.biz.domain.storage.ProdRelationOut"/>
+	<resultMap class="prodRelationOut" id="prodRelationOutResult">
+		<result column="id" property="id"/>
+		<result column="out_dep_id" property="outDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="amount" property="amount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="out_detail_id" property="outDetailId"/>
+		<result column="storage_id" property="storageId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="self_cost" property="selfCost"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+	</resultMap>
+
+	<resultMap class="prodRelationOut" id="printObjectResult">
+		<result column="instanceCode" property="instanceCode"/>
+		<result column="instanceName" property="instanceName"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goodsUnit" property="goodsUnit"/>
+		<result column="amount" property="amount"/>
+		<result column="money" property="money"/>
+		<result column="unitPrice" property="unitPrice"/>
+		<result column="depName" property="depName"/>
+		<result column="locName" property="locName"/>
+	</resultMap>
+
+<select id="getPrintOutDepList" parameterClass="java.lang.Long" resultMap="printObjectResult">
+<![CDATA[
+SELECT (select g.code from ioss_goods_instance g where g.id=a.goods_instance_id) as instanceCode,
+       (select g.instance_name from ioss_goods_instance g where g.id=a.goods_instance_id) as instanceName,
+       (select g.attrs from ioss_goods_instance g where g.id=a.goods_instance_id) as attrs,
+       (select g.goods_unit from ioss_goods_instance g where g.id=a.goods_instance_id) as goodsUnit,
+       (select l.loc_name from ioss_dep_location l where l.id=a.loc_id) as locName,
+       (select d.name from ioss_dep_location l,ioss_depository d where l.dep_id = d.id and l.id=a.loc_id) as depName,
+       a.amount as amount,
+       b.unit_price as unitPrice,
+       (a.amount*b.unit_price) as money
+FROM ioss_prod_relation_out a,ioss_out_detail b,ioss_out_depository c
+WHERE a.out_detail_id = b.id
+      AND a.out_dep_id = c.id
+	  AND c.id = #value#
+]]>
+</select>
+
+<!-- create ProdRelationOut object -->
+<insert id="addProdRelationOut" parameterClass="prodRelationOut">
+<![CDATA[
+		insert into ioss_prod_relation_out
+		(id,out_dep_id,goods_instance_id,amount,gmt_create,gmt_modify,goods_id,out_detail_id,storage_id,loc_id,self_cost,is_wholesale,tid )values(
+		null,
+		#outDepId#,
+		#goodsInstanceId#,
+		#amount#,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#outDetailId#,
+		#storageId#,
+		#locId#,
+		#selfCost#,
+		#isWholesale#,
+		#tid#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ProdRelationOut object -->
+<update id="editProdRelationOut" parameterClass="prodRelationOut">
+<![CDATA[
+		update ioss_prod_relation_out set out_dep_id = #outDepId#,
+		goods_instance_id = #goodsInstanceId#,
+		amount = #amount#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = #gmtModify#,
+		goods_id = #goodsId#,
+		out_detail_id = #outDetailId#,
+		storage_id = #storageId#,
+		loc_id = #locId#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete ProdRelationOut object -->
+<delete id="removeProdRelationOut" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_prod_relation_out where ioss_prod_relation_out.ID = #value#
+]]>
+</delete>
+<!-- search ProdRelationOut object -->
+<select id="getProdRelationOut" parameterClass="java.lang.Long" resultMap="prodRelationOutResult">
+<![CDATA[
+		select ioss_prod_relation_out.* from ioss_prod_relation_out where ioss_prod_relation_out.ID = #value#
+]]>
+</select>
+<!-- searchAll ProdRelationOut List -->
+<select id="getProdRelationOuts" resultMap="prodRelationOutResult">
+<![CDATA[
+		select ioss_prod_relation_out.* from ioss_prod_relation_out
+]]>
+</select>
+
+<delete id="removeProdRelationOutForAdd" parameterClass="java.util.Map">
+<![CDATA[
+		DELETE FROM ioss_prod_relation_out
+		WHERE ioss_prod_relation_out.out_dep_id = #outDepId#
+		AND goods_instance_id = #goodsInstanceId#
+		AND goods_id = #goodsId#
+		AND out_detail_id = #outDetailId#
+]]>
+</delete>
+
+<select id="getAmountAndStorageId" parameterClass="java.util.Map" resultMap="prodRelationOutResult">
+	select ioss_prod_relation_out.*
+	from ioss_prod_relation_out
+	where out_dep_id = #outDepId#
+	and goods_instance_id = #goodsInstanceId#
+	and goods_id = #goodsId#
+	and out_detail_id = #outDetailId#
+</select>
+
+<select id="getDistributedAmount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+	SELECT amount FROM ioss_prod_relation_out
+		WHERE ioss_prod_relation_out.out_dep_id = #outDepId#
+		AND goods_instance_id = #goodsInstanceId#
+		AND goods_id = #goodsId#
+		AND out_detail_id = #outDetailId#
+		AND storage_id = #storageId#
+</select>
+</sqlMap>

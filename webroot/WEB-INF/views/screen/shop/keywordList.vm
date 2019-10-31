@@ -1,0 +1,81 @@
+#set($layout = "layout/default.vm")
+
+
+<script type="text/javascript">
+
+	function deleteKeyword(id){
+ 		var obj = document.getElementById("keywordId");
+	  	obj.value = id;
+  		var	mymes=confirm("确定删除热门关键字？");
+		 if(true==mymes){
+	  		document.listForm.action = "/shop/deletekw.html";
+			document.listForm.submit();
+	  	}else {
+
+	  	}
+	}
+
+	function updateKeywordPage(id){
+		window.location.href = "$appServer/shop/updatekwp.html?keywordId="+id;
+	}
+
+</script>
+#set($title = "关键字管理 - 添加热门关键字")
+<form name="listForm" action="" method="post"><!-- start ads list -->
+	<input type="hidden" id="keywordId" name="keywordId" value="" />
+	<div class="list-div" id="listDiv">
+	<div class="tool">
+            <span><a href="/shop/addkwp.html" hidefocus="true" class="bt_add">添加热门关键字</a></span>
+        </div>
+	<div class="listBox">
+			<h3><span>热门关键字列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+   <tr>
+      <th>关键字</th>
+      <th>备注</th>
+	  <th>搜索Url</th>
+      <th>次序</th>
+      <th>操作</th>
+    </tr>
+	#set( $num = 1 )
+	#foreach($keyword in ${query.items})
+   <tr align="center">
+      <td height="27"><label>#if($!keyword.name.length()>12)
+                <div title="$!keyword.name">$!keyword.name.substring(0,12)...</div>
+				#else
+					$!keyword.name
+				#end</label></td>
+      <td>#if($!keyword.desc.length()>20)
+                <div title="$!keyword.desc">$!keyword.desc.substring(0,20)...</div>
+				#else
+					$!keyword.desc
+				#end</td>
+	  <td>
+
+		#if("$!keyword.link"!="")
+			#set($url="$ctx/l/search.html?catCode=$!{keyword.link}&searchName=$!keyword.name")
+		#else
+			#set($url="$ctx/l/search.html?searchName=$!keyword.name")
+		#end
+		#set($url=$stringUtil.encodeUrl($!url))
+		<a href="$url" target="_blank">$url</a>
+	  </td>
+      <td>$!{keyword.sort}</td>
+      <td><a href="javascript:deleteKeyword('$!{keyword.id}')">删除</a> <a href="javascript:updateKeywordPage('$!{keyword.id}')">修改</a></td>
+    </tr>
+	#set( $num = $num + 1 )
+	#end
+
+  </table>
+  </div>
+  </form>
+  #if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/kwlist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AdminDao">
+	<typeAlias alias="Admin" type="com.huaixuan.network.biz.domain.admin.Admin"/>
+	<typeAlias alias="AdminTeam" type="com.huaixuan.network.biz.domain.admin.AdminTeam"/>
+    <typeAlias alias="emp" type="com.huaixuan.network.biz.domain.admin.Employee"/>
+    
+	<resultMap id="adminResult" class="com.huaixuan.network.biz.domain.admin.Admin">
+	  <result column="id" property="id" />
+	  <result column="user_name" property="userName" />
+	  <result column="password" property="password" />
+	  <result column="gmt_create" property="gmtCreate" />
+	  <result column="gmt_modify" property="gmtModify" />
+	  <result column="status" property="status" />
+	  <result column="email" property="email" />
+	  <result column="mobile" property="mobile" />
+	  <result column="tel" property="tel" />
+	  <result column="name" property="name" />
+	  <result column="dep_code" property="depCode" />
+	  <result column="dep_first_id" property="depFirstId" />
+	  <result column="function_role" property="functionRole" />
+	  <result column="site" property="site" />
+	  <result column="higher_user_name" property="higerUserName" />
+	</resultMap>
+	
+	
+	<resultMap id="adminWebDutyResult" class="com.huaixuan.network.biz.domain.admin.Admin">
+	  <result column="id" property="id" />
+	  <result column="user_name" property="userName" />
+	  <result column="password" property="password" />
+	  <result column="gmt_create" property="gmtCreate" />
+	  <result column="gmt_modify" property="gmtModify" />
+	  <result column="status" property="status" />
+	  <result column="email" property="email" />
+	  <result column="mobile" property="mobile" />
+	  <result column="tel" property="tel" />
+	  <result column="name" property="name" />
+	  <result column="dep_code" property="depCode" />
+	  <result column="dep_first_id" property="depFirstId" />
+	  <result column="function_role" property="functionRole" />
+	  <result column="site" property="site" />
+	  <result column="webDuty" property="webDuty" />
+	  <result column="idSite" property="idSite"/>
+	  <result column="Sname" property="Sname"/>
+	</resultMap>
+	
+	<!--查询带有client_role的字段  -->
+	<resultMap id="adminResultClientRole" class="com.huaixuan.network.biz.domain.admin.Admin">
+	  <result column="id" property="id" />
+	  <result column="user_name" property="userName" />
+	  <result column="password" property="password" />
+	  <result column="gmt_create" property="gmtCreate" />
+	  <result column="gmt_modify" property="gmtModify" />
+	  <result column="status" property="status" />
+	  <result column="email" property="email" />
+	  <result column="mobile" property="mobile" />
+	  <result column="tel" property="tel" />
+	  <result column="name" property="name" />
+	  <result column="dep_code" property="depCode" />
+	  <result column="dep_first_id" property="depFirstId" />
+	  <result column="function_role" property="functionRole" />
+	  <result column="site" property="site" />
+	  <result column="higher_user_name" property="higerUserName" />
+	  <result column="client_role" property="clientrole" /> 
+	</resultMap>
+
+	<resultMap id="adminTeamResult" class="com.huaixuan.network.biz.domain.admin.AdminTeam">
+	  <result column="id" property="id" />
+	  <result column="admin_id" property="adminId" />
+	  <result column="user_name" property="userName" />
+	  <result column="team_name" property="teamName" />
+	  <result column="type" property="type" />
+	</resultMap>
+	
+	<resultMap  id="getAdminTeamResult" class="com.huaixuan.network.biz.domain.admin.AdminTeam" >
+		<result column="user_name" property="userName"/>
+	</resultMap>
+	
+	<resultMap  id="simpleAdminResultMap4Select" class="com.huaixuan.network.biz.domain.admin.Admin" >
+		<result column="id" property="id"/>
+		<result column="user_name" property="userName"/>
+	</resultMap>
+
+	<sql id="AdminDao.forSelectAll">
+		id, user_name, password, gmt_create, gmt_modify, status, email, mobile, tel, name, dep_first_id,site,dep_code,function_role,site,higher_user_name
+    </sql>
+    
+    
+    <!-- 查询带有client_role的字段 -->
+      <sql id="AdminDao.forSelectAllClientId">
+		id, user_name, password, gmt_create, gmt_modify, status, email, mobile, tel, name, dep_first_id,site,dep_code,function_role,site,higher_user_name,client_role
+      </sql>
+
+    <!--因为增加site在页面显示而增加的  -->
+     <sql id="AdminDao.forSelectAllAndSite">
+		e.id, e.user_name, e.password, e.gmt_create, e.gmt_modify, e.status, e.email, e.mobile, e.tel, e.name, e.dep_first_id,e.dep_code,e.function_role,e.site,e.higher_user_name,s.idSite,s.name Sname
+    </sql>
+
+
+	<sql id="AdminTeam.forSelectAll">
+		id, admin_id, user_name, team_name, type
+    </sql>
+
+	<sql id="AdminSQL_dynamicQuery">
+		<dynamic prepend="where" >
+			<isNotEmpty  property="userName"  prepend="and" >
+				user_name = #userName#
+			</isNotEmpty>
+
+			<isNotEmpty  property="email"  prepend="and" >
+				email = #email#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="AdminDao.getAdminByCondition" parameterClass="Admin" resultMap="adminResult">
+		select
+		<include refid="AdminDao.forSelectAll" />
+		from emall_admin
+		<dynamic prepend="where">
+		 <isNotEmpty property="userName" prepend="and">
+			 emall_admin.user_name = #userName#
+         </isNotEmpty>
+        </dynamic>
+    </select>
+    
+    
+    <select id="AdminDao.getAdminUserName" parameterClass="java.lang.String" resultClass="java.lang.String">
+		SELECT MAX(user_name+0)+1 FROM 
+		emall_admin ea,site s
+		WHERE  ea.site  = s.idSite
+		AND s.type = (SELECT TYPE FROM site WHERE idSite = $idSite$)
+    </select>
+
+    <select id="AdminDao.getAdminListByConditionWithPage" resultMap="adminWebDutyResult" parameterClass="java.util.Map">
+       
+	   select
+	   <include refid="AdminDao.forSelectAllAndSite" />,
+	   (SELECT GROUP_CONCAT(er.name) FROM emall_admin_role ear,emall_role er,emall_admin ea WHERE ear.role_id = er.id AND ea.id = ear.admin_id AND  ea.id = e.id) webDuty
+	   from emall_admin e LEFT JOIN site s  ON s.idSite= e.site
+	   <dynamic prepend="where">
+	   <isNotEmpty property="userName" prepend="and">
+		   e.user_name like concat('%',#userName#,'%') or e.name  like concat('%',#userName#,'%')
+       </isNotEmpty>
+        <isNotEmpty property="depCode" prepend="and">
+		     dep_code = #depCode#
+        </isNotEmpty> 
+       
+       <isNotEmpty property="mobile" prepend="and">
+		     e.mobile = #mobile#
+        </isNotEmpty>
+        
+        <isNotEmpty property="Sname" prepend="and">
+		     s.name = #Sname#
+        </isNotEmpty>
+       </dynamic>
+       order by id desc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+
+    <select id="AdminDao.getAdminListByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(*) from emall_admin e LEFT JOIN site s  ON s.idSite= e.site
+		<dynamic prepend="where">
+	    <isNotEmpty property="userName" prepend="and"> 
+		    e.user_name like concat('%',#userName#,'%') or e.name  like concat('%',#userName#,'%')
+        </isNotEmpty> 
+         <isNotEmpty property="depCode" prepend="and">
+		     dep_code = #depCode#
+        </isNotEmpty> 
+        
+        <isNotEmpty property="mobile" prepend="and">
+		     e.mobile = #mobile#
+        </isNotEmpty>
+        
+        <isNotEmpty property="Sname" prepend="and">
+		     s.name = #Sname#
+        </isNotEmpty>
+        </dynamic>
+	</select>
+  
+    <update id="AdminDao.updateAdminStatus">
+		update emall_admin
+		set status = #status#,gmt_modify = sysdate()
+		where id = #id#
+	</update>
+
+	<select id="AdminDao.getAdminById" parameterClass="java.lang.Long" resultMap="adminResultClientRole">
+		select
+		<include refid="AdminDao.forSelectAllClientId" />
+		from emall_admin where id = #value#
+    </select>
+
+	<select id="AdminDao.getAdminTeamListByMap" parameterClass="java.util.Map" resultMap="adminTeamResult" >
+		select
+		<include refid="AdminTeam.forSelectAll" />
+		from emall_admin_team
+		<dynamic prepend="where">
+		 <isNotEmpty prepend="and" property="type">
+			 type = #type#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="adminId">
+			 admin_id = #adminId#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="and" property="teamName">
+			 team_name = #teamName#
+		 </isNotEmpty>
+        </dynamic>
+	</select>
+
+	<delete id="AdminDao.deleteTeamByAdminId" parameterClass="java.lang.Long">
+		<![CDATA[
+			delete from emall_admin_team where emall_admin_team.admin_id = #value#
+		]]>
+	</delete>
+
+	<insert id="AdminDao.insertAdminTeam" parameterClass="AdminTeam">
+		<![CDATA[
+				insert into emall_admin_team
+				(id,admin_id,user_name,team_name, type) values(
+					null,
+					#adminId#,
+					#userName#,
+					#teamName#,
+					#type#
+				 )
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+    </insert>
+    
+    <!-- 添加employee  -->  
+    
+    <insert id="emplyeeDao.insertEmp" parameterClass="emp">
+    
+    insert into employee (idEmployee,name,idSite,phone) values(#idEmployee#,#name#,#idSite#,#phone#)
+
+    </insert>
+    
+
+	<select id="AdminDao.getAdminCount" parameterClass="Admin" resultClass="java.lang.Integer" >
+		select count(1) from emall_admin
+		<include refid="AdminSQL_dynamicQuery"/>
+	</select>
+
+    <update id="AdminDao.updateAdmin">
+	    update emall_admin set gmt_modify = sysdate(),
+		  status = #status#,
+		  tel = #tel#,
+		  mobile = #mobile#,
+		  email = #email#,
+		  name = #name#,
+		  password = #password#,
+		  user_name = #userName#,
+		  dep_code = #depCode#,
+		  higher_user_name = #higerUserName#
+		  <isNotNull prepend="," property="functionRole">
+			  function_role = #functionRole#
+		  </isNotNull>
+		  <isNotNull prepend="," property="site">
+			  site = #site#
+		  </isNotNull>
+		  <isNotNull prepend="," property="clientrole">
+			  client_role = #clientrole#
+		  </isNotNull>
+		where id = #id#
+	</update>
+
+    <update id="AdminDao.updateAdminDepfirst">
+	    update emall_admin set gmt_modify = sysdate(),
+		dep_first_id = #depFirstId#
+		where id = #id#
+	</update>
+
+	<insert id="AdminDao.insertAdmin" parameterClass="Admin">
+		<![CDATA[
+				insert into emall_admin
+				(id,user_name,dep_code,client_role,password,gmt_create,gmt_modify,status,email,mobile,tel,name,site,higher_user_name) values(
+					null,
+					#userName#,
+					#depCode#,
+					#clientrole#,
+					#password#,
+					sysdate(),
+					sysdate(),
+					#status#,
+					#email#,
+					#mobile#,
+					#tel#,
+					#name#,
+					#site#,
+					#higerUserName#
+				 )
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+    <update id="AdminDao.updateCurPasswordAdmin">
+	    update emall_admin set gmt_modify = sysdate(),
+		password = #password#
+		where id = #id#
+	</update>
+	
+	<select id="AdminDao.getAllAdminUserList" resultMap="simpleAdminResultMap4Select" >
+		select id, user_name from emall_admin where status=1
+	</select>
+	
+	<select id="AdminDao.getListBySameTeam" parameterClass="java.lang.String" resultMap="getAdminTeamResult" >
+		<![CDATA[
+			select distinct(user_name) from emall_admin_team where team_name in ( select team_name from emall_admin_team where user_name = #value# )
+		]]>
+	</select>
+	
+	<select id="getAdminByDepCode" parameterClass="java.util.Map" resultMap="adminResult">
+	select *
+	from
+	emall_admin
+	<isNotNull  property="depCode" prepend="where">
+	   dep_code like '$depCode$%'
+	</isNotNull>
+		
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</sqlMap>

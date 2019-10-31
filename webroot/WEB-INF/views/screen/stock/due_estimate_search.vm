@@ -1,0 +1,232 @@
+#set($layout = "layout/default.vm")
+#set($title = "财务管理 - 采购单暂估管理")
+<div class="main">
+	<h2>财务管理 - 采购单暂估管理</h2>
+
+	<div class="searchBox">
+		<h3><span>搜索采购单</span></h3>
+		<form action="$appServer/stock/due_estimate_search.html" name="searchForm" method="post">
+		<table >
+			<tr>
+				<th>采购订单号：</th>
+                <td>
+					<input type="text" name="shoppingNum" id="shoppingNum" value="$!{queryObject.shoppingNum}" size="15" theme="simple" maxlength="30" />
+				</td>
+				<th>供应商：</th>
+				<td >
+					<input type="text" name="supplierName" id="supplierName" value="$!{queryObject.supplierName}" readonly/>
+            		<input type="hidden" name="supplierId" id="supplierId" value="$!{queryObject.supplierId}"/>
+            		<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+            		<input type="button" value="清空" class="button" onclick="clearSupplier();"/>
+                </td>
+            </tr>
+			<tr>
+				<th>合同编号：</th>
+                <td>
+					<input type="text" name="primitiveNum" id="primitiveNum" value="$!{queryObject.primitiveNum}" size="15" theme="simple" maxlength="30" />
+				</td>
+				<th>创建人：</th>
+				<td >
+					<select name="creater" id="creater" >
+            			<option value="">-=请选择=-</option>
+            		#foreach($userInfo in $userList)
+                    	<option value="$!{userInfo.userName}" #if("$!{queryObject.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+            		#end
+            		</select>
+                </td>
+            </tr>
+
+
+			<tr>
+				<th>财务状态：</th>
+                <td>
+					<select name="financeStatus" id="financeStatus" >
+            			<option value="">-=请选择=-</option>
+            			<option value="y" #if("$!{queryObject.financeStatus}" == "y") selected="true" #end>已确认</option>
+            			<option value="n" #if("$!{queryObject.financeStatus}" == "n") selected="true" #end>未确认</option>
+            		</select>
+				</td>
+				<th>订单状态：</th>
+				<td >
+					<select name="status" id="status" >
+            			<option value="">-=请选择=-</option>
+						#foreach($s in $enumStockStatusMap.entrySet())
+								<option value="$s.key" #if("$!{queryObject.status}" == $s.key) selected="true" #end>$s.value</option>
+						#end
+            		</select>
+                </td>
+            </tr>
+			<tr>
+				<th>采购时间：从</th>
+                <td>
+					<input value="$!queryObject.shoppingTimeStart" type="text" name="shoppingTimeStart" id="shoppingTimeStart" size="10" theme="simple" readonly="true" />
+				</td>
+				<th>到</th>
+				<td >
+					<input value="$!queryObject.shoppingTimeEnd" type="text" name="shoppingTimeEnd" id="shoppingTimeEnd" size="10" theme="simple" readonly="true" />
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "shoppingTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "shoppingTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </td>
+            </tr>
+			<tr>
+				<th></th>
+                <td>
+					<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+					<input type="button" value="Excel导出" class="button" onclick="doExport();"/>
+				</td>
+				<th></th>
+				<td >
+
+                </td>
+            </tr>
+        </table>
+	</form>
+</div>
+<center ><div id="result" style="color:red;">$!message</div></center>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+		<tr>
+			<th colspan="10" align="right">
+				<font size='3'><strong><label>【 应付总金额(￥): </label></strong></font>
+				<font size='3' color="red"><strong><label>$!moneyUtil.getFormatMoney($!{gatherSumDueFee},'0.00')</label></strong></font>
+				<font size='3'><strong><label>；实付总金额(￥): </label></strong></font>
+				<font size='3' color="red"><strong><label>$!moneyUtil.getFormatMoney($!{gatherSumFactFee},'0.00')</label></strong></font>
+				<font size='3'><strong><label> 】</label></strong></font>
+			</th>
+		</tr>
+      <tr>
+        <th>采购订单号</th>
+        <th>供应商名称</th>
+        <th>采购时间</th>
+        <th>合同编号</th>
+		<th>应付金额(￥)</th>
+		<th>实付金额(￥)</th>
+        <th>创建人</th>
+		<th>订单状态</th>
+		<th>财务状态</th>
+		<th>操作</th>
+      </tr>
+      #foreach($shopping in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td  align="left">&nbsp;<a href="$appServer/stock/search_stock_detail.html?stockId=$!shopping.id">$!shopping.shoppingNum</a></td>
+		<td  align="left">&nbsp;$!shopping.supplierName</td>
+        <td  align="center">&nbsp;$!dateUtil.convertDateToString("yyyy-MM-dd",$!shopping.shoppingTime)&nbsp;</td>
+        <td  align="left"> &nbsp;$!shopping.primitiveNum</td>
+		<td  align="right">$!moneyUtil.getFormatMoney($!shopping.sumDueFee,'0.00')&nbsp;</td>
+		<td  align="right">$!moneyUtil.getFormatMoney($!shopping.sumFactFee,'0.00')&nbsp;</td>
+        <td  align="left">&nbsp;$!shopping.creater</td>
+		<td  align="center"><span id="displayStatus$shopping.id">&nbsp;$!enumStockStatusMap.get("${shopping.status}")</span></td>
+		<td  align="center">&nbsp;
+			<span id="${shopping.id}financeStatus">
+			#if("$!{shopping.financeStatus}" == "n") 未确认 #elseif("$!{shopping.financeStatus}" == "y") 已确认 #end
+            </span>
+        </td>
+		<td  align="center">
+			#if("$!{shopping.financeStatus}" == "n" && "${shopping.status}"=="stock_finished")
+				<input type="button" onclick="return confirmStatus($!shopping.id);" value="财务确认" id="${shopping.id}opbutton" name="${shopping.id}opbutton"/>
+			#end
+		</td>
+	  </tr>
+	  #end
+    </table>
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/due_estimate_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+    var opbuttonId;
+	var financeStatusId;
+
+	function confirmStatus(shopid){
+		if(!confirm("您确定要确认此订单吗？")){
+           return false;
+	   	}
+		  opbuttonId=shopid+"opbutton";
+		  financeStatusId=shopid+"financeStatus";
+		  jQuery.post('dueEstimateConfirm.html',{param:shopid},function(message){
+		    if(message.indexOf("already") > -1){
+			  jQuery("#result").html("此记录已经确认过了！");
+			}else if(message.indexOf("nothing") > -1){
+			  jQuery("#result").html("此记录不存在！");
+			}else if(message.indexOf("wrong") > -1){
+			  jQuery("#result").html("采购订单不是采购完成状态，不能确认付款！");
+			}else if(message.indexOf("notype") > -1){
+			  jQuery("#result").html("采购订单状态不为暂估！");
+			}else if(message.indexOf("true") > -1){
+			  document.getElementById(opbuttonId).style.display = "none";
+			  var financeStatus = document.getElementById(financeStatusId);
+			  financeStatus.innerHTML = "已确认";
+			  jQuery("#result").html("确认成功！");
+			}else{
+			  jQuery("#result").html("此条记录不存在！");
+			}
+		  },'json');
+	}
+
+	function sesp(){
+     	var ret = window.showModalDialog("$appServer/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}else{
+			document.getElementById('supplierId').value="";
+			document.getElementById('supplierName').value="";
+		}
+    }
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="$appServer/stock/exportDueEstimateSearchList.html";
+		form1.submit();
+		form1.action="$appServer/stock/due_estimate_search.html";
+	}
+
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var dateStart1=document.getElementById("shoppingTimeStart").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("shoppingTimeEnd").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("shoppingNum").value=document.getElementById("shoppingNum").value.trim();
+			document.getElementById("supplierId").value=document.getElementById("supplierId").value.trim();
+			document.getElementById("primitiveNum").value=document.getElementById("primitiveNum").value.trim();
+			document.getElementById("creater").value=document.getElementById("creater").value.trim();
+			document.getElementById("status").value=document.getElementById("status").value.trim();
+	    	document.getElementById("shoppingTimeStart").value=document.getElementById("shoppingTimeStart").value.trim();
+	    	document.getElementById("shoppingTimeEnd").value=document.getElementById("shoppingTimeEnd").value.trim();
+
+        	document.forms[0].submit();
+	    }
+
+		function clearSupplier(){
+			document.getElementById("supplierId").value="";
+			document.getElementById("supplierName").value="";
+	    }
+</script>
+</body>

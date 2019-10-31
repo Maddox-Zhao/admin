@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="OutDepAnalysisSQL">
+<typeAlias alias="outDepAnalysis" type="com.huaixuan.network.biz.domain.storage.OutDepAnalysis"/>
+	<resultMap class="outDepAnalysis" id="outDepAnalysisResult">
+		<result column="gmtOutDep" property="gmtOutDep"/>
+		<result column="goodsNum" property="goodsNum"/>
+	</resultMap>
+	<resultMap class="outDepAnalysis" id="outDepAnalysisResult2">
+		<result column="outDepSum" property="outDepSum"/>
+		<result column="gmtOutDep" property="gmtOutDep"/>
+	</resultMap>
+<!-- added by chenhang 2011/01/17 started-->
+<select id="getOutDepAnalysisCount" resultClass="int" >
+<![CDATA[
+	 select count(1)	from(
+	 select CONCAT(substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10),' 00:00:00')  gmtOutDep,sum(a.out_num) goodsNum from ioss_out_detail a,ioss_out_depository b
+	where a.out_depository_id = b.id  and  b.type='out_sales'
+	and gmt_out_dep between]]>
+<![CDATA[ STR_TO_DATE(#gmtOutDepStart#,'%Y-%m-%d %H:%i:%s') ]]> and
+  <![CDATA[ DATE_ADD(STR_TO_DATE(#gmtOutDepEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  <![CDATA[ group by substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10)
+  )p
+]]>
+</select>
+<!-- added by chenhang 2011/01/17 ended -->
+<!-- added by chenhang 2011/01/14 started-->
+<select id="getOutDepAnalysis" resultMap="outDepAnalysisResult" >
+<include refid="pageSQLHead"/>
+<![CDATA[
+	select CONCAT(substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10),' 00:00:00')  gmtOutDep,sum(a.out_num) goodsNum from ioss_out_detail a,ioss_out_depository b
+	where a.out_depository_id = b.id  and  b.type='out_sales'
+	and gmt_out_dep between
+	]]>
+	<![CDATA[ STR_TO_DATE(#gmtOutDepStart#,'%Y-%m-%d %H:%i:%s') ]]> and
+	<![CDATA[ DATE_ADD(STR_TO_DATE(#gmtOutDepEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+	<![CDATA[ group by substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10)
+	order by gmtOutDep
+]]>
+<include refid="pageSQLFoot"/>
+</select>
+<!-- added by chenhang 2011/01/14 ended -->
+<!-- added by chenhang 2011/01/27 started -->
+<select id="getOutDepAnalysisTradeCount" resultMap="outDepAnalysisResult2" >
+<include refid="pageSQLHead"/>
+<![CDATA[
+	select count(t.tid) outDepSum,CONCAT(substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10),' 00:00:00') gmtOutDep
+	from emall_trade t,ioss_out_depository b,emall_trade_package p
+	where  t.tid=p.tid and b.relation_num=p.merge_tid  and  b.type='out_sales'
+	and gmt_out_dep between
+	]]>
+	<![CDATA[ STR_TO_DATE(#gmtOutDepStart#,'%Y-%m-%d %H:%i:%s') ]]> and
+	<![CDATA[ DATE_ADD(STR_TO_DATE(#gmtOutDepEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+	<![CDATA[ group by substr(DATE_FORMAT(b.gmt_out_dep, '%Y-%m-%d'),1,10)
+	order by gmtOutDep
+]]>
+<include refid="pageSQLFoot"/>
+</select>
+<!-- added by chenhang 2011/01/27 ended -->
+</sqlMap>

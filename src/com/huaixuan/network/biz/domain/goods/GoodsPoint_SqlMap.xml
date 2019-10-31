@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GoodsPoint">
+<typeAlias alias="goodsPoint" type="com.huaixuan.network.biz.domain.goods.GoodsPoint"/>
+	<resultMap class="goodsPoint" id="goodsPointResult">
+		<result column="id" property="id"/>
+		<result column="point_date" property="pointDate"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_cat" property="goodsCat"/>
+		<result column="click_count" property="clickCount"/>
+		<result column="sale_count" property="saleCount"/>
+		<result column="trade_count" property="tradeCount"/>
+		<result column="hot_sale_point" property="hotSalePoint"/>
+		<result column="high_popular_point" property="highPopularPoint"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+
+	<resultMap class="goodsPoint" id="hotSalePoint">
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_cat" property="goodsCat"/>
+		<result column="hot_sale_point" property="hotSalePoint"/>
+	</resultMap>
+
+	<resultMap class="goodsPoint" id="highPopularPoint">
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_cat" property="goodsCat"/>
+		<result column="high_popular_point" property="highPopularPoint"/>
+	</resultMap>
+
+<!-- create GoodsPoint object -->
+<insert id="GoodsPoint.addGoodsPoint" parameterClass="goodsPoint">
+<![CDATA[
+insert into emall_goods_point
+  (id,
+   point_date,
+   goods_id,
+   goods_cat,
+   click_count,
+   sale_count,
+   trade_count,
+   hot_sale_point,
+   high_popular_point,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #pointDate#,
+   #goodsId#,
+   #goodsCat#,
+   #clickCount#,
+   #saleCount#,
+   #tradeCount#,
+   #hotSalePoint#,
+   #highPopularPoint#,
+   sysdate(),
+   sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update GoodsPoint object -->
+<update id="GoodsPoint.editGoodsPoint" parameterClass="goodsPoint">
+<![CDATA[
+		update emall_goods_point set point_date = #pointDate#,
+		goods_id = #goodsId#,
+		goods_cat = #goodsCat#,
+		click_count = #clickCount#,
+		sale_count = #saleCount#,
+		trade_count = #tradeCount#,
+		hot_sale_point = #hotSalePoint#,
+		high_popular_point = #highPopularPoint#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete GoodsPoint object -->
+<delete id="GoodsPoint.removeGoodsPoint" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_goods_point where emall_goods_point.ID = #value#
+]]>
+</delete>
+<!-- search GoodsPoint object -->
+<select id="GoodsPoint.getGoodsPoint" parameterClass="java.lang.Long" resultMap="goodsPointResult">
+<![CDATA[
+		select emall_goods_point.* from emall_goods_point where emall_goods_point.ID = #value#
+]]>
+</select>
+<!-- searchAll GoodsPoint List -->
+<select id="GoodsPoint.getGoodsPoints" resultMap="goodsPointResult">
+<![CDATA[
+		select emall_goods_point.* from emall_goods_point
+]]>
+</select>
+
+<select id="GoodsPoint.getGPByGoodsIdAndPointDate" parameterClass="java.util.Map" resultMap="goodsPointResult">
+<![CDATA[
+		select p.* from emall_goods_point p where p.goods_id = #goodsId# and DATE_FORMAT(p.point_date, '%Y-%m-%d') like #pointDate# LIMIT 1
+]]>
+</select>
+
+<select id="GoodsPoint.getHotSalePoints" resultMap="hotSalePoint">
+<![CDATA[
+		select goods_id,goods_cat,sum(hot_sale_point) as hot_sale_point from emall_goods_point where point_date > STR_TO_DATE(#value#,'%Y-%m-%d %H:%i:%s') group by goods_id,goods_cat
+]]>
+</select>
+
+<select id="GoodsPoint.getHighPopularPoint" resultMap="highPopularPoint">
+<![CDATA[
+		select goods_id,goods_cat,sum(high_popular_point) as high_popular_point from emall_goods_point where point_date > STR_TO_DATE(#value#,'%Y-%m-%d %H:%i:%s') group by goods_id,goods_cat
+]]>
+</select>
+
+</sqlMap>

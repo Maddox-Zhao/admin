@@ -1,0 +1,66 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+#set($message = $request.getParameter('message'))
+ #if($!message)
+ <div class="mag-t2">
+	#if($!message && $!message == "modifysuccess")
+	      修改信息成功！
+	#end
+ </div>
+ #end
+  <div class="formBox">
+    <!-- 表单模块 -->
+    <form name="form1" id="form1" action="$appServer/admin/modifyCurUser.html" method="post">
+      #springBind("admin.id")
+      <input name="${status.expression}" type="hidden" class="inp" value="$!{status.value}" />
+      #springBind("admin.userName")
+      <input name="${status.expression}" type="hidden" class="inp" value="$!{status.value}" />
+      <h3><i></i><span>修改信息</span></h3>
+      <div class="content">
+        <table class="c4">
+          <tr>
+            <th>真实姓名：</th>
+            <td> #springBind("admin.name")
+			  <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+              <span class="error">$!{status.errorMessage}</span> </td>
+          </tr>
+          <tr>
+            <th>EMAIL地址：</th>
+            <td> #springBind("admin.email")
+              <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" maxlength="20"/>
+              <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> </td>
+          </tr>
+          <tr>
+            <th>电　　话：</th>
+            <td>#springBind("admin.tel")
+              <input type="text" class="inp"  name="${status.expression}" value="$!{status.value}"/>
+              <span class="error">$!{status.errorMessage}</span> </td>
+          </tr>
+          <tr>
+            <th>手　　机：</th>
+            <td>#springBind("admin.mobile")
+              <input type="text" class="inp" name="${status.expression}" value="$!{status.value}"/>
+              <span>手机号码和电话号码必填一个</span> <span class="error">$!{status.errorMessage}</span> </td>
+          </tr>
+        </table>
+      </div>
+      <!-- 表单按钮区 -->
+      <div class="form-but">
+        <button type="button" class="button-s4" onclick="submitForm();">修改</button>
+		<button type="button" class="button-s4" onclick="javascript:history.back(-1);">取消</button>
+      </div>
+      <!-- 表单按钮区 END -->
+    </form>
+    <!-- 表单模块 END -->
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+function submitForm() {
+	if(confirm('确认修改吗？')) {
+		document.form1.submit();
+	}
+}
+</script>

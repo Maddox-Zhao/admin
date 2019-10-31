@@ -1,0 +1,476 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 订单换货详情")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 订单换货详情</h2>
+	
+	#if($error)
+		<div class="mag-t1">$error</div>
+	#end
+	#if($success)
+		<div class="mag-t2">$success</div>
+	#end
+	
+	<form action="changeGoods.html" name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="tid" value="$!trade.tid"/>
+		<div class="formBox">
+			<h3><i></i><span>订单信息</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>订单号：</th>
+						<td>$!trade.tid</td>
+						<th>订单金额：</th>
+						<td>￥$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount, $!trade.shippingAmount), '0.00') 元</td>
+					</tr>
+					<tr>
+						<th>订单状态：</th>
+						<td>$!enumTradeStatusMap.get("$!trade.status")</td>
+						<th>支付状态：</th>
+						<td>#if("$trade.payStatus" == "no_pay") 未付款 #elseif("$trade.payStatus" == "paid") 已付款 #end</td>
+					</tr>
+					<tr>
+						<th>下单时间：</th>
+						<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.gmtCreate)</td>
+						<th>支付时间：</th>
+						<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.payTime)</td>
+					</tr>
+					<tr>
+						<th>使用积分：</th>
+						<td>$!trade.userPoint</td>
+						<th>赠送积分：</th>
+						<td>$!trade.sendPoint</td>
+					</tr>
+					<tr>
+						<th>实付金额：</th>
+						<td>￥$!moneyUtil.getFormatMoney($!trade.amount, '0.00') 元 </td>
+						<th>运费：</th>
+						<td>￥<input name="shipFee" id="shipFee" type="text" value="$!moneyUtil.getFormatMoney($!trade.shippingAmount, '0.00')" /></td>
+				  	</tr>
+				</table>
+			</div>
+        </div>
+		
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>商品列表</span></h3>
+			<table>
+				<tr>
+					<th>商品名称</th>
+					<th>编码</th>
+    			    <th>选购属性</th>
+    			    <th>商品价格</th>
+    			    <th>订单数量</th>
+    			    <th>可换数量</th>
+    			    <th>换货数量</th>
+    			    <th>产品名称</th>
+    			    <th>产品价格</th>
+    			    <th>换货价格</th>
+				</tr>
+				#set($goodsPriceAcount = 0)
+				#set($marketPriceAcount = 0)
+				#foreach($order in $orderList)
+					#set($goodsAcount = $moneyUtil.mul($order.goodsNumber, $order.goodsPrice))
+					#set($goodsPriceAcount = $moneyUtil.add( $goodsPriceAcount, $goodsAcount))
+					#set($marketPriceAcount = $moneyUtil.add($marketPriceAcount, $moneyUtil.mul($order.goodsNumber, $order.marketPrice)))
+					<tr #if($velocityCount % 2 == 0) class="bg" #end>
+						<td>
+							<input type="hidden" name="orderIdText" value="$!order.id"/>
+							<a href="${liangpin99Server}/l/gdetail_$!{order.goodsId}.htm" target="_blank" class="f6">$!order.goodsTitle</a>
+						</td>
+						<td>$!order.goodsSn</td>
+						<td>$!order.buyAttr</td>
+						<td>￥$!moneyUtil.getFormatMoney($!order.goodsPrice, '0.00')元</td>
+						<td>$!order.goodsNumber</td>
+						<td>$!orderMap.get("$!order.id")</td>
+						#set($canRefAmount = $orderMap.get("$!order.id"))
+						<td>
+							<input type="hidden" name="goodsText" value="$!canRefAmount"/>
+							<input name="ordersNumberText" id="ordersNumberText$order.Id" type="text" value="$!canRefAmount" size="5"/>(件|个)
+						</td>
+						<td>
+							<input name="goodsInstNameText" id="goodsInstNameText$order.Id" onclick="javascript:modifyToOrder($order.Id);" type="text" value="" size="20" />
+							<input name="goodsInstIdText" id="goodsInstIdText$order.Id"  type="hidden" value="" />
+						</td>
+						<td>
+							￥<input name="goodsInstPriceText" id="goodsInstPrice$order.Id" type="text" value="" size="5" readonly=true/>元
+						</td>
+						<td>
+							￥<input name="goodsChangePriceText" id="goodsChangePrice$order.Id" type="text" value="" size="5" />元
+						</td>
+					</tr>
+				#end
+			</table>
+        </div>
+		
+		#if($!packageMap.size() > 0)
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>套餐列表</span></h3>
+				<table>
+					<tr>
+						<td>套餐名称</td>
+						<td>商品[选购属性]</td>
+						<td>合计价</td>
+						<td>套餐价</td>
+						<td>套餐数量</td>
+						<td>本套餐合计</td>
+					</tr>
+					#foreach($packages in $!packageMap.entrySet())
+						<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td>$!packages.key.name</td>
+							<td>
+								#set($orderpackages = $packages.value)
+								#foreach($orderpackage in $orderpackages)
+									<a href="${liangpin99Server}/l/gdetail_$!{orderpackage.goodsId}.htm" target="_blank">$stringUtil.abbreviate($!{orderpackage.goodsTitle},15)</a>
+									$!orderpackage.goodsSn
+									#if("$!{orderpackage.buyAttr}" != "")
+										[$!orderpackage.buyAttr]
+									#end
+									<br/>
+								#end
+							</td>
+							<td>￥$!moneyUtil.getFormatMoney($!packages.key.goodsAmount,'0.00')元</td>
+							<td>￥$!moneyUtil.getFormatMoney($!packages.key.packageAmount,'0.00')元</td>
+							<td>$!packages.key.number 个</td>
+							<td>￥$!moneyUtil.getFormatMoney($math.mul($!packages.key.packageAmount,$!packages.key.number),'0.00')元</td>
+						</tr>
+						#set($packageAcount=$moneyUtil.mul($!packages.key.packageAmount,$!packages.key.number))
+						#set( $goodsPriceAcount = $moneyUtil.add( $goodsPriceAcount,$!packageAcount))
+					#end
+				</table>
+            </div>
+		#end
+
+		<div class="formBox">
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>商品总价： </th>
+						<td>￥$!moneyUtil.getFormatMoney($!goodsPriceAcount,'0.00') 元</td>
+						<th>实际交易总金额：</th>
+						<td>￥$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount,$!trade.shippingAmount),'0.00') 元</td>
+						<th>换货原因：</th>
+						<td><textarea name="remark" id="remarkText" rows="3" cols="20"></textarea></td>
+					    <td><input type="button" id="button$order.Id" value="确定换货" onclick="modifyOrderNumber($!trade.tid);"/></td>
+					</tr>
+				</table>
+            </div>
+        </div>
+
+		#if($changeRefund && $changeRefund.size() > 0)
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>换货商品列表</span></h3>
+				<table>
+					<tr>
+						<th>换货单号</th>
+						<th>商品名称</th>
+						<th>编码</th>
+						<th>选购属性</th>
+						<th>换货价格</th>
+						<th>可换数量</th>
+						<th>换货数量</th>
+						<th>产品名称</th>
+						<th>产品价格</th>
+						<th>换货价格</th>
+					</tr>
+					#set($goodsPriceAcount =0)
+					#set($marketPriceAcount = 0)
+					#foreach($refundOrder in $changeRefund)
+						#set($goodsAcount = $moneyUtil.mul($refundOrder.refAmount, $refundOrder.goodsPrice))
+						#set($goodsPriceAcount = $moneyUtil.add($goodsPriceAcount, $goodsAcount))
+						#set($marketPriceAcount = $moneyUtil.add($marketPriceAcount, $moneyUtil.mul($refundOrder.refAmount, $refundOrder.marketPrice)))
+						<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td>$!refundOrder.refundId </td> 
+							<td>
+								<input type="hidden" name="refundorderIdText" value="$!refundOrder.id"/>
+								<a href="${liangpin99Server}/l/gdetail_$!{refundOrder.goodsId}.htm" target="_blank" class="f6">$!refundOrder.goodsTitle</a>
+							</td>
+							<td>$!refundOrder.goodsSn </td>
+							<td>$!attributeManager.getFullAttributeStringByAttrs($!refundOrder.buyAttr) </td>
+							<td class="r">￥$!moneyUtil.getFormatMoney($!refundOrder.price,'0.00')元</td>
+							<td>$!refundOrder.refAmountLeft </td>
+							<td>
+								<input type="hidden" name="refundgoodsText" value="$!refundOrder.refAmountLeft"/>
+								<input name="refundordersNumberText" id="refundordersNumberText$!refundOrder.Id" type="text" value="$!canRefOrderAmount" size="5"/>(件|个)
+							</td>
+							<td class="r">
+								<input name="refundgoodsInstNameText" id="refundgoodsInstNameText$!refundOrder.Id" onclick="javascript:modifyTo($!refundOrder.Id);" type="text" value="" size="20" />
+								<input name="refundOrderRefundId" id="refundOrderRefundId$!refundOrder.Id"  type="hidden" value="$!refundOrder.refundId" />
+								<input name="refundgoodsInstIdText" id="refundgoodsInstIdText$!refundOrder.Id"  type="hidden" value="" />
+							</td>
+							<td class="r">
+								￥<input name="refundgoodsInstPriceText" id="refundgoodsInstPrice$!refundOrder.Id" type="text" value="" size="5" readonly=true/>元
+							</td>
+							<td class="r">
+								￥<input name="refundgoodsChangePriceText" id="refundgoodsChangePrice$!refundOrder.Id" type="text" value="" size="5" />元
+							</td>
+						</tr>
+					#end
+				</table>
+			</div>
+			
+			<div class="formBox">
+    			<div class="content">
+    				<table class="c6">
+    					<tr>
+							<th>换货原因：</th>
+							<td><div><textarea name="refundremark" id="refundremarkText" rows="3" cols="20"></textarea></div></td>
+							<td><input type="button" id="button$!refundOrder.Id" value="确定换货" onclick="changeRefundOrder($!refundOrder.id);"/></td>
+						</tr>
+    				</table>
+                </div>
+            </div>
+		#end
+
+		#if($!refsList.size() > 0)
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>退货列表</span></h3>
+				<table>
+					<tr>
+						<th>用户名</th>
+						<th>申请编号</th>
+						<th>订单编号</th>
+						<th>状态</th>
+						<th>类型</th>
+						<th>申请时间</th>
+						<th>操作员</th>
+					</tr>
+					#foreach($refund in ${refsList})
+						<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td>$!{refund.buyNick} </td>
+							<td><a href="$!appServer.get("/trade/confirmRefund.html?id=$!refund.id&detail=yes")" target="_blank">$!{refund.refundId}</a> </td>
+							<td>$!{refund.tid} </td>
+							<td>$!enumRefundStatusMap.get($refund.status)</td>
+							<td>$!enumRefundTypeMap.get($refund.type)</td>
+							<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $!refund.gmtCreate) </td>
+							<td>$!refund.creater</td>
+						</tr>
+					#end                
+				</table>
+			</div>
+		#end
+	</form>
+
+</div>
+</body>
+
+<script language="javascript">
+function modifyToOrder(orderId){
+	var textId="goodsInstIdText"+orderId;
+	var textName="goodsInstNameText"+orderId;
+	var textPrice="goodsInstPrice"+orderId;
+	document.getElementById(textId).value='';
+	document.getElementById(textName).value='';
+	document.getElementById(textPrice).value='';
+
+	var ret = window.showModalDialog("$!appServer.get("/instance/select_instance.html?muse=true")",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+	if(ret!=null){
+		document.getElementById(textId).value=ret.id;
+		document.getElementById(textName).value=ret.instanceName;
+		document.getElementById(textPrice).value=ret.sellPrice;
+	}
+}
+
+
+function modifyOrderNumber(tid) {
+	var ordersNumbers=document.getElementsByName("ordersNumberText"); //goodsNumber
+	var goodsInstIds=document.getElementsByName("goodsInstIdText");   //换货id
+	var orderIds=document.getElementsByName("orderIdText");           //订单 id
+	var goods=document.getElementsByName("goodsText");				  //hidden goodsNumber
+	var remarkMemo=document.getElementById('remarkText').value;
+	var changePrices=document.getElementsByName("goodsChangePriceText");
+	var shipFee=document.getElementById("shipFee").value;				
+
+    //验证
+    var reg=/^[0-9]+[0-9]*]*$/;
+    var orderNumberList = new Array();
+	var orderIdList = new Array();
+	var goodsInstIdList = new Array();
+	var changePricesList = new Array();
+
+	for(var i=0;i<ordersNumbers.length;i++){
+		if(!validates(ordersNumbers[i],goods[i].value)){
+			return false;
+		}
+		if(ordersNumbers[i].value>0&&goodsInstIds[i].value==''){
+			alert('输入换货产品！');
+			return false;
+		}
+		if(ordersNumbers[i].value>0){
+			if(changePrices[i].value==null||changePrices[i].value==""){
+				alert("出错：换货价格您没有输入.");
+				jQuery(changePrices[i]).focus();
+				return false;
+			} else if(!isNumber(changePrices[i].value)){
+				alert("出错：您输入了不正确的换货价格.");
+				jQuery(changePrices[i]).focus();
+				return false;
+			}else if(changePrices[i].value>100000000){
+				alert("出错：您输入的换货价格太大.");
+				jQuery(changePrices[i]).focus();
+				return false;
+			}
+		}
+
+		orderNumberList[i] = ordersNumbers[i].value;
+		orderIdList[i] = orderIds[i].value;
+		goodsInstIdList[i] = goodsInstIds[i].value;
+		changePricesList[i]=changePrices[i].value;
+	}
+	
+	if(shipFee==null||shipFee==""){
+		alert("出错：运费您没有输入.");
+		return false;
+	} else if(!isNumber(shipFee)){
+		alert("出错：您输入了不正确的运费.");
+		return false;
+	}else if(shipFee>100000000){
+		alert("出错：您输入的运费太大.");
+		return false;
+	}
+
+	if(remarkMemo==null||remarkMemo==""){
+		alert("出错：请填写换货原因.");
+		return false;
+	}
+	
+	if(remarkMemo.length>400){
+		alert('换货原因超长，不能超过400个字');
+		return false;
+	}
+
+	document.getElementById('searchForm').submit();
+}
+
+function isNumber(val) {
+  var reg = /^[\d|\.|,]+$/;
+  return reg.test(val);
+}
+	
+function validates(ordersNumber,goodsNum){
+	var reg=/^[0-9]+[0-9]*]*$/;
+	if(!reg.test(ordersNumber.value)){
+		alert("请输入整数！");
+		ordersNumber.value=goodsNum;
+		jQuery(ordersNumber).focus();
+		return false;
+	}
+
+	if(parseInt(ordersNumber.value)<0){
+		alert("数量不能小于0");
+		ordersNumber.value=goodsNum;
+		jQuery(ordersNumber).focus();
+		return false;
+	}
+
+	if(parseInt(ordersNumber.value)>goodsNum){
+		alert("数量不能大于"+goodsNum);
+		ordersNumber.value=goodsNum;
+		jQuery(ordersNumber).focus();
+		return false;
+	}
+	return true;
+}
+
+function showResult2(msg){
+	if(msg=="success"){
+		alert("操作成功！");
+	}else{
+		alert("操作失败，"+toHTML.un(msg));
+	}
+}
+
+
+#if($changeRefund && $changeRefund.size() > 0)
+
+    function modifyTo(orderId){
+        var textId="refundgoodsInstIdText"+orderId;
+        var textName="refundgoodsInstNameText"+orderId;
+        var textPrice="refundgoodsInstPrice"+orderId;
+        document.getElementById(textId).value='';
+        document.getElementById(textName).value='';
+        document.getElementById(textPrice).value='';
+        var ret = window.showModalDialog("$!appServer.get("/instance/select_instance.html?muse=true")",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+        if(ret != null){
+            document.getElementById(textId).value=ret.id;
+            document.getElementById(textName).value=ret.instanceName;
+            document.getElementById(textPrice).value=ret.sellPrice;
+	    }
+	}
+
+    function changeRefundOrder(refundOrderId) {
+    	var ordersNumbers=document.getElementsByName("refundordersNumberText"); //goodsNumber
+    	var goodsInstIds=document.getElementsByName("refundgoodsInstIdText");   //换货id
+    	var orderIds=document.getElementsByName("refundorderIdText");           //订单 id
+    	var goods=document.getElementsByName("refundgoodsText");				  //hidden goodsNumber
+    	var remarkMemo=document.getElementById('refundremarkText').value;
+    	var changePrices=document.getElementsByName("refundgoodsChangePriceText");
+    	var shipFee=document.getElementById("shipFee").value;
+    	var refundOrderRefundIds=document.getElementsByName("refundOrderRefundId");           //退换货单子id				
+    
+        //验证
+        var reg=/^[0-9]+[0-9]*]*$/;
+        var orderNumberList = new Array();
+    	var orderIdList = new Array();
+    	var goodsInstIdList = new Array();
+	    var changePricesList = new Array();
+    
+    	for(var i=0;i<ordersNumbers.length;i++){
+    		if(!validates(ordersNumbers[i],goods[i].value)){
+    			return false;
+    		}
+    		if(ordersNumbers[i].value>0&&goodsInstIds[i].value==''){
+    			alert('输入换货产品！');
+    			return false;
+    		}
+    		if(ordersNumbers[i].value>0){
+    			if(changePrices[i].value==null||changePrices[i].value==""){
+    				alert("出错：换货价格您没有输入.");
+					jQuery(changePrices[i]).focus();
+    				return false;
+    			}else if(!isNumber(changePrices[i].value)){
+    				alert("出错：您输入了不正确的换货价格.");
+					jQuery(changePrices[i]).focus();
+    				return false;
+    			}else if(changePrices[i].value>100000000){
+    				alert("出错：您输入的换货价格太大.");
+					jQuery(changePrices[i]).focus();
+    				return false;
+    			}
+    		}
+			
+			orderNumberList[i] = ordersNumbers[i].value;
+			orderIdList[i] = orderIds[i].value;
+			goodsInstIdList[i] = goodsInstIds[i].value;
+			changePricesList[i]=changePrices[i].value;
+    	}
+		
+    	if(shipFee==null||shipFee==""){
+    		alert("出错：运费您没有输入.");
+    		return false;
+    	} else if(!isNumber(shipFee)){
+    		alert("出错：您输入了不正确的运费.");
+    		return false;
+    	} else if(shipFee>100000000){
+    		alert("出错：您输入的运费太大.");
+    		return false;
+    	}
+		
+    	if(remarkMemo==null||remarkMemo==""){
+    		alert("出错：请填写换货原因.");
+    		return false;
+    	}
+		
+    	if(remarkMemo.length>400){
+    		alert('换货原因超长，不能超过400个字');
+    		return false;
+    	}
+
+		document.getElementById('searchForm').action="changeRefundGoods.html";
+		document.getElementById('searchForm').submit();
+	}
+
+#end
+
+</script>
+

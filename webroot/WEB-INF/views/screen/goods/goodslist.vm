@@ -1,0 +1,1001 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+  <div class="main">
+	<form name="form1" id="form1" action="/goods/search.html" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="pageFlag" id="pageFlag" value="$!pageFlag"/>
+		#springBind("goods.returnPointId")
+		<input type="hidden" id="returnPointId" name="${status.expression}" value ="$!{status.value}" />
+
+		<div class="searchBox">
+			<h3><span>搜索商品</span></h3>
+		 <table>
+            <tr>
+				#*
+				<th>商品编码：</th>
+               <td>
+			     #springBind("goods.goodsSn")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   *#
+			   <th>商品名称：</th>
+               <td>
+			     #springBind("goods.title")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>商品编号：</th>
+               <td>
+			     #springBind("goods.id")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   <th>品牌:</th>
+                <td>
+			        #springBind("goods.brandId")
+                    <select class="select" name="${status.expression}" value ="$!{status.value}" >
+                       <option value="">-=请选择=-</option>
+                       #foreach($brandTemp in $brandList)
+					      <option #if("$!{status.value}"=="$!brandTemp.id") selected #end value="$!brandTemp.id">$!brandTemp.brandName</option>
+                       #end
+                    </select>
+				</td>
+				<th>品类:</th>
+                <td>
+			        #springBind("goods.idSeries")
+                    <select class="select" name="${status.expression}" value ="$!{status.value}" >
+                       <option value="">-=请选择=-</option>
+                       #foreach($seriesTemp in $seriesList)
+					      <option #if("$!{status.value}"=="$!seriesTemp.id") selected #end value="$!seriesTemp.id">$!seriesTemp.name</option>
+                       #end
+                    </select>
+				</td>
+			</tr>
+			<tr>
+			   <th>商品型号：</th>
+               <td>
+			     #springBind("goods.type")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>商品材质：</th>
+               <td>
+			     #springBind("goods.material")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   <th>商品颜色:</th>
+                <td>
+			        #springBind("goods.color")
+                    <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+				</td>
+				 <th>销售时间：</th>
+                    <td>
+						#springBind("goods.sellDateStart")
+                        <input id="sellDateStart" name="${status.expression}" value ="$!{status.value}" class="mini-datepicker"  format="yyyy-MM-dd" class="inp"/>
+                        ~
+						#springBind("goods.sellDateEnd")
+                        <input id="sellDateEnd" name="${status.expression}" value ="$!{status.value}" class="mini-datepicker" format="yyyy-MM-dd" class="inp" />
+                    </td>
+			</tr>
+			<tr>
+			   <th>总库存大于：</th>
+               <td>
+			     #springBind("goods.goodsNumberStr")
+				 <input type="text" name="${status.expression}"  value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>香港库存大于：</th>
+               <td>
+			     #springBind("goods.hkGoodsNumberStr")
+                 <input type="text" name="${status.expression}"  value ="$!{status.value}" class="inp" />
+               </td>
+			   <th>月销量大于：</th>
+               <td>
+				 #springBind("goods.saleNumber")
+                 <input type="number" name="${status.expression}"  value ="${status.value}" class="inp" min="0" />
+               </td>
+			   <th>促销价：</th>
+               <td>
+			     #springBind("goods.salePriceStart")
+                 <input style="width:52px;" type="text" name="${status.expression}"  value ="$!{status.value}" class="inp" />~
+				 #springBind("goods.salePriceEnd")
+				 <input style="width:52px;" type="text" name="${status.expression}"  value ="$!{status.value}" class="inp" />
+               </td>
+			</tr>
+            <tr>
+    			 <th>类目:：</th>
+    			 <td style="width:200px" colspan="4">
+					 #springBind("goods.oneList")
+                   <select id="oneList" name="oneList" onchange="javaScript:getTwoCatory(this.value);" style="width:100px;" class="select" name="${status.expression}" value ="$!{status.value}">
+                       <option value="">请选择</option>
+                	  #foreach($one in $oneCatory)
+                	   <option #if("$!{status.value}"=="$!one.catCode") selected #end value=$one.catCode>$one.catName</option>
+                	  #end
+                  </select>
+				   #springBind("goods.twoList")
+					#*<select id="twoList" name="twoList" onchange="javaScript:getThreeCatory(this.value);" style="width:100px" class="select" name="${status.expression}" value ="$!{status.value}">
+                	   #if("$!goods.oneList" == "")
+					   <option value="">请选择</option>
+					   #else
+                	   <option #if("$!goods.oneList" != "null") selected #end value="">$!goods.oneList</option>
+					   #end
+                	</select>
+					*#
+					<select id="twoList" name="twoList" onchange="javaScript:getThreeCatory(this.value);" style="width:100px" class="select" name="${status.expression}" value ="$!{status.value}">
+                	   #if("$!onelist" == "")
+					   <option value="">请选择</option>
+					   #else
+						 <option value="">请选择</option>
+						#foreach($two in $twoListCategorys)
+                	   <option #if("$!{status.value}"=="$!two.catCode") selected #end value=$two.catCode>$two.catName</option>
+                	     #end
+					   #end
+                	</select>
+					
+					#springBind("goods.threeList")
+					<select id="threeList" name="threeList" onchange="javaScript:forValidate(this.value);" style="width:100px" class="select" name="${status.expression}" value ="$!{status.value}">
+                	  #if("$!tolist" == "")
+					  <option value="">请选择</option>
+                	  #else
+						<option value="">请选择</option>
+						 #foreach($three in $threeListCategorys)
+                	       <option #if("$!{status.value}"=="$!three.catCode") selected #end value=$three.catCode>$three.catName</option>
+                	     #end
+					  #end	
+                	</select>
+                 </td>
+			</tr>
+			<tr>
+            
+             ##   <th>商品类型:</th>
+             ##   <td>
+			 ##       #springBind("goods.goodsKind")
+             ##       <select class="select" name="${status.expression}" value ="$!{status.value}" >
+			##		   <option value="">-=请选择=-</option>
+            ##           <option value="y" #if("$status.value"=="y")  selected #end>代销</option>
+			##		   <option value="w" #if("$status.value"=="w")  selected #end>批发</option>
+			##		   <option value="z" #if("$status.value"=="z")  selected #end>可批可销</option>
+            ##        </select>
+			##	</td>
+            </tr>
+            <tr>
+			   <th></th>
+				#springBind("goods.noPicture")
+                <td>无图片<input name="${status.expression}" type="checkbox" value="1" #if("$!{status.value}"=="1") checked="true" #end/></td>
+				#if($!pageFlag == "on_sale")
+				  #springBind("goods.zeroStock")
+                  <td>零库存<input name="${status.expression}" type="checkbox" value="1" #if("$!{status.value}"=="1") checked="true" #end/></td>
+				#elseif($!pageFlag == "on_depot")
+				  #springBind("goods.zeroStock")
+                  <td>有库存<input name="${status.expression}" type="checkbox" value="1" #if("$!{status.value}"=="1") checked="true" #end/></td>
+				#else
+				  #springBind("goods.zeroStock")
+                  <td><input name="${status.expression}" type="hidden" value=""/></td>
+				#end
+			##	#springBind("goods.isPaipai")
+            ##    <td>是否拍拍<input name="${status.expression}" type="checkbox" value="1" #if($!{goods.isPaipai}) checked="true" #end/></td>
+			##		#springBind("goods.isTaobao")
+              ##  <td>是否淘宝<input name="${status.expression}" type="checkbox" value="1" #if($!{goods.isTaobao}) checked="true" #end/></td>
+			</tr>
+			<tr>
+               <th></th>
+               <td><button type="button" onclick="javascript:doSearch()" class="btn">查询商品</button></td>
+			   <td><button type="button" onclick="javascript:doExport()" class="btn">excel导出</button></td>
+			   <td><button type="button" onclick="javascript:downLoadImg()" class="btn">图片下载</button></td>
+			   <td style="padding-left:50px;">
+                  <a class="mini-button" iconCls="icon-download"  onclick="javascript:doImport()">导入</a> 
+                    </td>
+					
+					<td colspan="2">
+                        <input type="file" name="dr"/>
+                    </td>
+	        </tr>
+         </table>
+        </div>
+
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	#if($!message == "sucdelist")
+	 <div class="mag-t2">
+		下架成功！
+	 </div>
+	#end
+	#if($!message == "faultdelist")
+	 <div class="mag-t1">
+		下架失败！
+	 </div>
+	#end
+	#if($!message == "succut")
+	 <div class="mag-t2">
+		设置特价商品成功！
+	 </div>
+	#end
+	#if($!message == "wrongcut")
+	 <div class="mag-t1">
+		此商品为活动商品，请先取消再设置为特价商品！
+	 </div>
+	#end
+	#if($!message == "faultcut")
+	 <div class="mag-t1">
+		设置特价商品失败！
+	 </div>
+	#end
+	#if($!message == "setupactsuc")
+	 <div class="mag-t2">
+		设置活动商品成功！
+	 </div>
+	#end
+	#if($!message == "setupactfault")
+	 <div class="mag-t1">
+		设置活动商品失败！
+	 </div>
+	#end
+	#if($!message == "listingsuc")
+	 <div class="mag-t2">
+		上架成功！
+	 </div>
+	#end
+	#if($!message == "listingfault")
+	 <div class="mag-t1">
+		上架失败！
+	 </div>
+	#end
+	#if($!message == "notexist")
+	 <div class="mag-t1">
+		商品不存在！
+	 </div>
+	#end
+	#if($!message == "statufault")
+	 <div class="mag-t1">
+		商品状态不为下架！
+	 </div>
+	#end
+	#if($!message == "deletegoodssuc")
+	 <div class="mag-t2">
+		商品删除成功！
+	 </div>
+	#end
+	#if($!message == "faultcanel")
+	 <div class="mag-t1">
+		取消特价商品失败！
+	 </div>
+	#end
+	#if($!message == "succanel")
+	 <div class="mag-t2">
+		取消特价商品成功！
+	 </div>
+	#end
+	#if($!message == "canelactfault")
+	 <div class="mag-t1">
+		取消活动商品失败！
+	 </div>
+	#end
+	#if($!message == "canelactsuc")
+	 <div class="mag-t2">
+		取消活动商品成功！
+	 </div>
+	#end
+	#if($!message == "sucbatdelisting")
+	 <div class="mag-t2">
+		批量下架商品成功！
+	 </div>
+	#end
+	#if($!message == "faultbatdelisting")
+	 <div class="mag-t1">
+		批量下架商品失败！
+	 </div>
+	#end
+	#if($!message == "sucessgoodscut")
+	 <div class="mag-t2">
+		批量设置特价商品成功！
+	 </div>
+	#end
+	#if($!message == "listfacut")
+	 <div class="mag-t1">
+		批量设置特价商品失败！
+	 </div>
+	#end
+	#if($!message == "listsucanel")
+	 <div class="mag-t2">
+		批量取消特价商品成功！
+	 </div>
+	#end
+	#if($!message == "listfacanel")
+	 <div class="mag-t1">
+		批量取消特价商品失败！
+	 </div>
+	#end
+	#if($!message == "batlistsuc")
+	 <div class="mag-t2">
+		批量上架成功！
+	 </div>
+	#end
+	#if($!message == "batlistfail")
+	 <div class="mag-t1">
+		批量上架失败！
+	 </div>
+	#end
+ #end
+ 
+  #if($!errormessage)
+	<div class="mag-t1">
+		$!errormessage
+    </div>
+  #end
+
+  <div class="tool">
+		#if($pageFlag=="on_depot")
+			#if($!adminAccess.has("A_GOODS_DOLIST_GB_USER"))
+            <span><a href="#" hidefocus="true" class="bt_add" onclick="javascript:listingGoodsBat()">批量上架</a></span>
+			#end
+	##		<span><a href="#" hidefocus="true" class="bt_add" onclick="javascript:CutPriceGoods()">批量设为特价商品</a></span>
+	##		<span><a href="#" hidefocus="true" class="bt_del" onclick="javascript:CanelCutPriceGoods()">批量取消特价商品</a></span>
+		#end
+		#if($!pageFlag=="on_sale")
+			#if($!adminAccess.has("A_GOODS_DOLIST_GB_USER"))
+            <span><a href="#" hidefocus="true" class="bt_no"  onclick="javascript:deListGoodsBat()">批量下架</a></span>
+			#end
+	##		<span><a href="#" hidefocus="true" class="bt_add"  onclick="javascript:CutPriceGoods()">批量设为特价商品</a></span>
+    ##        <span><a href="#" hidefocus="true" class="bt_del"  onclick="javascript:CanelCutPriceGoods()">批量取消特价商品</a></span>
+		#end
+		#if($!pageFlag=="cut_price")
+	##		<span><a href="#" hidefocus="true" class="bt_del" onclick="javascript:CanelCutPriceGoods()">批量取消特价商品</a></span>
+		#end
+		#if($!pageFlag=="is_agent")
+	##		<span><a href="#" hidefocus="true" class="bt_del" onclick="javascript:doCanelAgentGoods()">批量取消代销商品</a></span>
+		#end
+		##<span><a href="#" hidefocus="true" class="bt_edit" onclick="javascript:doGoodsBillRelation()">批量设置开票公司</a></span>
+  </div>
+
+        <div class="clear"></div>
+        <ul class="form-tab">
+            <li #if($!pageFlag=="on_sale") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_sale')">出售中的商品</a></span></li>
+            <li #if($!pageFlag=="on_depot") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_depot')">仓库中的商品</a></span></li>
+         ##   <li #if($!pageFlag=="cut_price") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','cut_price')">特价商品</a></span></li>
+		##<li #if($!pageFlag=="activity_goods") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','activity_goods')">活动商品</a></span></li>
+		##	<li #if($!pageFlag=="is_agent") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','is_agent')">代销商品</a></span></li>
+        </ul>
+		<div class="clear"></div>
+		<div class="listBox">
+			<ul class="hover">
+				<h3><span>商品列表</span></h3>
+				<table>
+                    <tr>
+					  <th><input type="checkbox" id="allbox" />全选</th>
+                      <th>商品编码</th>
+					  <th>商品图片</th>
+					  <th>商品名称</th>
+					  
+					   <th>材质描述</th>
+					  <th>颜色描述</th>
+					  <th>产地</th>
+					  <th>安全技术类别</th>
+					  <th>执行标准</th>
+					  <th>重量</th>
+					  
+					  <th>可用库存</th>
+					  <th>香港库存</th>
+					  <th>商品类目</th>
+					  <th>月销售量</th>
+					  <th>三月内销售量</th>
+					  
+					  <th style="text-align:center;">尚上价(RMB)</th>
+					  #if($!adminAccess.has("A_GOODS_MODIFY_USER"))
+					  <th>lusso&moda价(HKD)</th>
+					  #end
+					  <th style="text-align:center;">欧洲价(EU)</th>
+					  <th style="text-align:center;">大陆价(RMB)</th>
+					  <th style="text-align:center;">促销价</th>
+					  ##<th>商品状态</th>
+					  ##<th>商品销售时间</th>
+					##  #if($pageFlag=="is_agent")
+					##  <th>建议零售价(￥)</th>
+					##  <th>代销价(￥)</th>
+					##  #else
+					##  <th>代销</th>
+					##  <th>批发</th>
+					##  #end
+					  #if($pageFlag=="on_sale")
+					##  <th>是否拍拍</th>
+					##  <th>是否淘宝</th>
+					  #end
+					  <th>操作</th>
+					</tr>
+					#if($query.items.size()>0)
+						#springBind("goods.ids")
+						#foreach($goods in $query.items)
+                            <tr>
+                              <td><input name="ids" type="checkbox" value="$!goods.id"/></td>
+							  <td>$!goods.id</td>
+							  <td><a href="$upServer/$goods.imgLarge" target="blank"  ><img alt="$goods.title" src="$upServer/$goods.imgMiddle" title="$goods.title" style="width:80px;height:80px;"/></a> </td>
+							  <td>$!goods.title</td>
+							  
+							  <td style="text-align:center;">$!goods.materialdes</td>
+							   <td style="text-align:center;">$!goods.colordes</td>
+							   <td style="text-align:center;">$!goods.origin</td>
+							   <td style="text-align:center;">$!goods.securityTC</td>
+							   <td style="text-align:center;">$!goods.implementationS</td>
+							   <td style="text-align:center;">$!goods.goodsWeight</td>
+							  
+							  <td style="text-align:center;">$!goods.goodsNumber</td>
+							  <td style="text-align:center;">$!goods.hkGoodsNumber</td>
+							  <td style="text-align:center;">$!goods.catName</td>
+							  <td style="text-align:center;">$!goods.saleNumber</td>
+							  <td style="text-align:center;">$!goods.hkthNumber</td>
+							  <td style="text-align:center;color:red;">$!moneyUtil.getFormatMoney($!goods.goodsPrice,'0.00')</td>
+							  #if($!adminAccess.has("A_GOODS_MODIFY_USER"))
+							  <td style="text-align:center;color:red;">$!moneyUtil.getFormatMoney($!goods.hkhxPrice,'0.00')</td>
+							  #end
+							  <td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.euPrice,'0.00')</td>
+							  <td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.marketPrice,'0.00')</td>
+							  #if($!goods.salesProPrice == 0.00)
+							   <td style="text-align:center;"><a onclick="setsalesproprice($!goods.id,$!curpagee)"><span id="tt$!goods.id" >设置</span></a></td>
+							  #else
+								 <td style="text-align:center;"><a onclick="setsalesproprice($!goods.id,$!curpagee)"><span id="tt$!goods.id" >
+                                $!goods.salesProPrice</span></a></td>
+							  #end
+							  #*
+							  <td>
+							     #if($!goods.goodsStatus == "on_sale")
+									销售中
+								 #elseif($!goods.goodsStatus == "on_depot")
+									仓库中
+								 #else
+									删除
+								 #end
+							  </td>
+							  <td>
+							        #if(${goods.gmtListing} || ${goods.gmtDelisting})
+										$!dateUtil.convertDateToString("yyyy-MM-dd",$!goods.gmtListing)
+                                        /
+										$!dateUtil.convertDateToString("yyyy-MM-dd",$!goods.gmtDelisting)
+                                    #end
+							  </td>
+							  *#
+							##  #if($pageFlag=="is_agent")
+                            ##  <td>$!moneyUtil.getFormatMoney($!goods.goodsPrice,'0.00')</td>
+                            ##  <td>$!moneyUtil.getFormatMoney($!goods.agentPrice,'0.00')</td>
+							##  #else
+							##  <td>
+							##       	#if($!goods.isAgent=="y")
+							##		   是
+							##		#elseif($!goods.isAgent=="n")
+							##		   否
+							##		#end
+							##  </td>
+							##  <td>
+							##       	#if($!goods.isWholesale=="y")
+							##		  是
+							##		#elseif($!goods.isWholesale=="n")
+							##		  否
+							##		#end
+							##  </td>
+							##  #end
+							  #if($pageFlag=="on_sale")
+							##  <td>
+							##		#if($!goods.isPaipai=="y")
+							##		  是
+							##		#elseif($!goods.isPaipai=="n")
+							##		  否
+							##		#end
+							##  </td>
+							##  <td>
+							##		#if($!goods.isTaobao=="y")
+							##		  是
+							##		#elseif($!goods.isTaobao=="n")
+							##		  否
+							##		#end
+							##  </td>
+							  #end
+							  <td>
+								<a href="/instance/goods_instance.html?gid=$!{goods.id}">产品管理&nbsp;</a>
+								<a onclick="return showShoppingCar($goods.Id)">&nbsp;&nbsp;销售信息&nbsp;&nbsp;</a>
+								## <a href="/product/goodsSaleInfo.html?gid=$!{goods.id}">&nbsp;&nbsp;销售信息&nbsp;&nbsp;</a>
+								#if($pageFlag=="on_sale")
+                                <a href="#" onclick="return doDelisting($goods.Id);">下架</a><br/>
+                                ##    <a href="#" onclick="return doCutPriceGoodsOnSale($!goods.Id,'$!goods.isCutprice','$!goods.isAgent')">设为特价商品</a>
+                                ##    <a href="#" onclick="return doActivityGoods($goods.Id,'setup','$!goods.isCutprice')">设为活动商品</a><br/>
+                                ##    <a href="#" onclick="return doExpressRelation($goods.Id)">物流公司关联</a>
+								#elseif($pageFlag=="on_depot")
+									#if($!adminAccess.has("A_GOODS_DOLIST_USER"))
+                                    <a href="#" onclick="return doListing($goods.Id)">上架</a><br/>
+									#end
+									#if($!adminAccess.has("A_GOODS_MODIFY_USER"))
+                                    <a href="/goods/editg.html?goodsId=$goods.Id" >编辑</a>
+									#end
+									#if($!adminAccess.has("A_GOODS_DELETE_USER"))
+                                    <a href="#" onclick="return doDeleteGoods($goods.Id)">删除</a><br/>
+									#end
+                                ##    <a href="#" onclick="return doCutPriceGoodsOnSale($!goods.Id,'$!goods.isCutprice','$!goods.isAgent')">设为特价商品</a>
+                                ##   <a href="#" onclick="return doActivityGoods($goods.Id,'setup','$!goods.isCutprice')">设为活动商品</a><br/>
+                                ##    <a href="#" onclick="return doExpressRelation($goods.Id)">物流公司关联</a>
+								#elseif($pageFlag=="cut_price")
+                                ##    <a href="#" onclick="return doCanelCutPriceGoods($goods.Id)">取消特价商品</a>
+								#elseif($pageFlag=="activity_goods")
+                                ##    <a href="#" onclick="return doActivityGoods($goods.Id,'cancel','')">取消活动商品</a>
+								#elseif($pageFlag=="is_agent")
+                                ##    <a href="#" onclick="return dodisagent($goods.Id)">取消代销</a>
+								#end
+                              </td>
+							</tr>
+						#end
+					#end
+                </table>
+            </ul>
+        </div>
+    </form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/goods/search.html?pageFlag=$!pageFlag").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+</body>
+##var url="/goods/listing.html?id="+Id;
+##    document.location=url;
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+		
+		function checkIds(){
+		     var objs = document.getElementsByName("ids");
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   if(objs[i].checked){
+				     return true;
+				   }
+				}
+			  }
+			  alert('至少选择一条商品信息');
+			  return false;
+		}
+
+function deListGoodsBat(){
+    if(!checkIds())return;
+    document.getElementById('form1').action="/goods/delistinggb.html";
+    document.getElementById('form1').submit();
+}
+
+function CutPriceGoods(){
+    if(!checkIds())return;
+    if(!confirm("确实要进行批量设为特价商品操作吗？")){
+		return false;
+	}else{
+		    var ids = document.getElementsByName("ids");
+		    var b;
+
+			if($query.items.size()>0){
+    			#foreach($goods in $query.items)
+				for(var i = 0 ;i<ids.length;i++){
+                  if(ids[i].checked){
+                  	b=ids[i].value;
+					if(b==$!goods.id){
+						if("$goods.isCutprice"=="3" && "$goods.isAgent"!="y"){
+                    		alert("商品编码为【"+'$goods.goodsSn'+"】的商品为活动商品，请先取消再设置为特价商品！");
+            				return false;
+                    	}
+						break;
+					}
+                  }
+             	}
+    			#end
+    		}
+
+		document.getElementById('form1').action="/goods/cutPriceGoods.html";
+    	document.getElementById('form1').submit();
+	}
+}
+
+function CanelCutPriceGoods(){
+    if(!checkIds())return;
+    if(!confirm("确实要进行批量取消特价商品操作吗？"))
+        return false;
+
+    document.getElementById('form1').action="/goods/canelCutPriceGoods.html";
+    document.getElementById('form1').submit();
+}
+
+function doCanelAgentGoods(){
+    if(!checkIds())return;
+	if(!confirm("确实要进行批量取消代销商品操作吗？"))
+        return false;
+
+	document.getElementById('form1').action="/goods/doCanelAgentGoods.html";
+    document.getElementById('form1').submit();
+}
+
+function listingGoodsBat(){
+	if(!checkIds())return;
+    if(!confirm("确实要进行批量上架操作吗？"))
+        return false;
+    document.getElementById('form1').action="/goods/listinggb.html";
+    document.getElementById('form1').submit();
+}
+
+
+#if($!issuccess=="error")
+alert("特价商品不能设置为代销商品");
+#end
+function doagent(id){
+	var url="doagent.html?pageFlag=on_sale&id="+id;
+    window.location.href=url;
+}
+
+function dodisagent(id){
+	var url="/goods/dodisagent.html?pageFlag=is_agent&id="+id;
+    window.location.href=url;
+}
+
+function checkAllWithName(theForm, allCheckName) { // check all the checkboxes in the list with the name of the all check box
+  var allcheck;
+  for (var i=0;i<theForm.elements.length;i++) {
+    var e = theForm.elements[i];
+        var eName = e.name;
+        if(eName==allCheckName){
+        	allcheck=e;
+        }
+    }
+  for (var i=0;i<theForm.elements.length;i++) {
+    var e = theForm.elements[i];
+        var eName = e.name;
+        if (eName != allCheckName &&
+            (e.type.indexOf("checkbox") == 0)) {
+            e.checked = allcheck.checked;
+        }
+    }
+}
+
+
+function doSearch(){
+    document.getElementById('form1').submit();
+}
+function doExport(){
+    var form1=document.getElementById('form1');
+    form1.action="/goods/exportTaobaoExcel.html";
+    form1.submit();
+    form1.action="/goods/search.html";
+}
+
+function downLoadImg(){
+    var form1=document.getElementById('form1');
+    form1.action="/goods/downLoadImg.html";
+    form1.submit();
+    form1.action="/goods/search.html";
+}
+
+/* add goods number using prototype ajax*/
+/*
+function addGoodsNumber(Id){
+    var textId="goodsNumberText"+Id
+    var pars=document.getElementById(textId).value;
+    if(isNaN(pars)){
+        alert("输入不合法，请输入数字！");
+        document.getElementById(textId).value="";
+        Field.focus(document.getElementById(textId));
+        return false;
+    }
+    if(parseInt(pars)>99999){
+        alert("库存不能大于99999");
+        document.getElementById(textId).value="";
+        Field.focus(document.getElementById(textId));
+        return false;
+    }
+    if(!confirm("是否确认补货操作？"))
+        return false;
+
+    var url="addgn.html";
+    var myAjax=new Ajax.Request(
+        url,{ method:'get',
+              parameters:{goodsNumber:pars,id:Id},
+              onComplete:showResult,
+              onFailure:reportError
+            }
+    );
+}
+
+function reportError(){
+    document.getElementById('result').innerHTML="严重故障，请重试";
+}
+
+function showResult(originalRequest){
+    document.getElementById('result').innerHTML=originalRequest.responseText;
+}
+*/
+
+/* add goods number using DWR, the default ajax framework in this project */
+/*
+function addGoodsNumberWithDWR(Id) {
+    var textId="goodsNumberText"+Id
+    var goodsNumber=document.getElementById(textId).value;
+    var reg=/^[0-9]+[0-9]*]*$/;
+    if(!reg.test(goodsNumber)){
+        alert("请输入整数！");
+        document.getElementById(textId).value="";
+        Field.focus(document.getElementById(textId));
+        return false;
+    }
+
+    if(parseInt(goodsNumber)<0){
+        alert("库存不能小于0");
+        document.getElementById(textId).value="";
+        Field.focus(document.getElementById(textId));
+        return false;
+    }
+
+    if(parseInt(goodsNumber)>99999){
+        alert("库存不能大于99999");
+        document.getElementById(textId).value="";
+        Field.focus(document.getElementById(textId));
+        return false;
+    }
+
+    GoodsAction.addGoodsNumber(Id, goodsNumber,showResult2);
+}
+
+
+function showResult2(msg){
+    DWRUtil.setValue("result", msg, {escapeHtml :false});
+}
+*/
+
+function doListing(Id){
+    var url="/goods/listing.html?id="+Id;
+    document.location=url;
+}
+
+
+function doAgentGoods(){
+	if(!isAtLeastOneChecked('ids')){
+        alert("请选择要做批量的商品！");
+        return false;
+    }
+	if(!confirm("确实要进行批量取消代销商品操作吗？"))
+        return false;
+
+	document.getElementById('form1').action="doAgentGoods.html";
+    document.getElementById('form1').submit();
+}
+
+
+function doDelisting(Id){
+    var url="/goods/delisting.html?id="+Id;
+    document.location=url;
+}
+
+function doCutPriceGoodsOnSale(Id,is_cutprice,is_agent){
+    var url="/goods/cutPrice.html?pageFlag=on_sale&id="+Id;
+	if(is_cutprice=="3" && is_agent!="y"){
+		alert("此商品为活动商品，请先取消再设置为特价商品！");
+	}else{
+		window.location.href=url;
+	}
+}
+
+function doCanelCutPriceGoodsOnSale(Id){
+    var url="/goods/deCutPrice.html?pageFlag=on_sale&id="+Id;
+    window.location.href=url;
+}
+
+function doActivityGoods(Id,type,is_cutprice){
+    var url="/goods/doActivityGoods.html?pageFlag=activity_goods&id="+Id+"&actionType="+type;
+	if(type=='setup' && is_cutprice=="1"){
+    	alert("此商品为特价商品，请先取消再设置为活动商品！");
+		return false;
+    }
+	window.location.href=url;
+}
+
+function doCutPriceGoodsOnDepot(Id){
+    var url="cutPrice.html?pageFlag=on_depot&id="+Id;
+    window.location.href=url;
+}
+
+function doCanelCutPriceGoodsOnDepot(Id){
+    var url="deCutPrice.html?pageFlag=on_depot&id="+Id;
+        window.location.href=url;
+}
+
+function doCutPriceGoods(Id){
+    var url="cutPrice.html?pageFlag=cut_price&id="+Id;
+    window.location.href=url;
+}
+
+function doCanelCutPriceGoods(Id){
+    var url="deCutPrice.html?pageFlag=cut_price&id="+Id;
+    window.location.href=url;
+}
+
+function doDeleteGoods(Id){
+    if(!confirm("确实要删除商品吗？"))
+        return false;
+    var url="/goods/deleteg.html?id="+Id;
+    document.location=url;
+}
+
+function isAtLeastOneChecked(checkName){
+    var flag=false;
+
+	var idsArray=jQuery(":input[name="+checkName+"]");
+                jQuery.each(idsArray,function(n,obj) {
+                    if(obj.checked==true){
+                        flag=true;
+                    }
+    			});
+
+    return flag;
+}
+
+function doExpressRelation(goodsId){
+   var url="/goods/goodsExpressRelation.html?goodsId="+goodsId;
+   window.location.href=url;
+}
+
+function doGoodsBillRelation() {
+	if(!isAtLeastOneChecked('ids')){
+		alert("请选择要设置的商品！");
+		return false;
+	}
+	
+	var gids = '';
+	jQuery('input[name=ids]:checked').each(function() {
+		gids += jQuery(this).val() + ',';
+	});
+	
+	window.showModalDialog('$appServer/goods/goodsBillRel.html?ids=' + gids, '', 'dialogWidth:800px;dialogHeight:600px;status:no;');
+}
+function setsalesproprice(id,curpagee){
+
+var price;
+price=prompt("设置促销价");
+$('#tt').html(price);
+ jQuery.ajax({
+            url: "/goods/updatesalesproprice.html",
+			type: 'POST',
+			data: {price:price,id:id,curpagee:curpagee},
+            success: function(data) {
+				mini.unmask();
+				if(data.success == "ok")
+				{
+				$('#tt'+id).html(data.price+".0");
+				//當價格是0時，顯示設置
+    				if(data.price==0){
+    				$('#tt'+id).html("设置");
+    				}
+				}else if(data.success == "no"){
+				    alert("未完成本次价格设置")
+				}
+				
+            },
+            error: function() {}
+        });
+}
+		
+		mini.parse();
+        function showShoppingCar(Id) {
+            mini.open({
+                url: "/product/goodsSaleInfo.html?id="+Id,
+                title: "选择列表",
+                width: 1100,
+                height: 500,
+                
+
+            });
+
+        }
+		
+		
+		
+			//用于品类三级联动
+	function getTwoCatory(pCode){
+		jQuery("#ipt_pcd").val("");
+		jQuery("#twoList").show();
+		jQuery("#threeList").show();
+	var obj=document.getElementById('twoList');
+	var length2 = obj.length = 0;
+	var obj2=document.getElementById('threeList');
+	obj2.length=0;
+	obj2.options[0] = new Option("请选择", "");    
+	//modify by lincf jQuery ajax 代替DWR 
+	//按省份取得城市区域     modify by lincf
+                jQuery.ajax({   
+			          type:"post",   
+			          url: '/goods/getTwoCatory.html',
+			          async:true,
+			          dataType: "json",
+			          data:"catCode="+pCode,
+			          timeout:15000,
+			          error:function(){
+			          	alert("连接超时，您未登录或者离开过久，请刷新");
+			          },
+			          success:function(json){
+			          var tempid=0;
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(json,
+			          function(){
+					  obj.options[tempid] = new Option(json[tempid-1].catName,json[tempid-1].catCode);
+					  tempid=tempid+1;
+			          }
+			          )
+			          }
+			        });
+	         
+	}	
+       
+	function getThreeCatory(pCode){
+		$('ipt_pcd').value = '';
+		var obj=document.getElementById('threeList');
+		obj.length=0;
+		obj.options[0] = new Option("请选择", "");
+		jQuery.ajax({
+			type:"post",
+			url: '/goods/getThreeCatory.html',
+			async:true,
+            dataType: "json",
+            data:"catCode="+pCode,
+            timeout:15000,
+            error:function(){
+            	alert("连接超时，您未登录或者离开过久，请刷新");
+            },
+            success:function(json){
+            	var tempid=0;
+            	if(json[0]==null){
+				
+  					$('threeList').style.display='none';
+					$('ipt_pcd').value = $('twoList').value;
+					$('joke').style.display='';
+            		$('ipt_pcd').focus();
+            		$('ipt_pcd').blur();
+            		$('joke').style.display='none';
+				}else{
+					obj.options[tempid++] = new Option("请选择", "");
+					jQuery.each(json,function(){
+						obj.options[tempid] = new Option(json[tempid-1].catName,json[tempid-1].catCode);
+						tempid=tempid+1;
+					})
+				}
+			}
+		});
+	}
+	function doImport(){
+	var form1=document.getElementById('form1');
+	var form = new FormData(form1);
+     
+           mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿刷新...'
+                    });
+		    jQuery.ajax({  
+             url : "/goods/importExcelBytmc.html",  
+             type: "POST",
+			 data :form,
+			 contentType: false,
+			 processData: false,
+             success : function(data) {  
+			 mini.unmask();
+			   if(data == "error"){
+			     mini.alert("请联系管理员"); 
+				 return;
+			   }else if(data == "success"){
+			   mini.alert("导入完成"); 
+				 return;
+			   }else if(data == "non"){
+			     mini.alert("--请联系管理员--");
+				 return;
+			   }
+                
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+}	
+</script>

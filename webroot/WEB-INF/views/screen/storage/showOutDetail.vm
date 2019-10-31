@@ -1,0 +1,387 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 出库单管理")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 出库单管理</h2>
+	
+	#if($succFlag)
+		<div class="mag-t2" id="modifySuccess">操作成功</div>
+	#end
+	#if($errorInfo && $errorInfo != "")
+		<div class="mag-t1" id="modifyError">$!errorInfo</div>
+	#end
+
+	<div class="tool">
+		##if("$!{outDepositoryDispaly.status}"=="out_finished")
+		#if($disExpressFlag)
+			<span>
+				<select name="express" id="express" onChange="printOpt('printExpress',this.options[this.options.selectedIndex].value);">
+					<option value="-1" >选择物流公司打印</option>
+					#foreach($obj in $expressInfoList)
+						<option value="$!{obj.expressCode}" #if("$!{outDepositoryDispaly.expressName}"=="$!{obj.expressName}") selected #end>$!{obj.expressName}</option>
+					#end
+				</select>
+			</span>
+			<span><a href="#" hidefocus="true" class="bt_all"onclick="javascript:printOpt('printExpress',document.getElementById('express').options[document.getElementById('express').options.selectedIndex].value);">打印物流单</a></span>
+		#end
+		<span><a href="javascript:preview();" hidefocus="true" class="bt_all">打印$!outDepositoryTypeMap.get("$!{outDepositoryDispaly.type}")出库单</a></span>
+		##end
+		<span><a href="searchOutDepository.html?init=true" hidefocus="true" class="bt_ren">返回</a></span>
+    </div>
+
+	<div id="print">
+		<!-- 表单模块 -->
+		<form name="form1" action="showOutDetail.html?outDepId=$!{outDepositoryDispaly.id}" method="post">
+			<input type="hidden" name="optType" id="optType" value=""/>
+			<input type="hidden" name="expressTmp" id="expressTmp" value=""/>
+			<div class="formBox">
+				<h3><i></i><span>出库单信息</span></h3>
+				<div class="content">
+					<table class="c6">
+						<tr>
+							<th>单据编号</th>
+							<td>$!{outDepositoryDispaly.billNum}</td>
+							<th>类型</th>
+							<td>$!outDepositoryTypeMap.get("$!{outDepositoryDispaly.type}")</td>
+						</tr>
+						<tr>
+							<th>关联单据号</th>
+							<td>
+								#if(!$outDepositoryDispaly.tradePackageList || $outDepositoryDispaly.tradePackageList.size() == 0)
+									$!{outDepositoryDispaly.relationNum}
+								#else
+									#foreach($tradePackage in $outDepositoryDispaly.tradePackageList)
+										$tradePackage.tid 
+									#end
+								#end
+							</td>
+							<th>状态</th>
+							<td>$!outDepositoryStatusMap.get("${outDepositoryDispaly.status}")</td>
+						</tr>
+						<tr>
+							<th>操作人</th>
+							<td>$!{outDepositoryDispaly.creater}</td>
+							<th>操作时间</th>
+							<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${outDepositoryDispaly.gmtModify})</td>
+						</tr>
+						<tr>
+							<th>一级仓库</th>
+							<td colspan="3">$!{outDepositoryDispaly.depFirstName}</td>
+						</tr>
+						<tr>
+							<th>出库时间</th>
+							<td #if(!$disExpressFlag) colspan="3" #end>
+									#if($currDate)
+										#if(${outDepositoryDispaly.status} == 'out_finished')
+											<input name="outDepositoryTime" id="outDepositoryTime" size="10" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${outDepositoryDispaly.gmtOutDep})" disabled />
+										#else
+											<input name="outDepositoryTime" id="outDepositoryTime" size="10" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${currDate})" disabled />
+										#end
+									#else
+										#if(${outDepositoryDispaly.status} == 'out_finished')
+											<input name="outDepositoryTime" id="outDepositoryTime" size="10" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${outDepositoryDispaly.gmtOutDep})" disabled />
+										#else
+											<input name="outDepositoryTime" id="outDepositoryTime" size="10" value="$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${currDate})" disabled />
+										#end
+									#end
+									<script type="text/javascript">
+    			      					Calendar.setup({
+    										inputField : "outDepositoryTime",
+    			          					ifFormat   : "%Y-%m-%d",
+    			          					align      : "BR"
+    		      						});
+    			  					</script>
+							</td>
+							#if($disExpressFlag)
+								<th>物流公司</th>
+								<td>$!{outDepositoryDispaly.expressName}</td>
+							#end
+						</tr>
+						#if($disExpressFlag)
+							<tr>
+								<th>物流单号</th>
+								<td>$!{outDepositoryDispaly.expressCode}
+									<input type="hidden" name="expressCode" id="expressCode" size="15" value="$!{outDepositoryDispaly.expressCode}"/>
+								</td>
+								<th>支付方式</th>
+								<td>$!expressDistPaymentMap.get($!{outDepositoryDispaly.payment})
+									#if($payRecord)
+										[
+										#if("$!payRecord.payPlatform.toLowerCase()" == "zfb")
+											支付宝
+										#elseif("$!payRecord.payPlatform.toLowerCase()" == "chb")
+											网银在线
+										#elseif("$!payRecord.payPlatform.toLowerCase()" == "cft")
+											财付通
+										#elseif("$!payRecord.payPlatform.toLowerCase()" == "sxy")
+											首信易
+										#elseif("$!payRecord.payPlatform.toLowerCase()" == "back")
+											后台下单
+										#end
+										]
+									#end
+								</td>
+							</tr>
+							<tr>
+								<th>物流费用</th>
+								<td colspan="3">$!{outDepositoryDispaly.expressAmount}元</td>
+							</tr>
+						#end
+						<tr>
+							<th>备 注</th>
+							<td colspan="3">
+								<textarea cols="70" rows="3" id="remark"  #if(${outDepositoryDispaly.status} == 'out_finished') readonly="readonly" #end name="remark" onKeyUp="textLimitCheck(this,280);">$!{outDepositoryDispaly.remark}</textarea>
+									<font color="red">仓管填写未发货原因！</font>
+							</td>
+						</tr>
+					</table>
+				</div>
+            </div>
+			
+			#if("$!{outDepositoryDispaly.status}" != 'out_finished')
+				<div class="tool">
+					<span>
+						扫描输入产品编码：
+						<input type="text" id="scanGoodsCode" name="scanGoodsCode" value="" onkeypress="checkOutGoods(event);" maxLength="16" #if(!${goodsCodeStr}) readonly="readonly" #end/>
+						<input type="hidden" name="goodsCodeStr" id="goodsCodeStr" value="$!goodsCodeStr"/>
+					</span>
+				</div>
+			#end
+
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>出库产品列表</span></h3>
+				<table>
+					<tr>
+						<th>产品编码</th>
+						<th>产品名称</th>
+						<th>类目</th>
+						<th>属性</th>
+						<th>单位</th>
+						<th>单价</th>
+						<th>数量</th>
+						#if("$!{outDepositoryDispaly.status}" != 'out_finished')
+							<th>核对数</th>
+						#end
+						#if($!{outDepositoryDispaly.type} == "out_shopping")
+							<th>采购单号</th>
+						#end
+						<th>操作</th>
+					</tr>
+					#if($outDetailGoodsLists)
+						#foreach($outDetailGoodsInfo in $outDetailGoodsLists)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>$!outDetailGoodsInfo.code</td>
+								<td>$!outDetailGoodsInfo.instanceName</td>
+								<td>$!outDetailGoodsInfo.catName</td>
+								<td>$!outDetailGoodsInfo.attributeName</td>
+								<td>$!outDetailGoodsInfo.goodsUnit</td>
+								<td>￥$!moneyUtil.getFormatMoney($!outDetailGoodsInfo.unitPrice,'0.00')</td>
+								#if("$!{outDepositoryDispaly.status}" != 'out_finished')
+									<td>
+										<input id="outNum_$velocityCount" name="outNum_$outDetailGoodsInfo.code" value="$!outDetailGoodsInfo.outNum" size="5" readonly="readonly"/>
+									</td>
+									<td>
+										<input id="checkNum_$velocityCount" name="checkNum_$outDetailGoodsInfo.code" value="0" style="color:red" size="5" onchange="javascript:if(!isIntNumber(this.value)){alert('请输入数字。');this.value='';}"/>
+									</td>
+								#else
+									<td>$!outDetailGoodsInfo.outNum</td>	
+								#end
+								#if($!{outDepositoryDispaly.type}=="out_shopping")
+									<td>$!outDetailGoodsInfo.relationNum</td>
+								#end
+								<td><a href="outDepositoryOpt.html?optId=$!outDetailGoodsInfo.id&optType=$!{outDepositoryDispaly.type}&outStatus=${outDepositoryDispaly.status}" target="_blank">#if(${outDepositoryDispaly.status} != 'out_finished')库存出库#else 查看库存分配信息#end</a></td>
+							</tr>
+						#end
+					#end
+				</table>
+			</div>
+        </form>
+	</div>
+	
+    <div class="formBox">
+    	<div class="form-but">
+			#if(${outDepositoryDispaly.status} != 'out_finished')
+				<button type="button" class="button-s4" onclick="javascript:subFinish('remark','','');">提交备注信息</button>
+				#if($outDetailGoodsLists && $outDetailGoodsLists.size() > 0)
+					<button type="button" class="button-s4" onclick="javascript:subFinish('finishOpt','$!{outDepositoryDispaly.type}','');">完成</button>
+				#end
+			#end
+			## modify by fanyj 2010-11-16 【取消提交物流单号功能】
+			##if($disExpressFlag)
+			##	<span class="action-span"><a href="javascript:subFinish('updExpressCode','');">提交物流单号</a></span>
+			##end
+    	</div>
+    </div>
+
+</div>
+</body>
+
+<script >
+	function preview(){
+		window.showModalDialog("$appServer/storage/printOutDep.html?id=$!{outDepositoryDispaly.id}",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+	function printOpt(opt,expressTmp){
+		var url = "$appServer/storage/showOutDetail.html?outDepId=$!{outDepositoryDispaly.id}&optType=" + opt + "&expressTmp=" + expressTmp;
+		if(expressTmp==""){
+			alert("此物流信息并未配置物流代码，不能打印！");
+			return false;
+		}
+		if(expressTmp=="0"){
+			alert("无需打印！");
+			return false;
+		}
+		if(expressTmp == "ZTO"){
+			window.showModalDialog(url,null,"dialogWidth:950px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "SFO"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:650px;help:no;status:no");
+		}else if(expressTmp == "YTO"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:650px;help:no;status:no");
+		}else if(expressTmp == "EMS" || expressTmp == "YWEMS"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "STO" || expressTmp == "YWSTO"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "DBO"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "YWYD"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "SUER"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "UC"){
+			window.showModalDialog(url,null,"dialogWidth:1100px;dialogHeight:600px;help:no;status:no");
+		}else if(expressTmp == "-1"){
+			return false;
+		}else{
+			alert("暂不支持此物流速递，不能打印！");
+			return false;
+		}
+
+	}
+	function subFinish(opt,outType,expressTmp){
+		if(opt=='finishOpt'){
+			var goodsCodeStr = document.getElementById('goodsCodeStr').value;
+			var codeArray = goodsCodeStr.split(",");
+			var outNum,checkNum;
+			var errorCode="";
+			
+			if(codeArray !=null && codeArray.length > 0){
+				var num = 1;
+				for(i=0; i<codeArray.length-1; i++){
+					outNum = document.getElementById("outNum_"+num).value;
+					checkNum = document.getElementById("checkNum_"+num).value;
+					
+					if(isIntNumber(checkNum)){
+						if(Number(outNum)!=Number(checkNum)){
+							errorCode += codeArray[i]+","
+						}
+					}else{
+						alert("产品编码："+codeArray[i]+" 的核对数量输入错误。");
+						return;
+					}
+					num++;
+				}
+				num=1;
+			}
+			if($disExpressFlag){
+				var expressCode = document.getElementById("expressCode").value;
+        		if(expressCode == ""){
+        			alert("物流单号信息不能为空！");
+        			return;
+        		}
+			}
+			
+			if(errorCode != null && errorCode != ""){
+				alert("产品编号："+errorCode+" 的出库数量和核对数量不相等！");
+				errorCode="";
+    			return;
+			}else{
+    			document.getElementById("expressTmp").value=expressTmp;
+        		document.getElementById("optType").value=opt;
+        		document.forms[0].submit();
+        		document.getElementById("expressTmp").value=""; 
+        		document.getElementById("optType").value="";
+    		}
+		}else{
+			document.getElementById("expressTmp").value=expressTmp;
+    		document.getElementById("optType").value=opt;
+    		document.forms[0].submit();
+    		document.getElementById("expressTmp").value="";
+    		document.getElementById("optType").value="";
+		}
+	}
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+	
+	function checkOutGoods(event){
+		var e = event?event:(window.event?window.event:null);
+		
+		if (event.keyCode==13){
+			var goodsCodeStr = document.getElementById('goodsCodeStr').value;
+    		var scanGoodsCode=document.getElementById('scanGoodsCode');
+    		var scanGoodsCodeValue=scanGoodsCode.value.trim();
+
+    		if(goodsCodeStr==null||goodsCodeStr.trim()==""){
+    			alert("出错：产品编码产为空.");
+    			scanGoodsCode.value="";
+    			scanGoodsCode.select();
+                scanGoodsCode.focus();
+    		}else if(scanGoodsCodeValue==null||scanGoodsCodeValue.trim()==""){
+    			alert("出错：您没有输入.");
+    			scanGoodsCode.value="";
+    			scanGoodsCode.select();
+                scanGoodsCode.focus();
+    		}else if(scanGoodsCodeValue.length>20){
+    			alert("出错：您输入的产品编码太长.");
+    			scanGoodsCode.value="";
+    			scanGoodsCode.select();
+                scanGoodsCode.focus();
+    		}
+    		else{
+    			jQuery.get('checkOutGoodsByJQuery.html',{param1:goodsCodeStr,param2:scanGoodsCodeValue},function(message){
+    			    var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+    				var msgInfo = message.substring(message.indexOf(",") + 2, message.length-2);
+    				
+    		        if (msgType == 'false') {
+    			        alert(msgInfo);
+						scanGoodsCode.value="";
+    					scanGoodsCode.select();
+                		scanGoodsCode.focus();
+    		        }
+    				if(msgType == 'true'){
+    					var checkNum = document.getElementsByName('checkNum_'+scanGoodsCodeValue);
+						if(checkNum.length > 1){
+							var outNum = document.getElementsByName('outNum_'+scanGoodsCodeValue);
+							for(j=0;j<checkNum.length;j++){
+								if(Number(checkNum[j].value)<Number(outNum[j].value)){
+									checkNum[j].value = Number(checkNum[j].value)+1;
+									break;
+								}
+								if(j==checkNum.length-1){
+									checkNum[checkNum.length-1].value = Number(checkNum[checkNum.length-1].value)+1;
+									break;
+								}
+							}
+						}else{
+							var checkNumValue = Number(checkNum[0].value);
+    						checkNum[0].value = checkNumValue+1;
+						}
+						scanGoodsCode.value="";
+    					scanGoodsCode.select();
+                		scanGoodsCode.focus();
+    				}
+    		    });
+    		}
+		}		
+	}
+	
+	function isIntNumber(val){
+		var reg = /^[1-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+</script>

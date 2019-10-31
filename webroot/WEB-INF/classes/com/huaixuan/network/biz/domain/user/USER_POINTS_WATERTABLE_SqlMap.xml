@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserPointsWatertableSQL">
+<typeAlias alias="userPointsWatertable" type="com.huaixuan.network.biz.domain.user.UserPointsWatertable"/>
+	<resultMap class="userPointsWatertable" id="userPointsWatertableResult">
+		<result column="id" property="id"/>
+		<result column="points" property="points"/>
+		<result column="outer_id" property="outerId"/>
+		<result column="outer_type" property="outerType"/>
+		<result column="user_id" property="userId"/>
+		<result column="user_nick" property="userNick"/>
+		<result column="type" property="type"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+
+<insert id="addUserPointsWatertable" parameterClass="userPointsWatertable">
+<![CDATA[
+		insert into emall_user_points_watertable
+		(points,outer_id,outer_type,user_id,user_nick,type,gmt_create,gmt_modify )values(
+		#points#,
+		#outerId#,
+		#outerType#,
+		#userId#,
+		#userNick#,
+		#type#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+</insert>
+
+<select id="getWatertablesByComCondition"  resultMap="userPointsWatertableResult">
+	
+		<![CDATA[ 
+		select a.* from emall_user_points_watertable a  where 1=1 
+		]]>
+		<isNotNull prepend="and"  property="type">
+		<isEqual property="type" compareValue = "all">
+			a.type in ('order','pay','cancelOrder','transaction') 
+		</isEqual>		
+		<isNotEqual property="type" compareValue = "all">
+			a.type = #type#
+		</isNotEqual>
+		</isNotNull>
+		<isNotNull prepend="and"  property="userNick">
+			a.user_nick=#userNick#
+		</isNotNull>		
+		<isNotNull prepend="and"   property="startDate">
+		<![CDATA[		a.gmt_create >=STR_TO_DATE(#startDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>
+		<isNotNull prepend="and"  property="endDate">
+		<![CDATA[	a.gmt_create <= STR_TO_DATE(#endDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>						
+		order by a.gmt_create desc 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getAllWatertablesByComCondition"  resultMap="userPointsWatertableResult">
+
+		<![CDATA[ 
+		select a.* from emall_user_points_watertable a  where 1=1 
+		]]>
+		<isNotNull prepend="and"  property="type">
+		<isEqual property="type" compareValue = "all">
+			a.type in ('order','pay','cancelOrder','transaction') 
+		</isEqual>		
+		<isNotEqual property="type" compareValue = "all">
+			a.type = #type#
+		</isNotEqual>
+		</isNotNull>
+		<isNotNull prepend="and"  property="userNick">
+			a.user_nick=#userNick#
+		</isNotNull>		
+		<isNotNull prepend="and"   property="startDate">
+		<![CDATA[		a.gmt_create >=STR_TO_DATE(#startDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>
+		<isNotNull prepend="and"  property="endDate">
+		<![CDATA[	a.gmt_create <= STR_TO_DATE(#endDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>						
+		order by a.gmt_create desc 
+</select>
+
+<select id="getWatertablesByComConditionCount"  resultClass="java.lang.Integer">
+		<![CDATA[	select count(*) from emall_user_points_watertable a  where 1=1 ]]>
+		<isNotNull prepend="and"  property="type">
+		<isEqual property="type" compareValue = "all">
+			a.type in ('order','pay','cancelOrder','transaction') 
+		</isEqual>		
+		<isNotEqual property="type" compareValue = "all">
+			a.type = #type#
+		</isNotEqual>
+		</isNotNull>
+		<isNotNull  property="userNick">
+			and a.user_nick=#userNick#
+		</isNotNull>		
+		<isNotNull prepend="and"   property="startDate">
+		<![CDATA[		a.gmt_create >=STR_TO_DATE(#startDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>
+		<isNotNull prepend="and"  property="endDate">
+		<![CDATA[	a.gmt_create <= STR_TO_DATE(#endDate#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotNull>							
+</select>
+
+
+<select id="getWatertablesByUserNick" resultMap="userPointsWatertableResult">
+<![CDATA[
+		select * from emall_user_points_watertable a 
+		where a.user_nick=#userNick#
+		order by a.gmt_create desc
+]]>
+</select>
+
+<select id="getWatertablesByUserNickCount"  resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from emall_user_points_watertable a 
+		where a.user_nick=#userNick#
+]]>
+</select>
+
+<select id="getUserPointsWatertables" resultMap="userPointsWatertableResult">
+	
+<![CDATA[
+		select a.* from emall_user_points_watertable a order by a.gmt_modify desc
+]]>
+</select>
+
+<select id="getUserPointsWatertablesCount" resultClass="java.lang.Integer">
+	
+<![CDATA[
+		select count(*) from emall_user_points_watertable  
+]]>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+
+</sqlMap>

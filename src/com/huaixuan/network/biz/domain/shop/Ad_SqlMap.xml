@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Ad">
+	<cacheModel id="ad-cache" type="LRU">
+		<flushInterval hours="2"/>
+	   <flushOnExecute statement="addAd"/>
+	   <flushOnExecute statement="editAd"/>
+	   <flushOnExecute statement="removeAd"/>
+	   <flushOnExecute statement="updateAd"/>
+	   <flushOnExecute statement="updateAdSortlow"/>
+	   <flushOnExecute statement="updateAdSortUpdtae"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+	<typeAlias alias="ad" type="com.huaixuan.network.biz.domain.shop.Ad" />
+	<resultMap class="ad" id="adResult">
+		<result column="id" property="id" />
+		<result column="ad_position_id" property="adPositionId" />
+		<result column="ad_name" property="adName" />
+		<result column="type" property="adType" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+		<result column="link_man" property="linkMan" />
+		<result column="link_email" property="linkEmail" />
+		<result column="link_phone" property="linkPhone" />
+		<result column="status" property="status" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+
+	<resultMap class="ad" id="adList">
+		<result column="id" property="id" />
+		<result column="ad_position_id" property="adPositionId" />
+		<result column="ad_name" property="adName" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+		<result column="link_man" property="linkMan" />
+		<result column="link_email" property="linkEmail" />
+		<result column="link_phone" property="linkPhone" />
+		<result column="status" property="status" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="position_name" property="positionName" />
+		<result column="media_type" property="mediaType" />
+		<result column="media_code" property="mediaCode" />
+
+	</resultMap>
+
+	<resultMap class="ad" id="adEXT" extends="adResult">
+		<result column="positon_id" property="postionId" />
+		<result column="media_type" property="mediaType" />
+		<result column="media_code" property="mediaCode" />
+		<result column="link" property="link" />
+		<result column="sort" property="sort" />
+	</resultMap>
+
+	<!-- create Ad object -->
+	<insert id="addAd" parameterClass="ad">
+		<![CDATA[
+		insert into emall_ad
+		(id,ad_position_id,ad_name,start_time,end_time,link_man,link_email,link_phone,status,gmt_create,gmt_modify,type )values( null,
+		#adPositionId#,
+		#adName#,
+		STR_TO_DATE(#startTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		STR_TO_DATE(#endTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		#linkMan#,
+		#linkEmail#,
+		#linkPhone#,
+		#status#,
+		sysdate(),
+		sysdate(),
+		#adType#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update Ad object -->
+	<update id="editAd" parameterClass="ad">
+		<![CDATA[
+		update emall_ad set ad_position_id = #adPositionId#,
+		ad_name = #adName#,
+		start_time = STR_TO_DATE(#startTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		end_time = STR_TO_DATE(#endTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		link_man = #linkMan#,
+		link_email = #linkEmail#,
+		link_phone = #linkPhone#,
+		status = #status#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+	</update>
+	<!-- delete Ad object -->
+	<update id="removeAd" parameterClass="ad">
+		<![CDATA[
+		update emall_ad set
+		status = #status#,
+		gmt_modify = sysdate()
+		 where id = #id#
+]]>
+	</update>
+	<!-- search Ad object -->
+	<select id="getAd" parameterClass="java.lang.Long"
+		resultMap="adResult">
+		<![CDATA[
+		select emall_ad.* from emall_ad where emall_ad.ID = #value#
+]]>
+	</select>
+	<!-- searchAll Ad List -->
+	<select id="getAds" resultMap="adList">
+
+		select a.id, a.ad_position_id, a.ad_name, a.start_time,
+		a.end_time, a.link_man, a.link_email, a.link_phone, a.status,
+		a.gmt_create, a.gmt_modify, b.position_name, c.media_type from
+		emall_ad a left join emall_ad_detail c on a.id = c.ad_id left
+		join emall_ad_position b on a.ad_position_id = b.id order by
+		gmt_modify desc
+
+	</select>
+
+	<update id="updateAd" parameterClass="ad">
+		<![CDATA[
+		update emall_ad set ad_position_id = #adPositionId#,
+		ad_name = #adName#,
+		start_time = STR_TO_DATE(#startTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		end_time = STR_TO_DATE(#endTimeStr#,'%Y-%m-%d %H:%i:%s'),
+		link_man = #linkMan#,
+		link_email = #linkEmail#,
+		link_phone = #linkPhone#,
+		gmt_modify = sysdate(),
+		type = #adType#
+		 where id = #id#
+
+]]>
+	</update>
+
+	<select id="getAdsCount" resultClass="java.lang.Integer">
+		<![CDATA[
+		select count(*) from emall_ad
+		where emall_ad.status = 'open' and emall_ad.type=#adType#
+		order by emall_ad.gmt_create desc,emall_ad.id
+
+]]>
+	</select>
+
+	<select id="getAdsPage" parameterClass="map" resultMap="adList">
+	<include refid="pageSQLHead" />
+		<![CDATA[
+	select a.id,
+			a.ad_position_id,
+			a.ad_name,
+			a.start_time,
+			a.end_time,
+			a.link_man,
+			a.link_email,
+			a.link_phone,
+			a.status,
+			a.gmt_create,
+			a.gmt_modify,
+			b.position_name,
+			c.media_type,
+			c.media_code
+		 from emall_ad a left join emall_ad_detail c on a.id = c.ad_id
+		 				left join emall_ad_position b on a.ad_position_id = b.id
+		 				where a.status = 'open' and a.type=#adType#
+						order by  b.id asc,c.sort,a.id
+
+]]>
+<include refid="pageSQLFoot" />
+	</select>
+
+	<select id="getAdInfo" resultMap="adEXT" cacheModel="ad-cache" parameterClass="java.util.Map">
+		<![CDATA[
+	select a.*,
+			b.id as positon_id,
+			c.media_type,c.media_code ,c.link,c.sort as sort
+			from emall_ad a,emall_ad_detail c , emall_ad_position b where a.ad_position_id = b.id  and a.id=c.ad_id and a.status='open'
+				and a.start_time< sysdate() and a.end_time > sysdate()
+		]]>
+	<isNotEmpty prepend="and" property="type">
+	        a.type = #type#
+	</isNotEmpty>
+	order by b.id asc,c.sort asc
+	</select>
+
+
+	<select id="getAdMaxSort" resultClass="java.lang.Integer">
+		<![CDATA[
+	select max(sort) from emall_ad_detail a ,emall_ad b
+		where a.ad_id = b.id and b.status = 'open'
+	]]>
+	</select>
+
+	<update id="updateAdSortlow" parameterClass="java.util.Map">
+	<![CDATA[
+			update emall_ad_detail a set
+			a.sort = a.sort-1,
+			a.gmt_modify = sysdate()
+			 where a.sort <= #maxid#
+				and a.sort > #maxid2# and a.ad_id in (select a.ad_id
+                     from emall_ad_detail a, emall_ad b
+                    where a.ad_id = b.id
+                      and b.status = 'open')
+	]]>
+	</update>
+
+	<update id="updateAdSortUpdtae" parameterClass="java.util.Map">
+	<![CDATA[
+			update emall_ad_detail a set
+			a.sort = a.sort+1,
+			a.gmt_modify = sysdate()
+			 where a.sort >= #maxid#
+				and a.sort < #maxid2# and a.ad_id in (select a.ad_id
+                     from emall_ad_detail a, emall_ad b
+                    where a.ad_id = b.id
+                      and b.status = 'open')
+	]]>
+	</update>
+
+</sqlMap>

@@ -1,0 +1,343 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+
+<script src="${imageServer}/scripts/ajaxfileupload.js" type="text/javascript" language="javascript"></script>
+
+
+<style type="text/css">
+    body { 
+    font-family:Arial, Helvetica, sans-serif; 
+    font-size:12px; 
+    margin:0; 
+    } 
+    #main { 
+    padding-top:90px; 
+    text-align:center; 
+    } 
+    #fullbg { 
+    background-color:gray; 
+    left:0; 
+    opacity:0.5; 
+    position:absolute; 
+    top:0; 
+    z-index:3; 
+    filter:alpha(opacity=50); 
+    -moz-opacity:0.5; 
+    -khtml-opacity:0.5; 
+    } 
+    #dialog { 
+    background-color:#fff; 
+    border:5px solid rgba(0,0,0, 0.4); 
+    height:200px; 
+    left:50%; 
+    margin:-200px 0 0 -200px; 
+    padding:1px; 
+    position:fixed !important; /* 浮动对话框 */ 
+    position:absolute; 
+    top:50%; 
+    width:370px; 
+    z-index:5; 
+    border-radius:5px; 
+    display:none; 
+    } 
+    #dialog p { 
+    margin:0 0 12px; 
+    height:24px; 
+    line-height:24px; 
+    background:#CCCCCC; 
+    } 
+    #dialog p.close { 
+    text-align:right; 
+    padding-right:10px; 
+    } 
+    #dialog p.close a { 
+    color:#fff; 
+    text-decoration:none; 
+    } 
+</style>
+<body>
+	<div class="main">
+    	 <h2>现货查看</h2>
+		
+		 
+		 <form action="searchSupplierGoods.html" name="searchForm" id="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>供货商：</th>
+                    <td>
+            			#springBind("supplierGoods.supplierName")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>品牌：</th>
+                    <td>
+            			#springBind("supplierGoods.brandName")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>品名：</th>
+                    <td>
+            			#springBind("supplierGoods.series")
+						<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					
+                </tr>
+				<tr>
+        			<th>型号：</th>
+                    <td>
+            			#springBind("supplierGoods.type")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>材质：</th>
+                    <td>
+            			#springBind("supplierGoods.material")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>颜色：</th>
+                    <td>
+            			#springBind("supplierGoods.color")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+                </tr>
+				<tr id="sizetar" >					
+					<th>风格：</th>
+                    <td>
+            			#springBind("supplierGoods.style")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					<th>是否删除：</th>
+                    <td>
+            			#springBind("supplierGoods.isDelete")
+            			<select name="${status.expression}" class="select">
+							<option value="-1" #if("-1"==$!{status.value}) selected #end>---全部---</option>
+                        	<option value="0" #if("0"==$!{status.value}) selected #end>未删除</option>
+                        	<option value="1" #if("1"==$!{status.value}) selected #end>已删除</option>
+						</select>
+            		</td>
+					
+                </tr>
+    		</table>
+		</div>
+	</form>
+		 
+		 
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品管理</span></h3>
+            <table >
+                <tr>
+					<th>源文件</th>
+					<th>供货商</th>
+                    <th>品牌</th>
+                    <th>品名</th>
+                    <th>型号</th>
+					<th>材质</th>
+					<th>颜色</th>
+					<th>风格</th>
+					<th>欧洲零售价(eu)</th>
+					<th>成本(eu)</th>
+					<th>供货价</th>
+					<th>折扣</th>
+					<th>是否删除</th>
+					<th>size-库存</th>
+					<th>库存</th>
+					<th>图片</th>
+					<th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($goods in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center">$!goods.idFile</td>
+					<td style="text-align:center">$!goods.supplierName</td>
+                    <td style="text-align:center">$!goods.brandName</td>
+					<td style="text-align:center">$!goods.series</td>
+					<td style="text-align:center">$!goods.type</td>
+					<td style="text-align:center">$!goods.material</td>
+					<td style="text-align:center">$!goods.color</td>
+					<td style="text-align:center">$!goods.style</td>
+					<td style="text-align:center">$!goods.retail</td>
+					<td style="text-align:center">$!goods.cost</td>
+					<td style="text-align:center">$!goods.price</td>
+					<td style="text-align:center">$!goods.percent</td>
+					<td style="text-align:center"> 
+						      #if("0"==$!goods.isDelete)未删除
+			                 #elseif("1"==$!goods.isDelete)已删除
+	                         #end</td>
+					<td style="text-align:center">$!goods.size</td>
+					<td style="text-align:center">$!goods.totalNum</td>
+					<td style="text-align:center">
+					<a href="${upServer}/$!{goods.imgLarge}" onmousemove="cursor('${upServer}/$!{goods.imgLarge}',event)"  onmouseout="hidecursor()" target="_blank">查看</a></td>
+					<td>#if("0" == "$!goods.isDelete")<a href="/supplier/editSupplierGoods.html?id=$!goods.id" target="_bank">修改</a>#end  &nbsp;&nbsp;
+							<a href="javascript:void(0)" class="import" alt="${goods.id}"> 上传照片</a>
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/supplier/searchSupplierGoods.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+
+
+    </div>
+	
+	
+	
+	
+	<div id="main">
+<div id="fullbg"></div> 
+<div id="dialog"> 
+<p class="close"><a href="#" onclick="closeBg();">关闭</a></p> 
+<div>
+
+<div id="uploadHtml" style="margin-top:50px;">
+<form id="uploadForm" name="uploadForm"  method="post" action="uploadGoodsPic.html" enctype="multipart/form-data" style="text-align:center"  >
+	<input type="file" name="goodsPic" id="goodsPic"/>
+	<input type="hidden" id="goodsId" name="goodsId"/>
+	<input type="button" value="上传" id="up" onclick="upload()"/>
+	<div style="color:red;display:none" id="uploading" >上传中,请勿关闭</div>
+</form>
+ 
+</div>
+
+</div> 
+</div> 
+</div> 
+
+	<script language="javascript" type="text/javascript">
+	
+	function cursor(str,evt){
+
+        var id = document.getElementById("Layer3");
+        //id.innerHTML = str; //文字
+        evt = evt||window.event;
+
+        id.innerHTML = "<img src='" + str + "' height=\"270px\" width=\"270px\">"; //图片
+        id.style.visibility = "visible";
+        id.style.position = "absolute";
+        id.style.left = evt.clientX -350+"px";
+        id.style.top = evt.clientY -270+document.documentElement.scrollTop+"px";
+    }
+    
+    function hidecursor(){
+        var id = document.getElementById("Layer3");
+        id.style.visibility = "hidden";
+    }
+	function szietarDis(num){
+		var ser = document.getElementById("sizetar");
+		if(num=="1"||num=="2"){
+			ser.style.display="none";
+		}else{
+			ser.style.display="";
+		}
+	}
+	
+	
+	$(".import").each(function()
+    {
+    	$(this).click(function()
+    	{
+    		var  id = $(this).attr("alt");
+    		$("#goodsId").val(id);
+    		showBg();
+    	})
+    
+    })
+	
+function upload()
+{
+	var goodsId = $("#goodsId").val();
+	var fileName = $("#goodsPic").val();
+	if(!fileName){alert('请选择图片'); return false}
+	fileName = fileName.toLowerCase();
+	if(fileName.indexOf(".jpg") < 0){alert('请选择jpg图片'); return false}
+	if(confirm("确定上传"))
+	{
+		showDiv();
+    	jQuery.ajaxFileUpload({  
+                url:'/supplier/uploadGoodsPic.html',  
+                secureuri:false,  
+                fileElementId:'goodsPic',//file标签的id  
+                dataType: 'text/plain',//返回数据的类型  
+                data:{goodsId:goodsId},//一同上传的数据  
+                success: function (data, status) {
+					hideDiv();
+					data = data+"";
+    				if(data.indexOf("_ok_") > 0)
+    				{
+						$("#searchForm").submit();
+    				}
+    				else
+    				{
+    					alert("上传失败:" + data);
+    				}
+                },  
+                error: function (data, status, e) {
+					hideDiv();
+        			data = data+"";
+    				if(data.indexOf("_ok_") > 0)
+    				{
+						$("#searchForm").submit();
+    				}
+    				else
+    				{
+    					alert("上传失败:" + data);
+    				}
+                }  
+            });  
+		}
+}
+	
+	 //显示灰色 jQuery 遮罩层 
+function showBg() { 
+  
+$("#main").height(1800);
+var bh = $("body").height(); 
+var bw = $("body").width(); 
+$("#fullbg").css({ 
+height:bh, 
+width:bw, 
+display:"block" 
+}); 
+$("#dialog").show(); 
+} 
+//关闭灰色 jQuery 遮罩 
+function closeBg() { 
+$("#main").height(0);
+$("#fullbg,#dialog").hide(); 
+} 
+
+
+
+function showDiv()
+{
+	$("#uploading").css("display","block")
+	$("#up").attr("disabled","disabled");
+}
+function hideDiv()
+{
+	$("#uploading").css("display","none")
+	$("#up").removeAttr("disabled");
+}
+
+
+</script>
+	<div id="Layer3" style="visibility:hidden; border:#E1E1E1 1px solid; padding:3px;">Hello</div>
+</body>

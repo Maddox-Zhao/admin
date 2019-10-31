@@ -1,0 +1,218 @@
+#set($layout = "layout/default.vm")
+#set($title = "财务管理 - 周期结算收款管理")
+<div class="main">
+
+	<h2>财务管理 - 周期结算收款管理</h2>
+
+   <form action="$appServer/trade/searchPeriodList.html" name="searchForm" method="post" id="searchForm">
+	<div class="searchBox">
+		<h3><span>搜索订单</span></h3>
+        		<table >
+        			<tr>
+        				<th>订单号：</th>
+                        <td>
+        					<input type="text" name="tid" id="tid" value="$!{queryObject.tid}" size="15" theme="simple" maxlength="30"  />
+        				</td>
+        				<th>买家名称：</th>
+        				<td >
+        					<input type="text" name="buyNick" size="10" theme="simple" id="buyNick" value="$!queryObject.buyNick"/>
+                        </td>
+                    </tr>
+        			<tr>
+        				<th>财务状态：</th>
+                        <td>
+        					<select name="payStatus" id="payStatus" style="width:100px;">
+                    			<option value="">-=请选择=-</option>
+                                <option value="no_pay" #if($queryObject.payStatus=="no_pay") selected #end>未确认</option>
+                    			<option value="paid" #if($queryObject.payStatus=="paid") selected #end>已确认</option>
+                    		</select>
+        				</td>
+        				<th>是否催款：</th>
+        				<td >
+        					<select name="isReminders" id="isReminders" style="width:50px;">
+                    			<option value="">否</option>
+                                <option value="y" #if("$!{queryObject.isReminders}"=="y") selected #end>是</option>
+                    		</select>
+                        </td>
+                    </tr>
+
+        			<tr >
+            			<th>订单时间：从</th>
+            			<td >
+            				<input type="text" name="gmtCreateStart" id="gmtCreateStart" value="$!queryObject.gmtCreateStart" size="10" theme="simple" readonly="true" />
+                        </td>
+            			<th>到</th>
+            			<td >
+            				<input type="text" name="gmtCreateEnd" id="gmtCreateEnd" value="$!queryObject.gmtCreateEnd" size="10" theme="simple" readonly="true" />
+                        </td>
+                		  <script type="text/javascript">
+                		      Calendar.setup({
+                		          inputField : "gmtCreateStart",
+                		          ifFormat   : "%Y-%m-%d",
+                		          align      : "BR"
+                		      });
+                		      Calendar.setup({
+                		          inputField : "gmtCreateEnd",
+                		          ifFormat   : "%Y-%m-%d",
+                		          align      : "BR"
+                		      });
+                		</script>
+                    </tr>
+        			<tr >
+        				<th></th>
+            			<td >
+            				<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+        					<input type="button" value=" 重置 " class="button"  onclick="clean();"/>
+        					<input type="button" value="Excel导出" class="button" onclick="doExport();return false;"/>
+                        </td>
+                    </tr>
+        			<input type="hidden" value="$!queryObject.id" name="id" id="id"/>
+                </table>
+	</div>
+
+<center ><div id="result" style="color:red;">$!message</div></center>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+		#if($!trade)
+		<div align="right"><font size='4'><strong><label>【 汇总: </label></strong></font><font size='4' color="red"><strong><label>${trade.id}</label></strong></font><font size='4'><strong><label>笔&nbsp;&nbsp;&nbsp;支付总金额: </label></strong></font><font size='4' color="red"><strong><label>${trade.goodsAmountSum}</label></strong></font><font size='4'><strong><label>元 】</label></strong></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+		#end
+      <tr>
+		<th><input type="checkbox" id="allbox" />全选</th>
+        <th>订单号</th>
+        <th>支付金额(￥)</th>
+        <th>买家名称</th>
+        <th>财务确认时间</th>
+		<th>财务状态</th>
+		<th>结算截止日</th>
+		<th>操作</th>
+      </tr>
+      #foreach($trade in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td  align="center">#if(${trade.payStatus} == "no_pay")<input name="ids" type="checkbox" value="$trade.id" />#end</td>
+        <td  align="right"><a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)">$!{trade.tid}</a></td>
+        <td  align="right">$!moneyUtil.getFormatMoney($!{trade.amount},'0.00')</td>
+        <td  align="center">$!{trade.buyNick}</td>
+        <td  align="center">$!date.format("yyyy-MM-dd HH:mm:ss",$!trade.payTime)</td>
+		<td  align="center"><span id="displayStatus$trade.id">#if($!{trade.payStatus} == "no_pay") 未确认 #else 已确认 #end</span></td>
+		<td  align="center">$!date.format("yyyy-MM-dd HH:mm:ss",$!trade.gmtPeriodPayEnd)</td>
+		<td  align="center">
+		  #if($!{trade.payStatus} == "no_pay")
+			<input type="button" onclick="return confirmStatus($trade.id);" value="财务确认" id="doConfirm$trade.id"/>
+		  #end
+		</td>
+      </tr>
+	  #end
+    </table>
+	<table cellpadding="4" cellspacing="0">
+		<tr>
+			<td>
+				<input type="button" id="btnSubmit" value="批量确认" class="btn" onclick="batchConfirm();"/>
+				<input type="hidden" id="curpage" name="curpage"/>
+			</td>
+        </tr>
+    </table>
+    </div>
+	
+   </form>
+	<!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/trade/searchPeriodList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+
+    var payRecordId='';
+
+    String.prototype.trim = function() {
+        // 用正则表达式将前后空格
+        // 用空字符串替代。
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+    function formSubmit(){
+        var platdateStart=document.getElementById("gmtCreateStart").value.replace(/-/g, "/");
+        var platdateEnd=document.getElementById("gmtCreateEnd").value.replace(/-/g, "/");
+        var tid=document.getElementById("tid").value.replace(/-/g, "/");
+        var buyNick=document.getElementById("buyNick").value.replace(/-/g, "/");
+        var pb_date=new Date(Date.parse(platdateStart));
+        var pe_date=new Date(Date.parse(platdateEnd));
+        if(pe_date < pb_date){
+            alert("起始时间不能大于结束时间！");
+            return false;
+        }
+		document.getElementById("gmtCreateStart").value=jQuery.trim(document.getElementById("gmtCreateStart").value);
+		document.getElementById("gmtCreateEnd").value=jQuery.trim(document.getElementById("gmtCreateEnd").value);
+		document.getElementById("tid").value=jQuery.trim(document.getElementById("tid").value);
+		document.getElementById("buyNick").value=jQuery.trim(document.getElementById("buyNick").value);
+        document.searchForm.submit();
+    }
+
+	function clean(){
+		document.getElementById('tid').value='';
+		document.getElementById('buyNick').value='';
+		document.getElementById('gmtCreateStart').value='';
+		document.getElementById('gmtCreateEnd').value='';
+	}
+
+	function doExport(){
+		var form1=document.getElementById('searchForm');
+		form1.action="$appServer/trade/doExportPeriodReceive.html";
+		form1.submit();
+		form1.action="$appServer/trade/searchPeriodList.html";
+	}
+
+	function confirmStatus(id){
+	  	if(!confirm("请检查货款是否到账， 确定要确认此订单吗?")){
+           return false;
+	   }
+	   		var form1=document.getElementById('searchForm');
+			document.getElementById("id").value=id;
+			form1.action="confirmStatus.html?actionType=period";
+	   		form1.submit();
+	   //TradeAction.confirmStatus(payRecordId,showReturn);
+	}
+	
+	function batchConfirm(){
+	   if(!confirm("请检查货款是否到账， 确定要批量确认订单吗?")){
+           return false;
+	   }
+	   var num=0;
+	   var elements=document.getElementsByName("ids");
+	   for(var i=0 ; i<elements.length ; i++){
+	      if(elements[i].checked == true){
+		     num = num+1;
+		  }
+	   }
+	   if(num<1){
+	     alert("请至少选择一条订单进行确认");
+		 return false;
+	   }
+	   
+	   var page = document.getElementsByName("page");
+	   document.getElementById("curpage").value = page[0].value;
+	   
+	   var form1=document.getElementById('searchForm');
+	   form1.action="batchConfirmStatus.html?actionType=period";
+	   form1.submit();
+	}
+
+	function showReturn(message){
+		if(message=="statuswrong"){
+		    document.getElementById('result').innerHTML="订单状态已更改,请刷新!";
+	    }
+		if(message=="success"){
+			document.getElementById('displayStatus'+payRecordId).innerHTML='已确认';
+			document.getElementById('doConfirm'+payRecordId).style.display="none";
+		    document.getElementById('result').innerHTML="操作成功!";
+		}
+	}
+</script>

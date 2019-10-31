@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="WholesaleApplySQL">
+<typeAlias alias="wholesaleApply" type="com.huaixuan.network.biz.domain.trade.WholesaleApply"/>
+	<resultMap class="wholesaleApply" id="wholesaleApplyResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="TID" property="tid"/>
+		<result column="DEP_FIRST_ID" property="depFirstId"/>
+		<result column="depFirstName" property="depFirstName"/>
+		<result column="STATUS" property="status"/>
+	</resultMap>
+<!-- create WholesaleApply object -->
+<insert id="addWholesaleApply" parameterClass="wholesaleApply">
+<![CDATA[
+		insert into wholesale_apply
+		(ID,GMT_CREATE,GMT_MODIFY,TID,DEP_FIRST_ID,STATUS )values( null,
+		sysdate(),
+		sysdate(),
+		#tid#,
+		#depFirstId#,
+		#status#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update WholesaleApply object -->
+<update id="editWholesaleApply" parameterClass="wholesaleApply">
+<![CDATA[
+		update wholesale_apply set
+		GMT_MODIFY = sysdate(),
+		STATUS = #status#
+		 where ID = #id#
+		
+]]>
+</update>
+<!-- delete WholesaleApply object -->
+<delete id="removeWholesaleApply" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from wholesale_apply where wholesale_apply.ID = #value# 
+]]>
+</delete>
+<!-- search WholesaleApply object -->
+<select id="getWholesaleApply" parameterClass="java.lang.Long" resultMap="wholesaleApplyResult">
+<![CDATA[
+		select t.*,
+			(select d.dep_first_name from ioss_depository_first d where d.id=t.DEP_FIRST_ID) depFirstName
+		 from wholesale_apply t where t.ID = #value# 
+]]>
+</select>
+
+<select id="getWholesaleApplyByTid" parameterClass="java.lang.String" resultMap="wholesaleApplyResult">
+<![CDATA[
+		select t.*,
+			(select d.dep_first_name from ioss_depository_first d where d.id=t.DEP_FIRST_ID) depFirstName
+		 from wholesale_apply t where t.tid = #value# and (t.STATUS='handling' or t.STATUS='new') LIMIT 1 
+]]>
+</select>
+
+<!-- searchAll WholesaleApply List -->
+<select id="getWholesaleApplys" resultMap="wholesaleApplyResult">
+<![CDATA[
+		select t.*,
+			(select d.dep_first_name from ioss_depository_first d where d.id=t.DEP_FIRST_ID) depFirstName
+		 from wholesale_apply t
+]]>
+</select>
+
+<select id="getWholesaleApplysByParMap" resultMap="wholesaleApplyResult" parameterClass="java.util.Map">
+	
+	<![CDATA[
+			select t.*,
+				(select d.dep_first_name from ioss_depository_first d where d.id=t.DEP_FIRST_ID) depFirstName
+			 from wholesale_apply t where 1=1
+	]]>
+	<isNotEmpty property="tid" prepend="and">
+		    t.tid like CONCAT('%',#tid#,'%')
+	</isNotEmpty>
+	<isNotEmpty property="depFirstId" prepend="and">
+		    t.DEP_FIRST_ID=#depFirstId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depfirstIds">
+			t.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+	</isNotEmpty>
+	<isNotEmpty property="status" prepend="and">
+		    t.status=#status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtModifyStart">
+	<![CDATA[t.GMT_MODIFY >= STR_TO_DATE(#gmtModifyStart#,'%Y-%m-%d %H:%i:%s')]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtModifyEnd">
+	<![CDATA[t.GMT_MODIFY < DATE_ADD(STR_TO_DATE(#gmtModifyEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+	</isNotEmpty>
+		order by t.GMT_CREATE desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getCountWholesaleApplysByParMap" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	<![CDATA[
+			select count(t.id)
+			 from wholesale_apply t where 1=1
+	]]>
+	<isNotEmpty property="tid" prepend="and">
+		    t.tid like CONCAT('%',#tid#,'%')
+	</isNotEmpty>
+	<isNotEmpty property="depFirstId" prepend="and">
+		    t.DEP_FIRST_ID=#depFirstId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depfirstIds">
+			t.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+	</isNotEmpty>
+	<isNotEmpty property="status" prepend="and">
+		    t.status=#status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtModifyStart">
+	<![CDATA[t.GMT_MODIFY >= STR_TO_DATE(#gmtModifyStart#,'%Y-%m-%d %H:%i:%s')]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtModifyEnd">
+	<![CDATA[t.GMT_MODIFY < DATE_ADD(STR_TO_DATE(#gmtModifyEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+	</isNotEmpty>
+</select>
+</sqlMap>

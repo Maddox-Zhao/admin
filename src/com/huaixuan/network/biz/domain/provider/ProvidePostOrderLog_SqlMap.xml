@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+
+
+
+<typeAlias alias="providePostOrderLog" type="com.huaixuan.network.biz.domain.provider.ProvidePostOrderLog"/>
+<resultMap id="providePostOrderLog" class="com.huaixuan.network.biz.domain.provider.ProvidePostOrderLog" >
+		<result column="id" property="id"/>
+		<result column="order_id" property="orderId"/>
+		<result column="prod_id" property="prodId"/>
+		<result column="sku_id" property="skuId"/>
+		<result column="ss_prodid" property="sSprodid"/>
+		<result column="qty" property="qty"/>
+		
+		<result column="ptype" property="ptype"/>
+		<result column="push_platform" property="pushPlatform"/>
+		<result column="create_time" property="createTime"/>
+		<result column="status" property="status"/>
+		<result column="message" property="message"/>
+</resultMap>
+
+
+
+<select id="selectAllPushLog" parameterClass="java.util.Map" resultMap="providePostOrderLog">
+	select * from
+	provide_post_order_log
+	where 1=1	
+	<isNotNull prepend="and" property="prodId">
+		prod_id=#prodId#
+	</isNotNull>
+	<isNotNull prepend="and" property="skuId">
+		sku_id=#skuId#
+	</isNotNull>
+	<isNotNull prepend="and" property="orderId">
+		order_id=#orderId#
+	</isNotNull>
+	<isNotNull prepend="and" property="status">
+		status=#status#
+	</isNotNull>
+</select>
+
+   
+	
+	
+<insert  id ="insertPushLog"   parameterClass ="java.util.Map"> 
+    
+  insert into provide_post_order_log values(null,#orderId#,#prodId#,#skuId#,#sSprodid#,#qty#,#ptype#,#pushPlatform#,sysdate(),#status#,#message#)         
+     
+ </insert>
+  
+  
+<select id="getProviderLogPageCount" resultClass="java.lang.Integer">
+<![CDATA[
+	SELECT COUNT(*) FROM provide_post_order_log
+]]>
+</select>
+
+
+<select id="getProviderLogConditionWithPage" resultMap="providePostOrderLog" >
+SELECT * from provide_post_order_log where  1=1 
+	<!-- 银泰ID -->
+	<isNotNull prepend="and" property="prodId">
+		<![CDATA[ prod_id=#prodId# ]]>
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="skuId">
+		<![CDATA[ sku_id=#skuId# ]]>
+	</isNotNull>
+	
+ 	<!-- 银泰商品 -->
+	<isNotNull prepend="and" property="sSprodid">
+		ss_prodid=#sSprodid#
+	</isNotNull>
+	<!-- 订单号 -->
+	<isNotNull prepend="and" property="orderId">
+		<![CDATA[ order_id  =#orderId# ]]>
+	</isNotNull>
+	<!-- 推送数量 -->
+	<isNotNull prepend="and" property="qty">
+		qty=#qty#
+	</isNotNull>
+	<!-- 平台 -->
+	<isNotNull prepend="and" property="ptype">
+		<![CDATA[ ptype  like concat('%',upper(#ptype#),'%') ]]>
+	</isNotNull>
+	<!-- 状态 -->
+	<isNotNull prepend="and" property="status">
+		status=#status#
+	</isNotNull>
+	order by id DESC
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty> 	
+
+</select>
+
+
+</sqlMap>
+
+

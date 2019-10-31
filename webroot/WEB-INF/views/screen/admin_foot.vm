@@ -1,0 +1,4 @@
+#set($layout = 'layout\default.vm')
+<div class="admin-foot">
+    	<p>尚上后台管理系统</p>
+    </div>

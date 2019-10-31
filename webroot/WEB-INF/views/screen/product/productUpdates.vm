@@ -1,0 +1,130 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>批量修改</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+		
+</head>
+<body>
+  
+<div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+				<tr>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td >&nbsp;</td>
+					<td rowspan="2"><a class="mini-button" iconCls="icon-tip" onclick="UpdateNew()">修改</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:420px;" allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        idField="idProduct"  allowResize="true" pageSize="20" multiSelect="false"   showPager="false"   editNextOnEnterKey="true"  editNextRowCell="true"
+		allowAlternating="true"   allowCellEdit="true" allowCellSelect="true"   showSummaryRow="true">
+	
+	
+        <div property="columns">
+           <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+            <div field="idProduct" width="100" headerAlign="center" align="center" allowSort="true">idProduct</div>
+			
+            <div field="brandName" width="80" headerAlign="center" align="center"  allowSort="true">品牌
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>
+			
+            <div field="seriesName" width="40" headerAlign="center" align="center"  allowSort="true">品类
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>
+			
+            <div field="type" width="80" headerAlign="center" align="center"  allowSort="true">型号
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>
+			
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>
+			
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>
+            <div field="size" width="40" headerAlign="center" align="center"  allowSort="true">size
+				<input property="editor" class="mini-textbox" style="width:100%;" minWidth="200" />
+			</div>            
+        </div>
+    </div>
+ <script type="text/javascript">
+function SetData(data) {
+    data = mini.clone(data);
+    var idProducts = data.idProducts;
+    var grid = mini.get("datagrid1");
+    grid.setUrl("/product/updates.html?idProducts=" + data.idProducts);
+    grid.load();
+}
+
+function UpdateNew(){
+  
+  var grid = mini.get("datagrid1");
+  var rows = grid.getSelecteds();
+  alert(rows.length);
+  if(rows.length>0){
+    if(confirm("確定修改選中的嗎？")){
+	  var ids=[];
+	  var name=[];
+	  for(var i=0,l=rows.length;i<l;i++){
+	       var r=rows[i];
+		   
+		   ids.push(r.idProduct);
+		   name.push(r.brandName);
+	  }
+	var id = ids.join(',');
+    var brandName = name.join(',');
+   jQuery.ajax({
+			type: 'POST',
+            url: "/product/updateProductAll.html",
+			data:{idProducts: id,brandNames:brandName},
+            success:function() {
+				mini.alert("成功！");
+                        },
+             error: function() {
+				mini.alert("error，联系管理员");
+						},
+                    });
+	}
+  }else {
+              
+	mini.alert("请选中一条记录");
+            }
+  
+}
+</script>
+</body>
+</html>

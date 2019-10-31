@@ -1,0 +1,356 @@
+#set($layout = "layout/default.vm")
+
+#set($t_title = "")
+#if("$refund.type" == "g" || "$refund.type" == "a")
+	#set($t_title = "退货")
+#elseif("$refund.type" == "c")
+	#set($t_title = "换货")
+#elseif("$refund.type" == "f")
+	#set($t_title = "退款")
+#end
+
+#set($t_title2 = "申请确认")
+#if("$detailTag" == "yes")
+	#set($t_title2 = "详情")
+#end
+
+#set($title = "管理中心 - ${t_title}${t_title2}")
+
+<body>
+<div class="main">
+
+	<h2>管理中心 - ${t_title}${t_title2}</h2>
+
+	#if(("$refund.type" == "g" || "$refund.type" == "a") && $refund.status == "close")
+		<div class="tool">
+			<span><a href="javascript:preview();" hidefocus="true" class="bt_all">打印退货拒收单</a></span>
+		</div>
+	#end
+
+	#if($message)
+		<div #if($success) class="mag-t2" #else class="mag-t1" #end>${message}</div>
+	#end
+
+	<form action="$!appServer.get("/trade/confirmChange.html")" name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="id" value="$!refund.id"/>
+		<div class="formBox">
+			<h3><i></i><span>基本信息</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>订单号：</th>
+						<td><a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", ${trade.tid})">$!{trade.tid}</a></td>
+						<th>下单金额：</th>
+						<td>￥$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount,$!trade.shippingAmount),'0.00')</td>
+						<th>订单状态：</th>
+						<td>$!enumTradeStatusMap.get(${trade.status})</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<!-- 订单列表 -->
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>订单商品</span></h3>
+			<table>
+				<tr>
+					<th>商品名称</th>
+					<th>商品属性</th>
+					<th>产品名称</th>
+					<th>编码</th>
+					<th>建议零售价</th>
+					#if("$!trade.isWholesale" == "n")
+						<th>代销价</th>
+					#else
+						<th>批发价</th>
+					#end
+					<th>购买数量</th>
+					<th>小计</th>
+				</tr>
+				#if($orderList)
+    				#foreach($order in $orderList)
+    					<tr #if($velocityCount % 2 == 0) class="bg" #end>
+    						<td align="center">$!{order.goodsTitle}</td>
+    						<td align="center">$!{order.buyAttr}</td>
+    						<td align="center">$!{order.goodsInstanceName}</td>
+    						<td align="center">$!{order.goodsSn}</td>
+    						<td align="center">￥$!moneyUtil.getFormatMoney($!{order.marketPrice},'0.00')</td>
+    						<td align="center">￥$!moneyUtil.getFormatMoney($!{order.goodsPrice},'0.00')</td>
+    						<td align="center">$!{order.goodsNumber}</td>
+    						<td align="center">￥$!moneyUtil.getFormatMoney($moneyUtil.mul($!{order.goodsPrice},$!{order.goodsNumber}),'0.00')</td>
+    					</tr>
+					#end
+				#end
+			</table>
+        </div>
+
+		#if($!packageMap.size() > 0)
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>套餐信息</span></h3>
+				<table>
+					<tr>
+						<th>套餐名称</th>
+						<th>商品[选购属性]</th>
+						<th>合计价</th>
+						<th>套餐价</th>
+						<th>套餐数量</th>
+						<th>本套餐合计</th>
+					</tr>
+					#set($goodsAcountTotal = 0)
+					#set($packageAcountTotal = 0)
+					#foreach($packages in $packageMap.entrySet())
+						<tr>
+							#set($orderpackages = $packages.value)
+							<td align="center">$!packages.key.name</td>
+							<td align="center">
+								#foreach($orderpackage in $orderpackages)
+									<a href="$!{liangpin99Server}/l/gdetail_$!{orderpackage.goodsId}.htm" target="_blank">$stringUtil.abbreviate($!{orderpackage.goodsTitle},15)</a>
+									$!orderpackage.goodsSn
+									#if("$!{orderpackage.buyAttr}"!="")
+										[$!orderpackage.buyAttr]
+									#end
+									<br/>
+								#end
+							</td>
+							<td align="center" class="r">$!moneyUtil.getFormatMoney($!packages.key.goodsAmount)元</td>
+							<td align="center" class="r">$!moneyUtil.getFormatMoney($!packages.key.packageAmount)元</td>
+							<td align="center">$!packages.key.number 个</td>
+							<td align="center" class="r">$!moneyUtil.getFormatMoney($math.mul($!packages.key.packageAmount,$!packages.key.number))元</td>
+						</tr>
+						#set($goodsAcount=$moneyUtil.mul($!packages.key.goodsAmount,$!packages.key.number))
+						#set($packageAcount=$moneyUtil.mul($!packages.key.packageAmount,$!packages.key.number))
+						#set($goodsAcountTotal = $moneyUtil.add( $goodsAcountTotal,$!goodsAcount))
+						#set($packageAcountTotal = $moneyUtil.add( $packageAcountTotal,$!packageAcount))
+					#end
+				</table>
+            </div>
+		#end
+
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>${t_title}商品</span></h3>
+			<table>
+				<tr>
+					<th>商品名称</th>
+					<th>产品名称</th>
+					<th>编码</th>
+					<th>属性</th>
+					<th>价格</th>
+					<th>数量</th>
+				</tr>
+				#if($listRefundOrder)
+					#foreach($refundorder in $listRefundOrder)
+						<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td align="center">$!{refundorder.goodsTitle}</td>
+							<td align="center">$!{refundorder.goodsInstanceName}</td>
+							<td align="center">$!{refundorder.goodsSn}</td>
+							<td align="center">$!refundorder.goodsAttr</td>
+							<td align="center">￥$!moneyUtil.getFormatMoney($!{refundorder.price},'0.00')</td>
+							<td align="center">$!{refundorder.refAmount}</td>
+						</tr>
+					#end
+				#end
+			</table>
+		</div>
+
+		#if("$!detailTag" == "yes")
+			<div class="formBox" style="margin-top:10px;">
+    			<h3><i></i><span>其他信息</span></h3>
+    			<div class="content">
+    				<table class="c6">
+    					<tr>
+							<th style="width:150px;">是否收到货物：</th>
+							<td>
+								<input type="radio" name="isGoodsRecevied" value="1" #if("$!{refund.isGoodsRecevied}" == "1") checked="true" #end disabled="true"/> 是 <input type="radio" name="isGoodsRecevied" value="2" #if("$!{refund.isGoodsRecevied}" == "2") checked="true" #end disabled="true"/> 否
+							</td>
+						</tr>
+						<tr>
+							<th>是否需要退货：</th>
+							<td>
+								<input type="radio" name="isGoodsUntread" value="1"  #if("$!{refund.isGoodsUntread}" == "1") checked="true" #end disabled="true"/> 是 <input type="radio" name="isGoodsUntread" value="2" #if("$!{refund.isGoodsUntread}" == "2") checked="true" #end disabled="true"/> 否
+							</td>
+						</tr>
+						<tr>
+							<th>运费：</th>
+							<td>￥$!refund.shippingAmount 元</td>
+						</tr>
+						<tr>
+							<th>操作员：</th>
+							<td>$!refund.creater</td>
+						</tr>
+						<tr>
+							<th>退款金额：</th>
+							<td>￥$!refund.refundAmount 元</td>
+						</tr>
+						#*
+						#if("$!refund.ticketAmount" != "0")
+							<tr>
+								<th>退还点卷：</th>
+								<td>$!{refund.ticketAmount}</td>
+							</tr>
+						#end
+						*#
+						#if("$!{refund.status}" == "wait_seller_check_goods")
+							<tr>
+								<th>原因：</th>
+								<td>$!{refund.reason}</td>
+							</tr>
+							<tr>
+								<th>备注：</th>
+								<td><textarea name="note" id="note" cols="55" rows="4" ></textarea><font color="red">（填写拒绝退货原因）</font></td>
+							</tr>
+						#else
+							<tr>
+								<th>原因：</th>
+								<td>#if("$!{refund.reason}" == "") $!{refund.note} #else $!{refund.reason} #end</td>
+							</tr>
+						#end
+						#if("$!{refund.status}" == "close")
+							<tr>
+								<th>备注：</th>
+								<td>$!{refund.note}</td>
+							</tr>
+						#end
+						<tr>
+							<th>退款申请状态：</th>
+							<td>$!enumRefundStatusMap.get(${refund.status})</td>
+						</tr>
+                    </table>
+				</div>
+
+				<div class="form-but">
+					#if("$!{refund.status}" == "wait_seller_check_goods")
+						#if($adminAccess.has("A_REF_PASS_USER"))
+							<button type="button" class="button-s4" onclick="javascript:agreeRefundGoods();">验收通过</button>
+						#end
+						#if($adminAccess.has("A_REF_NO_PASS_USER"))
+							<button type="button" class="button-s4" onclick="javascript:refuseRefundGoods();">验收不通过</button>
+						#end
+					#end
+					<button type="button" class="button-s4" onclick="javascript:backToList();">返回列表</button>
+				</div>
+			</div>
+		#else
+			<div class="formBox" style="margin-top:10px;">
+    			<h3><i></i><span>其他信息</span></h3>
+    			<div class="content">
+    				<table class="c6">
+						<tr>
+							<th style="width:150px;">是否收到货物：</th>
+							<td><input type="radio" name="isGoodsRecevied" value="1"  #if("$!{refund.isGoodsRecevied}" == "1") checked="true" #end disabled="true"/> 是 <input type="radio" name="isGoodsRecevied" value="2" #if("$!{refund.isGoodsRecevied}" == "2") checked="true" #end disabled="true"/> 否 </td>
+						</tr>
+						<tr>
+							<th>是否需要退货：</th>
+							<td><input type="radio" name="isGoodsUntread" value="1"  #if("$!{refund.isGoodsUntread}" == "1") checked="true" #end disabled="true"/> 是 <input type="radio" name="isGoodsUntread" value="2" #if("$!{refund.isGoodsUntread}" == "2") checked="true" #end disabled="true"/> 否 </td>
+						</tr>
+						<tr>
+							<th>退款金额：</th>
+							<td>￥$!refund.refundAmount 元</td>
+						</tr>
+						#if("$!refund.ticketAmount"!="0")
+							<tr>
+								<th>退还点卷：</th>
+								<td>$!{refund.ticketAmount}</td>
+							</tr>
+						#end
+						<tr>
+							<th>退款申请状态：</th>
+							<td>$!enumRefundStatusMap.get(${refund.status})</td>
+						</tr>
+						<tr>
+							<th>原因：</th>
+							<td>$!{refund.note}</td>
+						</tr>
+						<tr>
+							<th>处理：</th>
+							#if("$!{refund.isGoodsUntread}" == "1")
+								<td> <input type="radio" name="agreeTag" value="2" #if("$!agreeTag" == "2") checked="true" #end checked="true"/> 同意退货 <input type="radio" name="agreeTag" value="0" #if("$!agreeTag" == "0") checked="true" #end/> 拒绝退货 </td>
+							#else
+								<td> <input type="radio" name="agreeTag" value="1" #if("$!agreeTag" == "1") checked="true" #end checked="true"/> 同意退款 <input type="radio" name="agreeTag" value="0" #if("$!agreeTag" == "0") checked="true" #end/> 拒绝退款 </td>
+							#end
+						</tr>
+                    </table>
+                </div>
+
+				<div class="form-but">
+					<button type="button" class="button-s4" onclick="javascript:congoo();">确定</button>
+					<button type="reset" class="button-s4">重置</button>
+				</div>
+            </div>
+		#end
+	</form>
+
+	<form name="form1" action="$!appServer.get("/trade/messageConserveforRefund.html")" id="form1" method="post">
+		<input type="hidden" name="refundId" value="$!{refund.refundId}">
+		<input type="hidden" name="id" value="$!{refund.id}">
+		<div class="formBox">
+			<h3><i></i><span>客服留言</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th style="width:150px;">客服订单备注：</th>
+						<td><textarea cols="70" rows="5" name="csMessage" id="csMessage" class="textarea">$!refund.serviceNote</textarea></td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="form-but">
+				<button type="button" class="button-s4" onclick="javascript:confirmMessage();">保存留言</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function congoo(){
+		if(confirm("确认继续此操作?")){
+			document.searchForm.submit();
+		}
+	}
+
+	function backToList(){
+		window.location.href = "refundList.html";
+	}
+
+	function confirmMessage(){
+		var rid = '$!refund.refundId';
+  		var smessage = document.getElementById("csMessage").value;
+		if( null == smessage || smessage == ''){
+			alert("提交之前请输入您的留言信息");
+			return;
+		}
+		if(smessage.length > 200){
+			alert("您输入的留言太长（不能超过200个字）");
+			return;
+		}
+		document.form1.submit();
+	}
+
+	function refuseRefundGoods(){
+		var note = document.getElementById("note").value.trim();
+		if(note == ""){
+			alert("请填写拒绝退货原因！");
+			return false;
+		}else if(note.length > 200){
+			alert("填写拒绝退货原因超长（不能超过200个字），请重新填写！");
+			return false;
+		}
+		document.getElementById('searchForm').action = "$!appServer.get("/trade/refuseRefundGoods.html")";
+		document.getElementById('searchForm').submit();
+	}
+
+	function agreeRefundGoods(){
+		window.location.href="$!appServer.get("/trade/agreeRefundGoods.html").addQueryData("id", $refund.id)";
+	}
+
+	function preview(){
+		window.showModalDialog("$!appServer.get("/trade/confirmRefund.html?id=$!refund.id&aType=print")",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+</script>

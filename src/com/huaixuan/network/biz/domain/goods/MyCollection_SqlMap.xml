@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MyCollectionSQL">
+<typeAlias alias="myCollection" type="com.huaixuan.network.biz.domain.goods.MyCollection"/>
+	<resultMap class="myCollection" id="myCollectionResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="gmt_create" property="gmtCreate"/>
+	</resultMap>
+	<resultMap class="myCollection" id="myCollectionResultDetail" extends="myCollectionResult">
+	    <result column="account" property="account"/>
+	    <result column="title" property="title"/>
+	    <result column="goodSn" property="goodSn"/>
+	    <!--added by chenhang 2010/06/17 start-->
+	    <result column="is_wholesale" property="isWholesale"/>
+	    <!--added by chenhang 2010/06/17 end-->
+	</resultMap>
+<!-- create MyCollection object -->
+<insert id="addMyCollection" parameterClass="myCollection">
+<![CDATA[
+insert into emall_my_collection
+  (id, user_id, goods_id, gmt_modify, gmt_create)
+values
+  (null, #userId#, #goodsId#, sysdate(), sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update MyCollection object -->
+<update id="editMyCollection" parameterClass="myCollection">
+<![CDATA[
+		update emall_my_collection set user_id = #userId#,
+		goods_id = #goodsId#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete MyCollection object -->
+<delete id="removeMyCollection" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_my_collection where emall_my_collection.ID = #value#
+]]>
+</delete>
+<!-- delete MyCollection object by userId-->
+<delete id="clearAllCollectionByUserId" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_my_collection where emall_my_collection.user_id = #value#
+]]>
+</delete>
+
+
+<!-- search MyCollection object -->
+<select id="getMyCollection" parameterClass="java.lang.Long" resultMap="myCollectionResult">
+<![CDATA[
+		select emall_my_collection.* from emall_my_collection where emall_my_collection.ID = #value#
+]]>
+</select>
+<!-- searchAll MyCollection List -->
+<select id="getMyCollections" resultMap="myCollectionResult">
+<![CDATA[
+		select emall_my_collection.* from emall_my_collection
+]]>
+</select>
+
+<select id="getMyCollectionByCondition" parameterClass="myCollection" resultMap="myCollectionResult">
+	<![CDATA[
+			select c.* from emall_my_collection c where 1=1
+	]]>
+	<isNotEmpty prepend="and" property="userId">
+		c.user_id = #userId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsId">
+		c.goods_id = #goodsId#
+	</isNotEmpty>
+</select>
+<select id="getMyCollectionsByUserId" parameterClass="java.util.Map" resultMap="myCollectionResult">
+<include refid="pageSQLHead"/>
+		select emall_my_collection.* 
+		from emall_my_collection join emall_goods on emall_my_collection.goods_id=emall_goods.id 
+		where emall_my_collection.user_id = #userId# 
+		<isNotEmpty prepend="and" property="isWholesale">
+			<isEqual property="isWholesale" compareValue="y">
+				emall_goods.is_Wholesale='y'
+			</isEqual>
+			<isNotEqual property="isWholesale" compareValue="y">
+				emall_goods.is_agent='y'
+			</isNotEqual>
+		</isNotEmpty>
+		order by emall_my_collection.gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+<select id="getMyCollectionsCountByUserId" parameterClass="java.util.Map" resultClass="int">
+		select count(1) 
+		from emall_my_collection join emall_goods on emall_my_collection.goods_id=emall_goods.id  
+		where emall_my_collection.user_id = #userId# 
+		<isNotEmpty prepend="and" property="isWholesale">
+			<isEqual property="isWholesale" compareValue="y">
+				emall_goods.is_Wholesale='y'
+			</isEqual>
+			<isNotEqual property="isWholesale" compareValue="y">
+				emall_goods.is_agent='y'
+			</isNotEqual>
+		</isNotEmpty>
+</select>
+
+<select id="getMyCollectionWithParmap" parameterClass="java.util.Map" resultMap="myCollectionResultDetail">
+<include refid="pageSQLHead"/>
+  <![CDATA[
+      select
+        ec.*,
+        eu.account as account,
+        eg.title as title,
+        eg.goods_sn as goodSn,
+        eg.is_wholesale
+      from emall_my_collection ec,emall_goods eg,emall_users eu
+      where ec.user_id = eu.id and ec.goods_id = eg.id
+  ]]>
+  <isNotEmpty prepend="and" property="userAccount">
+      eu.account like concat('%',#userAccount#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodTitle">
+      eg.title like concat('%',#goodTitle#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodSn">
+      eg.goods_sn like concat('%',#goodSn#,'%')
+  </isNotEmpty>
+      order by ec.id
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getMyCollectionCountWithParmap" parameterClass="java.util.Map" resultClass="int">
+  <![CDATA[
+  select count(1) from(
+      select
+        ec.*,
+        eu.account as account,
+        eg.title as title,
+        eg.goods_sn as goodSn,
+        eg.is_wholesale
+      from emall_my_collection ec,emall_goods eg,emall_users eu
+      where ec.user_id = eu.id and ec.goods_id = eg.id
+  ]]>
+  <isNotEmpty prepend="and" property="userAccount">
+      eu.account like concat('%',#userAccount#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodTitle">
+      eg.title like concat('%',#goodTitle#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodSn">
+      eg.goods_sn like concat('%',#goodSn#,'%')
+  </isNotEmpty>
+  ) aa
+</select>
+</sqlMap>

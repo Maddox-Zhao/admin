@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AdminRoleDao">
+	<typeAlias alias="AdminRole" type="com.huaixuan.network.biz.domain.admin.AdminRole"/>
+	<resultMap id="adminRoleResult" class="com.huaixuan.network.biz.domain.admin.AdminRole">
+	  <result column="admin_id" property="adminId" />
+	  <result column="role_id" property="roleId" />
+	</resultMap>
+	
+	<sql id="AdminRole.forSelectAll">
+		admin_id, role_id
+    </sql>
+
+	<select id="AdminRoleDao.getRoleByAdminId" parameterClass="java.lang.Long" resultMap="adminRoleResult">
+		 select 
+		 <include refid="AdminRole.forSelectAll" />
+		 from emall_admin_role where admin_id = #value#
+    </select>
+	
+	<insert id="AdminRoleDao.insertAdminRole" parameterClass="AdminRole">
+		<![CDATA[
+			insert into emall_admin_role(role_id,admin_id) 
+			values(#roleId#,#adminId#)
+		]]>
+	</insert>
+
+	<delete id="AdminRoleDao.deleteAdminRoleByAdminId" parameterClass="java.lang.Long">
+		<![CDATA[
+			delete from emall_admin_role where admin_id = #value#
+		]]>
+	</delete>
+</sqlMap>

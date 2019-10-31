@@ -1,0 +1,71 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>现金账户管理</h2>
+		 <div class="tool">
+			##<span><a href="/account/saveInput.html" hidefocus="true" class="bt_add">添加现金账户</a></span>
+		 </div>
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+		 
+		 <form action="list.html" name="searchForm" method="post">
+		
+
+	</form>
+
+	
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>现金账户管理</span></h3>
+            <table >
+                <tr>
+					<th>账户名称</th>
+					<th>账户地址</th>
+					<th >欧元账户余额</th>
+					<th >港元账户余额</th>
+					<th >人名币账户余额</th>
+                    <th >美元账户余额</th>
+					<th>账户名称分类</th>
+					<th >账户联系人</th>
+					<th>操作</th>
+                </tr>
+				
+				#if($accounts && $accounts.size()>0)
+				 #foreach($account in $accounts)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$!account.accountName</td>
+					<td style="text-align:center;">$!account.accountAddress</td>
+					<td style="text-align:center;">$!account.euBalance</td>
+					<td style="text-align:center;">$!account.hkBalance</td>
+					<td style="text-align:center;">$!account.rmbBalance</td>
+					<td style="text-align:center;">$!account.dollarBalance</td>
+					<td style="text-align:center;">$!account.accountType</td>
+					<td style="text-align:center;">$!account.accountContact</td>
+					<td style="text-align:center;">
+					##<a href="#" onclick="javascript:if(confirm('确定删除？')){ location.href = 'delete.html?id=$!account.id'}">删除</a> &nbsp;&nbsp;
+					<a href="search.html?accountId=$!account.id&isFirst=true">查看</a>&nbsp;&nbsp;
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+	#if($accounts.size() == 0)
+		没有结果！
+    #end
+</div> <!-- 列表模块 END -->
+</div>
+	

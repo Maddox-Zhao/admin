@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ConnectRecordSQL">
+<typeAlias alias="connectRecord" type="com.huaixuan.network.biz.domain.crm.ConnectRecord"/>
+<resultMap id="connectRecordResult" class="connectRecord">
+	<result column="id" property="id"/>
+	<result column="gmt_create" property="gmtCreate"/>
+	<result column="gmt_modify" property="gmtModify"/>
+	<result column="user_id" property="userId"/>
+	<result column="type" property="type"/>
+	<result column="gmt_time" property="gmtTime"/>
+	<result column="content" property="content"/>
+	<result column="status" property="status"/>
+	<result column="admin_user" property="adminUser"/>
+</resultMap>
+<resultMap id="connectRecordResultWithUserName" class="connectRecord">
+	<result column="id" property="id"/>
+	<result column="gmt_create" property="gmtCreate"/>
+	<result column="gmt_modify" property="gmtModify"/>
+	<result column="user_id" property="userId"/>
+	<result column="account" property="userName"/>
+	<result column="type" property="type"/>
+	<result column="gmt_time" property="gmtTime"/>
+	<result column="content" property="content"/>
+	<result column="status" property="status"/>
+	<result column="admin_user" property="adminUser"/>
+</resultMap>
+<insert id="addConnectRecord" parameterClass="connectRecord">
+<![CDATA[
+		insert into ioss_connect_record
+		(id,gmt_create,gmt_modify,user_id,type,gmt_time,content,status,admin_user)values(
+		null,
+		sysdate(),
+		sysdate(),
+		#userId#,
+		#type#,
+		#gmtTime#,
+		#content#,
+		#status#,
+		#adminUser#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<select id="listConnectRecordByParameterCount" resultClass="int">
+	SELECT count(1)
+	FROM ioss_connect_record a,emall_users b
+	WHERE a.status &lt;&gt; 'deleted' AND a.user_id = b.id(+)
+	<isNotEmpty prepend="and" property="userName">
+        b.account like concat('%',#userName#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		a.type = #type#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtTimeStart">
+	      <![CDATA[ a.gmt_time >=  STR_TO_DATE(#gmtTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtTimeEnd">
+	      <![CDATA[ a.gmt_time < DATE_ADD(STR_TO_DATE(#gmtTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+		a.status = #status#
+	</isNotEmpty>
+</select>
+<select id="listConnectRecordByParameter" resultMap="connectRecordResultWithUserName">
+	<include refid="pageSQLHead"/>
+	SELECT a.id,a.gmt_create,a.gmt_modify,a.user_id,a.type,a.gmt_time,a.content,a.status,a.admin_user,b.account
+	FROM ioss_connect_record a,emall_users b
+	WHERE a.status &lt;&gt; 'deleted' AND a.user_id = b.id(+)
+	<isNotEmpty prepend="and" property="userName">
+        b.account like concat('%',#userName#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		a.type = #type#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtTimeStart">
+	      <![CDATA[ a.gmt_time >=  STR_TO_DATE(#gmtTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="gmtTimeEnd">
+	      <![CDATA[ a.gmt_time < DATE_ADD(STR_TO_DATE(#gmtTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+		a.status = #status#
+	</isNotEmpty>
+	ORDER BY abs(a.gmt_time-sysdate()) ASC,a.id DESC
+	<include refid="pageSQLFoot"/>
+</select>
+<select id="getConnectRecordById"  resultMap="connectRecordResultWithUserName">
+	SELECT a.id,a.gmt_create,a.gmt_modify,a.user_id,a.type,a.gmt_time,a.content,a.status,a.admin_user,b.account
+	FROM ioss_connect_record a, emall_users b
+	WHERE a.id = #id# and a.user_id = b.id(+)
+</select>
+
+<update id="updateConnectRecordById" parameterClass="connectRecord">
+	UPDATE ioss_connect_record
+	SET gmt_modify = sysdate()
+	<isNotEmpty prepend="" property="gmtTime">
+	     ,gmt_time = #gmtTime#
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="content">
+	     ,content = #content#
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="status">
+	     ,status = #status#
+	</isNotEmpty>
+	WHERE id = #id#
+</update>
+
+<update id="updateConnectRecordStatusById" parameterClass="connectRecord">
+	UPDATE ioss_connect_record
+	SET gmt_modify = sysdate(),
+	status = #status#
+	WHERE id = #id#
+</update>
+<select id="listConnectRecordByUserId"  resultMap="connectRecordResult">
+	SELECT a.id,a.gmt_create,a.gmt_modify,a.user_id,a.type,a.gmt_time,a.content,a.status,a.admin_user
+	FROM ioss_connect_record a
+	WHERE a.user_id = #userId#
+	and a.type = #type#
+	and a.status &lt;&gt; 'deleted'
+	ORDER BY gmt_create desc
+</select>
+</sqlMap>

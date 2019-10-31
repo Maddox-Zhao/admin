@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="stockOut">
+<typeAlias alias="stockOut" type="com.huaixuan.network.biz.domain.storage.Stockout"/>
+
+
+<!-- create InDetail object -->
+<insert id="addStockOut" parameterClass="stockOut">
+<![CDATA[
+		INSERT INTO emall_stockout
+    (id,gmt_create,gmt_modify,user_id,user_email,goods_id,goods_instance_id,goods_instance_name,notify_status)
+        values( null,
+		sysdate(),
+		sysdate(),
+		#userId#,
+		#userEmail#,
+		#goodsId#,
+		#goodsInstanceId#,
+		#goodsInstanceName#,
+		#notifyStatus#
+	)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+    <select id="getStockOut" parameterClass="java.util.Map"
+        resultClass="stockOut">
+        <![CDATA[select id,gmt_create gmtCreate,gmt_modify gmt_modify,user_id userId,user_email userEmail,goods_id  goodsId,
+                    goods_instance_id goodsInstanceId,goods_instance_name goodsInstanceName,notify_status notifyStatus
+                     from emall_stockout where 1=1
+         ]]>
+        <isNotEmpty property="userId" prepend="and">
+            user_id= #userId#
+        </isNotEmpty>
+        <isNotEmpty property="goodsId" prepend="and">
+            goods_id= #goodsId#
+        </isNotEmpty>
+        <isNotEmpty property="notifyStatus" prepend="and">
+            notify_status= #notifyStatus#
+        </isNotEmpty>
+        <isNotEmpty property="optTimeStart" prepend="and">
+            gmt_create between STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s') 
+        </isNotEmpty>
+    </select>
+
+     <update id="updateNotifyStatus" parameterClass="java.util.Map">
+        UPDATE emall_stockout
+        SET gmt_modify = sysdate(),notify_status= #notifyStatus#
+        WHERE  user_id= #userId# and goods_id= #goodsId#
+    </update>
+
+	<select id="getStockoutbyid" parameterClass="int"
+        resultClass="stockOut">
+        <![CDATA[
+        select stockout.id id,users.account account,stockout.gmt_create gmtCreate,stockout.gmt_modify gmt_modify,stockout.user_id userId,stockout.user_email userEmail,stockout.goods_id  goodsId,
+		stockout.goods_instance_id goodsInstanceId,stockout.goods_instance_name goodsInstanceName,goods.cat_code catCode,goods.title title,goods.goods_sn goodsSn,goods.attr_desc goodsDesc,stockout.notify_status notifyStatus
+		from emall_stockout stockout ,emall_goods goods,emall_users users where users.id=stockout.user_id and stockout.goods_id=goods.id and stockout.id=#id#
+         ]]>
+    </select>
+
+
+    <select id="getStockOutByMap" parameterClass="java.util.Map"
+        resultClass="stockOut">
+        <include refid="pageSQLHead"/>
+        <![CDATA[
+        select stockout.id id,
+        	   users.account account,
+        	   stockout.gmt_create gmtCreate,
+        	   stockout.gmt_modify gmt_modify,
+        	   stockout.user_id userId,
+        	   stockout.user_email userEmail,
+        	   stockout.goods_id  goodsId,
+			   stockout.goods_instance_id goodsInstanceId,
+			   stockout.goods_instance_name goodsInstanceName,
+			   instance.cat_code catCode,
+			   instance.instance_name title,
+			   instance.code goodsSn,
+			   instance.attrs goodsDesc,
+			   stockout.notify_status notifyStatus
+		from emall_stockout stockout left join emall_users users on users.id=stockout.user_id,ioss_goods_instance instance
+		where stockout.goods_instance_id=instance.id
+         ]]>
+        <isNotEmpty property="title" prepend="and">
+            instance.instance_name like concat('%',#title#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="goodsSn" prepend="and">
+            instance.code like concat('%',#goodsSn#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="optTimeStart">
+			<![CDATA[			stockout.gmt_create > STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+			<![CDATA[			stockout.gmt_create < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+            stockout.goods_id= #goodsId#
+        </isNotEmpty>
+        <isNotEmpty property="notifyStatus" prepend="and">
+            stockout.notify_status= #notifyStatus#
+        </isNotEmpty>
+        <isNotEmpty property="goodsId" prepend="and">
+            stockout.goods_id= #goodsId#
+        </isNotEmpty>
+        <isNotEmpty property="catCode" prepend="and">
+            instance.cat_code like concat(#catCode#,'%')
+        </isNotEmpty>
+        order by stockout.gmt_create desc
+        <include refid="pageSQLFoot"/>
+    </select>
+
+    <select id="getStockOutCount" parameterClass="java.util.Map"
+        resultClass="java.lang.Integer">
+        <![CDATA[
+        select count(1) from emall_stockout stockout ,ioss_goods_instance instance where stockout.goods_instance_id=instance.id
+         ]]>
+        <isNotEmpty property="title" prepend="and">
+            instance.instance_name like concat('%',#title#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="goodsSn" prepend="and">
+            instance.code like concat('%',#goodsSn#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			stockout.gmt_create > STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			stockout.gmt_create < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+            stockout.goods_id= #goodsId#
+        </isNotEmpty>
+        <isNotEmpty property="notifyStatus" prepend="and">
+            stockout.notify_status= #notifyStatus#
+        </isNotEmpty>
+        <isNotEmpty property="catCode" prepend="and">
+            instance.cat_code like concat(#catCode#,'%')
+        </isNotEmpty>
+    </select>
+
+</sqlMap>

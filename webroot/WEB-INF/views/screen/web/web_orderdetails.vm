@@ -1,0 +1,245 @@
+#set($layout = '')
+<html>
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" /> 
+  <meta name="apple-mobile-web-app-capable" content="yes" /> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
+  <meta name="format-detection" content="telephone=no" />
+  
+ 
+<link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet.min.css">
+<link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet-theme-ios.css">
+<link rel="stylesheet" type="text/css" href="/wap/style/form.css" />
+<script src="${imageServer}/wap/list/js/jquery-1.8.2.min.js"></script>
+ 
+
+  <title>订单详情</title> 
+  
+ </head>
+ <body>
+	<div id="main">
+        <header class="bar bar-nav" style="width:100%;">
+            <a class="icon icon-left-nav pull-left" style="width:15%;" onClick="javascript:history.go(-1)"></a>
+		</header>
+	</div>
+  <div id="subjects">
+   <form id="main_form" action="#" method="get" onsubmit="return false" accept-charset="utf-8" style="padding-bottom: 4em;">
+    <div class="form_ctrl page_head"  style="margin-top:45px" >
+
+     <h2>订单详情</h2>
+    </div>
+    <div class="form_ctrl input_text"   title="订单号"> 
+     <label class="ctrl_title">订单号</label>
+     <input type="text" placeholder="订单号"  vtype="required" class="jform"  name="idorder" disabled="disabled"  value="$!{orderdetails.idorder}" /> 
+    </div>
+    <div class="form_ctrl form_select"  title="订单日期">
+     <label class="ctrl_title">订单日期</label>
+	  <input type="text" disabled="disabled"   value='$!dateUtilHX.convertDateToString("yyyy-MM-dd",$!orderdetails.date)' /> 
+    </div>
+    <div class="form_ctrl form_select"  > 
+     <label class="ctrl_title">订单总价</label> 
+	  <input type="text" disabled="disabled"  name="subTotal" vtype="required" class="jform" value="$!{orderdetails.subTotal}"/> 
+    </div>
+	
+	<div class="form_ctrl form_select"  > 
+     <label class="ctrl_title">订单状态</label> 
+	  <input type="text" disabled="disabled" class="judge"   value="$!{orderdetails.status}"/> 
+    </div>
+	
+    <div class="form_ctrl input_text" title="付款方式"> 
+     <label class="ctrl_title">付款方式</label>
+     <select   name="idPayment" class="jform" placeholder="付款方式" vtype="required">
+		 <option value="" #if("$!{orderdetails.idPayment}"=="") selected #end>请选择</option>
+			#foreach($paymen in $paymentList)
+					<option value="$!{paymen.id}" #if("$!{orderdetails.idPayment}"=="$paymen.id") selected #end>$!{paymen.name}</option>
+			#end
+	 </select>
+    </div>
+    <div class="form_ctrl input_text" > 
+     <label class="ctrl_title">非现金付款金额</label> 
+     <input type="text" disabled="disabled"    name="amountCard" value="$!{orderdetails.amountCard}"  /> 
+    </div>
+    <div class="form_ctrl form_ctrl" > 
+     <label class="ctrl_title">现金付款金额</label> 
+      <input type="text" name="amountCash" #if("$!orderdetails.status" != "1") disabled="disabled" #end class="jform"  vtype="float"  placeholder="现金付款金额" value="$!{orderdetails.amountCash}"/> 
+    </div>
+	<div class="form_ctrl form_ctrl" > 
+     <label class="ctrl_title">客户</label> 
+      <input type="text" disabled="disabled"  value="$!{orderdetails.customername}"/> 
+    </div>
+	<div class="form_ctrl form_ctrl" > 
+     <label class="ctrl_title">客户经理</label> 
+      <input type="text" disabled="disabled"  value="$!{orderdetails.customerManager}"/> 
+    </div>
+	 <div class="form_ctrl form_select" > 
+     <label class="ctrl_title">经手人</label> 
+	  <input type="text" disabled="disabled"   value="$!{orderdetails.employeename}"/> 
+    </div>														
+	 <div class="form_ctrl input_text"  > 
+     <label class="ctrl_title">销售渠道</label> 
+     <select  name="idSellChannel" class="jform" placeholder="销售渠道" vtype="required">
+		 <option value="" #if("$!{orderdetails.idSellChannel}"=="") selected #end>请选择</option>
+			#foreach($sellChannel in $sellChannelList)
+					<option value="$!{sellChannel.id}" #if("$!{orderdetails.idSellChannel}"=="$sellChannel.id") selected #end>$!{sellChannel.name}</option>
+			#end
+	 </select>
+    </div>
+	 <div class="form_ctrl form_select" > 
+     <label class="ctrl_title">已是否发货</label> 
+	  <input type="text" disabled="disabled"  name="deliverystatus" value="$!{orderdetails.deliverystatus}"/> 
+    </div>
+	 <div class="form_ctrl form_select" > 
+     <label class="ctrl_title">发货信息</label> 
+	  <input type="text" name="deliverymeno" class="jform" value="$!{orderdetails.deliverymeno}"/> 
+    </div>
+	 <div class="form_ctrl form_select"  > 
+     <label class="ctrl_title">备注</label> 
+	  <input type="text" name="remark"  class="jform" value="$!{orderdetails.remark}"/> 
+    </div>
+	#if($!orderdetails.status == 1 && $!adminAccess.has("A_ORDER_PAY"))
+    <div class="form_ctrl form_submit" > 
+     <input type="submit" name="submit" id="fukuan" value="付款" onClick="complateSettle()"/> 
+    </div>
+	#end
+    <div class="form_ctrl form_submit" > 
+     <input type="submit" name="submit" onClick="viewProduct()" value="查看订单包含商品" /> 
+    </div>
+	
+	
+	
+	<div class="form_ctrl form_submit" > 
+     <input type="submit" name="submit" onClick="updateOrder()" value="更新订单信息" /> 
+    </div>
+   </form> 
+   
+  </div>
+  
+  <script type="text/javascript">
+  
+  //列表显示订单状态
+    $(document).ready(function() {
+        $(".judge").each(function() {
+            if ($(this).val() == "0") {
+                $(this).val("已付款");
+            } else if ($(this).val() == "1") {
+                $(this).val("未付款");
+            } else if ($(this).val() == "2") {
+                $(this).val("部分取消/取消");
+            }
+        });
+    });
+   //订单详情
+    var data = {};
+    function valdateForm()
+    {
+    	var flag = true; //验证成功
+
+		//验证表单数据
+		jQuery(".jform").each(function()
+		{
+		
+			var field = $(this);
+			
+			var val = field.val();
+			val = val.trim();
+			var name = field.attr("name");
+			
+			data[name] = val;
+			
+			var vtype = field.attr("vtype");
+			var placeholder = field.attr("placeholder");
+			if(vtype)
+			{
+				var vtypeArr = vtype.split(";");
+				for(var i = 0;i < vtypeArr.length; i++)
+				{
+					var type = vtypeArr[i];
+					if("required" == type && !val)
+					{
+						alert(placeholder + '必填');
+						flag = false;
+						return false;
+					}
+					else if("float" == type || "int" == type || "double" == type)
+					{
+						if(isNaN(Number(val)))
+						{
+							alert(placeholder + '为数字');
+	    					flag = false;
+	    					return false;
+						}
+					}
+					 
+				}
+			}
+		});
+		return flag;
+    }
+	
+	
+//完成付款
+function complateSettle()
+{
+	var flag = valdateForm();
+	if(flag)
+	{
+		var f = confirm("确定收到款项")
+		if(f == true)
+		{
+			jQuery.post("/order1/orderPayMent.html",data,function(text){
+				if(text)
+				{
+					if(text == 'ok')
+					{
+						alert("付款成功");
+						$("#fukuan").hide();
+					}
+				}
+				else
+				{
+					alert("付款失败，请联系管理员");
+				}
+			});
+		}
+		
+	}
+}
+
+
+function viewProduct()
+{
+	window.location.href= "/m/order/getProductByidorder.html?idorder=" + $!{orderdetails.idorder};
+}
+
+
+function updateOrder()
+{
+	var flag = valdateForm();
+	if(flag)
+	{
+		jQuery.post("/order1/updatCustomerOrder.html",data,function(text){
+			if(text)
+			{
+				if(text == 'ok')
+				{
+					alert("更新成功");
+				}
+				else
+				{
+					alert("更新失败，请联系管理员");
+				}
+			}
+			else
+			{
+				alert("更新失败，请联系管理员");
+			}
+		});
+	}
+	
+	
+	
+}
+  </script>
+ </body>
+</html>

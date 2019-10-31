@@ -1,0 +1,81 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+
+	function deleteFriendLink(id){
+ 		var obj = document.getElementById("friendLinkId");
+	  	obj.value = id;
+  		var	mymes=confirm("确定删除链接?");
+		 if(true==mymes){
+	  		document.listForm.action = "/shop/deletefl.html";
+			document.listForm.submit();
+	  	}else {
+
+	  	}
+	}
+
+	function updateFriendLinkPage(id){
+		window.location.href = "$appServer/shop/updateflp.html?friendLinkId="+id;
+	}
+
+</script>
+
+#set($title = "友情链接管理 - 友情链接列表")
+<div class="tool">
+    <span><a href="/shop/addflp.html" hidefocus="true" class="bt_add">新增友情链接</a></span>
+  </div>
+  <div class="clear"></div>
+<form name="listForm" action="/shop/fllist.html" method="post"><!-- start ads list -->
+	<input type="hidden" id="friendLinkId" name="friendLinkId" value="" />
+	<div class="main">
+ <div class="listBox">
+          <h3><i></i><span>友情链接列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>名称</th>
+      <th>URL</th>
+      <th>图片</th>
+      <th>次序</th>
+      <th>操作</th>
+    </tr>
+	#set( $num = 1)
+	#foreach($friendLink in ${query.items})
+   <tr align="center">
+      <td>#if($!friendLink.linkName.length()>20)
+                <div title="$!friendLink.linkName">$!friendLink.linkName.substring(0,20)...</div>
+				#else
+					$!friendLink.linkName
+				#end </td>
+      <td><a href="$!{friendLink.linkUrl}"  target="_blank">
+			#if($!friendLink.linkUrl.length()>30)
+                <div title="$!friendLink.linkUrl">$!friendLink.linkUrl.substring(0,30)...</div>
+				#else
+					$!friendLink.linkUrl
+				#end </a></td>
+      <td>
+		#if($!{friendLink.linkLogo})
+		<img src="${upServer}/$!{friendLink.linkLogo}" width="47" height="50" />
+		#else
+		<img src="$request.getContextPath()/images/nomiagenew.gif"  width="39" height="39" />
+		#end
+	  </td>
+      <td>$num</td>
+      <td><a href="javascript:deleteFriendLink('$!{friendLink.id}')">删除</a> <a href="javascript:updateFriendLinkPage('$!{friendLink.id}')">修改</a></td>
+    </tr>
+	   #set( $num = $num+1)
+	#end
+
+  </table>
+  </form>
+  #if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/fllist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>
+
+

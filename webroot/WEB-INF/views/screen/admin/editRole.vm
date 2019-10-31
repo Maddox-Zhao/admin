@@ -1,0 +1,58 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>编辑职务</h2>
+        <div class="formBox">
+         <form id="form1" action="/role/modifyRole.html" method="post">
+			#springBind("role.id")
+			<input name="${status.expression}" type="hidden" value="$!{status.value}" />
+			
+			
+			#springBind("role.type")
+			<input name="${status.expression}" type="hidden" value="$!{status.value}" />
+			
+        	<h3><i></i><span>编辑职务</span></h3>
+
+        	<div class="content">
+        		<table class="c2">
+            	  <tr>
+                    <th>职务名称：</th>
+                    <td>
+					   #springBind("role.name")
+                       <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span>
+					</td>
+
+          	    </tr>
+            	  <tr>
+            	    <th>描述：</th>
+            	    <td>
+						#springBind("role.display")
+						<textarea name="${status.expression}" class="textarea">$!{status.value}</textarea>
+						<span class="error">$!{status.errorMessage}</span>
+            	    </td>
+          	    </tr>
+        	    <tr>
+        		   <th>状态:</th>
+        		   <td>
+					  #springBind("role.status")
+        			  <input type="checkbox" name="${status.expression}" value="1" #if("$!{role.status}" == "1") checked #end/>启用
+        		   </td>
+        	    </tr>
+              </table>
+    </div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="submit" class="button-s4">保存</button>
+                <button type="button" class="button-s4" onclick="javascript:history.back(-1);">取消</button>
+
+
+          	</div><!-- 表单按钮区 END -->
+
+         </form>
+        </div> <!-- 表单模块 END -->
+
+
+    </div>

@@ -1,0 +1,719 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>产品数据</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+		
+</head>
+#set($canUpdate = false)
+#set($canUpdateSKU = false)
+#set($canUpdateCost = false)
+#set($canUpdatePrice = false)
+#set($canShowCost = false)
+#set($canIn2Stock = false)
+#set($canSaleIn2Stock = false)
+#set($canCancelYuLiu = false)
+#set($canActivePrice = false)
+#set($isDxUser = false)
+#set($addshc = false)
+
+#if($!adminAccess.has('A_SHOPPINGCAR_ADD'))
+	#set($addshc = true)
+#end
+
+
+
+#if($!adminAccess.has('A_PRODUCT_UPDATE'))
+	#set($canUpdate = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_SKU_UPDATE'))
+	#set($canUpdateSKU = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_COST_UPDATE'))
+	#set($canUpdateCost = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_PRICE_UPDATE'))
+	#set($canUpdatePrice = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+	#set($canShowCost = true)
+#end
+
+#if($!adminAccess.has('A_PRODUCT_INSTOCK'))
+	#set($canIn2Stock = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_SALE_INSTOCK'))
+	#set($canSaleIn2Stock = true)
+#end
+
+#if($!adminAccess.has('A_PRODUCT_CANCEL_YULIU'))
+	#set($canCancelYuLiu = true)
+#end
+
+#if($!adminAccess.has('A_PRODUCT_ACTIVE_PRICE'))
+	#set($canActivePrice = true)
+#end
+
+#if($!adminAccess.has('A_DX_PRODUCT_MANAGER'))
+	#set($isDxUser = true)
+#end
+
+
+
+<body>
+  
+   <div style="width:100%;height:100%;" > 
+    <div class="mini-toolbar" style="border-bottom:0;padding:0px; height:430px;">  
+   <form id="form1" method="post" action="#"> 
+     <div style="padding-left:10px;padding-bottom:5px;"> 
+      <table cellpadding="3"> 
+       <tbody>
+        <tr> 
+         <td >ID：</td> 
+         <td ><input name="idProduct" class="mini-textbox" emptytext="idProduct" readonly="readonly" /></td> 
+         <td >品牌：</td> 
+         <td style="width:100px;">
+			<input name="brandID" required="true" #if(!$canUpdateSKU) enabled="false" #end class="mini-combobox" textfield="brandName" valuefield="id" emptytext="请选择..." url="/brand/getListByBrandName.html" allowinput="true" shownullitem="true" nullitemtext="请选择..." />
+		 </td> 
+         <td> 品名：</td> 
+         <td ><input name="seriesId" onValuechanged="seriesChange"  required="true" #if(!$canUpdateSKU) enabled="false" #end  class="mini-combobox" textfield="name" valuefield="id" emptytext="请选择..." url="/series/getAllSeries.html" allowinput="false" shownullitem="true" nullitemtext="请选择..." /></td> 
+         
+		 <td> 客户群体：</td> 
+         <td ><input name="targetCustomers"  class="mini-combobox" textfield="value" valuefield="id" emptytext="请选择..." data="statusData" allowinput="false" shownullitem="true" nullitemtext="请选择..." /> </td>
+		 <td  rowspan="8"> 
+			<img  src="" id="picture" width="250" height="250"/>
+		 </td> 
+        </tr> 
+        <tr> 
+         <td >型号：</td> 
+         <td ><input name="type"  required="true" #if(!$canUpdateSKU) enabled="false" #end class="mini-textbox" /></td> 
+         <td >材质：</td> 
+         <td style="width:100px;"><input name="material" #if(!$canUpdateSKU) enabled="false" #end class="mini-textbox" /></td> 
+         <td >颜色：</td> 
+         <td ><input name="color" #if(!$canUpdateSKU) enabled="false" #end class="mini-textbox" /></td> 
+         <td >尺寸：</td> 
+         <td > <input name="size" id="size" #if(!$canUpdateSKU) enabled="false" #end class="mini-textbox" /> </td>  
+        </tr> 
+        <tr> 
+         <td >名称：</td> 
+         <td ><input name="name" class="mini-textbox" /></td> 
+         <td style="width:60px;">材质描述：</td> 
+         <td style="width:100px;"><input name="materialdes" class="mini-textbox" /></td> 
+         <td style="width:60px;">颜色描述：</td> 
+         <td ><input name="colordes" class="mini-textbox" /></td> 
+         <td style="width:80px;">长*宽*高：</td> 
+         <td > <input name="sizedes" class="mini-textbox" /> </td> 
+        </tr> 
+        <tr> 
+         <td >UUID：</td> 
+         <td ><input name="uuid" class="mini-textbox" /></td> 
+         <td >aUUID：</td> 
+         <td style="width:100px;"><input name="aUUID" class="mini-textbox" /></td> 
+         <td >产地：</td> 
+         <td ><input name="origin" class="mini-textbox" /></td> 
+         <td >SKU：</td> 
+         <td > <input name="sku" id="sku" readonly="readonly" class="mini-textbox" /> </td> 
+        </tr> 
+		#if(!$isDxUser)
+        <tr> 
+         <td >类别：</td> 
+         <td ><input name="secondHand" id="secondHand"  enabled="false" onvaluechanged="typeChange" class="mini-combobox" textfield="value" valuefield="id" emptytext="请选择..." data="ptype" allowinput="false" shownullitem="true" nullitemtext="请选择..."  /></td> 
+         
+		 <td  #if(!$canShowCost) style="display:none" #end class="supply" > 货源：</td> 
+         <td #if(!$canShowCost) style="display:none" #end class="supply" style="width:100px;">
+				<input name="idSupply" enabled="false"  id="idSupply" class="mini-combobox" textfield="name" valuefield="id" emptytext="请选择..." url="/supply/getAllSupply.html" allowinput="false" shownullitem="true" nullitemtext="请选择..." />
+		 </td> 
+		 
+		 <td class="cai" style="display:none">采购单号：</td> 
+         <td class="cai" style="width:100px;display:none"><input name="idPurchase"  class="mini-combobox" textfield="idPurchaseLifeCycle" valuefield="idPurchase" emptytext="请选择..." url="/purchase/getPurchaseLifeCyleByStatus.html" allowinput="false" shownullitem="true" nullitemtext="请选择..." /></td>
+         <td >真品卡：</td> 
+         <td ><input name="hasValidCard"  class="mini-combobox" textfield="value" valuefield="id" emptytext="请选择..." data="hasValid" allowinput="false" shownullitem="true" nullitemtext="请选择..."  /></td> 
+         <td #if(!$canShowCost) style="display:none" #end >成本：</td> 
+         <td style="width:120px;"> 
+			<div #if(!$canShowCost) style="display:none" #end >
+					<input vtype="float" required="true"  name="cost" #if(!$canUpdateCost) enabled="false" #end  style="width:60px" class="mini-textbox"  /> 
+					<input name="idCostCurrency" required="true" #if(!$canUpdateCost) enabled="false" #end style="width:60px" class="mini-combobox" textfield="name" valuefield="id" emptytext="请选择..." url="/sell/getAllCurrency.html" allowinput="false" shownullitem="true" nullitemtext="请选择..." />  
+			</div>
+		 </td> 
+        </tr> 
+		
+        <tr> 
+         <td >位置：</td> 
+         <td style="width:150px"> <input name="curSiteName" class="mini-textbox" enabled="false"/> </td> 
+         <td >前位置：</td> 
+         <td style="width:100px;"> 
+		   <input  name="idLastLocation" class="mini-combobox"    enabled="false"  textField="name" valueField="id" emptyText="请选择..." url="/site/getSiteByType.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/> 
+		 </td> 
+         <td >状态：</td> 
+         <td ><input name="status" id="status" class="mini-textbox" enabled="false"/></td> 
+         <td >最后经手人：</td> 
+         <td ><input name="idLastOperator" id="idLastOperator" class="mini-textbox" enabled="false" enabled="false"/></td> 
+        </tr> 
+		
+        <tr> 
+         <td >大陆价：</td> 
+         <td ><input name="dlPrice" vtype="float" required="true" #if(!$canUpdatePrice) enabled="false" #end class="mini-textbox"  /></td> 
+         <td >欧洲价(EU)：</td> 
+         <td style="width:100px;"><input name="euPrice" vtype="float" required="true" #if(!$canUpdatePrice) enabled="false" #end class="mini-textbox"  /></td> 
+         <td >代销价：</td> 
+         <td ><input name="dxPrice" vtype="float" required="true" #if(!$canUpdatePrice) enabled="false" #end class="mini-textbox"  /></td> 
+         <td >尚美价：</td> 
+         <td ><input name="smPrice" vtype="float" required="true" #if(!$canUpdatePrice) enabled="false" #end class="mini-textbox"  /></td> 
+        </tr> 
+        <tr> 
+         <td >尚上价：</td> 
+         <td ><input name="ssPrice" vtype="float" required="true" #if(!$canUpdatePrice) enabled="false" #end class="mini-textbox"  /></td> 
+		<td >活动价：</td> 
+         <td ><input name="activePrice" vtype="float"  #if(!$canActivePrice) enabled="false" #end class="mini-textbox"  /></td>
+		  <td >年份：</td> 
+         <td ><input name="years"    enabled="false"   class="mini-textbox"  /> <input name="month"    enabled="false"   class="mini-textbox"  /></td> 
+         <td >备注：</td> 
+         <td colspan="5"> <textarea class="mini-textarea" name="remark"></textarea> </td> 
+        </tr> 
+		#end
+       </tbody>
+      </table> 
+     </div> 
+#if(!$isDxUser)
+     <div style="text-align:center;padding:10px;"> 
+      <a class="mini-button" id="submit" onclick="update" style="width:60px;margin-right:20px; #if(!$canUpdate) display:none #end">修改</a>
+	  <a class="mini-button" id="add2shopping" onclick="add2ShoppingCar" style="width:80px;margin-right:20px;">加购物车</a>
+	  #if($canCancelYuLiu)
+		<a class="mini-button" id="cancelYuLiuBtn" onclick="cancelYuLiu" style="width:80px;margin-right:20px;">取消预留</a>
+	  #end
+	  
+	  #if($canSaleIn2Stock)
+		<a class="mini-button" id="saleInStockBtn" onclick="saleInStock" style="width:80px;margin-right:20px; #if(!$canSaleIn2Stock) display:none #end">销售入库</a>
+	  #end
+	 
+	  <a class="mini-button" id="inStock" onclick="instockFn" style="width:60px;margin-right:20px;display:none">入库</a>
+	  <a class="mini-button" onclick="history" style="width:60px;margin-right:20px;">历史</a> 
+	  #if($canUpdate)
+		 <a class="mini-button" id="xiaci_no" onclick="xiaciFn(1)" style="width:80px;margin-right:20px;">设为瑕疵品</a>
+	    <a class="mini-button" id="xiaci_yes" onclick="xiaciFn(0)" style="width:80px;margin-right:20px;">取消瑕疵品</a> 
+		<a class="mini-button" onclick="updateHistory" style="width:80px;margin-right:20px;">更新记录</a>
+	  #end
+      <a class="mini-button" onclick="onCancel" style="width:60px;margin-right:20px;">取消</a>
+	 
+		
+     </div>  
+#end
+</form> 
+ <div style="float:right;margin-top:-33px;"> 
+	    <form enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+          图片上传: <input style="width:150px" type="file" name="img" id="uploadFile"/>
+           ##<input type="submit" value="上传" />
+			<a class="mini-button" id="chuan"  onclick="uploadFile()">上传</a>
+			 ##<td><input type="button" value="提交" /></td>
+        </form>
+		
+		</div> 
+  </div> 
+</div>
+   
+ 
+  <script type="text/javascript">
+            var statusData = [{id: 0, value: "--选择--"},{id: 1, value: "男士"},{ id: 2,value: "女士"}, { id: 3,  value: "中性"  } ]
+            var hasValid = [{id: 0, value: "未制作"}, {  id: 1, value: "已制作" }];
+			var ptype = [{id: -1, value: "采购产品"}, {  id: 1, value: "新品" }, {  id: 2, value: "二手" }];
+			mini.parse();
+            var form = new mini.Form("form1");
+   			var idProduct = '';
+
+
+            function SetData(data) {
+                if (data.action == "edit") {
+                    //跨页面传递的数据对象，克隆后才可以安全使用
+                    data = mini.clone(data);
+					idProduct = data.id;
+                    jQuery.ajax({
+                        url: "/product/getProduct.html?idproduct=" + data.id,
+                        cache: false,
+                        success: function(text) {
+                            var o = mini.decode(text);
+                            form.setData(o);
+							jQuery("#picture").attr("src",o.picture+"?t=" + Math.random());
+							
+							//如果是准入库 隐藏更新  取消预留 按钮 显示入库按钮隐
+							if("准入库" == o.status && $canIn2Stock)
+							{
+								//隐藏更新  取消预留  按钮 显示 入库按钮
+								jQuery("#submit").hide();
+								
+								jQuery("#inStock").show();
+							 
+								//隐藏货源  显示采购单号
+								jQuery(".supply").hide();
+								jQuery(".cai").show();
+								
+								
+								
+								//设置类型为采购产品
+								mini.get("secondHand").setValue(-1);
+								
+								//类型可选
+								mini.get("secondHand").setEnabled(true);
+								
+							}
+							
+							// 如果不是预订状态 隐藏预订按钮
+							var curSite = ${curSite};
+							var canCancelYuLiu = ${canCancelYuLiu};
+
+							//if(text.curSiteId == curSite && canCancelYuLiu && "预订" == text.status)
+							if(canCancelYuLiu && "预订" == text.status)
+							{
+								jQuery("#cancelYuLiuBtn").show();
+							}
+							else
+							{
+								jQuery("#cancelYuLiuBtn").hide();
+							}
+							
+							//是否显示加入购物车按钮
+							var addshc = ${addshc};
+							if(addshc && "可售" == text.status)
+							{
+								jQuery("#add2shopping").show();
+							}
+							else
+							{
+								jQuery("#add2shopping").hide();
+							}
+							
+							
+						 
+							//判断是否显示销售入库按钮   只有已售 且idLocation和当前用户idLocation一样 且有销售入库权限
+							var canSaleIn2Stock = ${canSaleIn2Stock};
+							//if(text.curSiteId == curSite && canSaleIn2Stock && "已售" == text.status)
+							if(canSaleIn2Stock && "已售" == text.status)
+							{
+								jQuery("#saleInStockBtn").show();
+							}
+							else
+							{
+								jQuery("#saleInStockBtn").hide();
+							}
+							
+							
+							
+							if(text.seriesId == 3 || text.seriesId == 4 || text.seriesId == 5 || text.seriesId == 6)
+							{
+								mini.get("size").setRequired("true");
+							}
+							if(o.isFlaw == "1")
+							{
+								jQuery("#xiaci_no").hide();
+							}
+							else
+							{
+								jQuery("#xiaci_yes").hide();
+							}
+							
+							
+                        }
+                    });
+                }
+            }
+            
+            function GetData() {
+			   form.validate();
+               if (form.isValid() == false) return;
+
+                var o = form.getData();
+                return o;
+            }
+			
+			
+            function CloseWindow(action) {
+                if (action == "close" && form.isChanged()) {
+                    if (confirm("数据被修改了，是否先保存？")) {
+                        return false;
+                    }
+                }
+                if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+                else window.close();
+            }
+			
+			
+			
+			
+	 function add2ShoppingCar() {
+                  var id =  form.getData().idProduct;
+                   mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿刷新...'
+                    });
+                    jQuery.ajax({
+                        url: "/shoppingCar/add2ShoppingCar.html",
+						type: 'POST',
+						data: {idProducts:id},
+                        success: function(text) {
+							mini.unmask();
+							if(text == "ok")
+							{
+								mini.alert("成功加入购物车");
+							}
+							else if(text == "exists_status_error")
+							{
+								mini.alert("购物车只能有一个状态的产品,请先清空购物车")
+							}
+							else if(text == "only_one_status")
+							{
+								mini.alert("加入购物车的产品状态必须一致");
+							} 
+                        },
+                        error: function() {}
+                    });
+               
+        }
+		
+		
+			
+			//类别改变  显示 采购单号和 供货商
+			function typeChange(obj)
+			{
+				if(obj)
+				{
+					if(obj.value == -1)
+					{
+						jQuery(".supply").hide();
+						jQuery(".cai").show();
+					}
+					else if(obj.value == 1)
+					{
+						jQuery(".supply").show();
+						jQuery(".cai").hide();
+						
+						mini.get("idSupply").setEnabled(true);
+					}
+					else 
+					{
+						jQuery(".supply").hide();
+						jQuery(".cai").hide();
+					}
+				}
+			}
+			
+			//类别改变  尺寸是否必填
+			function seriesChange(e)
+			{
+				if(e.value == 3 || e.value == 4 || e.value == 5 || e.value == 6)
+				{
+					mini.get("size").setRequired("true");
+				}
+				else
+				{
+					mini.get("size").setRequired("");
+				}
+			}
+			
+			//更新
+            function update(e) {
+                var data = GetData();
+				if(data == undefined){return;}
+				data.status = '';
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,请勿关闭...'
+                });
+                jQuery.post("/product/updateProduct.html",data,function(text){
+					mini.unmask(document.body);
+					if(text)
+    				{
+    					if(text.sku)
+    					{
+							mini.get("sku").setValue(text.sku);
+							mini.alert("更新成功");
+    					}
+						else
+						{
+							mini.alert("更新失败，联系管理员");
+						}
+    				}
+					else
+					{
+						mini.alert("更新失败，联系管理员");
+					}
+					
+				})
+            }
+			
+			//瑕疵品
+            function xiaciFn(isFlaw) {
+                var data = GetData();
+				if(data == undefined){return;}
+				if(isFlaw == 1)
+				{
+    				if (!confirm("确定是瑕疵品？")) {
+                            return false;
+                     }
+				 }
+				 else
+				 {
+				 	if (!confirm("确定设为非瑕疵品？")) {
+                            return false;
+                     }
+				 }
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,请勿关闭...'
+                });
+				var sendData = {idProduct: data.idProduct,isFlaw: isFlaw};
+                jQuery.post("/product/updateToXiaCiPin.html",sendData,function(text){
+					mini.unmask(document.body);
+					if(text== 'ok')
+    				{
+							mini.alert("设置成功");
+							if(isFlaw == 1)
+							{
+								jQuery("#xiaci_no").hide();
+							}
+							else
+							{
+								jQuery("#xiaci_yes").hide();
+							}
+    				}
+					else
+					{
+						mini.alert("更新失败，联系管理员");
+					}
+					
+				})
+            }
+			
+			
+			//入库
+			function  instockFn()
+			{
+				var data = GetData(); 
+				if(data == undefined){return;}
+				 if (!confirm("确定入库？")) {
+                        return false;
+                 }
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,请勿关闭...'
+                });
+				jQuery.post("/product/productInStock.html",data,function(text){
+					mini.unmask(document.body);
+					if(text)
+					{
+						if(text.sku)
+						{
+							//入库成功
+							mini.get("sku").setValue(text.sku);
+							jQuery("#picture").attr("src",text.picture+"?t=" + Math.random());
+							//显示更新按钮  隐藏入库按钮
+							jQuery("#submit").show();
+							jQuery("#inStock").hide();
+							
+							//隐藏采购单号 显示 供货商
+							jQuery(".supply").show();
+							jQuery(".cai").hide();
+							
+							//供货商不可选
+							mini.get("idSupply").setValue(text.idSupply);
+							mini.get("idSupply").setEnabled(false);
+
+							//类别不可选
+							mini.get("secondHand").setValue(text.secondHand);
+							mini.get("secondHand").setEnabled(false);
+							
+							//最后操作人和状态
+							mini.get("status").setValue("可售");
+							
+							//mini.alert("入库成功");
+						}
+						else
+						{
+							mini.alert("入库失败，联系管理员");
+						}
+					}
+					else
+					{
+						mini.alert("入库失败，联系管理员");
+					}
+					 
+				})
+			 
+			}
+			
+	     function history() {
+            if (idProduct)
+			{
+                mini.open({
+                    url: "/product/toGetProductHistory.html",
+                    title: "历史",
+                    width: 940,
+                    height: 450,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+						var data = { idProduct: idProduct};
+                        iframe.contentWindow.setData(data);
+						iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                       // grid.reload();
+                    }
+                });
+			}
+        }
+		
+		
+		
+		//更新记录
+		function updateHistory() {
+            if (idProduct)
+			{
+                mini.open({
+                    url: "/product/toGetProductUpdateLog.html",
+                    title: "更新记录",
+                    width: 940,
+                    height: 450,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+						var data = { idProduct: idProduct};
+                        iframe.contentWindow.setData(data);
+						iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                       // grid.reload();
+                    }
+                });
+			}
+        }
+		
+		//取消预留
+		function cancelYuLiu()
+		{
+				var data = GetData(); 
+				if(data == undefined){return;}
+				 if (!confirm("确定取消预留？")) {
+                        return false;
+                 }
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,请勿关闭...'
+                });
+				jQuery.post("/order1/cancelOrderByIdProduct.html",data,function(text){
+					 mini.unmask(document.body);
+        			if("ok" == text)
+        			{
+        				mini.alert("取消成功");
+						
+						//隐藏取消预留按钮
+						jQuery("#cancelYuLiuBtn").hide();
+        			}
+					else if("no_sample_operator"==text)
+					{
+						mini.alert("不在同一个站点");
+					}
+        			else
+        			{
+        				mini.alert("提交出错,联系管理员");
+        			}
+				})
+		}
+		
+		
+		
+		//销售入库
+		function saleInStock()
+		{
+				mini.open({
+                    url: "/order1/toSaleInStockByIdProduct.html",
+                    title: "销售入库",
+                    width: 500,
+                    height: 300,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+						var data = { idProduct: idProduct};
+                        iframe.contentWindow.setData(data);
+						iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                     	if('success' == action)
+						{
+							jQuery("#saleInStockBtn").hide();
+						}
+                    }
+                });
+		
+		}
+		
+		
+		
+		
+        function onCancel(e) {
+            CloseWindow("cancel");
+        }
+			
+		
+		
+		function GetDataa() {
+			   form.validate();
+               if (form.isValid() == false) return;
+
+                var o = form2.getData();
+                return o;
+            }
+		
+		
+		
+ 	 	function uploadFile(){		
+//      var nowV = document.getElementById("uploadFile").value;	
+	  var pic = $("#picture")[0].src;
+
+
+  var form = new FormData(document.getElementById("uploadForm"));
+           mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿刷新...'
+                    });
+		    jQuery.ajax({  
+             url : "/shoppingCar/timetask/SecurityHttpByFile.html?pic="+pic,  
+             type: "POST",
+			 data :form,
+			 contentType: false,
+			 processData: false,
+             success : function(data) {  
+			 mini.unmask();
+			   if(data.result == "error"){
+			     mini.alert("请联系管理员"); 
+				 return;
+			   }else if(data.result == "success"){
+			   //只更改图片，名称不变，不同图片名称相同,浏览器会在缓存中读取；如果后面加个随机数，浏览器会认为是不同的图片，会在服务器读取
+			   jQuery("#picture").attr("src",data.imgUrl+"?t=" + Math.random());
+			     mini.alert("图片上传成功");				 
+				 return;
+			   }else if(data.result == "non"){
+			     mini.alert("--请联系管理员--");
+				 return;
+			   }
+                
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+	}
+	
+	
+
+	
+        </script>   
+ </body>
+</html>

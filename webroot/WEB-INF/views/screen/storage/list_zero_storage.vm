@@ -1,0 +1,162 @@
+#set($layout = "layout/default.vm")
+
+<script language="javaScript" type="text/javascript">
+    String.prototype.trim= function()
+    {
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+	function doExport(){
+	 var form1=document.getElementById('searchform');
+	 form1.action="/storage/export_zero_storage.html";
+	 form1.submit();
+	 form1.action="/storage/list_zero_storage.html";
+	}
+
+	function formSubmit(){
+        	document.getElementById('searchform').submit();
+	    }
+</script>
+
+<div class="main">
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	 <div class="mag-t2">
+		$!message
+	 </div>
+ #end
+ <h2>管理中心 - 仓库管理</h2>
+	<form name="searchform" id="searchform" action="/storage/list_zero_storage.html" method="post">
+		<input type="hidden" id="flag" name="flag" value="$!flag" />
+	<div class="searchBox">
+	<h3><span>零库存查询</span></h3>
+	  <table>
+		<tr>
+            <th>产品名称：</th>
+			<td>
+				#springBind("storageQuery.instanceName")
+				<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+            </td>
+            <th>产品编码：</th>
+				<td>
+					#springBind("storageQuery.code")
+					<input type="text" id="code" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+    		<th> 产品类目：</th>
+			<td>
+				#springBind("storageQuery.catCode")
+				<select name="${status.expression}" id="catCode" class="inp">
+        				<option value="">-=请选择=-</option>
+        				#foreach($cat in $catList)
+        				<option value="$cat.catCode" #if("$cat.catCode"=="${status.value}") selected #end>$cat.catName</option>
+        				#end
+        		</select>
+            </td>
+
+             <th>是否上架：</th>
+			 <td>
+				#springBind("storageQuery.goodStatus")
+				<select name="${status.expression}" id="goodStatus">
+				        <option value="">-=请选择=-</option>
+                        <option value="on_depot" #if("on_depot"=="${status.value}") selected #end>下架</option>
+                        <option value="on_sale" #if("on_sale"=="${status.value}") selected  #end>上架</option>
+				</select>
+             </td>
+			 <th>
+				<input type="button" value=" 查询 " class="btn" onclick="formSubmit();"/>
+             </th>
+			<td>
+				<input type="reset" value=" 重置 " class="btn"/>
+            </td>
+
+			</tr>
+		</table>
+		</div>
+	</form>
+	#if($query && $query.items.size()>0)
+	<div class="tool">
+    	 <span><a href="#" onclick="doExport();" hidefocus="true" class="bt_wu">Excel导出</a></span>
+    </div>
+	#end
+		<!-- 物流信息列表   -->
+		<div class="listBox" id="listDiv">
+			<h3><span>零库存列表</span></h3>
+			<table  id="listTable" name="listTable">
+					<tr>
+						<th>
+							产品编码
+						</th>
+						<th>
+							供应商产品编码
+						</th>
+						<th >
+							产品名称
+						</th>
+						<th>
+							类目
+						</th>
+						<th>
+							属性
+						</th>
+						<th>
+							单位
+						</th>
+						<th>
+							在途库存
+						</th>
+						<th>
+							已售数量
+						</th>
+						<th>
+							时间
+						</th>
+						<th>
+							操作
+						</th>
+					</tr>
+				#if($query && $query.items.size()>0)
+					#foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td height="27">
+								$!{gi.code}
+							</td>
+							<td>
+								$!{gi.supplier_code}
+							</td>
+							<td title="$!{gi.instanceName}">
+								$!controlUtil.getNoticesTitle($!{gi.instanceName},60)
+							</td>
+							<td title="$!categoryManager.getCatFullNameByCatcode($gi.catCode)">
+								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($gi.catCode),20)
+							</td>
+							<td title="$!attributeManager.getFullAttributeStringByAttrs($gi.attrs)">
+								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($gi.attrs),20)
+							</td>
+							<td>
+								$!{gi.goodsUnit}
+							</td>
+							<td>
+								$!{gi.wayNum}
+							</td>
+							<td>
+								$!{gi.salesSum}
+							</td>
+							<td>
+							    $!dateUtil.convertDateToString('yyyy-MM-dd HH:MM:ss',${gi.gmtModify})
+							</td>
+							<td>
+
+							   <a href="$appServer/storage/zeroStoreCheck.html?goodsInsId=$!{gi.goodsInstanceId}"> 盘盈</a>
+							</td>
+						</tr>
+					#end
+				#end
+			</table>
+			<!-- 分页 -->
+            #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_zero_storage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+		</div>
+
+</div>

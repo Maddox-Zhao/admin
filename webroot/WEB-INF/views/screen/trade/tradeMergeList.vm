@@ -1,0 +1,389 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心——订单配货")
+
+<body>
+
+<div class="main">
+#if("$!tradeType"!="fx")
+	<h2>管理中心——订单配货</h2>
+	<div class="mag-t2" id="modifySuccess" style="display:none">修改金额成功</div>
+	<div class="mag-t1" id="modifyError" style="display:none">修改金额失败</div>
+	#if($succFlag)<div class="mag-t2" id="modifySuccess">合并配货成功！</div>#end
+	#if($errorInfo && $errorInfo != "")<div class="mag-t1" id="modifyError">$!errorInfo</div>#end
+#end
+
+	<form action="$appServer.get("/trade/showl.html")" name="searchForm" method="post" id="searchForm">
+		#springBind("query.tradeType")
+    	<input type="hidden" name="${status.expression}" id="tradeType"  value="$!{status.value}" />
+		#springBind("query.status")
+    	<input type="hidden" name="${status.expression}" id="query.status"  value="$!{status.value}" />
+		#springBind("query.send")
+    	<input type="hidden" name="${status.expression}" id="send"  value="$!{status.value}" />
+
+		<div class="searchBox">
+			<h3><span>搜索单据</span></h3>
+		#if("$!tradeType" != "fx")
+			<table>
+				<tr>
+					<th>买家昵称：</th>
+					<td>
+						#springBind("query.buyNick")
+						<input type="text" name="${status.expression}" id="query.buyNick" value="$!{status.value}" />
+					</td>
+					<th>下单时间：</th>
+					<td>
+						#springBind("query.gmtCreateStart")
+						<input type="text" id="query.gmtCreateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.gmtCreateEnd")
+						<input type="text" id="query.gmtCreateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.gmtCreateStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.gmtCreateEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th>仓库名称：</th>
+					<td>
+						#springBind("query.depFirstId")
+						<select id="query.depFirstId" name="${status.expression}" class="select" style="width:160px;">
+							<option value="">-=请选择=-</option>
+							#foreach($depFirst in $depositoryFirstList)
+                                <option value="$!{depFirst.id}" #if("$!{status.value}" == "${depFirst.id}") selected="selected" #end title="$!{depFirst.depFirstName}">$!{depFirst.depFirstName}</option>
+							#end
+						</select>
+					</td>
+					<th>支付方式：</th>
+					<td>
+						#springBind("query.expressPayment")
+						<select id="query.expressPayment" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							<option value="payment_first" #if("$!{status.value}" == "payment_first") selected="selected" #end>先款后货</option>
+							<option value="goods_first" #if("$!{status.value}" == "goods_first") selected="selected" #end>货到付款</option>
+							<option value="period_pay" #if("$!{status.value}" == "period_pay") selected="selected" #end>周期结算</option>
+						</select>
+					</td>
+					<th>发票：</th>
+					<td>
+						#springBind("query.invoice")
+						<select id="query.invoice" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							<option value="y" #if("$!{status.value}" == "y") selected="selected" #end>是</option>
+							<option value="n" #if("$!{status.value}" == "n") selected="selected" #end>否</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="6">
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+						<button type="button" class="btn" onclick="clean();">重置</button>
+					#if($query)
+						<button type="button" class="btn" onclick="doExportOrder();">Excel导出</button>
+					#end
+					</td>
+				</tr>
+			</table>
+		#end
+        </div>
+
+
+    	#if($trade)
+    	<div align="right">
+    		<font size='4'><strong><label>【 汇总: </label></strong></font>
+    		<font size='4' color='red'><strong><label>${trade.id}</label></strong></font>
+    		<font size='4'><strong><label>笔&nbsp;&nbsp;&nbsp;总金额: </label></strong></font>
+    		<font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney(${trade.goodsAmountSum}, '0.00')</label></strong></font>
+    		<font size='4'><strong><label>元 】</label></strong></font>
+    	</div>
+    	#end
+
+    	<!-- 订单列表 -->
+    	<div class="listBox">
+    		<h3><span>订单列表</span></h3>
+    		<table>
+    			<tr>
+    				<th>
+    					<input id="anothercheckall" type="checkbox" onclick="selectAll('anothercheckall');"/>全选
+    				</th>
+    				<th>订单号</th>
+    				<th>下单时间</th>
+    				<th>买家昵称</th>
+    				<th>总金额(元)</th>
+    				<th>付款时间</th>
+    				<th>物流公司</th>
+    				<th>支付方式</th>
+    				<th>订单状态</th>
+    				<th>仓库名称</th>
+    				<th>是否发票</th>
+    				<th>外部订单号</th>
+    				<th>操作</th>
+    			</tr>
+    		#foreach($trade in $page.items)
+    			<tr #if($velocityCount%2==0) class="bg" #end>
+    				<td>
+        				<input type="hidden" id='province_$!trade.tid' value="$!trade.province">
+        				<input type="hidden" id='city_$!trade.tid' value="$!trade.city">
+        				<input type="hidden" id='district_$!trade.tid' value="$!trade.district">
+        				<input type="hidden" id='address_$!trade.tid' value="$!trade.address">
+        				<input type="hidden" id='buyNick_$!trade.tid' value="$!trade.buyNick">
+        				<input type="hidden" id='receiver_$!trade.tid' value="$!trade.receiver">
+    					<input id="ids_$!trade.tid" name="ids" type="checkbox" value="$!trade.tid" #if("$!{trade.status}" != 'wait_seller_send_goods') disabled="disabled" #end />
+    				</td>
+    				<td>
+    				#if(${trade.tradeType}==2)
+    					<img title="拍拍同步订单" alt="拍拍同步订单" src="$imageServer/images/icon/paipai.png" width="15" height="15"/>
+    				#elseif(${trade.tradeType}==3)
+    					<img title="拍拍同步订单" alt="淘宝同步订单" src="$imageServer/images/icon/taobao.png" width="15" height="15"/>
+    				#end
+    					<a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)">$!trade.tid</a>
+    				</td>
+    				<td>
+    					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.gmtCreate)
+    				</td>
+    				<td>
+    					<a href="$!appServer.get("/user/userDetail.html?userId=$!trade.buyId")">$!trade.buyNick</a>
+    				</td>
+    				<td align="right">
+    					￥
+    					<span id='trade_amount_$!trade.id'>
+    						$!moneyUtil.getFormatMoney($math.add($trade.goodsAmount, $trade.shippingAmount), '0.00')
+    					</span>
+    				</td>
+    				<td  align="center">
+    					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!trade.payTime)
+    				</td>
+    				<td>
+    					<span id='expressName_$!trade.tid'>$!trade.expressName</span>
+    				</td>
+    				<td>
+    					<span id='expressPayment_$!trade.tid'>$!enumExpressDistPaymentMap.get($trade.expressPayment)</span>
+    				</td>
+    				<td>
+    					<span id='trade_status_$!trade.id'>
+    					#if("$!trade.status"=="trade_close" && ${trade.tradeType}==3 && "$trade.stockoutStatus"=="y")
+    						缺货
+    					#else
+    						$!enumTradeStatusMap.get($trade.status)
+    					#end
+    					</span>
+    				</td>
+    				<td>
+    					<span id='depFirstId_$!trade.tid'>$!depositoryNameMap.get($trade.depFirstId)</span>
+    				</td>
+    				<td>#if($!trade.invoice=="y") 是 #else 否 #end</td>
+    				<td>&nbsp;$!trade.interTid</td>
+    				<td>
+    					<a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)">查看</a>
+    					<span id='trade_do_$!trade.id'>
+    					#if("$trade.status" == "wait_seller_send_goods")
+    						#if("$trade.isWholesale" == "n")
+    							<a href="javascript:sendGoods('$trade.id', '$trade.tradeType');">审核</a>
+    						#else
+    							<a href="javascript:addWholesaleApply('$trade.id','$trade.tid','$!trade.depFirstId');">审核</a>
+    						#end
+    					#end
+    					</span>
+    				</td>
+    			</tr>
+    		#end
+        	</table>
+
+        	<span class="action-span">
+        		<input type="button" name="Submit4" value="合并配货" class="button" onclick="javascript:mergeSendGoods();"/>
+        	</span>
+    	</div>
+	</form>
+
+	<!-- 分页 -->
+	#if($page.items.size() > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/trade/showl.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+	#else
+		没有结果！
+	#end
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+
+	function formSubmit(){
+		var dateStart= document.getElementById('query.gmtCreateStart').value.replace(/-/g, "/");
+		var dateEnd= document.getElementById('query.gmtCreateEnd').value.replace(/-/g, "/");
+		var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		jQuery('#query.buyNick').val(jQuery.trim(jQuery('#query.buyNick').val()));
+		jQuery('#query.gmtCreateStart').val(jQuery.trim(jQuery('#query.gmtCreateStart').val()));
+		jQuery('#query.gmtCreateEnd').val(jQuery.trim(jQuery('#query.gmtCreateEnd').val()));
+		document.forms[0].submit();
+	 }
+
+	//DWR方式发货
+	function sendGoods(tradeId, tredeType){
+		// 添加淘宝分销物流验证
+		#if("$query.tradeType" == "fx")
+			jQuery.ajax({
+		         type:"get",
+		         url: '$appServer.get("/trade/getExpress.html")',
+		         dataType: "json",
+		         data:"tradeId="+tradeId,
+		         success:function(json){
+		         	if(json.error=="error"){
+			         	alert(json.msg);
+		         	}else if(json.success=="success"){
+		#end
+					if(confirm("你确定要生成配货单吗?")){
+						jQuery.get('$appServer.get("/trade/sendJsonGoods.html")',{param1:tradeId,param2:tredeType},
+							function(message){
+						         if(message=='success'){
+						            	var tradeStatusObj = document.getElementById('trade_status_' + tradeId);
+									    tradeStatusObj.innerHTML="$!enumTradeStatusMap.get('wait_distribution')";
+									    var tradeDoObj = document.getElementById('trade_do_' + tradeId);
+									    tradeDoObj.innerHTML="";
+									    alert('配货成功!');
+								}else{
+									    alert(message);
+								}
+							}
+						);
+						// 	TradeAction.sendDwrGoods(tradeId,function(msg){callBackSendGoods(msg,tradeId);});
+					}
+
+		#if("$query.tradeType" == "fx")
+	         	}
+	         }
+		});
+		#end
+	}
+
+	// 批发配货
+	function addWholesaleApply(tradeId,tid,depFirstId){
+		if(confirm("你确定要生成批发配货申请单吗?")){
+			jQuery.get('${ctx}/igc/ios/addWholesaleApply.html',{param1:tradeId,param2:tid,param3:depFirstId},function(message){
+                if(message=='success'){
+    				var tradeStatusObj = document.getElementById('trade_status_' + tradeId);
+    				tradeStatusObj.innerHTML="$!enumTradeStatusMap.get('wait_distribution')";
+    				var tradeDoObj = document.getElementById('trade_do_' + tradeId);
+    				tradeDoObj.innerHTML="";
+    				alert('批发配货申请成功!');
+    			}else{
+					alert(message);
+				}
+			}, 'json');
+		}
+	}
+
+	function doExportOrder(){
+		var form1=document.getElementById('searchForm');
+		form1.action='$appServer.get("/trade/exportOrder.html")';
+		form1.submit();
+		form1.action="$appServer.get("/trade/showl.html")";
+	}
+
+	function clean(){
+		document.getElementById('query.buyNick').value='';
+		document.getElementById('query.gmtCreateStart').value='';
+		document.getElementById('query.gmtCreateEnd').value='';
+		document.getElementById('query.expressPayment').value='';
+		jQuery('#query.wholesaleStatus').val('');
+	}
+
+	function selectAll(chkName) {
+		jQuery('input[name="ids"]').attr('checked', jQuery('#' + chkName).attr('checked'));
+	}
+
+	// 合并配货
+	function mergeSendGoods(){
+		var ids = document.getElementsByName("ids");
+		//初始化为全都没有选
+		var checkNum = 1;
+		var flag = 0;
+		var province,province_0;
+		var city,city_0;
+		var district,district_0;
+		var address,address_0;// 收货地址
+		var buyNick_0,buyNick;// 买家昵称
+		var receiver_0,receiver;// 收货人
+		var expressName_0,expressName;// 物流公司ID
+		var expressPayment_0,expressPayment;// 支付方式
+		var depFirstId_0,depFirstId;// 一级仓库
+
+		for(var i=0;i<ids.length;i++){
+    		//判断该复选框是否选择
+    		if(ids[i].checked == true){
+				if(checkNum == 1){
+					province_0 = document.getElementById('province_'+ids[i].value).value;
+					city_0 = document.getElementById('city_'+ids[i].value).value;
+					district_0 = document.getElementById('district_'+ids[i].value).value;
+					address_0 = document.getElementById('address_'+ids[i].value).value;
+					buyNick_0 = document.getElementById('buyNick_'+ids[i].value).value;
+					receiver_0 = document.getElementById('receiver_'+ids[i].value).value;
+            		expressName_0 = document.getElementById('expressName_'+ids[i].value).innerHTML;
+            		expressPayment_0 = document.getElementById('expressPayment_'+ids[i].value).innerHTML;
+            		depFirstId_0 = document.getElementById('depFirstId_'+ids[i].value).innerHTML;
+				}
+				flag++;
+				province = document.getElementById('province_'+ids[i].value).value;
+				city = document.getElementById('city_'+ids[i].value).value;
+				district = document.getElementById('district_'+ids[i].value).value;
+				address = document.getElementById('address_'+ids[i].value).value;
+				buyNick = document.getElementById('buyNick_'+ids[i].value).value;
+				receiver = document.getElementById('receiver_'+ids[i].value).value;
+    			expressName = document.getElementById('expressName_'+ids[i].value).innerHTML;
+    			expressPayment = document.getElementById('expressPayment_'+ids[i].value).innerHTML;
+    			depFirstId = document.getElementById('depFirstId_'+ids[i].value).innerHTML;
+
+				if(buyNick_0 != buyNick){
+					alert("请选择同一个买家的订单！");
+					return false;
+				}
+				if(receiver_0 != receiver){
+					alert("选择的订单中收货人不相同！");
+					return false;
+				}
+				if(expressName_0 != expressName){
+					alert("选择的订单中物流公司不相同！");
+					return false;
+				}
+				if(expressPayment_0 != expressPayment){
+					alert("选择的订单中支付方式不相同！");
+					return false;
+				}
+				if(depFirstId_0 != depFirstId){
+					alert("选择的订单中一级仓库不相同！");
+					return false;
+				}
+				if(province_0 != province || city_0 != city
+					 || district_0 != district || address_0 != address){
+					alert("选择的订单中地址不相同！");
+					return false;
+				}
+				checkNum++;
+    		}
+    	}
+		//如果全都没有选，则返回
+		if(flag < 2)
+		{
+			alert("请选择两个以上的订单进行合并配货操作！");
+			return;
+		}
+		var form1 = document.getElementById('searchForm');
+		form1.action = '$appServer.get("/trade/mergeSendGoods.html")';
+		form1.submit();
+	}
+</script>

@@ -1,0 +1,644 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>igoldcane</title>
+<link rel="stylesheet" href="../styles/common.css" />
+<link rel="stylesheet" href="../styles/myspace.css" />
+<script type="text/javascript" src="../scripts/jQuery/jquery-1.4.2.min.js"></script>
+
+
+</head>
+
+<body>
+	
+    <div class="wrapper">
+    	
+        <div class="w980">
+        
+            <div class="header">
+                <p>
+                    <a href="#">我的订单</a>|
+                    <a href="#">我的空间</a>|
+                    <a href="#">帮助中心</a>|
+                    <span>您好，欢迎光临</span>|
+                    <a href="#">登录</a>|
+                    <a href="#">注册</a>
+                </p>
+                
+                <div  class="logo"><a href="#"></a></div>
+                
+                <div class="selectarea">
+                	<input type="text" 
+                    	onblur="this.value==''?this.value=this.title:null" 
+                        onfocus="this.value==this.title?this.value='':null" 
+                        title="请输入关键词，如：浪莎" 
+                        value="请输入关键词，如：浪莎" 
+                        class="input_nob">
+                     <button type="button" class="selet_btn"></button>
+                </div>
+                
+                
+                <div class="menu">
+
+                    <ul>
+                        <li class="active"><a href="#">商城首页</a>|</li>
+                        <li><a href="#">超人专区</a>|</li>
+                        <li><a href="#">美的专区</a>|</li>
+                        <li><a href="#">天堂伞专区</a>|</li>
+                        <li><a href="#">浪莎专区</a>|</li>
+                        <li><a href="#">LOVO专区</a>|</li>
+                        <li><a href="#">代销购物车</a>|</li>
+                    </ul>
+                    
+      				<div class="clear"></div>
+      				
+                    <div class="link">        
+                    	<span><a href="#">今日补货</a></span>
+                    	<span><a href="#">今日下架</a></span>
+      	 				<span><a href="#">数据包下载说明</a></span>
+                    	<span><a href="#">代销下单流程演示</a></span>
+                        <span><a href="#">物流查询</a></span>
+                    	<span><a href="#">库存查询</a></span>
+           			</div>
+                    
+				</div>
+				
+                <div class="gwc"><a href="#">购物车有<span>0</span>件商品</a></div>
+
+            </div>
+            
+            <div class="main">
+
+                <div class="mySpace-left">
+                    <div class="modules">
+                        <h4>我的进货单</h4>
+                        <ul>
+                            <li><a href="tlist.html">我的订单</a></li>
+                            <li><a href="taddresses.html">收货地址</a></li>
+                            <li><a href="listc.html">我的收藏</a></li>
+                            <li><a href="show.html">我的购物车</a></li>
+                        </ul>
+                        
+                        <h4>我的账户</h4>
+                        <ul>
+                            <li><a href="myAccount.html">我的账户</a></li>
+                            <li><a href="searchMyAccount.html">账户明细</a></li>
+                        </ul>
+                        
+                        <h4>网络分销管理</h4>
+                        <ul>
+                            <li><a href="searchAgentGoodsByData.html">代销商品申请</a></li>
+                            <li><a href="agentrightgoodstatus.html">我代销的商品</a></li>
+                            <li><a href="searchTaobaoGoods.html">淘宝商品关联</a></li>
+                            <li><a href="myTaobaoGoods.html">我关联的淘宝商品</a></li>
+                            <li><a href="addInterfaceApplyPage.html">拍拍网店接入申请</a></li>
+                            <li><a href="searchFailed.html">查询同步失败数据</a></li>
+                        </ul>
+                            
+                        <h4>退换货</h4>
+                        <ul>
+                            <li><a href="refundApplySearch.html">退换货申请</a></li>
+                            <li><a href="refundSearch.html">退换货管理</a></li>
+                        </ul>
+                        <h4>我的消息</h4>
+                        <ul>
+                            <li><a href="comments.html">我的评论</a></li>
+                            <li  class="current"><a href="feedback.html">我的留言</a></li>
+                            <li><a href="getWebSiteList.html">站内消息</a></li>
+                        </ul>
+                        <h4>用户信息</h4>
+                        <ul>
+                            <li><a href="eu.html">我的资料</a></li>
+                            <li><a href="ep.html">修改密码</a></li>
+                        </ul>
+                    </div>  
+                </div>
+            	
+                <div class="mySpace-right">
+					<form method="post" action="feedback.html?tabFlag=receive" id="myfeedback" name="myfeedback">
+<div class="title-crumbs">
+     <!--
+<ul>
+	<li>当前位置：</li>
+    <li><a href="http://1858.net:8070/index_dx.html">商城首页</a> >></li>
+     <li><a href="http://1858.net:8070/u/home.html">我的空间</a> >></li>
+        <li>我的留言</li>
+    </ul>
+  -->
+<p><span>当前位置：</span><a href="http://1858.net:8070/index_dx.html">商城首页</a>&gt;&gt;<a href="http://1858.net:8070/u/home.html">我的空间</a>&gt;&gt;<a href="#"> 我的留言 </a></p>    <strong>我的消息</strong>
+</div>
+			 <div class="m">
+				<ul class="space-tab">
+    				<li class="current"><a hidefocus="true" onclick="javascript:document.location='feedback.html?tabFlag=receive'" href="#">收到的留言</a></li>
+    				<li><a hidefocus="true" onclick="javascript:document.location='feedback.html?tabFlag=send'" href="#">发出的留言</a></li>
+    				<li><a hidefocus="true" onclick="javascript:document.location='feedback.html?tabFlag=new'" href="#">给商家留言</a></li>
+					<li><a hidefocus="true" onclick="javascript:document.location='comments.html'" href="#">我的评论</a></li>
+				</ul>
+			 </div>
+			              <div class="mes_con">
+				                  <ul class="even">
+               	  <div class="myspace_sz"><i class="post-floor">1</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>黄护军将军</span>                    </div>
+                  <div class="comment-time">2011-04-27 16:46:26</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">反反复反复</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000780);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="tow">
+               	  <div class="myspace_sz"><i class="post-floor">2</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>阿哥盛大</span>                    </div>
+                  <div class="comment-time">2011-04-26 11:09:59</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">撒地发生地方撒淡淡的</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000763);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="even">
+               	  <div class="myspace_sz"><i class="post-floor">3</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>个哈哈哈</span>                    </div>
+                  <div class="comment-time">2011-04-25 15:43:02</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">按时发生地方艾丝凡</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000762);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="tow">
+               	  <div class="myspace_sz"><i class="post-floor">4</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>嘎嘎嘎</span>                    </div>
+                  <div class="comment-time">2011-04-25 11:20:26</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">的法定分</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000761);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="even">
+               	  <div class="myspace_sz"><i class="post-floor">5</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>$eachFeedback.msgTitle</span>                    </div>
+                  <div class="comment-time">2011-04-15 15:52:28</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">$eachFeedback.msgContent</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000721);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="tow">
+               	  <div class="myspace_sz"><i class="post-floor">6</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>fdhs</span>                    </div>
+                  <div class="comment-time">2011-04-15 11:22:49</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">gfgfgf</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000720);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="even">
+               	  <div class="myspace_sz"><i class="post-floor">7</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>撒打发打发是</span>                    </div>
+                  <div class="comment-time">2011-04-11 10:32:14</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">打法是否的</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000700);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="tow">
+               	  <div class="myspace_sz"><i class="post-floor">8</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>水水水水水水水水</span>                    </div>
+                  <div class="comment-time">2010-11-08 10:55:36</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">水水水水水水水水水水水</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000529);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="even">
+               	  <div class="myspace_sz"><i class="post-floor">9</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>cyantest</span>                    </div>
+                  <div class="comment-time">2010-11-05 16:11:30</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">cyantest</li>
+                    <li class="comment_dd">
+					                    <div style="float:left;">jjjjjjjjjjjjjj</div>
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000527);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                  <ul class="tow">
+               	  <div class="myspace_sz"><i class="post-floor">10</i></div>
+                    <div class="feedback_tit">
+                    	标题：<span>123</span>                    </div>
+                  <div class="comment-time">2010-11-05 16:04:30</div>
+                    <div class="clear"></div>
+                    <li class="word-wrap">123</li>
+                    <li class="comment_dd">
+					
+                                           														<input type="button" value=" 回 复 " onclick="back(10000526);" class="bt_del" name="button">
+					 
+                    </li>
+                </ul>
+				                </div>
+
+          <div class="myspace-page-nav">
+			                	  每页
+	  <input type="text" onchange="onPageChange(this);" size="3" value="10" name="pageSize">
+	  条记录 |
+	  共
+	  2
+	  页
+	    <input type="hidden" name="totalPages">
+	  /14
+	  条记录 |
+
+	  
+	  		<a title="下一页" href="javascript:gotoNext()"><img border="0" align="absbottom" alt="下一页" src="/images/ms/next.jpg"></a>
+		<a title="尾页" href="javascript:gotoLast()"><img border="0" align="absbottom" alt="尾页" src="/images/ms/last.jpg"></a>
+	  
+	  第
+	  <input type="text" onchange="onPageChanges(this);" value="1" size="3" name="currentPage">
+	  页
+	  <a title="跳转" href="javascript:setPageIndex();">
+		<img border="0" align="absbottom" alt="跳转" src="/images/ms/go.gif"></a>
+
+<script language="javascript" type="text/javascript">
+var ctl_currentPage = document.getElementById("currentPage");
+var ctl_totalPages  = document.getElementById("totalPages");
+var ctl_pageSize    = document.getElementById("pageSize");
+
+var totalPages= document.getElementsByName("totalPages")[0];
+var fieldCurrentPage=document.getElementsByName("currentPage")[0];
+
+var pValue;
+
+function onPageChange(ctl){
+	if(ctl.value==""|| isNaN(ctl.value)  || ctl.value &lt; 1){
+		ctl.value = 20;
+	}else{
+		ctl.value = parseInt(ctl.value);
+	}
+	ctl.form.submit();
+}
+
+function onPageChanges(ctl){
+	if(isNaN(ctl.value) || ctl.value==""){
+		ctl.value = 1;
+	}else{
+		ctl.value = parseInt(ctl.value);
+	}
+	ctl.form.submit();
+}
+
+function gotoNext()
+{
+     fieldCurrentPage.value= parseInt(fieldCurrentPage.value)+1 ;
+     setPageIndex(fieldCurrentPage.value);
+}
+
+function gotoPrevious()
+{
+     if(fieldCurrentPage.value&gt;1){
+      fieldCurrentPage.value= parseInt(fieldCurrentPage.value)-1 ;
+      setPageIndex();
+   }
+}
+
+function gotoFirst()
+{
+    fieldCurrentPage.value= 1 ;
+    setPageIndex();
+}
+function gotoLast()
+{
+    fieldCurrentPage.value= totalPages.value;
+    setPageIndex();
+}
+
+function setPageIndex()
+{
+	if(isNumber(fieldCurrentPage.value)){
+	document.forms[1].submit();}
+	else{
+	fieldCurrentPage.value = 1;
+	document.forms[1].submit();
+	}
+}
+
+function isNumber( s ){
+   var regu = "^[0-9]+$";
+   var re = new RegExp(regu);
+   if (s.search(re) != -1) {
+   return true;
+   } else {
+  return false;
+ }
+}
+
+</script>
+                      </div>
+		  		  </form>
+
+		   
+
+		  <input type="hidden" value="1" name="flag" id="flag">
+<div class="new_dx_rxsp">
+
+	<div class="new_dx_spfl_tit">
+   		<div class="new_dx_tit_left"></div>
+    	<div class="new_dx_rxsp_center">
+      		<div class="new_spfl_in">
+        		<li>热销商品</li>
+              	<li style="" class="new_shangxia">
+                  <a class="intleft" href="#"><img height="14" width="15" src="http://www.liangpin99.com/images/index20100331/2010413_in.gif"></a>
+                  <a class="intright" href="#"><img height="14" width="15" src="http://www.liangpin99.com/images/index20100331/2010413_int.gif"></a>
+			  </li>
+            </div>
+		</div>
+        
+        <div class="new_dx_tit_right"></div>
+	</div>
+    
+	<div class="new_dx_rxsp_con" style="">
+		<ul>
+        	<li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环个性扣带耳环</a>
+                </div>
+    		</li>
+			<li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+            <li>
+    			<a title="个性扣带耳环" target="_blank" href="#">
+					<img src="http://www.liangpin99.com/imageService/goods/201004/1271984843077rcpqamkb_l.JPG" alt="个性扣带耳环" title="个性扣带耳环">
+                </a>
+    			<br>
+                <div>
+                	<a href="http://www.liangpin99.com/l/gdetail_2090.html">个性扣带耳环</a>
+                </div>
+    		</li>
+		
+        </ul>
+  	</div>	
+    
+</div>
+<script type="text/javascript">
+    (function($) {
+    $(function() {
+        $(".new_dx_rxsp_con").jCarouselLite({
+            btnNext: ".intleft",
+            btnPrev: ".intright",
+    		visible: 6,
+    		auto:5000,
+    		speed:500
+        });
+    });
+    })(jQuery);
+</script><div class="clear"></div>
+<script type="text/javascript">
+	function back(id){
+		window.location.href="fdetail.html?feedbackId="+id;
+	}
+	function checkFeedback(){
+        var msgType = document.getElementsByName("feedback.msgType");
+        var check=0;
+        for(var i=0;i&lt;msgType.length;i++){
+            if(msgType[i].checked){
+            	check=1;
+            }
+        }
+        if( check == 0){
+	        alert("请选择留言类型!");
+	        return false;
+        }
+        var msgTitle=document.getElementById("msgTitle");
+        var ct=msgTitle.value;
+        var s=ct.trim();
+        if(s==null||s.length==0){
+	        alert("请输入主题!");
+	        return false;
+        }
+        if(s.length&gt;30){
+	        alert("您输入的主题内容过长，超出字数限制!");
+	        return false;
+        }
+        var msgContent=document.getElementById("msgContent");
+        var ctv=msgContent.value;
+        var ss=ctv.trim();
+        if(ss==null||ss.length==0){
+	        alert("请输入留言内容!");
+	        return false;
+        }
+        if(ss.length&gt;800){
+	        alert("您输入的留言内容过长，超出字数限制!");
+	        return false;
+        }
+		document.saveFeedback.submit();
+    }
+
+function deleteMyFeedback(id){
+    if(confirm("你确定要删除吗?")){
+        document.myfeedback.action = "removeMyFeedback.html?feedbackId="+id;
+        document.myfeedback.submit();
+    }
+}
+</script>
+                </div>
+            
+            	<div class="clear"></div>
+            </div>
+            
+            <div class="footer">
+        		<div class="xiangdao">
+                    <dl  class="gw">
+                        <dt>购物向导</dt>
+                        <dd><a href="/h/help.html?id=10663">交易条款</a></dd>
+                        <dd><a href="/h/help.html?id=10664">购物流程</a></dd>
+                        <dd><a href="/h/help.html?id=10663">订单查询</a></dd>
+                        <dd><a href="/h/help.html?id=10664">充值提现</a></dd>
+                    </dl>
+                    
+                    <dl class="zf">
+                        <dt>支付方式</dt>
+                        <dd><a href="/h/help.html?id=10665">支付宝</a></dd>
+                        <dd><a href="/h/help.html?id=10666">货到付款</a></dd>
+                        <dd><a href="/h/help.html?id=10665">网银支付</a></dd>
+                        <dd><a href="/h/help.html?id=10666">网点支付</a></dd>
+                        <dd><a href="/h/help.html?id=10666">汇款支付</a></dd>
+                    </dl>
+                    
+                    <dl class="sh">
+                        <dt>售后服务</dt>
+                        <dd><a href="/h/help.html?id=10667">品质保证原则</a></dd>
+                        <dd><a href="/h/help.html?id=10668">退换货原则</a></dd>
+                        <dd><a href="/h/help.html?id=10667">退换货流程</a></dd>
+                        <dd><a href="/h/help.html?id=10668">用户反馈</a></dd>
+                        <dd><a href="/h/help.html?id=10667">客服信箱</a></dd>
+                        <dd><a href="/h/help.html?id=10668">投诉通道</a></dd>
+                    </dl>
+                    
+                    <dl class="ps">
+                        <dt>配送服务</dt>
+                        <dd><a href="/h/help.html?id=10669">会员的优惠及服务</a></dd>
+                        <dd><a href="/h/help.html?id=10670">钻石卡会员</a></dd>
+                        <dd><a href="/h/help.html?id=10670">白金卡会员</a></dd>
+                    </dl>
+                    
+                    <dl class="hy">
+                        <dt>会员服务</dt>
+                        <dd><a href="/h/help.html?id=10669">什么是积分</a></dd>
+                        <dd><a href="/h/help.html?id=10670">积分发放规则</a></dd>
+                        <dd><a href="/h/help.html?id=10670">积分使用说明</a></dd>
+                    </dl>
+                    
+                     <dl class="jm">
+                        <dt>合作加盟</dt>
+                        <dd><a href="/h/help.html?id=10669">加盟商户</a></dd>
+                        <dd><a href="/h/help.html?id=10670">申请成为代办商</a></dd>
+                        <dd><a href="/h/help.html?id=10670">申请合作</a></dd>
+                    </dl>
+                    <div class="clear"></div>
+                </div>
+            	
+                
+                <div class="copyright">
+                
+                	<p>
+                        <a href="#">友情链接1</a>
+                        <a href="#">友情链接2</a>
+                        <a href="#">友情链接3</a>
+                        <a href="#">友情链接4</a>
+                        <a href="#">友情链接5</a>
+                        <a href="#">友情链接6</a>
+                        <a href="#">友情链接7</a>
+                    </p>
+                
+                    <strong>金手杖购物商城 www.igoldcane.com About 恒生电子股份有限公司</strong>
+                    
+                    ICP许可证B2-156156115号
+                     &nbsp;&nbsp;<a href="#">技术支持：恒生电子股份有限公司</a>
+                </div> 
+
+        	</div>
+    	
+        </div>
+         
+         
+
+  
+    </div>	
+
+</body>
+</html>

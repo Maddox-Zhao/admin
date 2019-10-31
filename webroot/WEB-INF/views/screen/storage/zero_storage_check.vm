@@ -1,0 +1,131 @@
+#parse("/velocity/taglibs.vm")
+<head>
+<title>管理中心 - 零库存盘盈 </title>
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+<script type='text/javascript' src='${ctx}/dwr/engine.js'></script>
+<script type='text/javascript' src='${ctx}/dwr/util.js'></script>
+
+</head>
+
+<body>
+<h1>
+	<span class="action-span1"><a href="${ctx}/igc/indexa.html"> 管理中心</a>  - 零库存盘盈</span>
+</h1>
+#if($message)
+<div style="clear: both;"></div>
+<div class="warning_min" id="massage">$message</div>
+<div style="clear: both;"></div>
+#end
+<div class="main-div">
+
+	<SCRIPT language="javascript" >
+function showDep()
+{
+var depFirstId = document.getElementById("parMap.depFirstId").value;
+ location.href='zeroStoreCheck.html?parMap.depFirstId='+depFirstId+'&goodsInsId=$!goodsInsId';
+}
+</SCRIPT >
+
+	<label>一级仓库：</label>
+    			<select name="parMap.depFirstId" id="parMap.depFirstId" style="width:100px;" onchange="showDep();">
+    			#if($depositoryFirstList)
+					      #foreach($depfirst in $depositoryFirstList)
+    				   <option value="$depfirst.id" #if("$depfirst.id"==$parMap.depFirstId) selected #end>$depfirst.depFirstName</option>
+      				#end
+    				#else
+    					<option value="">您不能选择</option>
+    				#end
+   </select>
+ <p>
+
+
+	<form action="finishZeroStoreCheck.html" name="finishForm" method="post">
+		<input type="hidden" name="goodsInsId" id="goodsInsId" value="$!goodsInsId"/>
+      <div class="list-div" id="listDiv">
+        <table  id="listTable" name="listTable"  class="list-table">
+          <tr>
+    		<th>产品编码</th>
+            <th>产品名称</th>
+    		<th>属性</th>
+    		<th>供应商</th>
+    		<th>一级仓库</th>
+			<th>仓库名</th>
+			<th>库位</th>
+    		<th>批次</th>
+    				<th>库存类型</th>
+            <th>库存数量</th>
+            <th>盘盈数量</th>
+          </tr>
+    	  #foreach($obj in $storageLists)
+    	  <tr #if($velocityCount%2==0) class="bg" #end>
+    		 <td  align="left">$!obj.code</td>
+    		 <td  align="left">$!obj.instanceName</td>
+    		 <td  align="left">$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attrs),20)</td>
+    		 <td  align="center">$!obj.supplierName</td>
+    		 <td  align="center">$!obj.depFirstName</td>
+			 <td  align="center">$!obj.depositoryName</td>
+			 <td  align="center">$!obj.depLocationName</td>
+    		 <td  align="center">$!obj.batchNum</td>
+    		 <td  align="center">&nbsp;$!storTypeMap.get($!obj.storType)</td>
+    		 <td  align="center">$!obj.storageNum</td>
+			 <td  align="center">
+				<input type="text" name="checkNum" value="" id="checkNum_$velocityCount" onchange="javascript:checkPanYingNum(${velocityCount});" size="8" maxLength="8"/>
+				<input type="hidden" name="storageId" id="storageId" value="$!obj.id"/>
+			 </td>
+    	  </tr>
+    	  #end
+
+        </table>
+      </div>
+      <div align="center">
+
+		 #if($storageLists.size()>0) <input name="finish" value=" 完成盘盈操作 " type="button" onclick="javascript:finishCheck();"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #end
+		<input type="button" name="close" value=" 返 回 " onclick="window.history.back(-1);"/>
+    	<script language="javascript" type="text/javascript">
+    		function finishCheck(){
+    			var answer = confirm("确定要完成零库存盘盈操作？")
+    			if (answer){
+    				document.finishForm.submit();
+    			}
+    		}
+     	</script>
+      </div>
+	</form>
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function checkPanYingNum(count_no){
+    	var obj_checkNum=document.getElementById('checkNum_' + count_no);
+    	var checkNum = obj_checkNum.value;
+    	if(!isIntNumber(checkNum)){
+    		alert("请输入正整数！");
+    		obj_checkNum.value = "";
+    		obj_checkNum.select();
+            obj_checkNum.focus();
+    		return false;
+    	}
+		return true;
+	}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^\d+$/;
+	  return reg.test(val);
+	}
+
+</script>
+</body>

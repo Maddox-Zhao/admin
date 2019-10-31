@@ -1,0 +1,154 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>管理员管理</span></h3>
+<form id="form1" action="/admin/showUserList.html" method="post">
+    <table>
+      <tr>
+        <th>用户名：</th>
+        <td>
+			#springBind("admin.userName")
+			<input type="text" name="${status.expression}" id="account" value="$!{status.value}" class="inp"/>
+		</td>
+
+		<th>手机：</th>
+        <td>
+			#springBind("admin.mobile")
+			<input type="text" name="${status.expression}" id="mobi" value="$!{status.value}" class="inp"/>
+		</td>
+		
+		<th>站点：</th>
+        <td>
+			#springBind("admin.Sname")
+			<input type="text" name="${status.expression}" id="sname" value="$!{status.value}" class="inp"/>
+		</td>
+		
+		<th>部门：</th>
+        <td>
+			#springBind("admin.depCodeName")
+			<input type="text" name="${status.expression}" id="code" value="$!{status.value}" class="inp"/>
+		</td>
+		
+		<td style="width:20px;"></td>
+		<td><button type="submit" class="btn">搜 索</button></td>
+      </tr>
+    </table>
+</form>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message && $!message == "freezesuccess")
+		冻结成功！
+	#elseif($!message && $!message == "releasesuccess")
+		解冻成功！
+	#elseif($!message && $!message == "setrolesuccess")
+		设置职务成功 ！
+	#elseif($!message && $!message == "setteamsuccess")
+		设置分组成功 ！
+	#elseif($!message && $!message == "modifysuccess")
+		编辑成功 ！
+	#elseif($!message && $!message == "setdepfirstsuccess")
+		设置一级仓库成功 ！
+	#elseif($!message && $!message == "insertadminsuccess")
+		添加成功 ！
+	#end
+</div>
+ #end
+
+ #if($!adminAccess.has("A_ADMINISTRATORS_ADD_USER"))
+       <div class="tool">
+
+            <span><a href="/admin/addAdmin.html" hidefocus="true" class="bt_add">新增</a></span>
+
+        </div>
+ #end
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>管理员列表</span></h3>
+            <table >
+                <tr>
+                    <th>用户名</th>
+                    <th>email</th>
+                    <th>真实姓名</th>
+                    <th>注册时间</th>
+                    <th>手机</th>
+					<th>站点</th>
+                    <th>web端职务</th>
+                    <th>部门</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($admin in $query.items)
+                <tr>
+                    <td style="text-align:center;">$!{admin.userName}</td>
+                    <td style="text-align:center;">$!{admin.email}</td>
+                	<td style="text-align:center;">$!{admin.name}</td>
+                    <td style="text-align:center;">$!dateUtil.convertDateToString("yyyy-MM-dd",$!admin.gmtCreate)</td>
+                    <td style="text-align:center;">$!{admin.mobile}</td>
+					<td style="text-align:center;">$!{admin.Sname}</td>
+                    <td style="text-align:center;">$!{admin.webDuty}</td>
+					<td style="text-align:center;">
+						#foreach($department in $list)
+    						 #if($!admin.depCode == $!department.depCode)  
+    							$!{department.name}
+    						 #end
+						 #end
+					</td>
+					<td style="text-align:center;">
+						<span id="$!{admin.id}userStatus">
+						#if("$!{admin.status}"=="0")
+							冻结
+						#else
+							正常使用
+						#end
+						</span>
+						<input type="hidden" id="$!{admin.id}statusText" value="$!{admin.stauts}"/>
+					</td>
+					<td style="text-align:center;">
+							#if("$!{admin.status}"=="0")
+                                <a href="javascript:thawUser('$!{admin.id}')" >解冻</a>
+							#else
+								<a href="javascript:freezeUser('$!{admin.id}')" >冻结</a>
+							#end
+							<a href="$appServer.get('/admin/userRoleList.html').addQueryData('id',$!{admin.id})" >web端职务</a>
+							<a href="$appServer.get('/admin/userClientRoleList.html').addQueryData('id',$!{admin.id})" >C客户端职务</a>
+						##	<a href="$appServer.get('/admin/showUserShoppingTeamList.html').addQueryData('id',$!{admin.id})" >分组</a>
+							#if($!adminAccess.has("A_ADMINISTRATORS_MODIFY_USER"))
+							<a href="$appServer.get('/admin/editUser.html').addQueryData('id',$!{admin.id})">编辑</a>
+							#end
+                           ## <a href="$appServer.get('/admin/depFirstList.html').addQueryData('id',$!{admin.id})">仓库权限</a>
+                    </td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/admin/showUserList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+<script language="javascript" type="text/javascript">
+	function freezeUser(userId) {
+		if(confirm('确定冻结用户吗？')) {
+			window.location.href="$appServer/admin/freezeUser.html?id="+userId;
+		}
+	}
+
+	function thawUser(userId) {
+		if(confirm('确定解冻用户吗？')) {
+			window.location.href="$appServer/admin/thawUser.html?id="+userId;
+		}
+	}
+</script>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace= "DxrecordNameSpace">
+	<typeAlias alias="Dxrecord" type="com.huaixuan.network.biz.domain.hx.Dxrecord"/>
+	<resultMap class="com.huaixuan.network.biz.domain.hx.Dxrecord" id="DxrecordResult">
+		<result property="userName" column="user_name"/>
+		<result property="time" column="time"/>
+		<result property="ip" column="ip"/>
+		<result property="name" column="name"/>
+		<result property="count" column="count"/>
+	</resultMap>
+	<sql id="DXRECORD.GETNAME">
+		<isNotEmpty property="name">
+		     and a.name = #name#
+		</isNotEmpty>
+	</sql>
+	<insert id="addDxrecord" parameterClass="Dxrecord">
+	<![CDATA[
+	INSERT INTO hx_dxrecord(
+	user_name,
+	time,
+	ip
+	)
+	VALUES(
+	#userName#,
+	sysdate(),
+	#ip#
+	)
+	]]>
+	</insert>
+	
+	<select id="dxrecordList" parameterClass="java.util.Map" resultMap="DxrecordResult">
+	SELECT d.user_name ,a.name,d.time,d.ip,d.count
+	FROM 
+	hx_dxrecord d,emall_admin a
+	WHERE d.user_name = a.user_name
+	order by d.time desc
+	<include refid="DXRECORD.GETNAME" />
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+    </isNotEmpty>
+	</select>
+	
+	<select id="statisticsDxrecordList" parameterClass="java.util.Map" resultMap="DxrecordResult">
+	SELECT 
+	d.user_name,a.name,MAX(d.time) time,d.ip,
+	COUNT(d.user_name)AS count 
+	FROM hx_dxrecord d,emall_admin a
+	WHERE
+	d.user_name = a.user_name
+	<include refid="DXRECORD.GETNAME" />
+	GROUP BY d.user_name	
+	ORDER BY TIME desc
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+    </isNotEmpty>
+	</select>
+	
+	<select id="getDxrecordLsitCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	SELECT COUNT(d.user_name)
+	FROM hx_dxrecord d,emall_admin a
+	where
+	d.user_name=a.user_name
+		<include refid="DXRECORD.GETNAME" />
+	</select>
+	
+	<select id="getstatisticsDxrecordListCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	SELECT COUNT(d.user_name) count
+	FROM (SELECT 
+	d.user_name,a.name,MAX(d.time) TIME,d.ip,
+	COUNT(d.user_name)AS COUNT 
+	FROM hx_dxrecord d,emall_admin a
+	WHERE
+	d.user_name = a.user_name
+	GROUP BY d.user_name) d,emall_admin a
+	where
+	d.user_name=a.user_name
+		<include refid="DXRECORD.GETNAME" />
+	</select>
+</sqlMap>

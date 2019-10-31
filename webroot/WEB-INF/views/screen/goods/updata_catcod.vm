@@ -1,0 +1,162 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+  <div class="main">
+	<form name="form1" id="form1" action="/goods/updata_catcod.html" method="post">
+        <input type="hidden" name="pageFlag" id="pageFlag" value="$!pageFlag"/>
+		#springBind("goods.returnPointId")
+		<input type="hidden" id="returnPointId" name="${status.expression}" value ="$!{status.value}" />
+		#springBind("goodsIds")
+		 <input type="hidden" name="goodsIds" value="$!{goodsIds}" id="goodIds"/>
+		<div class="searchBox">
+		##<h3><span>搜索商品</span></h3>
+		 <table>
+            <tr>
+			 <th>类目:</th>
+			 <td style="width:125px" >
+				 #springBind("goods.oneList")
+               <select id="oneList" name="oneList" onchange="javaScript:getTwoCatory(this.value);" style="width:120px;" class="select" name="${status.expression}" value ="$!{status.value}">
+                   <option value="">请选择</option>
+            	    #foreach($one in $oneCatory)
+            	    ##<option value=$one.catCode>$one.catName</option>
+					<option #if("$!{status.value}"=="$one.catCode") selected #end value=$one.catCode>$one.catName</option>
+				    #end
+              </select>
+             </td>
+			 <td style="width:125px" >
+			   #springBind("goods.twoList")
+				<select id="twoList" name="twoList" onchange="javaScript:getThreeCatory(this.value);" style="width:120px" class="select" name="${status.expression}" value ="$!{status.value}">
+				   #if("$!onelist" == "")
+    			   <option value="">请选择</option>
+    			   #else
+    				 <option value="">请选择</option>
+    				#foreach($two in $twoListCategorys)
+            	   <option #if("$!{status.value}"=="$!two.catCode") selected #end value=$two.catCode>$two.catName</option>
+            	     #end
+    			   #end
+            	</select>
+             </td>
+			<td style="width:125px" >
+				#springBind("goods.threeList")
+				<select id="threeList" name="threeList" onchange="javaScript:forValidate(this.value);" style="width:120px" class="select" name="${status.expression}" value ="$!{status.value}">
+            	   #if("$!tolist" == "")
+					  <option value="">请选择</option>
+                	  #else
+						<option value="">请选择</option>
+						 #foreach($three in $threeListCategorys)
+                	       <option #if("$!{status.value}"=="$!three.catCode") selected #end value=$three.catCode>$three.catName</option>
+                	     #end
+					  #end	
+            	</select>
+             </td>
+			</tr>
+		    <tr>
+			  <td ></td>
+              <td><button type="button" onclick="javascript:doSearch()" class="btn">确定修改</button></td>
+	        </tr>
+         </table>
+        </div>
+
+    </form>
+	
+  </div>  
+</div>
+
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	#if($!message == "success")
+	 <div class="mag-t2" style='color:red'>
+		修改成功！
+	 </div>
+	#end
+	#if($!message ==  "fail")
+	 <div class="mag-t2" style='color:red'>
+		修改失败！
+	 </div>
+	#end
+#end
+</body>
+<script language="javascript" type="text/javascript">
+	function doSearch(){
+    	document.getElementById('form1').submit();
+	}		
+			//用于品类三级联动
+	function getTwoCatory(pCode){
+		jQuery("#ipt_pcd").val("");
+		jQuery("#twoList").show();
+		jQuery("#threeList").show();
+	var obj=document.getElementById('twoList');
+	var length2 = obj.length = 0;
+	var obj2=document.getElementById('threeList');
+	obj2.length=0;
+	obj2.options[0] = new Option("请选择", "");    
+	//modify by lincf jQuery ajax 代替DWR 
+	//按省份取得城市区域     modify by lincf
+                jQuery.ajax({   
+			          type:"post",   
+			          url: '/goods/getTwoCatory.html',
+			          async:true,
+			          dataType: "json",
+			          data:"catCode="+pCode,
+			          timeout:15000,
+			          error:function(){
+			          	alert("连接超时，您未登录或者离开过久，请刷新");
+			          },
+			          success:function(json){
+			          var tempid=0;
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(json,
+			          function(){
+					  obj.options[tempid] = new Option(json[tempid-1].catName,json[tempid-1].catCode);
+					  tempid=tempid+1;
+			          }
+			          )
+			          }
+			        });
+	         
+	}
+	
+	function getThreeCatory(pCode){
+		$('ipt_pcd').value = '';
+		var obj=document.getElementById('threeList');
+		obj.length=0;
+		obj.options[0] = new Option("请选择", "");
+		jQuery.ajax({
+			type:"post",
+			url: '/goods/getThreeCatory.html',
+			async:true,
+            dataType: "json",
+            data:"catCode="+pCode,
+            timeout:15000,
+            error:function(){
+            	alert("连接超时，您未登录或者离开过久，请刷新");
+            },
+            success:function(json){
+            	var tempid=0;
+            	if(json[0]==null){
+				
+  					$('threeList').style.display='none';
+					$('ipt_pcd').value = $('twoList').value;
+					$('joke').style.display='';
+            		$('ipt_pcd').focus();
+            		$('ipt_pcd').blur();
+            		$('joke').style.display='none';
+				}else{
+					obj.options[tempid++] = new Option("请选择", "");
+					jQuery.each(json,function(){
+						obj.options[tempid] = new Option(json[tempid-1].catName,json[tempid-1].catCode);
+						tempid=tempid+1;
+					})
+				}
+			}
+		});
+	}
+</script>

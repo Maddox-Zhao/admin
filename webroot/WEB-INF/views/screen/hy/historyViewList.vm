@@ -1,0 +1,83 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>历史管理</h2>
+		
+		 
+		 <form action="historyViewList.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>日期：从</th>
+        			<td >
+						#springBind("historyView.dateStart")
+        				<input type="text" name="${status.expression}" id="dateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    
+        			&nbsp; 到  &nbsp; 
+        			
+						#springBind("historyView.dateEnd")
+        				<input type="text" name="${status.expression}" id="dateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "dateStart",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "dateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+                </tr>
+    		</table>
+		</div>
+	</form>
+		 
+		 
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>历史管理</span></h3>
+            <table >
+                <tr>
+                    <th>产品id</th>
+                    <th>操作</th>
+                    <th>日期</th>
+                    <th>操作人</th>
+					<th>地点</th>
+					<th>状态</th>
+					<th>供应商</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($hview in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+                    <td>$!hview.idproduct</td>
+					<td>$!hview.operation</td>
+					<td>$!hview.date</td>
+					<td>$!hview.operator</td>
+					<td>$!hview.site</td>
+					<td>$!hview.status</td>
+					<td>$!hview.supply</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/historyView/historyViewList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+
+
+    </div>

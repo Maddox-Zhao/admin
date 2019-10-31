@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BrandSQL">
+<typeAlias alias="brand" type="com.huaixuan.network.biz.domain.shop.Brand"/>
+<typeAlias alias="series" type="com.huaixuan.network.biz.domain.shop.Series"/>
+<typeAlias alias="size" type="com.huaixuan.network.biz.domain.shop.Size"/>
+<typeAlias alias="brandStoreDay" type="com.huaixuan.network.biz.domain.shop.BrandStoreDay"/>
+	<resultMap class="brand" id="brandResult">
+		<result column="id" property="id"/>
+		<result column="brand_name" property="brandName"/>
+		<result column="brand_logo" property="brandLogo"/>
+		<result column="brand_desc" property="brandDesc"/>
+		<result column="link" property="link"/>
+		<result column="sort" property="sort"/>
+		<result column="is_show" property="isShow"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	
+	<resultMap class="series" id="seriesResult">
+		<result column="idSeries" property="id"/>
+		<result column="name" property="name"/>
+	</resultMap>
+	
+	<!--三级联动使用  -->
+	<!-- <resultMap class="series" id="seriesThreeResult">
+		<result column="idSeries" property="id"/>
+		<result column="name" property="name"/>
+		<result column="parentIdSeries" property="parentIdSeries"/>
+	</resultMap> -->
+	
+	<resultMap class="size" id="allsize">
+		<result column="idSize" property="idSize"/>
+		<result column="name" property="name"/>
+	</resultMap>
+	
+	<resultMap class="brandStoreDay" id="brandStoreDayResult">
+		<result column="idBrand" property="idBrand"/>
+		<result column="costall" property="allStore"/>
+		<result column="costkeshoueu" property="brandStore"/>
+		<result column="costhkd" property="daySaleCostHkd"/>
+		<result column="costeu" property="daySaleCost"/>
+		<result column="costkyudingeu" property="dayPreCost"/>
+		<result column="costdaifukuaneu" property="dayOrderPreCost"/>
+		<result column="amount" property="daySaleAmount"/>
+	</resultMap>
+	
+	<resultMap class="brandStoreDay" id="brandStoreDayALLResult">
+		<result column="id" property="id"/>
+		<result column="idBrand" property="idBrand"/>
+		<result column="allstore" property="allStore"/>
+		<result column="brand_store" property="brandStore"/>
+		<result column="brand_store_rate" property="brandStoreRate"/>
+		<result column="date" property="date"/>
+		<result column="day_sale_cost" property="daySaleCost"/>
+		<result column="day_sale_cost_hkd" property="daySaleCostHkd"/>
+		<result column="day_pre_cost" property="dayPreCost"/>
+		<result column="day_order_pre_cost" property="dayOrderPreCost"/>
+		<result column="day_rate" property="dayRate"/>
+		<result column="week_sale" property="weekSale"/>
+		<result column="week_rate" property="weekRate"/>
+		<result column="half_month_sale" property="halfMonthSale"/>
+		<result column="half_month_sale_rate" property="halfMonthSaleRate"/>
+		<result column="month_sale" property="monthSale"/>
+		<result column="month_sale_rate" property="monthSaleRate"/>
+		<result column="day_sale_amount" property="daySaleAmount"/>
+		<result column="week_sale_amount" property="weekSaleAmount"/>
+		<result column="half_ms_amount" property="halfMsAmount"/>
+		<result column="month_sale_amount" property="monthSaleAmount"/>
+		<result column="day_maori" property="dayMaori"/>
+		<result column="hm_maori_rate" property="hmMaoriRate"/>
+		<result column="month_maori_rate" property="monthMaoriRate"/>
+	</resultMap>
+
+<!-- create Brand object -->
+<insert id="addBrand" parameterClass="brand">
+<![CDATA[
+		insert into emall_brand
+		(id,brand_name,brand_logo,brand_desc,link,sort,is_show,gmt_create,gmt_modify,shop_id,status )values(null,
+		#brandName#,
+		#brandLogo#,
+		#brandDesc#,
+		#link#,
+		#sort#,
+		#isShow#,
+		sysdate(),
+		sysdate(),
+		#shopId#,
+		1
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<!-- create Brand object -->
+<insert id="addBrandStoreDay" parameterClass="brandStoreDay">
+<![CDATA[
+		insert into hx_brand_storeday
+		(id,idBrand,allstore,brand_store,brand_store_rate,date,day_sale_cost,day_sale_cost_hkd,day_order_pre_cost,day_pre_cost
+		,day_rate,day_sale_amount,day_maori,gmt_create,gmt_modify )values(null,
+		#idBrand#,
+		#allStore#,
+		#brandStore#,
+		#brandStoreRate#,
+		#date#,
+		#daySaleCost#,
+		#daySaleCostHkd#,
+		#dayOrderPreCost#,
+		#dayPreCost#,
+		#dayRate#,
+		#daySaleAmount#,
+		#dayMaori#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert> 
+
+
+<!-- update Brand object -->
+<update id="editBrand" parameterClass="brand">
+<![CDATA[
+		update emall_brand set brand_name = #brandName#,
+		brand_logo = #brandLogo#,
+		brand_desc = #brandDesc#,
+		link = #link#,
+		sort = #sort#,
+		is_show = #isShow#,
+
+		gmt_modify = sysdate(),
+		shop_id = #shopId#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Brand object -->
+<update id="removeBrand" parameterClass="java.lang.Long">
+<![CDATA[
+		update emall_brand
+		set status = -1,
+		gmt_modify = sysdate()
+		 where emall_brand.ID = #value#
+]]>
+</update>
+<!-- search Brand object -->
+<select id="getBrand" parameterClass="java.lang.Long" resultMap="brandResult">
+<![CDATA[
+		select emall_brand.* from emall_brand where emall_brand.ID = #value#
+]]>
+</select>
+
+<select id="getBrandByCatCode" parameterClass="java.lang.String" resultMap="brandResult">
+<![CDATA[
+		select b.* from emall_brand b
+		where b.is_show <> 0 and
+		exists
+		(select  1 from emall_goods g,emall_category c where g.cat_code=c.cat_code
+		and g.cat_code like concat(#value#,'%') and b.id=g.brand_id)
+]]>
+</select>
+
+<!-- searchAll Brand List -->
+<select id="getBrands" resultMap="brandResult">
+<![CDATA[
+		select emall_brand.* from emall_brand where emall_brand.status <> -1 and emall_brand.is_show <> 0 order by emall_brand.brand_name asc
+]]>
+</select>
+
+<select id="getBrandStoreDaylist" resultMap="brandStoreDayResult" parameterClass="map">
+<![CDATA[
+		SELECT
+		  t.idBrand,
+		  ROUND(SUM(IFNULL((SELECT l.cost FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND (w.idStatus = 4 or w.idStatus = 3)AND c.date = #date# ),0)*IFNULL((SELECT p.exchangeRate FROM purchaselifecycle p WHERE p.idPurchase = l.idPurchase),10)),2) AS costhkd,
+		  ROUND(SUM(IFNULL((SELECT l.cost FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND (w.idStatus = 4 or w.idStatus = 3)AND c.date = #date# ),0)),2)  AS costeu,
+		  ROUND(SUM(IFNULL((SELECT l.price FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND (w.idStatus = 4 or w.idStatus = 3)AND c.date = #date# ),0)),2)  AS amount,
+		  ROUND((SELECT SUM(q.cost) FROM lifecycle q WHERE q.idStatus = 1 AND q.idCostCurrency = 2 AND q.idLocation = 102 ),2) AS costall,
+		  
+		  ROUND(SUM(IFNULL((SELECT l.cost FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND w.idStatus = 1),0)),2)  AS costkeshoueu,
+		  ROUND(SUM(IFNULL((SELECT l.cost FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND w.idStatus = 3 ),0)),2)  AS costkyudingeu,
+		  ROUND(SUM(IFNULL((SELECT l.cost FROM lifecycle w WHERE l.idLifeCycle = w.idLifeCycle AND w.idStatus = 3 AND c.date = #date# ),0)),2)  AS costdaifukuaneu,
+		  b.name
+		  
+		FROM lifecycle l,
+		  product t,customerorder c,brand b
+		WHERE l.idProduct = t.idProduct
+		    AND l.idStatus != 7
+		    AND l.idCostCurrency = 2 AND l.idOrder = c.idOrder  AND t.idBrand = b.idBrand AND l.idLocation = 102
+		GROUP BY t.idBrand 
+]]>
+</select>
+
+
+<select id="getBrandListCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from emall_brand a  where a.status <> -1 order by a.gmt_create desc,a.id
+]]>
+</select>
+
+<select id="getBrandListPage" parameterClass="map"
+		resultMap="brandResult">
+		                  <include refid="pageSQLHead"/>
+<![CDATA[
+	select * from emall_brand a
+	where a.status <> -1
+	order by  a.gmt_create desc ,a.id
+]]>
+          <include refid="pageSQLFoot"/>
+</select>
+
+<select id="getMaxBrandSort" parameterClass="java.lang.Long"
+		resultClass="java.lang.Integer">
+<![CDATA[
+	select max(sort) from  emall_brand a where a.status <> -1
+]]>
+
+</select>
+
+<update id="updateBrand" parameterClass="brand">
+
+		update emall_brand set brand_name = #brandName#,
+		<isNotEmpty property="brandLogo">
+		brand_logo = #brandLogo#,
+		</isNotEmpty>
+		brand_desc = #brandDesc#,
+		link = #link#,
+		<isNotEmpty property="isShow">
+		is_show = #isShow#,
+		</isNotEmpty>
+		gmt_modify = sysdate()
+		 where id = #id#
+
+
+</update>
+
+
+
+<update id="updateBrandSort" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_brand a set
+		a.sort = a.sort-1,
+		gmt_modify = sysdate()
+		 where a.sort > #sort# and a.status <> -1
+]]>
+</update>
+
+
+
+<select id="getBrandsByName" parameterClass="java.util.Map" resultMap="brandResult">
+<![CDATA[
+		select emall_brand.* from emall_brand where emall_brand.status <> -1 and emall_brand.brand_name like '%$brandName$%' order by emall_brand.brand_name asc
+]]>
+</select>
+
+<select id="getBrandisHaveGoods" resultClass="java.lang.Integer" parameterClass="java.lang.Long">
+<![CDATA[
+		select count(*) from emall_goods a  where a.brand_id = #brandId#
+]]>
+</select>
+
+
+
+<select id="getBrandStoreDayConditionWithPage" resultMap="brandStoreDayALLResult" parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*
+	   from hx_brand_storeday t
+	   ]]>
+	  <dynamic prepend="where">
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.date >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.date < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.date is not null ]]>
+		</isNotEmpty>
+        </dynamic>
+        <isNotEmpty property="idBrand" >
+       order by t.id desc
+       </isNotEmpty>
+       <isEmpty property="idBrand" >
+       order by t.brand_store_rate desc
+       </isEmpty>
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+    <select id="getBrandStoreDayConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		<![CDATA[ select count(t.id) from hx_brand_storeday t  ]]>
+		<dynamic prepend="where">
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.date >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.date < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.date is not null ]]>
+		</isNotEmpty>
+        </dynamic>
+	</select>
+
+
+
+	<select id="getAllSeries" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+			<![CDATA[ select count(t.id) from hx_brand_storeday t  ]]>
+			<dynamic prepend="where">
+		    <isNotEmpty property="idBrand" prepend="and">
+			<![CDATA[  t.idBrand = #idBrand# ]]>
+	        </isNotEmpty>
+	        <isNotEmpty prepend="and" property="dateStart">
+	<![CDATA[			t.date >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateEnd">
+	<![CDATA[			t.date < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.date is not null ]]>
+			</isNotEmpty>
+	        </dynamic>
+		</select>
+
+
+
+
+<!--  查询所有品类 -->
+<select id="getAllSeries2Object" resultMap="seriesResult">
+	select * from series
+</select>
+<select id="getAllSize" resultMap="allsize">
+	select * from size
+</select>
+
+<select id="getBrandName" parameterClass="brand" resultMap="brandResult">
+   select * from emall_brand where brand_name = #brandName#
+</select>
+
+<select id="getSeriesName" parameterClass="series" resultMap="seriesResult">
+ select * from series where name=#name#
+</select>
+<!-- 品类三级联动使用 -->
+<!-- <select id="getseriesByParams" parameterClass="series" resultMap="seriesThreeResult">
+      select series.* from series
+        <dynamic prepend=" where ">
+            <isGreaterThan prepend=" and " property="id" compareValue="0">
+				<![CDATA[series.idSeries = #id#]]>
+			</isGreaterThan>
+			<isNotEmpty prepend=" and " property="name">
+				<![CDATA[series.name = #name#]]>
+			</isNotEmpty>
+			<isNotEmpty prepend=" and " property="parentIdSeries">
+				<![CDATA[series.parentIdSeries = #parentIdSeries#]]>
+			</isNotEmpty>
+		</dynamic>
+		order by series.idSeries
+</select> -->
+
+</sqlMap>

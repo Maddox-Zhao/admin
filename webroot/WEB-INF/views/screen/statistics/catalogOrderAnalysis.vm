@@ -1,0 +1,107 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>类别订单统计</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+ <h3><span>类别订单统计</span></h3>
+  <form action="catalogOrderAnalysis.html" id="singleForm" name="singleForm" method="post">
+    <table>
+<tr>
+	<th>类目</th>
+	<td>				<select name="catCode" id="catCodeSearch" style="width:100px;">
+				<option value="">-=请选择=-</option>
+				#foreach($cat in $catList)
+				<option value="$cat.catCode" #if("$cat.catCode"==$!parMap.catCode) selected #end>$cat.catName</option>
+				#end
+			</select>
+			</td>
+  	<th> 日期&nbsp;&nbsp;</th>
+  												<td>
+
+											<input name="dateStart"  id="gmtCreateStart" value="$!parMap.dateStart"  size="6" readonly="true"/>到
+
+			<input  name="dateEnd" id="gmtCreateEnd" value="$!parMap.dateEnd"   size="6" readonly="true"/>
+			</td>
+
+	<script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "gmtCreateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "gmtCreateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+
+<th>
+     <input type="button" value="查询" class="button"  onclick="formSubmit();"/>
+</th></tr>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			    var dateStart=document.getElementById("gmtCreateStart").value.replace(/-/g, "/");
+    		var dateEnd=document.getElementById("gmtCreateEnd").value.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(dateStart));
+    var e_date=new Date(Date.parse(dateEnd));
+    		if(e_date < b_date){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}
+	    document.getElementById("gmtCreateStart").value=document.getElementById("gmtCreateStart").value.trim();
+	    document.getElementById("gmtCreateEnd").value=document.getElementById("gmtCreateEnd").value.trim();
+        	document.getElementById('singleForm').submit();
+	    }
+</script>
+ </table>
+ </form>
+</div>
+
+<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="listBox">
+          <h3><span>类别订单统计</span></h3>
+    <table>
+      <tr>
+      	<th>类目编码</th>
+		<th>类目名称</th>
+        <th>客户数量</th>
+		<th>订单数量</th>
+        <th>商品销售金额</th>
+      </tr>
+
+	  #foreach($saleAnaly in $query.items)
+		<tr    #if($velocityCount%2==0) class="bg" #end>
+												<td  align="left">$!saleAnaly.catCode</td>
+				<td  align="left">$!saleAnaly.catName</td>
+				<td  align="center">$!saleAnaly.customerNum</td>
+				<td  align="center">$!saleAnaly.orderNum</td>
+				<td  align="center">$!moneyUtil.getFormatMoney($!saleAnaly.orderAmount ,'0.00')</td>
+		</tr>
+	  #end
+
+		</table>
+<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/statistics/catalogOrderAnalysis.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+
+ </div>
+</div>
+
+
+
+</body>

@@ -1,0 +1,103 @@
+#set($layout = "layout/default.vm")
+#set($title = "友情链接管理 - 修改友情链接")
+<div class="main">
+		<div class="formBox">
+	<h3><i></i><span>修改友情链接</span></h3>
+	<div class="content">
+		<form __unmht_action="#" name="theForm"  action="/shop/updatefl.html" method="post" enctype="multipart/form-data">
+			#springBind("friendLink.id")
+			<input type="hidden" name="${status.expression}" value="$!{friendLink.id}" />
+			<input type="hidden" name="friendLink.linkLogo" value="$!{friendLink.linkLogo}" />
+			<table id="general-table" width="100%">
+			<tbody>
+				<div class="form">
+				<ol>
+				         <li>
+			<label>名称：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("friendLink.linkName")
+					<input  type="text"  id="linkName" name="${status.expression}"  value="$!{friendLink.linkName}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+  <li>
+			<label>URL：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("friendLink.linkUrl")
+					<input  type="text" size="30"  id="linkUrl" name="${status.expression}"  value="$!{friendLink.linkUrl}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>图片：</label>
+				<span class="con">
+					<ul>
+              <li>#if($!{friendLink.linkLogo} && $friendLink.linkLogo !='' )<img src="${upServer}/$!{friendLink.linkLogo}" width="95" height="100" /> #end<input type="file" name="images" size="35"/>
+				</li>
+						<li><em>*</em></li>
+				<li>
+					#springBind("friendLink.linkTemp")
+                <label class="red">$!{errormessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>次序：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("friendLink.sort")
+					<input name="${status.expression}" id="${status.expression}" size="3" type="text" value="$!{friendLink.sort}" onchange="checkValue('$!{friendLink.sort}');" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		</table></form></div>
+    <div class="form-but">
+    <input class="button" value="确定" type="submit" onClick="javascript:updatefriendlink();"> <input class="button" value="重置" type="reset" onClick="javascript:resetfl();"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>
+<script language="javascript" type="text/javascript">
+function checkValue(oldValue){
+	       var f=document.getElementById("sort");
+		   var c=document.getElementById("sort")
+			var content=jQuery.trim(document.getElementById("sort").value);
+		if(content!=null && content!=""){
+			if(isNaN(content)||content<0){
+			alert("出错：请输入数字.");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+		}else if(content==null||content==""){
+			alert("次序不能为空");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+
+	}
+
+	function updatefriendlink(){
+		document.theForm.submit();
+	}
+
+		function resetfl(){
+	document.theForm.reset();
+	}
+</script>

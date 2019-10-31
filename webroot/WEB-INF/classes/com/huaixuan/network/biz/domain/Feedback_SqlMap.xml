@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="FeedbackSQL">
+<typeAlias alias="feedback" type="com.huaixuan.network.biz.domain.Feedback"/>
+<typeAlias alias="leaveword" type="com.huaixuan.network.biz.domain.hx.Leaveword"/>
+<typeAlias alias="insertcontent" type="com.huaixuan.network.biz.domain.hx.Insertcontent"/>
+	<resultMap class="feedback" id="feedbackResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="user_nickname" property="userNickname"/>
+		<result column="user_email" property="userEmail"/>
+		<result column="to_user_type" property="toUserType"/>
+		<result column="to_user_id" property="toUserId"/>
+		<result column="to_user_nick" property="toUserNick"/>
+		<result column="msg_title" property="msgTitle"/>
+		<result column="msg_type" property="msgType"/>
+		<result column="msg_content" property="msgContent"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="reply_content" property="replyContent"/>
+		<result column="reply_flag" property="replyFlag"/>
+		<result column="gmt_reply" property="gmtReply"/>
+	</resultMap>
+	<resultMap class="feedback" id="countWithReplayFlagResult">
+		<result column="reply_flag" property="replyFlag"/>
+		<result column="countWithReplyFlag" property="countWithReplyFlag"/>
+	</resultMap>
+	
+	
+	<!-- 客户端的留言迁移过来 -->
+	<resultMap class="leaveword" id="leavewordResult">
+		<result column="id" property="id"/>
+		<result column="idCustomer" property="idCustomer"/>
+		<result column="content" property="content"/>
+		<result column="leaveTime" property="leaveTime"/>
+		<result column="isBroad" property="isBroad"/>
+		<result column="title" property="title"/>
+		<result column="name" property="name"/>
+		<result column="phone" property="phone"/>
+		<result property="insertcontentList" column="{leavewordId=id}"  select="getInsertcontentListByLeavewordId"/>
+	</resultMap>
+	
+	<!-- 客户端的留言迁移过来 -->
+	<resultMap class="insertcontent" id="insertcontentResult">
+		<result column="insertId" property="insertId"/>
+		<result column="idCustomer" property="idCustomer"/>
+		<result column="id" property="leavewordId"/>
+		<result column="content" property="content"/>
+		<result column="leaveTime" property="leaveTime"/>
+	</resultMap>
+	
+	
+	
+	<!-- search Condition -->
+	<sql id="FEEDBACK_COMMON_CONDITION">
+		<isNotEmpty property="userId" prepend="and">
+			user_id =  #userId#
+		</isNotEmpty>
+		<isNotEmpty property="userNickname" prepend="and">
+			user_nickname like  CONCAT('%',#userNickname#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="toUserNick" prepend="and">
+			to_user_nick like  CONCAT('%',#toUserNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="toUserType" prepend="and">
+			to_user_type = #toUserType#
+		</isNotEmpty>
+		<isNotEqual compareValue="0" property="toUserId" prepend="and">
+			to_user_id = #toUserId#
+		</isNotEqual>
+		<isNotEmpty property="msgType" prepend="and">
+			msg_type = #msgType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			gmt_create >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[ 			gmt_create < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="replyFlag" prepend="and">
+			reply_flag = #replyFlag#
+		</isNotEmpty>
+
+	</sql>
+<!-- create Feedback object -->
+<insert id="addFeedback" parameterClass="feedback">
+<![CDATA[
+		insert into emall_feedback
+		(id,user_id,user_nickname,user_email,to_user_type,to_user_id,to_user_nick,msg_title,msg_type,msg_content,gmt_create )values( null,
+		#userId#,
+		#userNickname#,
+		#userEmail#,
+		#toUserType#,
+		#toUserId#,
+		#toUserNick#,
+		#msgTitle#,
+		#msgType#,
+		#msgContent#,
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<insert id="addInsertcontent" parameterClass="insertcontent">
+  
+<![CDATA[
+		insert into insertcontent
+		(insertId,idCustomer,Content,leavetime,Id )values( null,
+		#idCustomer#,
+		#content#,
+		sysdate(),
+		#leavewordId#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<insert id="addLeaveword" parameterClass="leaveword">
+  
+<![CDATA[
+		insert into leaveword
+		(Id,idCustomer,Content,leavetime,isBroad,title )values( null,
+		#idCustomer#,
+		#content#,
+		sysdate(),
+		#isBroad#,
+		#title#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<!-- update Feedback object -->
+<update id="editFeedback" parameterClass="feedback">
+<![CDATA[
+		update emall_feedback set user_id = #userId#,
+		user_nickname = #userNickname#,
+		user_email = #userEmail#,
+		to_user_type = #toUserType#,
+		to_user_id = #toUserId#,
+		to_user_nick = #toUserNick#,
+		msg_title = #msgTitle#,
+		msg_type = #msgType#,
+		msg_content = #msgContent#,
+		gmt_create = #gmtCreate#,
+		reply_content = #replyContent#,
+		reply_flag = #replyFlag#,
+		gmt_reply = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+
+<!-- reply feedback -->
+<update id="replyFeedback" parameterClass="map">
+<![CDATA[
+		update emall_feedback set
+			reply_content = #replyContent#,
+			gmt_reply = sysdate()
+		 where id = #id#
+]]>
+</update>
+
+<!-- delete Feedback object -->
+<delete id="removeFeedback" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_feedback where emall_feedback.ID = #value#
+]]>
+</delete>
+<!-- search Feedback object -->
+<select id="getFeedback" parameterClass="java.lang.Long" resultMap="leavewordResult">
+<![CDATA[
+		select leaveword.*,Customer.name,Customer.phone
+		from leaveword,Customer
+		where leaveword.idCustomer = Customer.idCustomer
+		AND leaveword.id = #value#
+]]>
+</select>
+<!-- search Feedback object -->
+<select id="getFeedbackByUserId" resultMap="feedbackResult" parameterClass="java.util.Map">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_feedback.* from emall_feedback where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			emall_feedback.user_id = #userId#
+		</isNotEmpty>
+		order by gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getFeedbacksCountByUserId" resultClass="java.lang.Integer">
+   <![CDATA[
+      select count(*) from(
+        select emall_feedback.* from emall_feedback where 1=1
+   ]]>
+        <isNotEmpty prepend="and" property="userId">
+			emall_feedback.user_id = #userId#
+		</isNotEmpty>
+	  ) a
+</select>
+<!-- search Feedback object by toUserId -->
+<select id="getFeedbackByToUserId" resultMap="feedbackResult" parameterClass="java.util.Map">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_feedback.* from emall_feedback where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			emall_feedback.to_user_id = #userId#
+		</isNotEmpty>
+		order by gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getFeedbacksCountByToUserId" resultClass="java.lang.Integer">
+   <![CDATA[
+      select count(*) from(
+        select emall_feedback.* from emall_feedback where 1=1
+   ]]>
+        <isNotEmpty prepend="and" property="userId">
+			emall_feedback.to_user_id = #userId#
+		</isNotEmpty>
+	  ) a
+</select>
+
+<!-- searchAll Feedback List -->
+<select id="getFeedbacks" resultMap="feedbackResult">
+<![CDATA[
+		select emall_feedback.* from emall_feedback
+]]>
+</select>
+<!-- search feedbacks by condition -->
+<select id="getFeedbacksByCondition"  resultMap="leavewordResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select leaveword.*,Customer.name,Customer.phone
+		from leaveword,Customer
+		where leaveword.idCustomer = Customer.idCustomer
+]]>
+		<isNotEmpty property="name" prepend="and">
+			Customer.name like  CONCAT('%',#name#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="phone" prepend="and">
+			Customer.phone like  CONCAT('%',#phone#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			leaveword.leaveTime >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[ 			leaveword.leaveTime < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	order by leaveword.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+<!-- search feedback counts by condition -->
+<select id="getFeedbackCountByCondition" resultClass="java.lang.Integer">
+<![CDATA[
+	select count(leaveword.id) from leaveword,Customer
+		where leaveword.idCustomer = Customer.idCustomer
+]]>
+		<isNotEmpty property="name" prepend="and">
+			Customer.name like  CONCAT('%',#name#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="phone" prepend="and">
+			Customer.phone like  CONCAT('%',#phone#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			leaveword.leaveTime >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[ 			leaveword.leaveTime < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</select>
+
+
+<select id="getInsertcontentListByLeavewordId" resultClass="java.lang.Long" resultMap="insertcontentResult" >
+       <![CDATA[  select * from insertcontent 
+       			where 
+      			id = #leavewordId#
+       			order by insertcontent.insertId asc
+       ]]>
+</select>
+
+
+<select id="feedbackCountWithReplyFlag" resultMap="countWithReplayFlagResult">
+	select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback
+	where 1=1
+	<isNotEmpty property="toUserType" prepend="and">
+		to_user_type = #toUserType#
+	</isNotEmpty>
+	group by Reply_Flag
+</select>
+</sqlMap>

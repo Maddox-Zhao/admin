@@ -1,0 +1,10 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 发送留言")
+
+<body>
+	<div class="r-success">
+		<h3>留言发送成功</h3>
+	</div>
+</body>
+
+

@@ -1,0 +1,201 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购管理 - 退货订单管理")
+
+<div class="main">
+    <h2>采购管理 - 退货订单管理</h2>
+	<div class="searchBox">
+		<h3><span>搜索退货订单</span></h3>
+		<form action="$appServer/stock/refund/search_shopping_refund_list.html" name="searchForm" method="post">
+
+    		<table >
+    			<tr >
+                	<th>采购退货单号：</th>
+    				<td >
+    					<input type="text" name="refNum" id="refNum" value="$!queryObject.refNum" size="15" theme="simple" onblur="javascript:this.value=this.value.trim()" />
+                    </td>
+    				<th>退货单类型：</th>
+    				<td >
+    					<select name="type" id="type" >
+    						<option value="">请选择</option>
+    						#foreach($s in $enumShoppingRefundMap.entrySet())
+    							<option value="$!{s.key}" #if($!{queryObject.type} == ${s.key}) selected="true" #end>$!{s.value}</option>
+    						#end
+                        </select>
+
+                    </td>
+    			</tr>
+
+    			<tr >
+                	<th>供应商名称：</th>
+    				<td >
+    					<input type="text" name="supplierName" id="supplierName" value="$!{queryObject.supplierName}" readonly/>
+                		<input type="hidden" name="supplierId" id="supplierId" value="$!{queryObject.supplierId}"/>
+                		<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+                		<input type="button" value="清空" class="button" onclick="clearSupplier();"/>
+                    </td>
+    				<th>创建人：</th>
+    				<td >
+    					<select name="creater" id="creater" onblur="javascript:this.value=this.value.trim()">
+                        <option value="">-=请选择=-</option>
+                		#**
+                            #foreach($userInfo in $userLists)
+                                <option value="$!{userInfo.account}" #if($creater == ${userInfo.account})selected="true" #end>$!{userInfo.account}</option>
+                			#end
+
+                		*#
+                			#foreach($userInfo in $userList)
+                				<option value="$!{userInfo.userName}" #if("$!{queryObject.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+                			#end
+                        </select>
+                    </td>
+    			</tr>
+
+    			<tr >
+                	<th>退货时间:从</th>
+    				<td >
+    					<input type="text" name="refTimeStart" id="refTimeStart" value="$!queryObject.refTimeStart" size="10" theme="simple" readonly="true" />
+                    </td>
+    				<th>到</th>
+    				<td >
+    					<input type="text" name="refTimeEnd" id="refTimeEnd" value="$!queryObject.refTimeEnd" size="10" theme="simple" readonly="true" />
+                          <script type="text/javascript">
+                              Calendar.setup({
+                                  inputField : "refTimeStart",
+                                  ifFormat   : "%Y-%m-%d",
+                                  align      : "BR"
+                              });
+                              Calendar.setup({
+                                  inputField : "refTimeEnd",
+                                  ifFormat   : "%Y-%m-%d",
+                                  align      : "BR"
+                              });
+                          </script>
+                    </td>
+    			</tr>
+    			<tr >
+    				<th></th>
+        			<td >
+        				<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+                    </td>
+                </tr>
+
+
+				<center ><div id="result" style="color:red;">$!message</div></center>
+            </table>
+		</form>
+    </div>
+<div class="tool">
+        <span><a href="${appServer}/stock/refund/add_shopping_refund_page.html" hidefocus="true" class="bt_add">新增退货订单</a></span>
+</div>
+
+<!-- 订单列表 -->
+<div class="clearing"></div>
+<div class="listBox" id="listDiv">
+   <table width="100%" cellpadding="3" cellspacing="1" class="list-table">
+      <tr>
+        <th>采购退货单号</th>
+        <th>采购订单号</th>
+        <th>一级仓库名称</th>
+        <th>供应商名称</th>
+        <th>退货时间</th>
+        <th>类型</th>
+        <th>状态</th>
+        <th>创建时间</th>
+        <th>创建人</th>
+        <th>操作</th>
+      </tr>
+
+      #foreach($shoppingRefund in $query.items)
+        <tr    #if($velocityCount%2==0) class="bg" #end>
+         <td  align="center" width="10%">$!shoppingRefund.refNum</td>
+		 <td  align="center" width="10%">
+		 #foreach($shoppingRefundShopNum in $!shoppingRefund.shoppingNum.split(";"))
+           $shoppingRefundShopNum<br>
+		 #end
+		 </td>
+        <td  width="15%">$!depositoryNameMap.get($!shoppingRefund.depFirstId)</td>
+         <td  width="15%">&nbsp;$!shoppingRefund.supplierName</td>
+         <td  align="center" width="10%">&nbsp;$!date.format("yyyy-MM-dd",$!shoppingRefund.refTime)&nbsp;</td>
+         <td  align="center" width="10%">$!enumShoppingRefundMap.get("${shoppingRefund.type}")</td>
+         <td  align="center" width="10%"><span id="displayStatus$shoppingRefund.id">$!enumShopRefundMap.get("${shoppingRefund.status}")</span></td>
+         <td  align="center" width="15%">&nbsp;$!date.format("yyyy-MM-dd HH:ss",$!shoppingRefund.gmtCreate)&nbsp;</td>
+         <td  align="center" width="10%">$!shoppingRefund.creater</td>
+         <td  align="center" width="10%" >
+			#if("${shoppingRefund.type}"=="refund_storage")
+				<a href="$appServer/storage/searchKTDetail.html?shoppingRefId=$!shoppingRefund.id">查看</a>
+			#else
+				<a href="$appServer/stock/refund/search_sr_detail_list.html?shoppingRefId=$!shoppingRefund.id">查看</a>
+			#end
+			#if($!enumShopRefundMap.get("${shoppingRefund.status}")=="退货新建" && "refund_storage"!="${shoppingRefund.type}")
+                <a href="#" id="doCloseOper$shoppingRefund.id" onclick="return doClose($shoppingRefund.id);">关闭</a>
+		    #end
+		 </td>
+      </tr>
+      #end
+
+		</table>
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/refund/search_shopping_refund_list.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+	#end
+	</div>
+
+</div>
+
+<script language="javascript" type="text/javascript">
+    var shopRefundId='';
+
+    function formSubmit(){
+		var dateStart1str = document.getElementById("refTimeStart").value;
+		var dateEnd1str = document.getElementById("refTimeEnd").value;
+		var dateStart1 = dateStart1str.replace(/-/g, "/");
+	    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+            var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+            if(e_date1 < b_date1){
+                alert("退货起始时间不能大于结束时间！");
+                return false;
+            }
+            document.forms[0].submit();
+        }
+
+	function sesp(){
+     	var ret = window.showModalDialog("$appServer/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}else{
+			document.getElementById('supplierId').value="";
+			document.getElementById('supplierName').value="";
+		}
+    }
+
+	function clearSupplier(){
+	    document.getElementById("supplierId").value="";
+		document.getElementById("supplierName").value="";
+	}
+
+	function doClose(id){
+	   if(!confirm("确实要关闭退货单并取消其明细吗?")){
+           return false;
+	   }
+	   shopRefundId=id;
+		   	jQuery.get('$appServer/stock/refund/close_dwr_shopping_refund.html',{param:id},function(message){
+			    if(message=="userwrong"){
+				   jQuery("#result").html("不是你做的退货单,不能关闭!");
+			    }
+			    if(message=="statuswrong"){
+				   jQuery("#result").html("退货状态已更改,请刷新!");
+			    }
+		        if(message=="success"){
+				   var displayStatusId = document.getElementById('displayStatus'+shopRefundId);
+				   displayStatusId.innerHTML = "退货关闭";
+				   var doCloseOperId = document.getElementById('doCloseOper'+shopRefundId);
+			       doCloseOperId.style.display="none";
+				   jQuery("#result").html("操作成功!");
+		        }
+		    });
+	}
+</script>

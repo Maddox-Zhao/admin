@@ -1,0 +1,222 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>调货产品</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+	<style type="text/css">
+        .redRow
+        {
+            background:red;
+        }
+    	.yellowRow
+        {
+            background:yellow;
+        }
+    #set($isAdmin = false)
+    #if($!adminAccess.has('A_PRODUCT_SHOPPINGCAR_ADD'))
+    		#set($isAdmin = true)
+    #end
+    </style>
+   </head>
+#set($isAdmin = false)
+#if($dutyids.contains("52"))
+		#set($isAdmin = true)
+#end
+<body>
+	## <form id="excelForm"  action="/product/exportSuoKuProduct.html" method="post" target="excelIFrame">
+	<form id="excelForm"  action="/HxStockOrder/exportSaleGoodsInfo.html" method="post" target="excelIFrame">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">idProduct：</td>
+                    <td style="width:150px">
+                        <input name="idProduct" class="mini-textbox" onenter="search()"/>
+						<input id="sedid" name="id" class="mini-textbox"  value="$!{id}" style="display:none"/>
+                    </td>
+					<td class="form-label" >sku：</td>
+					<td >
+                        <input name="sku" class="mini-textbox" onenter="search()"/>
+						<input id="sedid" name="id" class="mini-textbox"  value="$!{id}" style="display:none"/>
+                    </td>
+					<td class="form-label" >状态：</td>
+                    <td style="width:150px">
+                        <input  name="status" id="statusId" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+					<td class="form-label" >瑕疵：</td>
+                    <td style="width:100px">
+                        <input  name="isFlaw" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..." 
+                            data="isFlawData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                    <td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+						<a class="mini-button" iconCls="icon-download" onclick="exportSaleGoodsInfo()">导出</a>
+                    </td>
+                    <td>
+						##<a class="mini-button" href="javascript:history.go(-1)">返回</a>
+					</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	</form>
+	##<iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:400px;" allowResize="false" multiSelect="true"  
+        url="goodsSaleInfoList.html"  idField="id"  pageSize="50" allowAlternating="true" pageIndex="1" onCellbeginedit="cellbeginedit"
+		 showSummaryRow="true" onCellcommitedit="onCellcommitedit"  onCellendedit="setSalePriceFn">
+        <div property="columns">
+            <div type="indexcolumn"></div>
+			
+            <div field="idProduct" width="120" headerAlign="center" align="center" allowSort="true">idProduct</div>
+            <div field="sku" width="120" headerAlign="center" align="center"  allowSort="true">sku</div>
+            <div field="brandName" width="100" headerAlign="center" align="center"  allowSort="true">品牌</div>
+            <div field="seriesName" width="40" headerAlign="center" align="center"  allowSort="true">品类</div>
+            <div field="type" width="100" headerAlign="center" align="center"  allowSort="true">型号
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="size" width="40" headerAlign="center" align="center"  allowSort="true">size
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="status" width="60" headerAlign="center" align="center"  allowSort="true">状态</div>
+            <div field="dlPrice" width="60" headerAlign="center" align="center"  allowSort="true">大陆价</div>
+            <div field="euPrice" width="60" headerAlign="center" align="center"  allowSort="true">欧洲价</div>
+			
+			#if($!adminAgent.username!="1002011" && $!adminAgent.username!="30001")
+            <div field="dxPrice" width="60" headerAlign="center" align="center"  allowSort="true">代销价</div>
+            <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+			#end
+            <div field="ssPrice" width="60" headerAlign="center"  align="center"  allowSort="true">尚上价</div>
+			
+			#if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+            <div field="cost" width="60" headerAlign="center" align="center"  allowSort="true">成本</div>
+    		<div field="idCostCurrency" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">成本币种</div>
+    		<div field="exchangeRate" width="60" headerAlign="center" align="center"  allowSort="true">汇率</div>
+			<div field="taxesReate" width="60" headerAlign="center" align="center"  allowSort="true">税率</div>
+			#end
+			
+            <div field="curSiteName" width="60" headerAlign="center" align="center"  allowSort="true">当前位置</div>           
+            <div field="salePrice" width="60" headerAlign="center" align="center"  allowSort="true" renderer="onSalZero">售价</div>
+            <div field="salePriceCurrency" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">销售币种</div>
+            <div field="instock" width="120" headerAlign="center" align="center"  allowSort="true" renderer="renderDate" >入库时间</div>
+            <div field="sellDate" width="80" headerAlign="center" align="center"  allowSort="true"   renderer="renderDate1" >销售时间</div>
+            <div field="sellIdOrder" width="60" headerAlign="center" align="center"  allowSort="true">销售单号</div>
+            <div field="sellChannel" width="60" headerAlign="center" align="center"  allowSort="true">销售渠道</div>
+            <div field="customerName" width="80" headerAlign="center" align="center"  allowSort="true">客户</div>
+			##<div field="managerUserName" width="80" headerAlign="center" align="center"  allowSort="true">客户经理</div>
+			<div field="isFlaw" width="80" headerAlign="center" align="center"  allowSort="true"  renderer="onFlawRenderer">瑕疵</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+		var Genders = [{ id: 1, text: '男' }, { id: 2, text: '女'}];
+		
+        var statusData = [{id: 1,value: "可售"  },{ id: 2, value: "运输在途" },{id: 3, value: "预订"},{ id: 4, value: "已售" },{ id: 5,value: "寄卖已售未结算"},{ id: 6,value: "准入库"},{ id: 8,value: "锁库"} ] ;
+		var isFlawData = [{id: 'TRUE',value: '是'},{id: 'FALSE',value: '否'}];
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		search();
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据 
+            grid.load(data);
+        }
+		//是否有瑕疵
+       function onFlawRenderer(e) {
+		 	var value = e.value;
+			if(value == 0) return "否";
+			else if(value == 1) return "是";
+			else return "";
+        }
+		//币种
+		function renderCurrency(row) {
+            if (row.value == '1') return "RMB";
+            else if (row.value == '2') return "EU";
+            else if (row.value == '3') return "HKD";
+            else if (row.value == '4') return "US";
+			else if (row.value == '5') return "CHF";
+            else return "";
+        }
+		//入库时间
+		function renderDate(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, true);
+        }
+		//销售销售
+		function renderDate1(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, false);
+        }
+	    function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		search();
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据 
+			//处理日期
+            var date = mini.get("inStockDateStart").getValue();
+            if (date instanceof Date) {
+                data.inStockDateStart = formatDate(date);
+            }
+            var date = mini.get("inStockDateEnd").getValue();
+            if (date instanceof Date) {
+                data.inStockDateEnd = formatDate(date);
+            }
+            var date = mini.get("sellDateStart").getValue();
+            if (date instanceof Date) {
+                data.sellDateStart = formatDate(date);
+            }
+            var date = mini.get("sellDateEnd").getValue();
+            if (date instanceof Date) {
+                data.sellDateEnd = formatDate(date);
+            }	
+            grid.load(data);
+        }
+		//查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            
+            grid.load(data);
+        }
+		
+		 //导出
+        function exportSaleGoodsInfo() {
+		    var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据  
+		    var excelForm = document.getElementById("excelForm");
+	  		excelForm.submit();
+        }
+	
+</script>
+</body>
+</html>

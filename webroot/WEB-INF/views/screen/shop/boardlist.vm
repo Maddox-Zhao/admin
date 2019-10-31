@@ -1,0 +1,406 @@
+#set($layout = "layout/default.vm")
+<script type="text/javascript">
+ jQuery(function(){
+			var div_a =jQuery(".form-tab li");
+			div_a.hover(function(){
+				jQuery(".form-tab li").removeClass("c");
+				jQuery(this).addClass("c");
+				var index =  div_a.index(this);
+				jQuery(".listBox ul")
+						.eq(index).show()
+						.siblings().hide();
+			});
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+</script>
+<center ><div id="result" style="color:red;">$!message</div></center>
+	<div id="tabbar-div" class="list-div">
+		<div class="tool">
+		<ul class="form-tab">
+            <li class="#if($pageFlag=="hot_sale") tab-front #else tab-back #end" id="hotsale-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=hot_sale'"><span>热销榜</span></li>
+            <li class="#if($pageFlag=="high_popular") tab-front #else tab-back #end" id="highpopular-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=high_popular'"><span>人气榜</span></li>
+			<li class="#if($pageFlag=="cut_price") tab-front #else tab-back #end" id="cutprice-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=cut_price'"><span>特价商品</span></li>
+			<li class="#if($pageFlag=="browse_history") tab-front #else tab-back #end" id="browsehistory-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=browse_history'"><span>历史浏览</span></li>
+			<li class="#if($pageFlag=="properly_like") tab-front #else tab-back #end" id="properlylike-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=properly_like'"><span>猜你喜欢</span></li>
+			<li class="#if($pageFlag=="buy_others") tab-front #else tab-back #end" id="buyothers-tab" style="cursor:hand;" onclick="javascript:document.location='bardl.html?pageFlag=buy_others'"><span>买了还买</span></li>
+		 </ul>
+        </div>
+    </div>
+		<form name="saveBoard" id="saveBoard" action="/shop/sbard.html" method="post">
+			<input type="hidden" name="pageFlag" id="pageFlag" value="$!pageFlag"/>
+			<input type="hidden" name="board.id" id="boardId" value="$!board.id"/>
+				<div class="listBox">
+			<h3><span>榜单管理</span></h3>
+				#if($pageFlag=="hot_sale")
+					<table style="#if($pageFlag=="hot_sale") display: table; #else display: none; #end" id="hotsale-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>热销榜</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				#if($pageFlag=="high_popular")
+					<table style="#if($pageFlag=='high_popular') display: table; #else display: none; #end" id="highpopular-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>人气榜</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				#if($pageFlag=="cut_price")
+					<table style="#if($pageFlag=="cut_price") display: table; #else display: none; #end" id="cutprice-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>特价商品</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr style="display:none">
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				#if($pageFlag=="browse_history")
+					<table style="#if($pageFlag=="browse_history") display: table; #else display: none; #end" id="browsehistory-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>历史浏览</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr style="display:none">
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				#if($pageFlag=="properly_like")
+					<table style="#if($pageFlag=="properly_like") display: table; #else display: none; #end" id="properlylike-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>猜你喜欢</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr style="display:none">
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				#if($pageFlag=="buy_others")
+					<table style="#if($pageFlag=="buy_others") display: table; #else display: none; #end" id="buyothers-table">
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜名称：</td>
+							<td>买了还买</td>
+	                    </tr>
+						<tr >
+	                        <td class="label"><span class="require-field">*</span>排行榜标题：</td>
+							<td ><input size="24" id="ipt_title" name="board.title" type="text" value="$!{board.title}" maxLength="12"/></td>
+							<td id="ipt_title_inf">
+							</td>
+	                    </tr>
+	                    <tr style="display:none">
+	                        <td class="label"><span class="require-field">*</span>排行榜周期：</td>
+							<td >
+								<input style="border: medium none ; width: auto;"  id="period1" name="board.period" value="30" #if($board.period==30)checked="checked" #end  type="radio" onclick="hideother();"/>月（30天）
+	    						<input style="border: medium none ; width: auto;"  id="period2" name="board.period" value="7" #if($board.period==7)checked="checked" #end  type="radio" onclick="hideother();"/>周（7天）
+	    						<input style="border: medium none ; width: auto;"  id="period3" name="board.period" value="1" #if($board.period==1)checked="checked" #end  type="radio" onclick="hideother();"/>日（1天）
+	    						<input style="border: medium none ; width: auto;"  id="period4" name="board.period" value="-1" #if($board.period!=30&&$board.period!=7&&$board.period!=1)checked="checked" #end  type="radio" onclick="showother();"/>其他
+	    						<span id="other_period" #if($board.period==30||$board.period==7||$board.period==1) style="display:none" #end>
+	    							<input size="5" id="otherPeriod" name="period" type="text" value="$!{board.period}" maxLength="8" />天
+	    						</span>
+							</td>
+							<td id="ipt_period_inf">
+							</td>
+	                    </tr>
+	                    <tr >
+	                        <td class="label"><span class="require-field">*</span>显示数量：</td>
+							<td ><input size="24" id="ipt_amount" name="board.amount" type="text" value="$!{board.amount}" maxLength="8"/></td>
+							<td id="ipt_amount_inf">
+							</td>
+	                    </tr>
+					</table>
+				#end
+				<div align="center">
+					<input type="submit" value=" 确定 " onclick="return valid_from();"/>
+					<input type="reset" value=" 重置 "  onclick="clear_invalid();"/>
+                </div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+$("#tabbar-div").onmouseover = function(e)
+{
+    var obj = Utils.srcElement(e);
+
+    if (obj.className == "tab-back")
+    {
+        obj.className = "tab-hover";
+    }
+}
+
+$("#tabbar-div").onmouseout = function(e)
+{
+    var obj = Utils.srcElement(e);
+
+    if (obj.className == "tab-hover")
+    {
+        obj.className = "tab-back";
+    }
+}
+
+
+$('#tabbar-div').onclick = function(e)
+{
+    var obj = Utils.srcElement(e);
+
+    if (obj.className == "tab-front" || obj.className != "tab-back")
+    {
+        return;
+    }
+    else
+    {
+        objTable = obj.id.substring(0, obj.id.lastIndexOf("-")) + "-table";
+
+        var tables = document.getElementsByTagName("table");
+        var spans  = document.getElementsByTagName("span");
+
+        for (i = 0; i < tables.length; i++)
+        {
+            if (tables[i].id == objTable)
+            {
+                tables[i].style.display = (Browser.isIE) ? "block" : "table";
+            }
+            else
+            {
+                tables[i].style.display = "none";
+            }
+        }
+        for (i = 0; spans.length; i++)
+        {
+            if (spans[i].className == "tab-front")
+            {
+                spans[i].className = "tab-back";
+                obj.className = "tab-front";
+                break;
+            }
+        }
+    }
+}
+
+function hideother(){
+	document.getElementById("other_period").style.display="none";
+}
+function showother(){
+	document.getElementById('other_period').style.display="";
+}
+
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+function $i(s){return document.getElementById(s);}
+function $t(s){return document.getElementsByTagName(s);}
+function $n(s){return document.getElementsByName(s);}
+var msgs = {
+	ipt_title_invalid_format: '请输入1到12个字符',
+	ipt_period_invalid_required: '请选择周期',
+	ipt_period_invalid_format: '请输入1到8位的正整数',
+	ipt_amount_invalid_format: '请输入1到8位的正整数'
+};
+function valid_from(){
+	var ck=1;
+	document.getElementById('ipt_title_inf').innerHTML="";
+	document.getElementById('ipt_period_inf').innerHTML="";
+	document.getElementById('ipt_amount_inf').innerHTML="";
+
+	if(!(jQuery.trim(document.getElementById('ipt_title').value).length <= 12&&jQuery.trim(document.getElementById('ipt_title').value).length >=1)){
+		document.getElementById('ipt_title_inf').innerHTML="<font color='red'>"+msgs.ipt_title_invalid_format+"</font>";
+		ck=0;
+	}
+	var check=0;
+	for(var i=0;i<document.getElementsByName('board.period').length;i++){
+        if(document.getElementsByName('board.period')[i].checked){
+        check=1;
+        }
+	}
+	if(check==0){
+		document.getElementById('ipt_period_inf').innerHTML="<font color='red'>"+msgs.ipt_period_invalid_required+"</font>";
+	}
+	if(!(jQuery.trim(document.getElementById('ipt_amount').value).length <= 8&&jQuery.trim(document.getElementById('ipt_amount').value).length >=1&&(jQuery.trim(document.getElementById('ipt_amount').value))&&jQuery.trim(document.getElementById('ipt_amount').value)>=1)){
+		document.getElementById('ipt_amount_inf').innerHTML="<font color='red'>"+msgs.ipt_amount_invalid_format+"</font>";
+		ck=0;
+	}
+	if(document.getElementById('period4').checked&&!((jQuery.trim(document.getElementById('otherPeriod').value))&&jQuery.trim(document.getElementById('otherPeriod').value)>=1&&jQuery.trim(document.getElementById('otherPeriod').value).length <= 8&&jQuery.trim(document.getElementById('otherPeriod').value).length >=1)){
+		document.getElementById('ipt_period_inf').innerHTML="<font color='red'>"+msgs.ipt_period_invalid_format+"</font>";
+		ck=0;
+	}
+
+
+	 var f=document.getElementById("otherPeriod");
+			var content=jQuery.trim(document.getElementById("otherPeriod").value);
+			if(isNaN(content)||content<0){
+			alert("出错：请输入数字.");
+			f.select();
+            f.focus();
+			return false;
+		}else{
+			document.getElementById("otherPeriod").value=content;
+		}
+	 var d=document.getElementById("otherPeriod");
+			var contentd=jQuery.trim(document.getElementById("ipt_amount").value);
+			if(isNaN(contentd)||contentd<0){
+			alert("出错：请输入数字.");
+			d.select();
+            d.focus();
+			return false;
+		}else{
+		document.getElementById("ipt_amount").value=contentd;
+		}
+
+
+
+	if(ck==1&&check==1){
+		document.getElementById('ipt_title').value=jQuery.trim(document.getElementById('ipt_title').value);
+		document.getElementById('otherPeriod').value=jQuery.trim(document.getElementById('otherPeriod').value);
+		document.getElementById('ipt_amount').value=jQuery.trim(document.getElementById('ipt_amount').value);
+		return true;
+	}else{
+		return false;
+	}
+
+
+}
+function clear_invalid(){
+	document.getElementById('ipt_title_inf').innerHTML="";
+	document.getElementById('ipt_period_inf').innerHTML="";
+	document.getElementById('ipt_amount_inf').innerHTML="";
+	radio_check();
+}
+function radio_check(){
+	if($board.period==30||$board.period==7||$board.period==1){
+		document.getElementById('other_period').style.display="none";
+	}else{
+		document.getElementById('other_period').style.display="";
+	}
+}
+</script>

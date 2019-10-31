@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AttrGroupSQL">
+	<typeAlias alias="attrGroup"
+		type="com.huaixuan.network.biz.domain.goods.AttrGroup" />
+	<resultMap class="attrGroup" id="attrGroupResult">
+		<result column="id" property="id" />
+		<result column="group_name" property="groupName" />
+		<result column="group_desc" property="groupDesc" />
+		<result column="enable" property="enable" />
+	</resultMap>
+	<!-- create AttrGroup object -->
+	<insert id="addAttrGroup" parameterClass="attrGroup">
+		<![CDATA[
+		insert into emall_attr_group
+		(id,group_name,group_desc,enable )values(
+		null,
+		#groupName#,
+		#groupDesc#,
+		#enable#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update AttrGroup object -->
+	<update id="editAttrGroup" parameterClass="attrGroup">
+		<![CDATA[
+		update emall_attr_group set group_name = #groupName#,
+		group_desc = #groupDesc#,
+		enable = #enable#
+		 where id = #id#
+
+]]>
+	</update>
+	<!-- delete AttrGroup object -->
+	<delete id="removeAttrGroup" parameterClass="java.lang.Long">
+		<![CDATA[
+		delete from emall_attr_group where emall_attr_group.ID = #value#
+]]>
+	</delete>
+
+	<delete id="removeAttrGroupAll" >
+		<![CDATA[
+		delete from emall_attr_group
+]]>
+	</delete>
+
+	<!-- search AttrGroup object -->
+	<select id="getAttrGroup" parameterClass="java.lang.Long"
+		resultMap="attrGroupResult">
+		<![CDATA[
+		select emall_attr_group.* from emall_attr_group where emall_attr_group.ID = #value#
+]]>
+	</select>
+	<select id="getAttrGroupByName" parameterClass="string"
+		resultMap="attrGroupResult">
+		<![CDATA[
+	select emall_attr_group.* from emall_attr_group where emall_attr_group.group_name = #groupName#
+]]>
+
+	</select>
+
+	<!-- searchAll AttrGroup List -->
+	<select id="getAttrGroups" resultMap="attrGroupResult">
+		<![CDATA[
+		select emall_attr_group.* from emall_attr_group
+]]>
+	</select>
+</sqlMap>

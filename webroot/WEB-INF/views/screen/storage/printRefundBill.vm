@@ -1,0 +1,161 @@
+#set($layout = "layout/print.vm")
+#set($title = "管理中心 - 打印采购退货单")
+#set($base = true)
+<div class="main">
+<form id="form1" name="form1" action="$appServer/stock/refund/printRefundBill.html?id=$!id&type=$!type&shoppingNum=$!shoppingNum" method="post">
+<h1>
+	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+	<span class="action-span">每页条数
+		<select name="pageNum" id="pageNum" onChange="submitForm();">
+			<option value="1" #if("$!pageNum"=="1") selected #end>1</option>
+			<option value="2" #if("$!pageNum"=="2") selected #end>2</option>
+			<option value="3" #if("$!pageNum"=="3") selected #end>3</option>
+			<option value="4" #if("$!pageNum"=="4") selected #end>4</option>
+			<option value="5" #if("$!pageNum"=="5") selected #end>5</option>
+			<option value="6" #if("$!pageNum"=="6") selected #end>6</option>
+			<option value="7" #if("$!pageNum"=="7") selected #end>7</option>
+			<option value="8" #if("$!pageNum"=="8") selected #end>8</option>
+			<option value="9" #if("$!pageNum"=="9") selected #end>9</option>
+			<option value="10" #if("$!pageNum"=="10") selected #end>10</option>
+		</select>
+	</span>
+	<span class="action-span">字体大小
+		<select name="fontSize" id="fontSize" onChange="submitForm();">
+			<option value="2" #if("$!fontSize"=="2") selected #end>小</option>
+			<option value="3" #if("$!fontSize"=="3") selected #end>中</option>
+			<option value="4" #if("$!fontSize"=="4") selected #end>大</option>
+		</select>
+	</span>
+</h1>
+<div style="border-right: #DDF0FE 1px solid; border-top: #DDF0FE 1px solid; background: #eef8f9; border-left: #DDF0FE 1px solid; border-bottom: #DDF0FE 1px solid">
+<div id="print">
+	#set($titleSize=$fontSize + 1)
+	#set($no=$!pageNum)
+	#set($no_2=$no - 1)
+	#set($pageSize=0)
+	<table width="970" style="border: 1px solid #006699;border-collapse:collapse;">
+
+		#if($shoppingRefundDetailList)
+			#if($shoppingRefundDetailList.size()%$no==0)
+				#set($sumPageSize=$shoppingRefundDetailList.size()/$no)
+			#else
+				#set($sumPageSize=$shoppingRefundDetailList.size()/$no+1)
+			#end
+			#foreach($obj in $shoppingRefundDetailList)
+				#set($count=$velocityCount - 1)
+				#if($count%$no==0)
+					#set($pageSize=$pageSize+1)
+					#if($pageSize>1)
+				<tr>
+        			<td height="20" colspan="9">&nbsp;&nbsp;</td>
+        		</tr>
+					#end
+					#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+						#set($colNum=10)
+					#else
+						#set($colNum=9)
+					#end
+        		<tr>
+        			<td style="border: 1px solid #006699;" colspan="$colNum">
+        				<table width="100%">
+        					<tr>
+        						<td colspan="3"align="center"><font size="$titleSize"><B>1858$!enumShoppingRefundMap.get("${shoppingRefund.type}")单</B></font></td>
+        					</tr>
+                    		<tr>
+        						<td width="400"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;采购单号：$!{shoppingNum}</font></td>
+        						<td width="170"><font size="$fontSize">日期：$!date.format('yyyy-MM-dd',$!{shoppingRefund.refTime})</font></td>
+								<td width="400"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										编号：$!{shoppingRefund.refNum}</font></td>
+                    		</tr>
+        					<tr>
+                    			<td width="400"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;供应商：$!shoppingRefund.supplierName</font></td>
+								<td width="170"><font size="$fontSize">&nbsp;一级仓库：$!depositoryNameMap.get($!shoppingRefund.depFirstId)</font></td>
+        						<td width="400"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										页码：$pageSize / $sumPageSize</font></td>
+                    		</tr>
+                    	</table>
+        			</td>
+        		</tr>
+        		<tr>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品编码</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品名称</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单位</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">数量</font></td>
+					#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+					<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">采购单价</font></td>
+					#end
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">退货单价</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">应收金额</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">实收金额</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">退货原因</font></td>
+					<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">备注</font></td>
+        		</tr>
+				#end
+        		<tr>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.code</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.instanceName</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.units</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$moneyUtil.getFormatMoney($moneyUtil.add($!obj.refNum,$!obj.damagedNum),'0')</font></td>
+        			#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+					<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!obj.unitPrice,'0.00')</font></td>
+					#end
+					<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!obj.refPrice,'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!obj.dueFee,'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!obj.factFee,'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!enumShoppingRefundRMap.get("$!{obj.reason}")</font></td>
+					<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.remark</font></td>
+        		</tr>
+				#if($velocityCount==$shoppingRefundDetailList.size())
+				<tr>
+					#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+        			<td style="border: 1px solid #006699;background: #fff;" colspan="6" align="center">
+						<font size="$fontSize">合 &nbsp;&nbsp;&nbsp;&nbsp;计 &nbsp;&nbsp;&nbsp;&nbsp;金 &nbsp;&nbsp;&nbsp;&nbsp;额</font></td>
+					#else
+        			<td style="border: 1px solid #006699;background: #fff;" colspan="5" align="center">
+						<font size="$fontSize">合 &nbsp;&nbsp;&nbsp;&nbsp;计 &nbsp;&nbsp;&nbsp;&nbsp;金 &nbsp;&nbsp;&nbsp;&nbsp;额</font></td>
+					#end
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!{sumDueFee},'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">￥$!moneyUtil.getFormatMoney($!{sumFactFee},'0.00')</font></td>
+        			<td style="border: 1px solid #006699;background: #fff;" colspan="2">&nbsp;</td>
+        		</tr>
+				#end
+				#if($count%8==7 || $velocityCount==$shoppingRefundDetailList.size())
+        		<tr>
+        			<td style="border: 1px solid #006699;background: #fff;" colspan="$colNum">
+        				<table width="100%">
+                    		<tr>
+                    			<td width="490"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;采购：$!{shoppingCreater}</font></td>
+        						<td width="480"><font size="$fontSize">检验：</font></td>
+                    		</tr>
+                    	</table>
+        			</td>
+        		</tr>
+				#end
+			#end
+		#end
+	</table>
+</div>
+</div>
+<h1>
+	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+
+</h1>
+</form>
+</div>
+<script >
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+	function cl(){
+		window.close();
+	}
+	function submitForm(){
+		document.getElementById('form1').submit();
+	}
+</script>

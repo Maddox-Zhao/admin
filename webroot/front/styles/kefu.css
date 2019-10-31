@@ -1,0 +1,53 @@
+img{
+margin:0; padding:0; border:0;}
+.QQbox {
+	Z-INDEX: 99; RIGHT: 0px; WIDTH: 178px; POSITION: absolute; TOP: 40px;
+}
+.QQbox .press {
+	RIGHT: 0px; WIDTH: 33px; CURSOR: pointer; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; POSITION: absolute; HEIGHT: 158px;BORDER-BOTTOM-STYLE: none
+}
+.QQbox .Qlist {
+	BACKGROUND: url(../../images/kefu/qq_bg.gif) repeat-y left bottom; POSITION: absolute; left:0;
+}
+.QQbox .Qlist .t {
+	FONT-SIZE: 1px; FLOAT: left; WIDTH: 138px; HEIGHT: 36px; position:relative;
+}
+.QQbox .Qlist .t2 {
+	FONT-SIZE: 1px; FLOAT: left; WIDTH: 138px; HEIGHT: 27px
+}
+.QQbox .Qlist .b {
+	FONT-SIZE: 1px; FLOAT: left; WIDTH: 138px;HEIGHT: 71px
+}
+.QQbox .Qlist .t {
+	BACKGROUND: url(../../images/kefu/qq_top.gif) no-repeat left top
+}
+.QQbox .Qlist .t2 {
+	BACKGROUND: url(../../images/kefu/qq_center.gif) no-repeat left top
+}
+.QQbox .Qlist .b {
+	BACKGROUND: url(../../images/kefu/qq_bot.gif) no-repeat right 0
+}
+.QQbox .Qlist .con {
+	 FONT: bold 12px/22px "宋体"; color:#fff; 
+}
+
+.con{
+
+}
+*.QQbox .Qlist .con UL {
+margin: 0; padding:0;height:110px;
+}
+*+html .QQbox .Qlist .con UL {
+margin: 0; padding:0;height:130px;
+}
+.QQbox .Qlist .con UL {
+margin: 0; padding:0;height:180px;
+}
+.QQbox .Qlist .con UL LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 8px; PADDING-BOTTOM: 5px; PADDING-TOP: 5px;border-bottom:1px solid #cdcdcd; width:90%;margin:0 auto; text-align:center;
+}
+.QQbox .Qlist .con UL LI.odd {
+
+
+}
+

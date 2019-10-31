@@ -1,0 +1,222 @@
+#set($layout = 'layout\default.vm')
+<style type="text/css">
+.title { height: 1em; }
+</style>
+<script>
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+function formSubmit(){
+	var dateStart=document.getElementById("createTimeStart").value.replace(/-/g, "/");
+	var dateEnd=document.getElementById("createTimeEnd").value.replace(/-/g, "/");
+	var account=document.getElementById("account").value.replace(/-/g, "/");
+	var b_date=new Date(Date.parse(dateStart));
+	var e_date=new Date(Date.parse(dateEnd));
+
+
+
+
+   if(dateStart!="")
+   {
+      var r = dateStart.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+	     alert('账户创建开始日期格式不正确');
+         document.getElementById("createTimeStart").value="";
+         document.getElementById("createTimeStart").focus();
+	     return false;
+	  }
+
+   }
+
+   if(dateEnd!="")
+   {
+     var r = dateEnd.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+	     alert('账户创建结束日期格式不正确');
+         document.getElementById("createTimeEnd").value="";
+         document.getElementById("createTimeEnd").focus();
+	     return false;
+	  }
+
+   }
+
+
+    if(dateStart!=""&&dateEnd!=""&&e_date < b_date){
+    	alert("起始时间不能大于结束时间！");
+    	return false;
+    }
+
+
+
+	document.getElementById("createTimeStart").value=document.getElementById("createTimeStart").value.trim();
+	document.getElementById("createTimeEnd").value=document.getElementById("createTimeEnd").value.trim();
+	document.getElementById("accountNo").value=document.getElementById("accountNo").value.trim();
+	document.getElementById("account").value=document.getElementById("account").value.trim();
+    document.listForm.action="doAccountsListByCondition.html";
+    document.listForm.target="";
+    document.listForm.submit();
+}
+
+function openToAccountDetail(accountNo){
+    var availX = window.screen.availWidth;
+    var availY = window.screen.availHeight;
+    var winWidth = availX-100;
+    var winHeight = availY-100;
+    document.getElementById("account.accountNo").value=accountNo;
+    var win = window.open("getAccountDetail.html?account.accountNo="+accountNo,"accountDetailWin","left=50,top=50,width="+winWidth+",height="+winHeight+",scrollbars=yes,status=no,help=no,resizable=no,menubar=no,location=no");
+    //document.listForm.action="getAccountDetail.html";
+   //document.listForm.target="accountDetailWin";
+    //document.listForm.submit();
+    win.focus();
+}
+
+function openToListAccountLogs(accountNo){
+    var availX = window.screen.availWidth;
+    var availY = window.screen.availHeight;
+    var winWidth = availX-100;
+    var winHeight = availY-100;
+    document.getElementById("account.accountNo").value=accountNo;
+    var win = window.open("doAccountLogsListByAccountNo.html?account.accountNo="+accountNo,"accountAdminLogsWin","left=50,top=50,width="+winWidth+",height="+winHeight+",scrollbars=yes,status=no,help=no,resizable=no,menubar=no,location=no");
+    // document.listForm.action="doAccountLogsListByAccountNo.html";
+    // document.listForm.target="accountAdminLogsWin";
+   //  document.listForm.submit();
+    win.focus();
+}
+
+function openToListBalanceLogs(accountNo){
+    var availX = window.screen.availWidth;
+    var availY = window.screen.availHeight;
+    var winWidth = availX-100;
+    var winHeight = availY-100;
+    document.getElementById("account.accountNo").value=accountNo;
+   // var win = window.open("doBalanceLogsListByAccountNo.html","balanceAdminLogsWin","left=50,top=50,width="+winWidth+",height="+winHeight+",scrollbars=yes,status=no,help=no,resizable=no,menubar=no");
+   // document.listForm.action="doBalanceLogsListByAccountNo.html";
+  //  document.listForm.target="balanceAdminLogsWin";
+  //  document.listForm.submit();
+    win.focus();
+}
+</script>
+#set($title = "账户管理 - 账户查询")
+<div class="main">
+<form name="listForm" action="doAccountsListByCondition.html" method="post">
+	<div class="searchBox">
+		<h3><span>账户查询</span></h3>
+
+
+ 	帐户号： <input type="text" name="accountNo"  id="accountNo" size="15" value="$!searchConditionQuery.accountNo"/>
+ 	&nbsp;&nbsp;&nbsp;&nbsp;
+ 	用户名称： <input type="text" name="account" id="account"  size="10" value="$!searchConditionQuery.account"/>
+   &nbsp;&nbsp;&nbsp;&nbsp;<label>帐户创建时间：从</label>
+   <input type="text" name="createTimeStart" id="createTimeStart" value="$!searchConditionQuery.createTimeStart" size="10" theme="simple" readonly="true" />
+   <label>到</label>
+      <input type="text" name="createTimeEnd" id="createTimeEnd" value="$!searchConditionQuery.createTimeEnd" size="10" theme="simple" readonly="true" />
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "createTimeStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "Tl",
+			          data       : "$!{searchConditionQuery.createTimeStart}"
+			      });
+			      Calendar.setup({
+			          inputField : "createTimeEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          data       : "$!{searchConditionQuery.createTimeEnd}"
+			      });
+			</script>
+余额状态：<select name="accountBalance" id="accountBalance">
+	     	<option value=""></option>
+	     	<option value="0" #if("$!searchConditionQuery.accountBalance"=="0") selected #end>余额不为零</option>
+	     </select>
+帐户状态：<select name="enabledStatus" id="enabledStatus">
+	     	<option value=""></option>
+	     	<option value="T" #if("$!searchConditionQuery.enabledStatus"=="T") selected #end>正常</option>
+	     	<option value="B" #if("$!searchConditionQuery.enabledStatus"=="B") selected #end>冻结</option>
+	     </select>
+</br>帐户类型：<select name="accountTypeSearch" id="accountTypeSearch">
+	     	<option value=""></option>
+	     	<option value="1" #if("$!searchConditionQuery.accountTypeSearch"=="1") selected #end>对公</option>
+	     	<option value="2" #if("$!searchConditionQuery.accountTypeSearch"=="2") selected #end>对私</option>
+		<option value="3" #if("$!searchConditionQuery.accountTypeSearch"=="3") selected #end>内部账户</option>
+	     </select>
+</br><input type="button" value="搜 索" class="btn"  onclick="formSubmit();"/>
+<br><br> </div>
+<div class="clearing"></div>
+  <div class="listBox">
+	<h3><span>账户列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>账户号</th>
+      <th>用户名称</th>
+      <th>帐户类型</th>
+      <th>帐户子类型</th>
+      <th>账户余额</th>
+      <th>账户可用余额</th>
+      <th>账户冻结余额</th>
+      <th>创建时间</th>
+      <th>最后操作人</th>
+      <th>帐户状态</th>
+      <th>明细</th>
+    </tr>
+  #foreach( $account in $query.items)
+  <tr align="center">
+    <td>
+    	<a href='javascript:openToAccountDetail("$!{account.accountNo}")'>
+    	    $!{account.accountNo}
+    	</a>
+    </td>
+    <td>$!{account.account}</td>
+    <td>$!accountUtil.getAccountTypeNameByCode("$!{account.accountType}")</td>
+    <td>$!accountUtil.getSubAccountTypeNameByCode("$!{account.accountSubType}")</td>
+    #set($divAmountYuan=$!{moneyUtil.div("$!{account.balance}","100")})
+    <td>￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+    #set($freeAmount=$!{moneyUtil.sub($!{account.balance},$!{account.freezeAmount})})
+    #set($divAmountYuan=$!{moneyUtil.div("$!freeAmount","100")})
+    <td>￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+    #set($divAmountYuan=$!{moneyUtil.div("$!{account.freezeAmount}","100")})
+    <td>￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+    <td>$date.format("yyyy-MM-dd HH:mm:ss",${account.gmtCreate})</td>
+    <td>$!{account.modifier}</td>
+    <td>
+    	#set($processAccountName="")
+    	#if("$!{account.enabledStatus}"=="T")
+    		#set($processAccountName="正常帐户")
+    	#elseif("$!{account.enabledStatus}"=="B")
+    	    #set($processAccountName="冻结帐户")
+	    #end
+    	$!processAccountName
+    </td>
+    <td>
+    	<a href='javascript:openToListAccountLogs("$!{account.accountNo}")'>
+			#set($descInfo="账户明细查看")
+			#if("$!{account.accountSubType}"=="01")
+			  #set($descInfo="账户明细查看")
+		    #elseif("$!{account.accountSubType}"=="02")
+			  #set($descInfo="保证金明细查看")
+            #end
+			 $!descInfo
+    	</a>
+
+    	#*<a href='javascript:openToListBalanceLogs("$!{account.accountNo}")'>
+    	    保证金明细查看
+    	</a>
+	   *#
+    </td>
+  </tr>
+  #end
+  </tbody>
+</table>
+
+<input type="hidden" name="account.enabledStatus" id="account.enabledStatus">
+<input type="hidden" name="account.accountNo" id="account.accountNo">
+</form>
+ <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/account/doAccountsListByCondition.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+

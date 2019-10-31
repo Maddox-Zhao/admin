@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ProdRelationInSQL">
+<typeAlias alias="prodRelationIn" type="com.huaixuan.network.biz.domain.storage.ProdRelationIn"/>
+	<resultMap class="prodRelationIn" id="prodRelationInResult">
+		<result column="id" property="id"/>
+		<result column="in_dep_id" property="inDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="amount" property="amount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="in_detail_id" property="inDetailId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="self_cost" property="selfCost"/>
+	</resultMap>
+
+	<resultMap class="prodRelationIn" id="locIdAndAmountForStorage">
+	    <result column="id" property="id"/>
+	    <result column="in_dep_id" property="inDepId"/>
+	    <result column="goods_instance_id" property="goodsInstanceId"/>
+	    <result column="goods_id" property="goodsId"/>
+		<result column="amount" property="amount"/>
+		<result column="in_detail_id" property="inDetailId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="self_cost" property="selfCost"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+	</resultMap>
+
+	<resultMap class="prodRelationIn" id="locIdAndAmountSales">
+		<result column="id" property="id"/>
+		<result column="amount" property="amount"/>
+		<result column="loc_id" property="locId"/>
+	</resultMap>
+
+	<resultMap class="prodRelationIn" id="printObject">
+		<result column="supplierName" property="supplierName"/><!--供应商名称-->
+		<result column="instanceCode" property="instanceCode"/><!--产品编码-->
+		<result column="instanceName" property="instanceName"/><!--产品名称-->
+		<result column="attrs" property="attrs"/>    <!-- 属性 -->
+		<result column="goodsUnit" property="goodsUnit"/><!--单位-->
+		<result column="amount" property="amount"/><!--数量-->
+		<result column="money" property="money"/><!--金额-->
+		<result column="unitPrice" property="unitPrice"/><!--单价-->
+		<result column="depName" property="depName"/><!--仓库-->
+		<result column="locName" property="locName"/><!--库位-->
+	</resultMap>
+
+<!-- 入库单打印详细信息 -->
+<select id="getPrintInDepList" parameterClass="java.lang.Long" resultMap="printObject">
+<![CDATA[
+SELECT (select g.code from ioss_goods_instance g where g.id=a.goods_instance_id) as instanceCode,
+       (select g.instance_name from ioss_goods_instance g where g.id=a.goods_instance_id) as instanceName,
+       (select g.attrs from ioss_goods_instance g where g.id=a.goods_instance_id) as attrs,
+       (select g.goods_unit from ioss_goods_instance g where g.id=a.goods_instance_id) as goodsUnit,
+       (select l.loc_name from ioss_dep_location l where l.id=a.loc_id) as locName,
+       (select d.name from ioss_dep_location l,ioss_depository d where l.dep_id = d.id and l.id=a.loc_id) as depName,
+	   (select s.name from ioss_supplier s where s.id=a.supplier_id) as supplierName,
+       a.amount as amount,
+       b.unit_price as unitPrice,
+       (a.amount*b.unit_price) as money
+FROM ioss_prod_relation_in a,ioss_in_detail b,ioss_in_depository c
+WHERE a.in_detail_id = b.id
+      AND a.in_dep_id = c.id
+      AND c.id = #value#
+]]>
+</select>
+
+<!-- create ProdRelationIn object -->
+<insert id="addProdRelationIn" parameterClass="prodRelationIn">
+<![CDATA[
+		insert into ioss_prod_relation_in
+		(id,in_dep_id,goods_instance_id,amount,gmt_create,gmt_modify,goods_id,in_detail_id,loc_id,supplier_id,batch_num,self_cost,dep_first_id,stor_type,is_wholesale,tid )values(
+		null,
+		#inDepId#,
+		#goodsInstanceId#,
+		#amount#,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#inDetailId#,
+		#locId#,
+		#supplierId#,
+		#batchNum#,
+		#selfCost#,
+		#depFirstId#,
+		#storType#,
+		#isWholesale#,
+		#tid#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ProdRelationIn object -->
+<update id="editProdRelationIn" parameterClass="prodRelationIn">
+<![CDATA[
+		update ioss_prod_relation_in set in_dep_id = #inDepId#,
+		goods_instance_id = #goodsInstanceId#,
+		amount = #amount#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = #gmtModify#,
+		goods_id = #goodsId#,
+		in_detail_id = #inDetailId#,
+		loc_id = #locId#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete ProdRelationIn object -->
+<delete id="removeProdRelationIn" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_prod_relation_in where ioss_prod_relation_in.ID = #value#
+]]>
+</delete>
+<!-- search ProdRelationIn object -->
+<select id="getProdRelationIn" parameterClass="java.lang.Long" resultMap="prodRelationInResult">
+<![CDATA[
+		select ioss_prod_relation_in.* from ioss_prod_relation_in where ioss_prod_relation_in.ID = #value#
+]]>
+</select>
+<!-- searchAll ProdRelationIn List -->
+<select id="getProdRelationIns" resultMap="prodRelationInResult">
+<![CDATA[
+		select ioss_prod_relation_in.* from ioss_prod_relation_in
+]]>
+</select>
+
+<delete id="removeProdRelationInForAdd" parameterClass="prodRelationIn">
+<![CDATA[
+		DELETE FROM ioss_prod_relation_in
+		 WHERE ioss_prod_relation_in.in_dep_id =#inDepId#
+		AND ioss_prod_relation_in.goods_instance_id=#goodsInstanceId#
+		AND ioss_prod_relation_in.goods_id=#goodsId#
+		AND ioss_prod_relation_in.in_detail_id=#inDetailId#
+]]>
+</delete>
+
+<select id="getSalesDistributedAmount" parameterClass="java.util.Map" resultMap="locIdAndAmountSales">
+<![CDATA[
+	SELECT id,loc_id,amount FROM ioss_prod_relation_in
+		 WHERE ioss_prod_relation_in.in_dep_id =#inDepId#
+		AND ioss_prod_relation_in.goods_instance_id=#goodsInstanceId#
+		AND ioss_prod_relation_in.goods_id=#goodsId#
+		AND ioss_prod_relation_in.in_detail_id=#inDetailId#
+		AND ioss_prod_relation_in.supplier_id=#supplierId#
+		AND ioss_prod_relation_in.batch_num=#batchNum#
+]]>
+</select>
+
+<select id="getShoppingAndCheckDistributedAmount" parameterClass="java.util.Map" resultClass="java.lang.Long">
+<![CDATA[
+	SELECT amount FROM ioss_prod_relation_in
+		 WHERE ioss_prod_relation_in.in_dep_id =#inDepId#
+		AND ioss_prod_relation_in.goods_instance_id=#goodsInstanceId#
+		AND ioss_prod_relation_in.goods_id=#goodsId#
+		AND ioss_prod_relation_in.in_detail_id=#inDetailId#
+		AND ioss_prod_relation_in.loc_id=#locId#
+]]>
+</select>
+
+<select id="getLocIdAndAmountForStorage" parameterClass="prodRelationIn" resultMap="locIdAndAmountForStorage">
+<![CDATA[
+	SELECT id,in_dep_id,amount,goods_id,goods_instance_id,in_detail_id,loc_id,supplier_id,batch_num,self_cost,dep_first_id,stor_type,is_wholesale,tid
+	FROM ioss_prod_relation_in
+	WHERE in_dep_id = #inDepId#
+	      AND goods_instance_id = #goodsInstanceId#
+	      AND in_detail_id = #inDetailId#
+	      AND goods_id = #goodsId#
+]]>
+</select>
+</sqlMap>

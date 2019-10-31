@@ -1,0 +1,43 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* 元素 */
+div, ul, ol, li, form, iframe, fieldset, input, p, dl, dt, dd, tr, td{
+	font: 12px Geneva, Arial, Helvetica, sans-serif, Tahoma;margin:0;padding:0;font-size:12px;}
+input, select, textarea {font: 12px Geneva, Arial, Helvetica, sans-serif, Tahoma; color: #000;}
+body {
+font-size:12px;
+margin:auto;
+width:642px;
+height:auto;
+}
+img {border:0;vertical-align:middle; text-align:center;}
+.clear{clear:both;}
+ol,ul{list-style:none;}
+a:link {color: #404040; text-decoration:none;}
+a:hover {color: #ff6600; text-decoration:none;}
+
+.new_car{margin:0 auto;width:642px;_margin:0px;}
+.car_top{background:url(../../images/car_decorate.png) no-repeat center top;  height:24px; }
+.car_con{background:url(../../images/car_con.png) repeat-y center top; padding:8px 80px 14px 80px;_padding:5px 20px 7px 20px;}
+.car_con ul{list-style-type:none;}
+.car_con li{height:24px; line-height:22px; padding-top:4px; border-bottom:1px solid #ddd;}
+.car_con li b{font-size:13px; color:#ff6600;}
+.car_con li dl{float:left; line-height:28px; width:225px; text-align:left;}
+.car_con li dl strong{color:#ff0000;}
+.car_inp{ height:16px; border:1px solid #7f9db9;}
+.bor421 {
+border-right:1px dashed #DDDDDD;
+border-top:1px dashed #DDDDDD;
+
+}
+.bo421 {
+border-bottom:1px dashed #DDDDDD;
+border-left:1px dashed #DDDDDD;
+padding-left:8px;
+height:22px;
+}
+
+.f421{ color:#888;}
+.car_ck{height:auto; padding-bottom:5px;}
+.car_bo{background:url(../../images/car_bo.png) no-repeat center bottom; height:87px; text-align:center; padding:30px 0px 0px 30px;}

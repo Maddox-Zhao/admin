@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MailTaskSQL">
+<typeAlias alias="mailtask" type="com.huaixuan.network.biz.domain.user.MailTask"/>
+	<resultMap class="mailtask" id="mailtaskResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="context" property="context"/>
+		<result column="is_send" property="isSend"/>
+	</resultMap>
+<!-- create Users object -->
+<insert id="addMailTask" parameterClass="mailtask">
+<![CDATA[
+insert into emall_mailtask (id, user_id, context) values (null, #userId#, #context#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<select id="getMailTaskList" parameterClass="java.util.Map" resultMap="mailtaskResult">
+	
+     select emall_mailtask.* from emall_mailtask where 1=1
+    <isNotEmpty prepend="and" property="isSend">
+       is_send = #isSend#
+    </isNotEmpty>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getMailTaskListCount" parameterClass="java.util.Map" resultClass="int">
+ <![CDATA[
+  select count(1) from(
+    select emall_mailtask.* from emall_mailtask where 1=1
+]]>
+    <isNotEmpty prepend="and" property="isSend">
+       is_send = #isSend#
+    </isNotEmpty>
+  ) aa
+</select>
+
+
+<update id="updateMailTask" parameterClass="mailtask">
+<![CDATA[
+		update emall_mailtask set is_send = #isSend#
+		 where id = #id#
+]]>
+</update>
+</sqlMap>

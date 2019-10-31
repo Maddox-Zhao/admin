@@ -1,0 +1,210 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<style>
+	.className{
+  line-height:50px;
+  height:50px;
+  width:80px;
+  color:#777777;
+  background-color:#ededed;
+  font-size:16px;
+  font-weight:normal;
+  font-family:Arial;
+  background:-webkit-gradient(linear, left top, left bottom, color-start(0.05, #ededed), color-stop(1, #f5f5f5));
+  background:-moz-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:-o-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:-ms-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  background:linear-gradient(to bottom, #ededed 5%, #f5f5f5 100%);
+  background:-webkit-linear-gradient(top, #ededed 5%, #f5f5f5 100%);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#f5f5f5',GradientType=0);
+  border:1px solid #dcdcdc;
+  -webkit-border-top-left-radius:27px;
+  -moz-border-radius-topleft:27px;
+  border-top-left-radius:27px;
+  -webkit-border-top-right-radius:27px;
+  -moz-border-radius-topright:27px;
+  border-top-right-radius:27px;
+  -webkit-border-bottom-left-radius:27px;
+  -moz-border-radius-bottomleft:27px;
+  border-bottom-left-radius:27px;
+  -webkit-border-bottom-right-radius:27px;
+  -moz-border-radius-bottomright:27px;
+  border-bottom-right-radius:27px;
+  -moz-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  box-shadow: inset 0px 0px 0px 0px #ffffff;
+  text-align:center;
+  display:inline-block;
+  text-decoration:none;
+}
+.className:hover{
+  background-color:#f5f5f5;
+  background:-webkit-gradient(linear, left top, left bottom, color-start(0.05, #f5f5f5), color-stop(1, #ededed));
+  background:-moz-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:-o-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:-ms-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  background:linear-gradient(to bottom, #f5f5f5 5%, #ededed 100%);
+  background:-webkit-linear-gradient(top, #f5f5f5 5%, #ededed 100%);
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#ededed',GradientType=0);
+}
+	
+</style>
+    <head>
+        <title>订单打印</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	</head>
+	
+<body style="font-size:12px;">
+	<div id="btn" style="margin-left:50%">
+		<a href='javascript:void(0)' onclick="printOrder()" class='className'>打印</a>
+		<a href="javascript:window.opener=null;window.open('','_self');window.close();" class="className">关闭</a>
+	</div>
+    <table border="0" width="80%"  style="margin-top:200px;width:500px;" >
+		<tr> <td>Invoice:$order.idorder </td><td></td><td colspan='2'> $!dateUtil.convertDateToString("yyyy-MM-dd",$!order.date)</td><td></td></tr><tr></tr><tr></tr>
+		<tr><td>Product</td><td>Qty.</td><td>Unit Price</td><td>Deal Price </td><td>Amount</td></tr><tr></tr>
+		#foreach($product in $list)
+			#if($!{velocityCount} <= 27) ##每页打印27条数据
+			<tr>
+				 <td>$product.name</td>
+				 <td> $product.qty </td>
+				 <td>$product.unitPrice</td>
+				 <td>$product.dealPrice</td>
+				 <td>$product.amountPrice</td>
+			</tr>
+			#end
+		#end
+		
+		#if($!{list.size()} > 27)
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				<tr><td></td><td></td><td></td><td></td><td></td></tr>
+				
+        		#foreach($product in $list)
+        			#if($!{velocityCount} > 27)
+        			<tr>
+        				 <td>$product.name</td>
+        				 <td>$product.qty </td>
+        				 <td>$product.unitPrice</td>
+        				 <td>$product.dealPrice</td>
+        				 <td>$product.amountPrice</td>
+        			</tr>
+        			#end
+        		#end
+		#end
+		
+		
+		
+			
+		
+		<tr><td></td><td></td><td></td><td></td><td></td></tr>
+		
+		<tr><td>Total Qty.</td><td>$!totalNum</td><td>Subtotal</td><td>$!order.currencyname</td><td>$!order.subTotal</td> </tr>
+		<tr><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td>              </td><td>Payment</td><td>$!order.paymentname</td><td></td><td>$!order.amountCard</td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td>              </td><td>Cash</td><td></td><td></td><td>$!order.amountCash</td></tr><tr></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td></tr>
+		
+	</table>
+	
+	#if($customer.managerId == 1002011)
+	 <table border="0" width="100%" style="margin-buttom:200px" >
+		<tr> <td>Customer:$order.customername &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+				phone:$customer.phone</td><td></td></tr>
+		<tr> <td></td> <td></td><td></td></tr>
+		<tr> <td colspan="2">请检查好货品。</td> </tr>
+		<tr> <td></td> <td></td></tr>
+		<tr> <td colspan="2"> 地址：上海市 中山北路3300号 月星环球港L1016</td>  </tr>
+
+	</table>
+	#else
+	<table border="0" width="100%" style="margin-buttom:200px" >
+		<tr> <td>Customer:$order.customername &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+				phone:$customer.phone</td><td></td></tr>
+		<tr> <td></td> <td></td><td></td></tr>
+		<tr> <td colspan="2">貨品售出，概不退換，物流自提 </td> </tr>
+		<tr> <td></td> <td></td></tr>
+		<tr> <td colspan="2"> 提貨地址：香港 九龍區 新蒲崗大有街31號 善美工業大廈1202室</td>  </tr>
+
+	</table>
+	#end
+	
+</body>
+</html>
+
+<script type="text/javascript">
+ 
+function printOrder()
+{
+	document.getElementById("btn").style.visibility = "hidden";
+	window.print();
+	document.getElementById("btn").style.visibility = "visible";
+}
+</script>
+

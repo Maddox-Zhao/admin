@@ -1,0 +1,403 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>采购管理 - 采购单详情</h2>
+	<div class="tool">
+		<span><a href="javascript:preview(1);" hidefocus="true" class="bt_wu">打印</a></span>
+		#if($type && "$type"=="check")
+			<span><a href="$appServer/stock/stock_search.html?isCheck=true&isFirst=true&status=stock_wait_check" hidefocus="true" class="bt_wu">采购验收列表</a></span>
+		#else
+			<span class="action-span"><a href="stockList.html" hidefocus="true" class="bt_wu">采购订单列表</a></span>
+		#end
+		<span class="action-span"><a href="#" onclick="doExportDetail();" hidefocus="true" class="bt_wu">Excel导出</a></span>
+	</div>
+
+<form  name="form1"  action="" method="post">
+<div id="print">
+<div class="formBox" >
+	<div class="content">
+	<h3><span>采购订单信息</span></h3>
+	<table class="c6">
+		<input type="hidden" name="stockId" value="$!shoppingList.id"/>
+				#if("${shoppingList.isWholesale}"=="w")
+				<tr>
+				<th class="label">订单类型：</th>
+				<td>$!enumStockTypeMap.get("${shoppingList.isWholesale}")</td>
+
+				<th class="label">交易订单号：</th>
+				<td>$!{shoppingList.tid}</td>
+				</tr>
+				#end
+				<tr>
+				<th class="label">采购单号：</th>
+				<td>$!{shoppingList.shoppingNum}</td>
+
+				<th class="label">关联单号：</th>
+				<td>$!{shoppingList.relationShoppingNum}</td>
+				</tr>
+
+				<tr>
+				<th class="label">供应商：</th>
+				<td>$!{shoppingList.supplierName}</td>
+
+				<th class="label">合同编号：</th>
+				<td>$!{shoppingList.primitiveNum}</td>
+				</tr>
+
+				<tr>
+				<th class="label">采购时间：</th>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingList.shoppingTime})</td>
+
+				<th class="label">预期到货时间：</th>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingList.arriveTime})</td>
+				</tr>
+
+				<tr>
+				<th class="label">实际到货时间：</th>
+				<td>
+    				<input type="text" name="factArriveTime_str" id="factArriveTime_str" size="15" theme="simple" readonly="true" />
+    			    <script type="text/javascript">
+    			      Calendar.setup({
+    			          inputField : "factArriveTime_str",
+    			          ifFormat   : "%Y-%m-%d",
+    			          align      : "BR"
+    			      });
+    				</script>
+				</td>
+
+				<th class="label">状态：</th>
+				<td>$!stockStatusMap.get("${shoppingList.status}")</td>
+
+				</tr>
+
+				<tr>
+				<th class="label">创建人：</th>
+				<td>${shoppingList.creater}</td>
+
+				<th class="label">创建时间：</th>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingList.gmtCreate})</td>
+
+				</tr>
+				<th class="label">库存类型：</th>
+				<td>$!storTypeMap.get("${shoppingList.storType}")</td>
+				<th class="label"></th>
+				<td></td>
+				</tr>
+
+				<tr>
+				<th class="label">备注：</th>
+				<td colspan="3"><textarea cols="40" rows="3" id="shoppingList.remark" name="shoppingList.remark" readonly="readonly">$!{shoppingList.remark}</textarea></td>
+				</tr>
+		</table>
+	</div>
+</div>
+
+  <div class="listBox" id="listDiv">
+	<h3><span>采购产品列表</span></h3>
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>产品编码</th>
+        <th>产品名称</th>
+		<th>供应商产品编码</th>
+        <th>类目</th>
+        <th>属性</th>
+        <th>单位</th>
+		<th>单价</th>
+		<th>采购数量</th>
+		<th>缺货数量</th>
+		<th>拒收数量</th>
+		<th>验收数量</th>
+		<th>应付金额</th>
+		<th>实付金额</th>
+      </tr>
+      #foreach($goods in $shoppingMoreDetails)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+
+         <td>&nbsp;$!goods.goodsInstanceCode
+			<input type="hidden" name="id" value="$!goods.id" id="id_$!goods.id"/>
+		 </td>
+         <td>&nbsp;$!goods.instanceName</td>
+		 <td>$!goods.supplierCode</td>
+         <td title="$!goods.catCode">&nbsp;
+			#if ($!goods.catCode.length()<20)
+				$!goods.catCode
+			#else
+				$!controlUtil.getNoticesTitle($!goods.catCode,20)
+			#end
+		 </td>
+         <td title="$!goods.attrs">&nbsp;
+			#if ($!goods.attrs.length()<20)
+				$!goods.attrs
+			#else
+				$!controlUtil.getNoticesTitle($!goods.attrs,20)
+			#end
+		 </td>
+		 <td>&nbsp;$!goods.units</td>
+         <td>&nbsp;￥<span>$!moneyUtil.getFormatMoney($!goods.unitPrice,'0.00')</span><input type="hidden" id="unitPrice_$!goods.id" value="$!goods.unitPrice"/></td>
+		 <td>&nbsp;$!goods.amount
+			<input type="hidden" name="amount" value="$!goods.amount" id="amount_$!goods.id"/>
+		 </td>
+		 <td  class="r" align="right">
+        	#if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+				<span id='goods_missingNum_edit_$!goods.id'>
+					<input type="text" name="newMissingNum" value="$!goods.missingNum" id="newMissingNum_$!goods.id"  onchange="checkMissingNum('$!goods.id',$!goods.missingNum);" size="6" maxLength="20"/>
+				</span>
+			#else
+    			<span id='goods_missingNum_$!goods.id'>
+    				$!goods.missingNum
+    			</span>
+			#end
+         </td>
+		 <td  class="r" align="right">
+        	#if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+				<span id='goods_rejectNum_edit_$!goods.id'>
+					<input type="text" name="newRejectNum" value="$!goods.rejectNum" id="newRejectNum_$!goods.id"  onchange="checkRejectNum('$!goods.id',$!goods.rejectNum);" size="6" maxLength="20"/>
+				</span>
+			#else
+    			<span id='goods_rejectNum_$!goods.id'>
+    				$!goods.rejectNum
+    			</span>
+			#end
+         </td>
+		 <td  class="r" align="right">
+        	#if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+				<span id='goods_receiveNum_edit_$!goods.id'>
+					<input type="text" name="newReceiveNum" value="$!goods.amount" id="newReceiveNum_$!goods.id"  onchange="checkReceiveNum('$!goods.id',$!goods.receiveNum);" size="6" maxLength="20"/>
+				</span>
+			#else
+    			<span id='goods_receiveNum_$!goods.id'>
+    				$!goods.receiveNum
+    			</span>
+			#end
+         </td>
+		 <td>￥$!moneyUtil.getFormatMoney($!goods.dueFee,'0.00')</td>
+         <td>￥<input type="text" name="goodsFactFee" value="$!goods.factFee" id="goodsFactFee_$!goods.id" size="6"  readonly="true" /></td>
+      </tr>
+	  #end
+    </table>
+    <!-- 分页 -->
+    #if($shoppingMoreDetails.size() == 0)
+		没有结果！
+    #end
+ </div>
+ </div>
+ <br/>
+ #if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+ <div align="center">
+	<label>一级仓库：</label>
+	#if("${shoppingList.isWholesale}"=="w")
+		#foreach($depFirstIdInfo in $depFirstIdInfoList)
+        	#if($!{depFirstIdInfo.id}==$!{shoppingList.depFirstId})
+				$!{depFirstIdInfo.depFirstName}
+				<input type="hidden" name="depFirstId" value="$!{depFirstIdInfo.id}"/>
+			#end
+    	#end
+	#else
+	<select name="depFirstId" id="depFirstId">
+		#if(!$depFirstIdInfoList || $depFirstIdInfoList.size<=0)
+			<option value="">您没有权限</option>
+		#end
+    	#foreach($depFirstIdInfo in $depFirstIdInfoList)
+        	<option value="$!{depFirstIdInfo.id}">$!{depFirstIdInfo.depFirstName}</option>
+    	#end
+	</select>
+	#end
+    <input type="button" name="finish" value=" 完 成  " onclick="javascript:finishCheck();"/>
+	<input type="button" name="export" value=" 导出条码  " onclick="javascript:doExport();"/>
+ </div>
+ #end
+ </form>
+  </div>
+ <script language="javascript" type="text/javascript">
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+        window.document.body.innerHTML=bdhtml;
+	}
+
+	function doExportDetail(){
+		document.form1.action="exportShoppingDetail.html";
+		document.form1.submit();
+		document.form1.action="";
+	}
+
+	function finishCheck(){
+		var	mymes=confirm("确定要完成此采购订单吗？");
+		if(true==mymes){
+			if(checkData()){
+    			document.form1.action = "$appServer/stock/check_stock.html";
+        		document.form1.submit();
+    		}
+		}
+	}
+
+ 	function checkData(){
+		var amount;
+		var reject_num;
+		var receive_num;
+		var missing_num;
+		var sum_num;
+		var depFirstId;
+		var receiveNumAll = 0;
+
+		#if($shoppingMoreDetails)
+      		#foreach($goods in $shoppingMoreDetails)
+			amount = Number(document.getElementById("amount_$!goods.id").value);
+			reject_num = Number(document.getElementById("newRejectNum_$!goods.id").value);
+			receive_num = Number(document.getElementById("newReceiveNum_$!goods.id").value);
+			missing_num = Number(document.getElementById("newMissingNum_$!goods.id").value);
+			sum_num = reject_num + receive_num + missing_num;
+			receiveNumAll = receiveNumAll + receive_num;
+			if(amount != sum_num){
+				alert("采购的产品[#direct($!goods.instanceName)]中缺货、拒收、验收数量之和不等于采购数量！");
+				return false;
+			}
+			#end
+			depFirstId = document.getElementById("depFirstId").value;
+			if(depFirstId == "" && receiveNumAll > 0){
+				alert("验收数量大于0的时候，必须选择分配的一级仓库！");
+				return false;
+			}
+		#end
+
+		return true;
+	}
+
+ 	//缺货数量
+	function checkMissingNum(goodsId,oldValue){
+		var newMissingNum=document.getElementById('newMissingNum_' + goodsId);
+		var newMissingNumValue=newMissingNum.value;
+		if(newMissingNumValue==null||jQuery.trim(newMissingNumValue)==""){
+			alert("出错：您没有输入.");
+			newMissingNum.value=oldValue;
+			newMissingNum.select();
+            newMissingNum.focus();
+            return false;
+		}
+		else if(!isIntNumber(newMissingNumValue)){
+			alert("出错：您输入了不正确的数量.");
+			newMissingNum.value=oldValue;
+			newMissingNum.select();
+            newMissingNum.focus();
+            return false;
+		}else if(newMissingNumValue>100000000000){
+			alert("出错：您输入的数量太大.");
+			newMissingNum.value=oldValue;
+			newMissingNum.select();
+            newMissingNum.focus();
+            return false;
+		}
+		var checkPrice = document.getElementById('unitPrice_'+ goodsId).value;
+		var receiveNum = document.getElementById('newReceiveNum_'+ goodsId).value;
+		if(receiveNum==0){
+			var newFactFee = 0.00;
+		}else{
+		    var newFactFeeAll = checkPrice * receiveNum;
+		    var newFactFee = Math.round(newFactFeeAll*100)/100;
+		}
+		document.getElementById('goodsFactFee_'+ goodsId).value = newFactFee;
+		return true;
+	}
+
+	//拒收数量
+	function checkRejectNum(goodsId,oldValue){
+		var newRejectNum=document.getElementById('newRejectNum_' + goodsId);
+		var newRejectNumValue=newRejectNum.value;
+		if(newRejectNumValue==null||jQuery.trim(newRejectNumValue)==""){
+			alert("出错：您没有输入.");
+			newRejectNum.value=oldValue;
+			newRejectNum.select();
+            newRejectNum.focus();
+            return false;
+		}
+		else if(!isIntNumber(newRejectNumValue)){
+			alert("出错：您输入了不正确的数量.");
+			newRejectNum.value=oldValue;
+			newRejectNum.select();
+            newRejectNum.focus();
+            return false;
+		}else if(newRejectNumValue>100000000000){
+			alert("出错：您输入的数量太大.");
+			newRejectNum.value=oldValue;
+			newRejectNum.select();
+            newRejectNum.focus();
+            return false;
+		}
+		var checkPrice = document.getElementById('unitPrice_'+ goodsId).value;
+		var receiveNum = document.getElementById('newReceiveNum_'+ goodsId).value;
+		if(receiveNum==0){
+		    var newFactFee = 0.00;
+		}else{
+		    var newFactFeeAll = checkPrice * receiveNum;
+		    var newFactFee = Math.round(newFactFeeAll*100)/100;
+		}
+		document.getElementById('goodsFactFee_'+ goodsId).value = newFactFee;
+		return true;
+	}
+
+	//验收数量
+	function checkReceiveNum(goodsId,oldValue){
+		var newReceiveNum=document.getElementById('newReceiveNum_' + goodsId);
+		var newReceiveNumValue=newReceiveNum.value;
+		if(newReceiveNumValue==null||jQuery.trim(newReceiveNumValue)==""){
+			alert("出错：您没有输入.");
+			newReceiveNum.value=oldValue;
+			newReceiveNum.select();
+            newReceiveNum.focus();
+            return false;
+		}
+		else if(!isIntNumber(newReceiveNumValue)){
+			alert("出错：您输入了不正确的数量.");
+			newReceiveNum.value=oldValue;
+			newReceiveNum.select();
+            newReceiveNum.focus();
+            return false;
+		}else if(newReceiveNumValue>100000000000){
+			alert("出错：您输入的数量太大.");
+			newReceiveNum.value=oldValue;
+			newReceiveNum.select();
+            newReceiveNum.focus();
+            return false;
+		}
+		var checkPrice = document.getElementById('unitPrice_'+ goodsId).value;
+		var receiveNum = document.getElementById('newReceiveNum_'+ goodsId).value;
+		if(receiveNum==0){
+		    var newFactFee = 0.00;
+		}else{
+		    var newFactFeeAll = checkPrice * receiveNum;
+		    var newFactFee = Math.round(newFactFeeAll*100)/100;
+		}
+		document.getElementById('goodsFactFee_'+ goodsId).value = newFactFee;
+		return true;
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+	//正整数和零
+	function isIntNumber(val){
+		var reg = /^[\d]+$/;
+		return reg.test(val);
+	}
+
+	function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00'
+              : ( (mnt*10 == Math.floor(mnt*10)) ?
+                       mnt + '0' : mnt);
+	}
+	//导出条码
+	function doExport(){
+		document.form1.action="exportBarCode.html";
+		document.form1.submit();
+		document.form1.action="";
+	}
+</script>

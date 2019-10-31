@@ -1,0 +1,150 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>锁库</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+          <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+   <div id="form1"  style="margin-left:auto;margin-center:auto;margin-left:100px">
+        <table>
+            
+            <tr>
+                <td>
+                    <label >锁库解锁日期：</label>
+                <td>
+                    <input id="overtime"  name="overtime" style="width:150px" class="mini-datepicker"  style="width:150px;" nullValue="null"
+					format="yyyy-MM-dd H:mm:ss"   timeFormat="H:mm:ss" showTime="true" showOkButton="true" showClearButton="false"/>
+                </td>
+            </tr>
+			 
+			<tr><td></td><td>&nbsp;</td></tr>
+	 
+            <tr>
+                <td>
+                    客户：
+                </td>
+                <td>
+                        <input id="customerShow" name="idCustomer" style="width:150px"  class="mini-buttonedit" emptyText="请选择..."  onbuttonclick="onButtonEdit" selectOnFocus="true" />
+                </td>
+            </tr>
+			<tr><td></td><td>&nbsp;</td></tr>
+			
+             <tr>
+					<td>
+						 &nbsp;&nbsp; <a class="mini-button" iconCls="icon-ok" onclick="submit()">提交</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+			 
+			 
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	var data; //保存页面传过来的开单数据 [{idproduct:price}]
+
+	 function SetData(data1) {
+        //跨页面传递的数据对象，克隆后才可以安全使用
+        data = mini.clone(data1);
+    }
+	
+	
+	
+	
+	//选中客户
+	function onButtonEdit()
+	{
+		mini.open({
+            url: "/customer/toSearchCustomer.html",
+            title: "选择客户",
+            width: 700,
+            height: 300,
+            onload: function() {
+                 var iframe = this.getIFrameEl();
+             	 iframe.contentWindow.setData();
+            },
+            ondestroy: function(action) {
+               var iframe = this.getIFrameEl();
+               var data = iframe.contentWindow.getData(data);
+			   data = mini.clone(data);
+			   if(data)
+			   {
+			   		mini.get("customerShow").setText(data.name);
+					mini.get("customerShow").setValue(data.idCustomer);
+				 
+			   }
+            }
+        });
+	}
+	
+	
+ 
+		
+	function submit()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		var formData = form.getData();//form表单填写的数据
+		
+		var productRequestStr = "";//产品
+		for(var i = 0; i < data.length;i++)
+		{
+			var row = data[i];
+			var idProduct = row.idProduct;
+			productRequestStr += idProduct+",";	
+		}
+		if(productRequestStr == ""){mini.alert("没有产品数据！");return;}
+		
+ 		var overtime = mini.get("overtime");
+		if(!overtime.getValue())
+		{
+			mini.alert("请填写解锁日期");
+			return;
+		}
+		var customerShow = mini.get("customerShow");
+		if(!customerShow.getValue())
+		{
+			mini.alert("请选择客户");
+			return;
+		}		
+		formData.overtime = overtime.text;
+		formData.idProducts = productRequestStr;
+
+		mini.mask({
+            el: document.body,
+            cls: 'mini-mask-loading',
+            html: '提交中,请勿关闭...'
+        });
+		jQuery.post("/shoppingCar/suoku.html",formData,function(text)
+		{
+		 	mini.unmask(document.body);
+			if("ok" == text)
+			{
+				CloseWindow('close');
+			}
+			else
+			{
+				mini.alert("提交出错,联系管理员");
+			}
+		});
+		
+		
+		
+	}
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+	 
+</script>
+</body>
+</html>

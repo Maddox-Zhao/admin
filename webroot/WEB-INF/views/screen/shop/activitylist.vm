@@ -1,0 +1,93 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript" src="${ctx}/scripts/jquery.js"></script>
+<script type="text/javascript">
+
+	function publishActivity(id){
+ 		var obj = document.getElementById("id");
+	  	obj.value = id;
+  		document.listForm.action = "/shop/publishActivity.html";
+		document.listForm.submit();
+	}
+
+	function cancelActivity(id){
+ 		var obj = document.getElementById("id");
+	  	obj.value = id;
+  		document.listForm.action = "/shop/cancelActivity.html";
+		document.listForm.submit();
+	}
+
+	function updateActivity(id){
+ 		var obj = document.getElementById("id");
+	  	obj.value = id;
+  		document.listForm.action = "/shop/updateActivityPage.html";
+		document.listForm.submit();
+	}
+</script>
+#set($title = "专场管理 - 添加专场")
+<form name="listForm" action="" method="post"><!-- start ads list -->
+	<input type="hidden" id="id" name="id" value="" />
+<div class="list-div" id="listDiv">
+	<div class="tool">
+
+            <span><a href="/shop/addActivityPage.html" hidefocus="true" class="bt_add">添加专场</a></span>
+
+        </div>
+	<div class="listBox">
+			<h3><span>专场列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>活动名称</th>
+      <th>活动开始时间</th>
+      <th>活动结束时间</th>
+	  <th>位置</th>
+	  <th>状态</th>
+      <th>操作</th>
+    </tr>
+	#foreach( $activity in ${query.items})
+    <tr align="center">
+      <td><a href="$!{liangpin99Server}/activity/$!{activity.id}.html" target= "_blank">
+		<span>#if($!activity.title.length()>12)
+                <div title="$!activity.title">$!activity.title.substring(0,12)...</div>
+				#else
+					$!activity.title
+				#end</span>
+		</a>
+	  </td>
+      <td>$!dateUtil.convertDateToString('yyyy年MM月dd日',${activity.gmtStart})</td>
+       <td>$!dateUtil.convertDateToString('yyyy年MM月dd日',${activity.gmtEnd})</td>
+	   <td>#if($!{activity.activityPosition} && $!{activity.activityPosition} == ('indexSwiper')) 首页轮播
+	   #elseif($!{activity.activityPosition} && $!{activity.activityPosition} == ('indexNew')) 首页最新上线
+		#elseif($!{activity.activityPosition} && $!{activity.activityPosition} == ('discountTop')) 特惠上方
+		#elseif($!{activity.activityPosition} && $!{activity.activityPosition} == ('discountLeftMiddle')) 特惠左侧中间
+		#elseif($!{activity.activityPosition} && $!{activity.activityPosition} == ('discountLeftBottom')) 特惠左下角
+		#elseif($!{activity.activityPosition} && $!{activity.activityPosition} == ('discountRight')) 特惠右侧长条
+		#else 其他 #end</td>
+      <td> #if($!{activity.status} && $!{activity.status} == '1') 未发布  #else 已发布 #end</td>
+      <td>
+            #if($!{activity.status} && $!{activity.status} == '1') <a href="javascript:publishActivity('$!{activity.id}')">发布</a>
+            #else <a href="javascript:cancelActivity('$!{activity.id}')">取消</a>
+            #end
+
+	    #if($!{activity.status} && $!{activity.status} == '1')
+	      <a href="javascript:updateActivity('$!{activity.id}')">修改</a>
+            #else 修改
+            #end
+
+	  </td>
+    </tr>
+	#end
+  </table>
+  </div>
+  </form>
+  #if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/activitylist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>
+

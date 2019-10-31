@@ -1,0 +1,117 @@
+#set($layout = 'layout\default.vm')
+
+<div class="main">
+
+<h2>添加供应商商品</h2>
+        <!-- 搜索模块 -->
+  
+    
+	<script language="javascript" type="text/javascript">
+		function modifyTo(){
+		window.open("${appServer}/instance/select_instance.html","window","");
+	}
+
+function getInstanceInfo(ret){
+		var goodsId_str = '';
+		if(ret!=null &&　ret.length>0){
+
+			for(var i=0;i<ret.length;i++) {
+			var newEle;
+					var con		= document.getElementById("goodsIns");
+
+										var ff		= document.getElementById("ag");
+
+			var newEle	= document.createElement("DIV");
+
+	newEle		= ff.insertBefore(newEle,con);
+　				goodsId_str += ret[i].id + ',';
+
+  newEle.innerHTML	= "\n<div><input name=\"goodsInstanceId\" type=\"hidden\" value=\""+ret[i].id+"\" /><input name=\"goodsId\" type=\"hidden\" value=\""+ret[i].goodsId+"\" />产品名称:<input name=\"goodsInstanceName\" type=\"text\" size=\"15\" value=\""+ret[i].instanceName+"\" readonly=\"readonly\"/> 产品编码<input name=\"goodsInstanceCode\" type=\"text\"  size=\"15\" value=\""+ret[i].code+"\" readonly=\"readonly\"/> 供应商编码：<input name=\"supplierCode\" type=\"text\" size=\"15\" value=\"\" /> 供应商进货价格：<input name=\"consultPrice\"  type=\"text\"  size=\"15\" value=\"\" /><input type=\"button\" value=\"\u5220\u9664\" onclick=\"javascript:return removeOption(this);\" /></div>\n";
+			}
+		}
+		
+//if(ret!=null){
+//document.getElementById('goodsInstanceId').value=ret.id;
+//document.getElementById('goodsInstanceName').value=ret.instanceName;
+//document.getElementById('goodsInstanceCode').value=ret.code;
+//}
+}
+
+function removeOption(e){
+	var tar		= e.parentNode.parentNode;	//\u83b7\u53d6\u5220\u9664\u5bf9\u8c61
+	var con		= document.getElementById("ag");//\u83b7\u53d6Form\u5143\u7d20\u7684\u5bb9\u5668
+	if(!tar || !con) return;
+    if(e.name=="true"){alert("\u8be5\u9009\u9879\u5df2\u6295\u8fc7\u7968\uff0c\u4e0d\u80fd\u5220\u9664\uff01");return;}
+	con.removeChild(tar);
+	
+}
+
+function checkForm(){
+	var codes=document.getElementsByName("supplierCode");
+	var prices=document.getElementsByName("consultPrice");
+
+	 for(var i=0;i<prices.length;i++){
+	 var price = prices[i].value;
+	 if(price!=""){
+	 if(!isNumber(price)){
+			alert("出错：您输入了不正确的金额.");
+					Field.focus(price);
+							return false;
+
+}else if(price>100000000){
+			alert("出错：您输入的金额太大.");
+								Field.focus(price);
+					return false;
+			}}
+	 }
+document.addSupplierGoods.submit();
+	 
+
+}
+
+function isMoney(s){
+var regu  = "/^[\-\+]?([0-9]\d*|0|[1-9]\d{0,2}(,\d{3})*)(\.\d+)?$/"; 
+//var regu = "^[0-9]+[\.][0-9]{0,2}$";
+var re = new RegExp(regu);
+if (re.test(s)){
+return true;}
+else {
+return false;
+}
+}
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+</script>
+ <div class="searchBox">
+    <h3><span>添加供应商商品</span></h3>
+		<form  name="addSupplierGoods" id="addSupplierGoods"   action="addSupplierGoods.html" method="post">
+    <table>
+      <tr>
+
+        <input  type="hidden" name="supplierId"  value="$!supplier.id" />
+
+<td colspan="6"><font color="red">#if($!message)$!message#end</font></td></tr>
+				
+				<tr>
+				<th>供应商名称				</th><td><input  type="text" name="name"  value="$!{supplier.name}" readonly="readonly"/>
+				<input  type="button" name="selectGs"  value="选择产品" onclick="javascript:modifyTo();"/>
+				</td>
+				<th>&nbsp;</th>
+								<td>&nbsp;</td>
+												<th>&nbsp;</th>
+								<td>&nbsp;</td>
+				</tr>
+								<tr><td colspan="6">				   	<div id="ag"> 
+											<div id="goodsIns">
+				</div>				</div>
+				</td></tr>
+				
+  <tr>
+    <th>&nbsp;</th>
+    <td colspan="4"><input class="button" value=" 确定 " type="button" onclick="checkForm();"> <input class="button" value=" 重置 " type="reset"> 
+	
+</td><th>&nbsp;</th><td>&nbsp;</td></tr></table></form></div>

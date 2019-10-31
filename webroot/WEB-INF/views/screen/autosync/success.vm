@@ -1,0 +1,24 @@
+#set($layout = '')
+<html>
+<head>
+	<title>同步 </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+	OK<br/>
+	#if($cnt)
+		更新成功 $cnt  条数据
+	#end
+	#set($index = 1)
+	#if($resultList.size()  == 0)
+			没有数据更新！！！
+	 #end
+#foreach($result in $resultList)
+	$index   $result  <br/>
+	#set($index = $index + 1)
+#end
+</body>
+
+</html>

@@ -1,0 +1,444 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+<h1>
+	#if("$rule.resultValue"=="priceFull")
+		#set($typeName = "金额")
+	#else
+		#set($typeName = "数量")
+	#end
+</h1>
+
+
+<div class="main">
+
+#set($errormessage = $request.getParameter('errormessage'))
+ #if($!errormessage)
+<div class="mag-t1">
+	#if($!errormessage == "same")
+		对不起，该优惠套餐名称已经存在！
+	#end
+	#if($!errormessage == "areaerror")
+		如果选择了类目范围，则类目不能为空！
+	#end
+	#if($!errormessage == "branderror")
+		如果选择了品牌范围，则品牌不能为空！
+	#end
+</div>
+ #end
+  <div class="formBox">
+  <form action="/goods/updateFullGive.html"  method="post" name="listForm" >
+	<div class="content">
+  <table width="100%" id="mybody" name="">
+  #springBind("promation.id")
+  <input type="hidden" id="promation.id" name="${status.expression}" value ="$!{status.value}">
+  <input type="hidden" id="amount" name="amount"  value="$!amount">
+  <input type="hidden"  id="editFlag"  value="$!editFlag" />
+  <input type="hidden"  id="errorFlag" value="$!errorMsg"/>
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;">套餐类型:</td><span></span>
+        <td>
+			${typeName}满就送
+			<input type='hidden' id="promationType" name='promationType'  size='30'   value="$rule.resultValue">
+		</td>
+      </tr>
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐名称:</td>
+        <td>
+			#springBind("promation.name")
+          <input type="text" id="attrName" name="${status.expression}"  size="30"   value="$!{status.value}" ></input>
+		  <label class="red">${status.errorMessage}</label>
+		</td>
+	  </tr>
+	    <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐时间:</td>
+        <td>
+					#springBind("promation.startDate_str")
+					<input name="${status.expression}" id="startDateStr" size="10" readonly="true" value="$!{status.value}"/>
+					#springBind("promation.startDate_hour")
+					<select name="${status.expression}" id="hourStart">
+						<option #if("$!{status.value}" == "0") selected #end value='0'>  0</option>
+						<option #if("$!{status.value}" == "1") selected #end value='1'>  1</option>
+						<option #if("$!{status.value}" == "2") selected #end value='2'>  2</option>
+						<option #if("$!{status.value}" == "3") selected #end value='3'>  3</option>
+						<option #if("$!{status.value}" == "4") selected #end value='4'>  4</option>
+						<option #if("$!{status.value}" == "5") selected #end value='5'>  5</option>
+						<option #if("$!{status.value}" == "6") selected #end value='6'>  6</option>
+						<option #if("$!{status.value}" == "7") selected #end value='7'>  7</option>
+						<option #if("$!{status.value}" == "8") selected #end value='8'>  8</option>
+						<option #if("$!{status.value}" == "9") selected #end value='9'>  9</option>
+						<option #if("$!{status.value}" == "10") selected #end value='10'>  10</option>
+						<option #if("$!{status.value}" == "11") selected #end value='11'>  11</option>
+						<option #if("$!{status.value}" == "12") selected #end value='12'>  12</option>
+						<option #if("$!{status.value}" == "13") selected #end value='13'>  13</option>
+						<option #if("$!{status.value}" == "14") selected #end value='14'>  14</option>
+						<option #if("$!{status.value}" == "15") selected #end value='15'>  15</option>
+						<option #if("$!{status.value}" == "16") selected #end value='16'>  16</option>
+						<option #if("$!{status.value}" == "17") selected #end value='17'>  17</option>
+						<option #if("$!{status.value}" == "18") selected #end value='18'>  18</option>
+						<option #if("$!{status.value}" == "19") selected #end value='19'>  19</option>
+						<option #if("$!{status.value}" == "20") selected #end value='20'>  20</option>
+						<option #if("$!{status.value}" == "21") selected #end value='21'>  21</option>
+						<option #if("$!{status.value}" == "22") selected #end value='22'>  22</option>
+						<option #if("$!{status.value}" == "23") selected #end value='23'>  23</option>
+</select>
+			<label>到</label>
+					#springBind("promation.endDate_str")
+					<input name="${status.expression}" id="endDateStr" size="10" readonly="true" value="$!{status.value}"/>
+					#springBind("promation.endDate_hour")
+					<select  name="${status.expression}" id="hourEnd">
+						<option #if("$!{status.value}" == "0") selected #end value='0'>  0</option>
+						<option #if("$!{status.value}" == "1") selected #end value='1'>  1</option>
+						<option #if("$!{status.value}" == "2") selected #end value='2'>  2</option>
+						<option #if("$!{status.value}" == "3") selected #end value='3'>  3</option>
+						<option #if("$!{status.value}" == "4") selected #end value='4'>  4</option>
+						<option #if("$!{status.value}" == "5") selected #end value='5'>  5</option>
+						<option #if("$!{status.value}" == "6") selected #end value='6'>  6</option>
+						<option #if("$!{status.value}" == "7") selected #end value='7'>  7</option>
+						<option #if("$!{status.value}" == "8") selected #end value='8'>  8</option>
+						<option #if("$!{status.value}" == "9") selected #end value='9'>  9</option>
+						<option #if("$!{status.value}" == "10") selected #end value='10'>  10</option>
+						<option #if("$!{status.value}" == "11") selected #end value='11'>  11</option>
+						<option #if("$!{status.value}" == "12") selected #end value='12'>  12</option>
+						<option #if("$!{status.value}" == "13") selected #end value='13'>  13</option>
+						<option #if("$!{status.value}" == "14") selected #end value='14'>  14</option>
+						<option #if("$!{status.value}" == "15") selected #end value='15'>  15</option>
+						<option #if("$!{status.value}" == "16") selected #end value='16'>  16</option>
+						<option #if("$!{status.value}" == "17") selected #end value='17'>  17</option>
+						<option #if("$!{status.value}" == "18") selected #end value='18'>  18</option>
+						<option #if("$!{status.value}" == "19") selected #end value='19'>  19</option>
+						<option #if("$!{status.value}" == "20") selected #end value='20'>  20</option>
+						<option #if("$!{status.value}" == "21") selected #end value='21'>  21</option>
+						<option #if("$!{status.value}" == "22") selected #end value='22'>  22</option>
+						<option #if("$!{status.value}" == "23") selected #end value='23'>  23</option>
+						</select> 
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "endDateStr",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "startDateStr",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+			</td>
+      </tr>
+	    <tr>
+        <td></td>
+        <td align="left">
+        <input type="button" id="btnSubmit" value="添加条件" class="button" onclick="addMyRow();" />
+        <input type="button" id="btnSubmit" value="删除最后一条" class="button" onclick="delMyRow();" /></td>
+        </td>
+      </tr>
+       #foreach($pro in $priceList)
+      <tr id="tr$!pro.amount">
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>$!pro.name</td>
+        <td align="left">
+        ${typeName}   
+			<input   type="text"  id="money0$!pro.amount" name="money0$!pro.amount"  size="10" #if(${typeName}=="金额") value="$!pro.lowerPrice" #else value="$!pro.lowerNumber"  #end/> 
+			到 
+			<input   type="text"  id="money1$!pro.amount"  name="money1$!pro.amount"  size="10" #if(${typeName}=="金额") value="$!pro.topPrice" #else value="$!pro.topNumber"  #end/>    
+			<span id="attrDiv$!pro.amount" name ="attrDiv$!pro.amount"  style="">
+				<input type="text" id="attrName$!pro.amount" name="attrName$!pro.amount"  value="$!pro.goodsName"/>
+				<input type="hidden" id="attrId$pro.amount" name="attrId$!pro.amount"  value="$!pro.goodsId"/>
+			</span>
+			<input type="button" name="selePro" value="选产品" onClick="selectGoods($!pro.amount)" /> 
+        </td>
+      </tr>														
+     							#end
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;">商品范围:</td>
+        <td align="left">
+			<input type="radio" name="scope" #if("$scope" == "all") checked #end value="all">全场<br>
+			<input type="radio" name="scope" #if("$scope" == "brand") checked #end value="brand">品牌
+			<select name="selectBrand" id="selectBrand">
+                #foreach($brandTemp in $brandList)
+                <option value="$brandTemp.id" #if("$brandTemp.id"=="$scopeValue") selected #end>$!brandTemp.brandName</option>
+                #end
+            </select><br>
+			<input type="radio" name="scope" #if("$scope" == "cat") checked #end value="cat">类目
+				<input type='text' id="selectCat" name='selectCat' size='30' value="$!catName"></input>
+				<input type="hidden" id="selectCode" name="selectCode" value="$!scopeValue"/>
+				<span class="action-span"><a href="javascript:selectCat();">选择类目</a></span>
+        </td>
+      </tr>
+      </table>
+	  </div>
+     </form>
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onClick="updatePromation()">确定</button>
+		<button type="reset" id="allcheckbutton" class="button-s4" onClick="resetForm();">重置</button>
+    </div>
+   </div>
+</div>
+<script type="text/javascript">   
+        //全局变量
+        var rowNumber=0;   
+        var i=0;   
+        var typeName = '$typeName';
+           
+window.onload=function(){
+   i='$!amount'; 
+}
+        //添加行  
+        function addMyRow(){  
+       		 var dom="";
+        	if(i>10){
+       			 return false;
+       			 } 
+       			 var arrays=new Array("一","二","三","四","五","六","七","八","九","十");
+       			 dom="第"+arrays[i];
+        
+            var mytable = document.getElementById("mybody");   
+            var mytr = mytable.insertRow(4+i*1);   
+            mytr.setAttribute("id","tr"+i);   
+            var mytd_1=mytr.insertCell(0);   
+            var mytd_2=mytr.insertCell(1);  
+            var dome= "<tr><td style='width:100px;font-weight:bold;font-size:14px;'>"+dom+"</td><td> "+typeName+" <input type='text' id='attrName' name='attribute.attrName'  size='10'   ><input type='text' id='attrName' name='attribute.attrName'  size='10'   >减<input type='text' id='attrName' name='attribute.attrName'  size='10'   >"
+            mytd_1.innerHTML="<span style='color:red'>*</span>"+dom+": ";   
+            mytd_1.className="label";
+            var name = "attrName"+i;
+            var id = "attrId"+i;
+            var divst = "attrDiv"+i;
+            
+            var name0 = "money0"+i;
+            var name1 = "money1"+i;
+            
+            mytd_2.innerHTML=typeName+"   <input   type='text'  id='"+name0+"' name='"+name0+"'  size='10'> 到 <input   type='text'  id='"+name1+"' name='"+name1+"'  size='10'> <span id='"+divst+"' name ='"+divst+"'  style='display:none'> <input type='text' id='"+name+"' name='"+name+"' readonly='true' /><input type='hidden' id='"+id+"' name='"+id+"' readonly='true' /></span><input type='button' name='selePro' value='选产品' onClick='selectGoods("+i+")' > ";   
+            i++;   
+        }   
+        //删除当前行   
+        function delMyRow(){   
+            if(i<0)
+            	return false;
+            else if(i>0)i--;   
+            var mytable = document.getElementById("mybody");   
+            var myrow = document.getElementById("tr"+i);   
+			if(myrow != null){
+			  mytable.deleteRow(myrow.rowIndex); 
+			}  
+        }   
+        //删除所有行   
+        function delAllMyRow(){
+            var mytable = document.getElementById("mybody");   
+            var rowlen=mytable.rows.length;   
+            for(var i=rowlen-1;i>=0;i--){   
+                mytable.deleteRow(i);   
+            }   
+        } 
+          
+          
+       function fullGive(ss){
+   		 	      var vstr = ss.split("~@~");
+   							       	if(vstr.length > 0){
+                    	var tstr = vstr[0].split("~!~");
+                   var goodsname ="attrName"+rowNumber; 
+			                   var goodsid ="attrId"+rowNumber; 
+			                   var goodsDiv ="attrDiv"+rowNumber; 
+			                   
+		                   document.getElementById(goodsid).value=tstr[0];
+  	                 document.getElementById(goodsname).value=tstr[2];
+  	                //   ShowDiv(goodsDiv);
+  	               document.getElementById(goodsDiv).style.display="";
+           	}
+	        }
+    
+      function ShowDiv(goodsDiv)   
+       {   
+         var Layer_choice;  
+         
+         //抓div    
+         if (document.getElementById) {
+           var  name = "document.getElementById('"+goodsDiv+"')";
+           Layer_choice = eval(name);   
+           alert("name==>"+name);
+         }   
+         else { 
+            var  name1 = "document.all.choice."+goodsDiv;
+            Layer_choice = eval(name1);   
+           }   
+ 
+         if(Layer_choice)//先判斷是否存在   
+          {   
+          alert("Layer_choice==>"+Layer_choice);
+           Layer_choice.style.display='';   
+            }   
+        }
+        
+        function selectGoods(num){
+            			var row = num;
+            			if(row==null||row==""){
+            			row=0;
+              			}
+            			rowNumber = row;
+              			//var ret = window.open('addsalegoods.html?chtype=fullGive','','');
+              			window.open('/instance/addGiftInstanceGoods.html?type=fullGive','','');
+ 		          }
+ 		
+       
+        
+         function newdialog1(url)
+         {
+       	   		alert(url);
+				          window.open(url, 'window', '');
+         }
+         
+         function updatePromation(){
+              var money=0;
+              var name=document.getElementById("attrName").value;
+              if(name==null||name==""){
+              alert("套餐名称不能为空");
+              return false;
+			  }
+			  
+			 var objs = document.getElementsByName("scope");
+			 var selectCode = document.getElementById("selectCode").value;
+			 var isChecked = "";
+ 			 for(var n=0;n<objs.length;n++){
+  				if(objs[n].checked){ 
+   					if(objs[n].value=="cat" && selectCode==""){
+    					alert("如果选择类目范围，则类目信息不能为空！");  
+   					} 
+					isChecked = "true";
+  				}  
+ 			 }
+			 
+			 if(isChecked==""){
+			 	alert("请选择满就送的范围！"); 
+				return false;
+			 }
+			 
+              var arrays=new Array("一","二","三","四","五","六","七","八","九","十");
+              var  startDate =  document.getElementById("startDateStr").value;
+              var  endDate =  document.getElementById("endDateStr").value;
+              var hourEnd =  document.getElementById("hourEnd").value;
+              var hourStart =  document.getElementById("hourStart").value;
+              if(startDate==null||startDate==""){
+              alert("起始时间不能为空");
+              return false;
+              }
+              if(endDate==null||endDate==""){
+              alert("结束时间不能为空");
+              return false;
+              }
+              
+              if(startDate>endDate){
+              alert("起始时间不能大于结束时间");
+              return false;
+              }
+              else if(startDate==endDate){
+              	    if(hourEnd*1<=hourStart){
+              	    alert("起始时间不能大于等于结束时间");
+                  		return false;
+              	   }
+              }
+            
+	          	  if(i==0){
+	              alert("最少添加一个条件！");
+	             return false;}
+	             
+	           var re = /^[0-9]+\.?[0-9]{0,2}$/;
+			   var re2 = /^[0-9]+[0-9]*]*$/;
+	           
+	            for( j=0;j<i;j++){
+	            var name0 = "money0"+j;
+            	var name1 = "money1"+j;
+            	var name2 = "attrId"+j;
+            var  money0 =  document.getElementById(name0).value;
+            var  money1 =  document.getElementById(name1).value;
+            var  money2 =  document.getElementById(name2).value;
+            if(money0==null||money0==""||money1==null||money1=="")
+             {
+                alert("条件中数值不能为空");
+                return false;
+             }
+            if(money2==null||money2==""){
+                alert("请选择条件"+arrays[j]+"赠送的物品");
+                return false;
+              }
+           if(typeName=="数量"){
+		   	  if(!re2.test(money0)){
+                 alert("条件中数量必须为整数");
+                 document.getElementById(name0).value="0";
+                    return false;
+              }
+                if(!re2.test(money1)){
+                 alert("条件中数量必须为整数");
+                 document.getElementById(name1).value="0";
+                 return false;
+              }
+		   }else{
+		   	  if(!re.test(money0)){
+                 alert("条件中金额必须为整数或保留两位小数的数字");
+                 document.getElementById(name0).value="0";
+                    return false;
+              }
+                if(!re.test(money1)){
+                 alert("条件中金额必须为整数或保留两位小数的数字");
+                 document.getElementById(name1).value="0";
+                 return false;
+              }
+		   }
+            
+            if(money1*1 <= money0*1){
+			   if(typeName=="数量"){
+			       alert("条件中数量区间不明确");
+                   return false;
+			   }else{
+			       alert("条件中金额区间不明确");
+                   return false;   
+			   }
+             }
+            if(money0*1 < money*1){
+			  if(typeName=="数量"){
+			      alert("后一个条件的起始数量不能超过前一条件的最高数量");
+                  return false;
+			  }else{
+			      alert("后一个条件的起始金额不能超过前一条件的最高金额");
+                  return false;
+			  }
+            }
+            else{
+                money=money1;
+	             }
+	             if(j==i-1&&money*1>=1000000){
+				    if(typeName=="数量"){
+					   	alert("条件中数量区间必须小于1000000");
+	                    document.getElementById(name1).value="0";
+					}else{
+					    alert("条件中金额区间必须小于1000000");
+	                    document.getElementById(name1).value="0";
+					}
+                 return false;
+	                }
+	          }
+	          document.getElementById("amount").value=i;
+	         document.listForm.submit();
+         }
+		 
+	//选择类目     
+   function selectCat(){
+		var ret = window.showModalDialog("/goods/scat.html?muse=true",null,"dialogWidth:900px;dialogHeight:500px;help:no;status:no");
+		var selectCatName = '',selectCode = '';
+
+		if(ret!=null &&　ret.length>0){
+			selectCode = ret[1];
+			selectCatName = ret[0];	
+		}
+		
+		document.getElementById('selectCat').value=selectCatName;
+		document.getElementById('selectCode').value=selectCode;
+	}
+	
+	function resetForm(){
+	  document.listForm.reset();
+	}
+	
+</script> 

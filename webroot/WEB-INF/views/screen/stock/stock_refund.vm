@@ -1,0 +1,277 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+<h2>采购管理 - 采购退货单</h2>
+
+	<h1>
+		<div class="success_min" id="modifySuccess" style="display:none">修改金额成功</div>
+		<div class="warning_min" id="modifyError" style="display:none">修改金额失败</div>
+		<div class="success_min" id="modifyRefPriceSuccess" style="display:none">修改单价成功</div>
+		<div class="warning_min" id="modifyRefPriceError" style="display:none">修改单价失败</div>
+		<div class="success_min" id="modifyReasonSuccess" style="display:none">修改退货原因成功</div>
+		<div class="warning_min" id="modifyReasonError" style="display:none">修改退货原因失败</div>
+		<div style="clear: both;"></div>
+		#if($message)
+		#if($message == "jsth")
+			<div class="warning_min" id="massage">拒收退货记录已存在！</div>
+			<div style="clear: both;"></div>
+		#elseif($message == "djth")
+			<div class="warning_min" id="massage">订单退货记录已存在！</div>
+			<div style="clear: both;"></div>
+		#end
+		#end
+	</h1>
+
+<div class="searchBox">
+    <h3><span>采购退货单信息</span></h3>
+	<table width="100%" cellpadding="3" cellspacing="1">
+				<tr>
+				<td class="label">退货单号</td>
+				<td>$!{shoppingRefund.refNum}
+				</td>
+
+
+				<td class="label">退货类型</td>
+				<td>$!enumShoppingRefund.get("${shoppingRefund.type}")</td>
+
+				</tr>
+
+				<tr>
+				<td class="label">供应商</td>
+				<td>$!{shoppingRefund.supplierName}</td>
+
+				<td class="label">退货时间</td>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingRefund.refTime})</td>
+
+				</tr>
+
+				<tr>
+				<td class="label">创建人</td>
+				<td>${shoppingRefund.creater}</td>
+
+				<td class="label">创建时间</td>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingRefund.gmtCreate})</td>
+				</tr>
+		</table>
+</div>
+
+<form  name="form1"  action="$appServer/stock/refundDetail.html?actionType=detail&refundId=$!{shoppingRefund.id}&stockId=$!{stockId}" onsubmit="return checkdata();" method="post">
+<div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+		<tr>
+    		<th colspan="9"  scope="col">采购退货单产品信息</th>
+		</tr>
+      <tr>
+        <th>产品名称</th>
+        <th>产品编码</th>
+        <th>采购数量</th>
+        <th>采购单价</th>
+        <th>退货数量</th>
+        <th>退货单价</th>
+        <th>应收金额</th>
+        <th>实收金额</th>
+        <th>退货原因</th>
+      </tr>
+	#if($shoppingRefundDetailLists)
+      #foreach($goods in $shoppingRefundDetailLists)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+
+		 <td>&nbsp;$!goods.instanceName</td>
+		 <td>&nbsp;$!goods.code</td>
+		 <td>&nbsp;$!goods.amount</td>
+		 <td>&nbsp;￥$!moneyUtil.getFormatMoney($!goods.unitPrice,'0.00')</td>
+		 <td>&nbsp;<input type="text" name="newRefNum" value="$!goods.refNum" id="newRefNum_$!goods.id"  title="点击修改退货数量"  size="6" readonly=true/></td>
+		 <td  class="r" align="center">
+			￥<span id='goods_refprice_edit_$!goods.id'>
+				<input type="text" name="newRefPrice" id="newRefPrice_$!goods.id" value="$!moneyUtil.getFormatMoney($!goods.refPrice,'0.00')" title="点击修改退货单价"  onchange="editDwrRefPrice('$!goods.id',$!moneyUtil.getFormatMoney($!goods.refPrice,'0.00'));" size="6" maxLength="16"/>
+			</span>
+			</td>
+		 <td align="center">￥<input type="text" name="newDueFee" id="newDueFee_$!goods.id" value="$!moneyUtil.getFormatMoney($!goods.dueFee,'0.00')" size="6" readonly=true/></td>
+         <td  class="r" align="center">
+			￥<span id='goods_factfee_edit_$!goods.id'>
+				<input type="text" name="newFactFee" value="$!moneyUtil.getFormatMoney($!goods.factFee,'0.00')" id="newFactFee_$!goods.id"  title="点击修改实收金额" onchange="editDwrRefFactFee('$!goods.id',$!moneyUtil.getFormatMoney($!goods.factFee,'0.00'));" size="10" maxLength="16"/>
+			</span>
+         </td>
+		 <td  align="center">
+			<select name="newReason" id="newReason_$!goods.id" onchange="editDwrReason('$!goods.id','$!goods.reason');">
+				<option value=''>-=请选择=-</option>
+			#foreach($reason in $enumShoppingRefundReason.entrySet())
+				<option value="$!{reason.key}" #if("$!{goods.reason}" == "$!{reason.key}") selected #end>$!{reason.value}</option>
+			#end
+			</select>
+		 </td>
+      </tr>
+	  #end
+	#end
+    </table>
+    <!-- 分页 -->
+    #if($shoppingRefundDetailLists.size() == 0)
+		没有结果！
+    #end
+ </div>
+ <br />
+ <div align="center">
+    <input type="submit" name="finish" value=" 完 成 "/>
+ </div>
+ </form>
+</div>
+ <script language="javascript" type="text/javascript">
+
+ 	function checkdata(){
+		var reason;
+		#if($shoppingRefundDetailLists)
+      		#foreach($goods in $shoppingRefundDetailLists)
+			reason = Number(document.getElementById("newReason_$!goods.id").value);
+			if(reason == ""){
+				alert("退货产品[$!goods.instanceName]中的退货原因为空！");
+				return false;
+			}
+			#end
+		#end
+		return true;
+	}
+
+
+	function editDwrRefPrice(goodsId,oldValue){
+		var newRefPrice=document.getElementById('newRefPrice_' + goodsId);
+		var newRefPriceValue=newRefPrice.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newRefPriceValue==null||jQuery.trim(newRefPriceValue)==""){
+			alert("出错：您没有输入.");
+			newRefPrice.value=oldValue;
+			newRefPrice.select();
+            newRefPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newRefPriceValue)){
+			alert("出错：您输入了不正确的单价.");
+			newRefPrice.value=oldValue;
+			newRefPrice.select();
+            newRefPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newRefPriceValue>10000000000){
+			alert("出错：您输入的单价太大.");
+			newRefPrice.value=oldValue;
+			newRefPrice.select();
+            newRefPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newRefPriceValue=parseFloat(newRefPriceValue);
+			jQuery.get('$appServer/stock/editDwrRefPrice.html',{param1:goodsId,param2:newRefPriceValue},function(message){
+			   	var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifyRefPriceSuccess");
+		        var msgDiv2=document.getElementById("modifyRefPriceError");
+		        var amount = document.getElementById('newRefNum_' + goodsId).value;
+		        var priceNum = Number(newRefPrice.value);
+		        var refNum = Number(amount);
+		        if (msgType == 'true') {
+			        msgDiv2.style.display="none";
+			        msgDiv.style.display="";
+			        document.getElementById('newDueFee_' + goodsId).value=(priceNum*refNum).toFixed(2);
+			        document.getElementById('newFactFee_' + goodsId).value=(priceNum*refNum).toFixed(2);
+		        } else{
+			        alert("修改单价失败!");
+			        msgDiv2.style.display="";
+			        msgDiv.style.display="none";
+		        }
+		    },'');
+		}
+	}
+
+
+	function editDwrRefFactFee(goodsId,oldValue){
+		var newFactFee=document.getElementById('newFactFee_' + goodsId);
+		var newFactFeeValue=newFactFee.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newFactFeeValue==null||jQuery.trim(newFactFeeValue)==""){
+			alert("出错：您没有输入.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newFactFeeValue)){
+			alert("出错：您输入了不正确的金额.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newFactFeeValue>10000000000){
+			alert("出错：您输入的金额太大.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newFactFeeValue=parseFloat(newFactFeeValue);
+			jQuery.get('$appServer/stock/editDwrRefFactFee.html',{param1:goodsId,param2:newFactFeeValue},function(message){
+			   	var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifySuccess");
+		        var msgDiv2=document.getElementById("modifyError");
+		        if (msgType == 'true') {
+			        msgDiv2.style.display="none";
+			        msgDiv.style.display="";
+		        } else{
+			        alert("修改实付金额失败!");
+			        msgDiv2.style.display="";
+			        msgDiv.style.display="none";
+		        }
+		    },'');
+		}
+	}
+
+
+	function editDwrReason(goodsId,oldValue){
+		var newReason=document.getElementById('newReason_' + goodsId);
+		var newReasonValue=newReason.value;
+		var msgDiv=document.getElementById("modifyReasonSuccess");
+		var msgDiv2=document.getElementById("modifyReasonError");
+		if(newReasonValue==null||jQuery.trim(newReasonValue)==""){
+			alert("出错：您没有输入.");
+			newReason.value=oldValue;
+			newReason.select();
+            newReason.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			jQuery.get('$appServer/stock/editDwrReason.html',{param1:goodsId,param2:newReasonValue},function(message){
+			   	var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifyReasonSuccess");
+		        var msgDiv2=document.getElementById("modifyReasonError");
+		        if (msgType == 'true') {
+			        msgDiv2.style.display="none";
+			        msgDiv.style.display="";
+		        } else{
+			        alert("修改退货原因失败!");
+			        msgDiv2.style.display="";
+			        msgDiv.style.display="none";
+		        }
+		    },'');
+		}
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+</script>
+</body>

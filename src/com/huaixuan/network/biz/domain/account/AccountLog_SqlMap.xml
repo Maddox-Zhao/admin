@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AccountAdminLogSQL">
+<typeAlias alias="accountAdminLog" type="com.huaixuan.network.biz.domain.account.AccountLog"/>
+<typeAlias alias="accountLog" type="com.hundsun.itrans.domain.base.AccountLogDO"/>
+	<resultMap class="accountAdminLog" id="accountAdminLogResult">
+		<result column="ID" property="id"/>
+		<result column="TRANS_LOG_ID" property="transLogId"/>
+		<result column="TRANS_DATE" property="transDate"/>
+		<result column="OUT_DATE" property="outDate"/>
+		<result column="TRANS_DT" property="transDt"/>
+		<result column="TRANS_CODE" property="transCode"/>
+		<result column="SUB_TRANS_CODE" property="subTransCode"/>
+		<result column="TRANS_AMOUNT" property="transAmount"/>
+		<result column="BALANCE" property="balance"/>
+		<result column="FREEZE_BALANCE" property="freezeBalance"/>
+		<result column="ACCOUNT_TYPE" property="accountType"/>
+		<result column="TRANS_ACCOUNT" property="transAccount"/>
+		<result column="OTHER_ACCOUNT_TYPE" property="otherAccountType"/>
+		<result column="OTHER_ACCOUNT" property="otherAccount"/>
+		<result column="TRANS_INSTITUTION" property="transInstitution"/>
+		<result column="TRANS_OUT_ORDER_NO" property="transOutOrderNo"/>
+		<result column="BANK_TYPE" property="bankType"/>
+		<result column="TRANS_MEMO" property="transMemo"/>
+		<result column="TRANS_OPERATOR" property="transOperator"/>
+		<result column="TRANS_TERMINAL" property="transTerminal"/>
+	</resultMap>
+	<resultMap id="balanceChangeResult" class="accountLog" >
+		<result column="ID" property="id"/>
+		<result column="TRANS_DATE" property="transDate"/>
+		<result column="SUB_TRANS_CODE" property="subTransCode"/>
+		<result column="TRANS_AMOUNT" property="transAmount"/>
+		<result column="TRANS_OUT_ORDER_NO" property="transOutOrderNo"/>
+	</resultMap>
+   <select id="accountLog-searchLogByAccountNo-query" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+       <![CDATA[ 
+		        SELECT id,trans_log_id,trans_out_order_no order_no,bank_type,DATE_FORMAT(trans_dt,'%Y-%m-%d %H:%i:%s') trans_dt,STR_TO_DATE(out_date,'%Y%m%d %H%i%s') out_date,
+		        IFNULL(case when trans_amount<=0 then abs(trans_amount) end,0) out_amount,
+		        IFNULL(case when trans_amount>=0 then trans_amount end,0) in_amount,balance,sub_trans_code,freeze_balance
+		        FROM ep_account_log t
+	    ]]>
+		        <dynamic prepend="WHERE">
+		            <isNotEmpty prepend="AND" property="accountNo">
+		                TRANS_ACCOUNT =#accountNo#
+		            </isNotEmpty>
+		            <isNotEmpty prepend="AND" property="transDateStart">
+		                <![CDATA[TRANS_DATE >= #transDateStart#]]>
+		            </isNotEmpty>
+		            <isNotEmpty prepend="AND" property="transDateEnd">
+		                <![CDATA[TRANS_DATE < #transDateEnd#+1]]>
+		            </isNotEmpty>
+		            <isNotEmpty prepend="AND" property="subTransCode">
+		                  sub_trans_code = #subTransCode#
+		            </isNotEmpty>
+		        </dynamic>
+		<![CDATA[
+		        order by t.trans_dt desc
+		        LIMIT #startRow#,#endRow#
+        ]]>
+   </select>
+
+   <select id="accountLog-searchLogByAccountNo-count" parameterClass="java.util.Map" resultClass="int">
+       <![CDATA[
+		        SELECT count(*) FROM ep_account_log
+        ]]>
+        <dynamic prepend="WHERE">
+            <isNotEmpty prepend="AND" property="accountNo">
+                TRANS_ACCOUNT =#accountNo#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="transDateStart">
+                <![CDATA[TRANS_DATE >= #transDateStart#]]>
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="transDateEnd">
+                <![CDATA[TRANS_DATE < #transDateEnd#+1]]>
+            </isNotEmpty>
+		    <isNotEmpty prepend="AND" property="subTransCode">
+		          sub_trans_code = #subTransCode#
+		    </isNotEmpty>
+        </dynamic>
+   </select>
+
+   <!-- 网站沉淀资金变动表 数据搜索 -->
+   <select id="accountLog-searchAccumulationLogByDate-query" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+       <![CDATA[
+		        SELECT b.user_id,
+		               a.trans_code,
+		               a.sub_trans_code,
+		               a.balance,
+		               DATE_FORMAT(a.trans_dt,'%Y-%m-%d') trans_dt,
+		               IFNULL(case when a.trans_amount<=0 then abs(trans_amount) end,0) out_amount,
+		               IFNULL(case when a.trans_amount>=0 then trans_amount end,0) in_amount
+		        FROM ep_account_log a,ep_account b
+		        where b.account_no = a.trans_account
+		        	   and a.TRANS_CODE in ('4003', '5003')
+					   and (a.account_type = 1 or a.account_type = 2)
+					   and a.trans_date >= #startDate#
+                       and a.trans_date < #endDate#+1
+	    ]]>
+		<![CDATA[
+		        order by a.ID desc
+		        LIMIT #startRow#,#endRow#
+        ]]>
+   </select>
+
+   <!-- 网站沉淀资金变动表 数据 统计 -->
+   <select id="accountLog-searchAccumulationLogByDate-count" parameterClass="java.util.Map" resultClass="int">
+       <![CDATA[SELECT count(*)
+		        FROM ep_account_log a
+		        where  a.TRANS_CODE in ('4003', '5003')
+					   and (a.account_type = 1 or a.account_type = 2)
+					   and a.trans_date >= #startDate#
+                       and a.trans_date < #endDate#+1
+	    ]]>
+   </select>
+
+	<select id="getBalanceChangeReportByDate" resultMap="balanceChangeResult">
+	<![CDATA[
+	
+		select a.ID,a.TRANS_DATE, a.TRANS_OUT_ORDER_NO, a.SUB_TRANS_CODE, a.TRANS_AMOUNT
+		  from ep_account_log a
+		 where a.trans_date >= #beginDate#
+		   and a.trans_date < #endDate#+1
+		   and a.sub_trans_code in ('600102', '600202', '301101', '301102')
+		   and a.trans_account = '11185601000000009999'
+		 order by a.TRANS_OUT_ORDER_NO, a.trans_dt
+		 LIMIT #startRow#,#endRow#
+	 ]]>
+	</select>
+
+	<select id="getBalanceChangeReportByDateCount" resultClass="java.lang.Integer">
+	<![CDATA[
+	select count(*) as value from ep_account_log a
+		 where a.trans_date >= #beginDate#
+		   and a.trans_date < #endDate#+1
+		   and a.sub_trans_code in ('600102', '600202', '301101', '301102')
+		   and a.trans_account = '11185601000000009999'
+		 order by a.TRANS_OUT_ORDER_NO, a.trans_dt
+	]]>
+	</select>
+
+	<select id="getBalanceChangeReportByOutOrderNo" resultMap="balanceChangeResult">
+	<![CDATA[
+	select a.ID,a.TRANS_DATE, a.TRANS_OUT_ORDER_NO, a.SUB_TRANS_CODE, a.TRANS_AMOUNT
+	  from ep_account_log a
+	where a.sub_trans_code in ('600102', '600202', '301101', '301102')
+	   and a.trans_account = '11185601000000009999'
+	and a.TRANS_OUT_ORDER_NO=#transOutOrderNo#
+	 order by a.TRANS_OUT_ORDER_NO, a.trans_dt
+	]]>
+	</select>
+</sqlMap>

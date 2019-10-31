@@ -1,0 +1,268 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+<div class="main">
+  <div class="formBox">
+ <form action="/goods/promation.html"  method="post" name="theForm" >
+  <div class="content">
+  <table width="100%" id="mybody" name="mybody">
+  <input type="hidden"  name="attribute.id"  value="$!attribute.id">
+  <input type="hidden"  name="amount"  value="">
+  <input type="hidden"  id="editFlag"  value="$!editFlag" />
+  <input type="hidden"  id="errorFlag" value="$!errorMsg"/>
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span></span>套餐类型:</td>
+        <td>全场金额满就减金额</td>
+      </tr>
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐名称:</td>
+        <td>
+			#springBind("promation.name")
+           <input type="text" id="attrName" name="${status.expression}"  size="30"   value="$!{status.value}"></input>
+		   <label class="red">${status.errorMessage}</label>
+        </td>
+      </tr>
+	  <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐时间:</td>
+        <td>
+		      <input name="startDateStr" id="startDateStr" size="10" readonly="true"/>
+						        <select name="promation.startDate_hour" id="hourStart">
+						         <option  value="0">0</option>
+						         <option  value="1">1</option>
+						         <option  value="2">2</option>
+						         <option  value="3">3</option>
+						         <option  value="4">4</option>
+						         <option  value="5">5</option>
+						         <option  value="6">6</option>
+						         <option  value="7">7</option>
+						         <option  value="8">8</option>
+						         <option  value="9">9</option>
+						         <option  value="10">10</option>
+						         <option  value="11">11</option>
+						         <option  value="12">12</option>
+						         <option  value="13">13</option>
+						         <option  value="14">14</option>
+						         <option  value="15">15</option>
+						         <option  value="16">16</option>
+						         <option  value="17">17</option>
+						         <option  value="18">18</option>
+						         <option  value="19">19</option>
+						         <option  value="20">20</option>
+						         <option  value="21">21</option>
+						         <option  value="22">22</option>
+						         <option  value="23">23</option>
+						</select> 
+			<label>到</label>
+			<input name="endDateStr" id="endDateStr" size="10" readonly="true"/>
+									  <select name="promation.endDate_hour" id="hourEnd">
+						         <option  value="0">0</option>
+						         <option  value="1">1</option>
+						         <option  value="2">2</option>
+						         <option  value="3">3</option>
+						         <option  value="4">4</option>
+						         <option  value="5">5</option>
+						         <option  value="6">6</option>
+						         <option  value="7">7</option>
+						         <option  value="8">8</option>
+						         <option  value="9">9</option>
+						         <option  value="10">10</option>
+						         <option  value="11">11</option>
+						         <option  value="12">12</option>
+						         <option  value="13">13</option>
+						         <option  value="14">14</option>
+						         <option  value="15">15</option>
+						         <option  value="16">16</option>
+						         <option  value="17">17</option>
+						         <option  value="18">18</option>
+						         <option  value="19">19</option>
+						         <option  value="20">20</option>
+						         <option  value="21">21</option>
+						         <option  value="22">22</option>
+						         <option  value="23">23</option>
+						</select> 
+			  
+			</td>
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "startDateStr",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "endDateStr",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+      </tr>
+      
+	    <tr>
+        <td class="label"></td>
+        <td align="left">
+        <input type="button" id="btnSubmit" value="添加条件" class="button" onclick="addMyRow();" />
+        <input type="button" id="btnSubmit" value="删除最后一条" class="button" onclick="delMyRow();" /></td>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:100px;font-weight:bold;font-size:14px;"><span></span>商品范围:</td>
+        <td align="left">
+          <input type="checkbox"  name="attribute.isIndex"  value="0"  onclick="return false" checked/>全场
+        </td>
+      </tr>
+      </table>
+	</div>
+  </form>
+	<div class="form-but">
+		<button type="button"  class="button-s4" onClick="addFullReduce()">确定</button>
+		<button type="reset" class="button-s4" onClick="resetForm();">重置</button>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">   
+        //全局变量   
+        var i=0;   
+        
+        //添加行   
+        function addMyRow(){  
+       		 var dom="";
+        	  if(i>10){
+       			 			return false;
+       			 } 
+       		  else if(i<0){
+       			 i=0;}
+       			 
+       		var arrays=new Array("一","二","三","四","五","六","七","八","九","十");
+       		dom="第"+arrays[i];
+            var mytable = document.getElementById("mybody");   
+            var mytr = mytable.insertRow(4+i);  
+            mytr.setAttribute("id","tr"+i); 
+            var mytd_1=mytr.insertCell(0);  
+	        mytd_1.innerHTML="<span style='color:red'>*</span>"+dom+": ";   
+            mytd_1.className="label";
+
+            var mytd_2=mytr.insertCell(1);  
+            var name0 = "money0"+i;
+             var name1 = "money1"+i;
+            var name2 = "money2"+i;
+            var ih = "价格   <input   type='text'  id='"+name0+"' name='"+name0+"'  size='10'> 到 <input   type='text'  id='"+name1+"' name='"+name1+"'  size='10'>   减   <input   type='text'  id='"+name2+"' name='"+name2+"'  size='10'>";
+           // var ih = "价格   <input   type='text'  id='aaa'>";
+            mytd_2.innerHTML=ih;
+            i++; 
+         
+        }   
+        //删除当前行   
+        function delMyRow(){  
+        
+            if(i<0)
+            	return false;
+            else if(i>0)i--;   
+            
+            var mytable = document.getElementById("mybody");   
+            var myrow = document.getElementById("tr"+i);   
+            mytable.deleteRow(myrow.rowIndex);   
+        }   
+        //删除所有行   
+        function delAllMyRow(){
+            var mytable = document.getElementById("mybody");   
+            var rowlen=mytable.rows.length;   
+            for(var i=rowlen-1;i>=0;i--){   
+                mytable.deleteRow(i);   
+            }   
+        }   
+        function addFullReduce(){
+         var money = 0;
+        	 var name=document.getElementById("attrName").value;
+             if(name==null||name==""){
+              alert("套餐名称不能为空");
+              return false;
+              }
+              var  startDate =  document.getElementById("startDateStr").value;
+              var  endDate =  document.getElementById("endDateStr").value;
+              var hourEnd =  document.getElementById("hourEnd").value;
+              var hourStart =  document.getElementById("hourStart").value;
+              if(startDate==null||startDate==""){
+              alert("起始时间不能为空");
+              return false;
+              }
+              if(endDate==null||endDate==""){
+              alert("结束时间不能为空");
+              return false;
+              }
+              if(startDate>endDate){
+              alert("起始时间不能大于结束时间");
+              return false;
+              }
+              else if(startDate==endDate){
+              	    if(hourEnd*1<=hourStart){
+              	    alert("起始时间不能大于等于结束时间");
+              		return false;
+              	   }
+              }
+	          if(i==0){
+	          alert("最少添加一个条件！");
+	          return false;
+	          }
+	           for( j=0;j<i;j++){
+	            var name0 = "money0"+j;
+            	var name1 = "money1"+j;
+            	var name2 = "money2"+j;
+               	var  money0 =  document.getElementById(name0).value;
+                var  money1 =  document.getElementById(name1).value;
+                var  money2 =  document.getElementById(name2).value;
+                if(money0==null||money0==""||money1==null||money1==""||money2==null||money2=="")
+                {
+                alert("条件中价格不能为空");
+                return false;
+                }
+                 var re = /^[0-9]+[0-9]*]*$/;   
+                 
+                 
+               if(!re.test(money0)){
+                 alert("条件中价格必须为整数");
+                 document.getElementById(name0).value="0";
+                return false;
+                }
+               if(!re.test(money1)){
+                alert("条件中价格必须为整数");
+                document.getElementById(name1).value="0";
+                return false;
+                }
+                if(!re.test(money2)){
+                document.getElementById(name2).value="0";
+                alert("条件中减去价格必须为整数");
+                return false;
+                }
+                if(money1*1 <= money0*1){
+                alert("条件中价格区间不明确");
+                return false;
+                }
+                if(money0*1 < money*1){
+                 alert("后一个条件的起始价格不能超过前一条件的最高价格");
+                 return false;
+                }
+                else{
+                money=money1;
+	                }
+	              if(j==i-1&&money*1>=1000000){
+	                 alert("条件中价格区间必须小于1000000");
+	                 document.getElementById(name1).value="0";
+                 return false;
+	                }
+	          }
+	          document.theForm.amount.value=i;
+	          document.theForm.submit();
+        }   
+		
+			
+	function resetForm(){
+	  document.theForm.reset();
+	}
+        
+       
+        </script>  
+
+</div>

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="OrderSQL">
+	<typeAlias alias="order" type="com.huaixuan.network.biz.domain.trade.Order"/>
+	<resultMap class="com.huaixuan.network.biz.domain.trade.Order" id="orderResult">
+		<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="package_id" property="packageId"/>
+		<result column="goods_title" property="goodsTitle"/>
+		<result column="goods_number" property="goodsNumber"/>
+		<result column="goods_price" property="goodsPrice" nullValue="0"/>
+		<result column="goods_price_sc" property="goodsPriceSc" nullValue="0"/>
+		<result column="market_price" property="marketPrice" nullValue="0"/>
+		<result column="goods_attr" property="goodsAttr"/>
+		<result column="refund_stauts" property="refundStauts"/>
+		<result column="good_weight" property="goodWeight"/>
+		<result column="shipping_amount" property="shippingAmount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="buy_attr" property="buyAttr"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="agent_sell_price" property="agentSellPrice" nullValue="0"/>
+		<result column="order_type" property="orderType" nullValue="0"/>
+
+	</resultMap>
+	<resultMap id="orderList" class="order" >
+	   	<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="goods_title" property="goodsTitle"/>
+		<result column="goods_sn" property="goodsSn"/>
+		<result column="buy_attr" property="buyAttr"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="status" property="status"/>
+		<result column="goods_number" property="goodsNumber"/>
+		<result column="buy_nick" property="buyNick"/>
+		<result column="buy_id" property="buyId"/>
+   </resultMap>
+    <resultMap id="orderListExtend" class="order" extends="orderList">
+   		<result column="goods_instance_id" property="goodsInstanceId" />
+   		<result column="dep_first_id" property="depFirstId" />
+   		<result column="goods_price" property="goodsPrice" nullValue="0"/>
+   	</resultMap>
+	<resultMap id="orderJoinTradeResult" class="order"
+		extends="orderResult">
+		<result column="tid" select="getTradeByTid" property="trade" />
+	</resultMap>
+	<resultMap id="orderListResult" class="order">
+	    <result column="goods_instance_id" property="goodsInstanceId" />
+		<result column="goods_number" property="goodsNumber" />
+		<result column="attrs" property="goodsAttr" />
+	</resultMap>
+	<resultMap id="orderSalesSum" class="order">
+	    <result column="sales_sum" property="salesSum" nullValue="0"/>
+	</resultMap>
+<!-- create Order object -->
+<insert id="addOrder" parameterClass="order">
+<![CDATA[
+insert into emall_order
+  (id,
+   tid,
+   goods_id,
+   package_id,
+   goods_title,
+   goods_number,
+   goods_price,
+   market_price,
+   goods_attr,
+   refund_stauts,
+   good_weight,
+   shipping_amount,
+   gmt_create,
+   gmt_modify,
+   buy_attr,
+   goods_instance_id,
+   agent_sell_price,
+   order_type)
+values
+  (null,
+   #tid#,
+   #goodsId#,
+   #packageId#,
+   #goodsTitle#,
+   #goodsNumber#,
+   #goodsPrice#,
+   #marketPrice#,
+   #goodsAttr#,
+   #refundStauts#,
+   #goodWeight#,
+   #shippingAmount#,
+   sysdate(),
+   sysdate(),
+   #buyAttr#,
+   #goodsInstanceId#,
+   #agentSellPrice#,
+   #orderType#)
+
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Order object -->
+<update id="editOrder" parameterClass="order">
+<![CDATA[
+		update emall_order set tid = #tid#,
+		goods_id = #goodsId#,
+		package_id = #packageId#,
+		goods_title = #goodsTitle#,
+		goods_number = #goodsNumber#,
+		goods_price = #goodsPrice#,
+		market_price = #marketPrice#,
+		goods_attr = #goodsAttr#,
+		refund_stauts = #refundStauts#,
+		good_weight = #goodWeight#,
+		shipping_amount = #shippingAmount#,
+		agent_sell_price=#agentSellPrice#,
+		gmt_modify = sysdate()
+		 where id = #id#
+]]>
+</update>
+<!-- delete Order object -->
+<delete id="removeOrder" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_order where emall_order.ID = #value#
+]]>
+</delete>
+<!-- search Order object -->
+<select id="getOrder" parameterClass="java.lang.Long" resultMap="orderResult">
+<![CDATA[
+		select emall_order.* from emall_order where emall_order.ID = #value#
+]]>
+</select>
+<!-- searchAll Order List -->
+<select id="getOrders" resultMap="orderResult">
+<![CDATA[
+		select emall_order.* from emall_order
+]]>
+</select>
+<select id="getOrdersByGoodsId" parameterClass="java.lang.Long" resultMap="orderJoinTradeResult">
+<![CDATA[
+		select emall_order.* from emall_order where emall_order.goods_id = #value#
+		order by emall_order.gmt_create desc
+]]>
+</select>
+
+<!-- getOrdersByParameterMap Order List -->
+<select id="getOrdersByParameterMap" resultMap="orderResult">
+<![CDATA[
+		select emall_order.* from emall_order
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			tid = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsId">
+			goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="packageId">
+			package_id = #packageId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsTitle">
+			goods_title = #goodsTitle#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsNumber">
+			goods_number = #goodsNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsPrice">
+			goods_price = #goodsPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="marketPrice">
+			market_price = #marketPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsAttr">
+			goods_attr = #goodsAttr#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="refundStauts">
+			refund_stauts = #refundStauts#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodWeight">
+			good_weight = #goodWeight#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shippingAmount">
+			shipping_amount = #shippingAmount#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = #gmtCreate#
+		</isNotEmpty>
+		order by id desc
+
+</select>
+
+
+<!-- added by chenhang 2010/12/02 started -->
+<select id="getDepNameByMap" parameterClass="java.util.Map" resultClass="java.lang.String" >
+<![CDATA[
+select distinct h.name as  from
+(select d.name,p.out_dep_id from ioss_depository d,ioss_dep_location l,
+(select t.* from ioss_prod_relation_out t where t.out_dep_id=#outDepId# and t.goods_instance_id=#goodsInstanceId#) p where
+   p.loc_id=l.id
+ and l.dep_id=d.id ) h
+ ]]>
+</select>
+
+<!-- added by chenhang 2010/12/02 ended   -->
+<!-- modified by chenhang 2011/02/11 started   -->
+<select id="getOrdersByParameterMapQuery" resultMap="orderListExtend" parameterClass="com.huaixuan.network.biz.query.OrderListQuery">
+	
+<![CDATA[
+   select emall_goods.goods_sn,
+       emall_order.tid,
+       emall_order.goods_title,
+       emall_order.id,
+       replace(emall_order.buy_attr,'=',':') as buy_attr,
+       emall_order.goods_number,
+       emall_order.goods_price,
+       emall_order.gmt_create,
+       emall_order.goods_instance_id,
+       emall_trade.status,
+       emall_trade.buy_nick,
+       emall_trade.buy_id,
+       emall_trade.dep_first_id
+  from emall_order, emall_goods, emall_trade
+ where emall_order.goods_id = emall_goods.id
+   and emall_trade.tid = emall_order.tid
+]]>
+		<isNotEmpty prepend="and" property="goodsSn">
+			emall_goods.goods_sn like CONCAT('%',#goodsSn#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsName">
+			emall_order.goods_title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+          <![CDATA[ emall_order.gmt_create >  STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+         <![CDATA[ emall_order.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			emall_trade.status = #status#
+		</isNotEmpty>
+		order by emall_order.gmt_create desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+<!-- modified by chenhang 2011/02/11 ended   -->
+<select id="getOrdersByParameterMapCount" resultClass="java.lang.Integer" parameterClass="com.huaixuan.network.biz.query.OrderListQuery">
+<![CDATA[
+		select count(emall_order.id) from emall_order,emall_goods,emall_trade
+		where emall_order.goods_id=emall_goods.id and emall_trade.tid=emall_order.tid
+]]>
+		<isNotEmpty prepend="and" property="goodsSn">
+			emall_goods.goods_sn like CONCAT('%',#goodsSn#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsName">
+			emall_order.goods_title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+          <![CDATA[ emall_order.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+         <![CDATA[ emall_order.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			emall_trade.status = #status#
+		</isNotEmpty>
+</select>
+
+<select id="getOrdersNotInPackage" resultMap="orderResult" parameterClass="string">
+	select emall_order.*
+	  from emall_order
+	 where emall_order.tid = #value#
+	   and emall_order.package_id is null
+	 order by emall_order.goods_id desc, emall_order.id asc
+</select>
+
+
+<select id="getOrdersListByRefundId" resultMap="orderResult">
+<![CDATA[
+		select a.* from emall_order a ,emall_refund_order b
+		where b.refund_id = #refundId#
+		    and b.order_id = a.id
+]]>
+</select>
+
+<select id="getOrdersListByTid" resultMap="orderResult">
+<![CDATA[
+		select emall_order.* from emall_order where emall_order.tid = #value#
+		order by emall_order.gmt_create desc
+]]>
+</select>
+
+<select id="getOrdersByDate" resultMap="orderListResult" parameterClass="java.util.Map">
+	
+<![CDATA[
+		select o.goods_instance_id ,sum(o.goods_number)as goods_number,i.attrs from emall_order o,ioss_goods_instance i
+		where 1=1   and o.goods_instance_id = i.id
+		 ]]>
+        <isNotEmpty prepend="and" property="startTime">
+<![CDATA[			o.gmt_create >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			o.gmt_create < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+<![CDATA[			i.code like CONCAT('%',#instanceCode#,'%')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+<![CDATA[			i.instance_name like CONCAT('%',#instanceName#,'%') ]]>
+		</isNotEmpty>
+
+		 group by o.goods_instance_id,i.attrs
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getOrdersCountByDate" resultClass="int" parameterClass="java.util.Map">
+<![CDATA[
+SELECT COUNT(1) FROM(
+		select count(1) from emall_order o,ioss_goods_instance i where 1=1
+		and o.goods_instance_id=i.id
+		 ]]>
+        <isNotEmpty prepend="and" property="startTime">
+<![CDATA[			o.gmt_create >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			o.gmt_create < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+<![CDATA[			i.code=#instanceCode#  ]]>
+		</isNotEmpty>
+			<isNotEmpty prepend="and" property="instanceName">
+<![CDATA[			i.instance_name=#instanceName#  ]]>
+		</isNotEmpty>
+		group by o.goods_instance_id) aa
+</select>
+
+<update id="updateGoodsPriceById" parameterClass="java.util.Map">
+	update emall_order set gmt_modify = sysdate(),goods_price=#goodsPrice# where id=#id#
+</update>
+
+<select id="getSalesSumByGoodsInstanceId" parameterClass="java.lang.Long" resultMap="orderSalesSum">
+    select sum(eo.goods_number) as sales_sum
+      from emall_order eo, emall_trade et
+     where eo.goods_instance_id = #value#
+       and eo.tid = et.tid
+       and et.status in ('wait_buyer_confirm_goods', 'trade_finish')
+</select>
+
+
+<delete id="deleteOrderByIdProduct" parameterClass="java.util.Map">
+	DELETE FROM emall_order_product 
+	WHERE  productId  = #productId# 
+	AND orderId = #orderId# 
+</delete>
+
+<delete id="deleteOrderByOrderId" parameterClass="java.lang.Long">
+	DELETE FROM emall_order_product 
+	WHERE  orderId = #orderId#
+</delete>
+</sqlMap>

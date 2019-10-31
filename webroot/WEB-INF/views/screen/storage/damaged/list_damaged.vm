@@ -1,0 +1,178 @@
+#set($layout = "layout/default.vm")
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<center >
+		<div id="result" style="color:red;">$!message</div>
+	</center>
+  <form action="/storage/damaged/list_damaged.html" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>报残单查询</span></h3>
+		<table>
+			<tr>
+    <th>报残单号：</th>
+			<td><input type="text" name="damagedCode" id="damagedCode" value="$!{damagedQuery.damagedCode}" size="15" theme="simple" maxlength="30"  />
+			</td>
+	<th>状态：</th>
+    <td><select name="status" id="status" theme="simple">
+						<option value="">-=请选择=-</option>
+						#foreach($s in $enumDamagedStatus.entrySet())
+							<option value="$!{s.key}" #if($!{damagedQuery.status} == ${s.key}) selected="true" #end>$!{s.value}</option>
+						#end
+                    </select>
+	</td>
+	<th>制单人：</th>
+		<td><select name="creater" id="creater" >
+			<option value="">-=请选择=-</option>
+			#**
+         #foreach($userInfo in $userLists)
+            <option value="$!{userInfo.account}" #if("$!{damageParMap.creater}" == "${userInfo.account}") selected="true" #end>$!{userInfo.account}</option>
+		 #end
+		 *#
+		 #foreach($userInfo in $userList)
+				<option value="$!{userInfo.userName}" #if("$!{damagedQuery.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+			#end
+        </select>
+		</td>
+	<th>经手人：</th>
+		<td><select name="agent" id="agent" >
+			<option value="">-=请选择=-</option>
+         ##foreach($userInfo in $userLists)
+          ##  <option value="$!{userInfo.account}" #if("$!{damageParMap.agent}" == "${userInfo.account}") selected="true" #end>$!{userInfo.account}</option>
+         ###end
+		 #foreach($userInfo in $userList)
+				<option value="$!{userInfo.userName}" #if("$!{damagedQuery.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+			#end
+        </select>
+		</td>
+
+            </tr>
+		<tr>
+			<th>一级仓库：</th>
+			<td><select name="depFirstId" id="depFirstId" style="width:100px;">
+				#if($!depositoryFirstList)
+				  #if($depositoryFirstList.size() == 0 )
+					<option value="">您没有权限</option>
+				  #else
+					#if($depositoryFirstList.size() > 1 )
+						<option value="">-=请选择=-</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+						<option value="$depfirst.id" #if("$depfirst.id"=="$damagedQuery.depFirstId") selected #end>$depfirst.depFirstName</option>
+					#end
+				  #end
+				#else
+					<option value="">您没有权限</option>
+				#end
+            </select>
+		</td>
+	<th>报残时间：</th>
+	   <td colspan="2"><input type="text" name="damagedTimeStart" id="damagedTimeStart" value="$!damagedQuery.damagedTimeStart" size="10" theme="simple" readonly="true" />
+		-
+		<input type="text" name="damagedTimeEnd" id="damagedTimeEnd" value="$!damagedQuery.damagedTimeEnd" size="10" theme="simple" readonly="true" />
+	   </td>
+		     <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "damagedTimeStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "damagedTimeEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+
+            <th><input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/></th>
+        	#if($query.items.size() > 0)
+            <td><input type="button" value="Excel导出" class="btn" onclick="doExport();"/></td>
+        	#end
+            </tr>
+    	</table>
+		</div>
+	</form>
+
+	<div class="tool">
+        <span><a href="${appServer}/storage/damaged/addDamagedPage.html" hidefocus="true" class="bt_add">新增报残单</a></span>
+    </div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox">
+	<h3><span>报残单列表</span></h3>
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>报残单号</th>
+        <th>报残时间</th>
+        		<th>一级仓库</th>
+		<th>仓库</th>
+        <th>状态</th>
+        <th>制单人</th>
+		<th>经手人</th>
+		<th>创建时间</th>
+		<th>修改时间</th>
+      </tr>
+   #if($query)
+      #foreach($dam in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td  align="left">&nbsp;<a href="searchDamagedDetail.html?damagedId=$!dam.id">$!dam.damagedCode</a></td>
+        <td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!dam.gmtDamaged)&nbsp;</td>
+        		<td  align="left">&nbsp;$!depositoryNameMap.get($!dam.depfirstId)</td>
+		<td  align="left">&nbsp;$!dam.depName</td>
+		<td  align="center">&nbsp;$!enumDamagedStatus.get("${dam.status}")</td>
+		<td  align="left">&nbsp;$!dam.creater</td>
+		<td  align="left">&nbsp;$!dam.agent</td>
+		<td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!dam.gmtCreate)&nbsp;</td>
+		<td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!dam.gmtModify)&nbsp;</td>
+      </tr>
+	  #end
+   #end
+    </table>
+	  </div>
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/damaged/list_damaged.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+    </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var dateStart1str=document.getElementById("damagedTimeStart").value;
+    		var dateEnd1str=document.getElementById("damagedTimeEnd").value;
+    		var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+    		if(e_date1 < b_date1){
+    			alert("报残起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("damagedCode").value=jQuery.trim(document.getElementById("damagedCode").value);
+			document.getElementById("status").value=jQuery.trim(document.getElementById("status").value);
+			document.getElementById("creater").value=jQuery.trim(document.getElementById("creater").value);
+			document.getElementById("agent").value=jQuery.trim(document.getElementById("agent").value);
+	    	document.getElementById("damagedTimeStart").value=jQuery.trim(document.getElementById("damagedTimeStart").value);
+	    	document.getElementById("damagedTimeEnd").value=jQuery.trim(document.getElementById("damagedTimeEnd").value);
+
+        	document.forms[0].submit();
+	    }
+
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="exportDamagedList.html";
+		form1.submit();
+		form1.action="/storage/damaged/list_damaged.html";
+	}
+</script>
+</body>

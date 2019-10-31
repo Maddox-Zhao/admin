@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="false" lazyLoadingEnabled="false" maxRequests="3000"
+		maxSessions="3000" maxTransactions="3000" useStatementNamespaces="false" />
+	<sqlMap resource="ibatis2_blank_mapping.xml" />
+	<sqlMap resource="com/huaixuan/network/biz/domain/account/basesqlmap.xml" />
+	<!-- <sqlMap resource="sqlmap/AccountLogSQL.xml" />
+	<sqlMap resource="sqlmap/AccountSQL.xml" />
+	<sqlMap resource="sqlmap/FreezeBalanceLogSQL.xml" />
+	<sqlMap resource="sqlmap/GeneralAccounLogSQL.xml" />
+	<sqlMap resource="sqlmap/GeneralAccountSQL.xml" />
+	<sqlMap resource="sqlmap/TransLogSQL.xml" />  -->
+</sqlMapConfig>

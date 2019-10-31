@@ -1,0 +1,258 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心—— 缺货订单管理展示")
+
+<body>
+	
+<div class="main">
+#if("$query.tradeType" != "fx")
+    <h2>管理中心——缺货订单管理展示</h2>
+	<div class="mag-t2" id="modifySuccess" #if("$!message"=="")style="display:none"#end>$!message</div>
+#end
+
+
+	<form action="$appServer.get("/trade/showStockoutList.html")" name="searchForm" method="post" id="searchForm">
+    	<input type="hidden" name="orderType" id="orderType"  value="$!orderType"></input>
+    	<input type="hidden" name="tradeType" id="tradeType"  value="$!tradeType"></input>
+    
+    	<div class="searchBox">
+    		<h3><span>搜索订单</span></h3>
+    		<table>
+    			<tr>
+    				<th>订单编号：</th>
+    				<td>
+    					#springBind("query.tid")
+    					<input type="text" id="query.tid" name="${status.expression}" value="$!{status.value}" class="inp inp-w80" />
+    				</td>
+    				<th>买家昵称：</th>
+    				<td>
+    					#springBind("query.buyNick")
+    					<input type="text" id="query.buyNick" name="${status.expression}" value="$!{status.value}" class="inp inp-w80" />
+    				</td>
+    				<th>下单时间：</th>
+    				<td>
+    					#springBind("query.gmtCreateStart")
+    					<input type="text" id="query.gmtCreateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					-
+    					#springBind("query.gmtCreateEnd")
+    					<input type="text" id="query.gmtCreateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					<script type="text/javascript">
+    						Calendar.setup({
+    							inputField : "query.gmtCreateStart",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    						Calendar.setup({
+    							inputField : "query.gmtCreateEnd",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    					</script>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td colspan="6">
+    					<button type="button" class="btn" onclick="formSubmit();">查询</button>
+    					<button type="button" class="btn" onclick="clean();">重置</button>
+    				</td>
+    			</tr>
+    		</table>
+    	</div>
+
+    	#if($trade)
+    	<div align="right">
+    		<font size='4'><strong><label>【 汇总: </label></strong></font>
+    		<font size='4' color='red'><strong><label>${trade.id}</label></strong></font>
+    		<font size='4'><strong><label>笔&nbsp;&nbsp;&nbsp;总金额: </label></strong></font>
+    		<font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney(${trade.goodsAmountSum}, '0.00')</label></strong></font>
+    		<font size='4'><strong><label>元 】</label></strong></font>
+    	</div>
+    	#end
+    	
+    	<!-- 订单列表 -->
+    	<div class="listBox">
+    		<h3><span>订单列表</span></h3>
+    		<table>
+    			<tr>
+    				<th><input name="checkall" type="checkbox"/>全选</th>
+    				<th>订单号</th>
+    				<th>下单时间</th>
+    				<th>买家昵称</th>
+    				<th>总金额(元)</th>
+    				<th>付款时间</th>
+    				<th>支付方式</th>
+    				<th>订单状态</th>
+    				<th>仓库名称</th>
+    				#if("$!{orderType}"=="w")
+    				<th>订单类型</th>
+    				<th>客服状态</th>
+    				#end
+    				<th>操作</th>
+    			</tr>
+    		#foreach($trade in $page.items)
+    			<tr #if($velocityCount % 2 == 0) class="bg" #end>
+    				<td><input name="ids" type="checkbox" value="$!trade.tid"/></td>
+    				<td>
+    				#if(${trade.tradeType} == 2)
+    					<img title="拍拍同步订单" alt="拍拍同步订单" src="$imageServer/images/icon/paipai.png" width="15" height="15"/>
+    				#elseif(${trade.tradeType} == 3)
+    					<img title="淘宝同步订单" alt="淘宝同步订单" src="$imageServer/images/icon/taobao.png" width="15" height="15"/>
+    				#end
+    					<a href="$appServer.get("/trade/stockoutDetail.html").addQueryData("tradeId", $trade.tid)">$!trade.tid</a>
+    				</td>
+    				<td>
+    					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!trade.gmtCreate)&nbsp;
+    				</td>
+    				<td>
+    					<a href="$!appServer.get("/user/userDetail.html").addQueryData("userId", $trade.buyId)">$!trade.buyNick</a>
+    				</td>
+    				<td align="right">
+    					￥
+    					<span id='trade_amount_$!trade.id'>
+    						$!moneyUtil.getFormatMoney($math.add($trade.goodsAmount, $trade.shippingAmount), '0.00')
+    					</span>
+    					#*
+    						#if("$!trade.status" == "wait_buyer_pay")
+    							￥
+    							<span id='trade_amount_edit_$!trade.id'>
+    								<input type="text" name="newTradeAmount" value="$!moneyUtil.getFormatMoney($!trade.amount,'0.00')" id="newTradeAmount_$!trade.id"  title="点击修改订单总金额" onchange="editTradeAmount('$!trade.id',$!moneyUtil.getFormatMoney($!trade.amount,'0.00'));" size="10" maxLength="11"/>
+    							</span>
+    						#else
+    								<input type="hidden" name="newTradeAmount" value="$!moneyUtil.getFormatMoney($!trade.amount,'0.00')" id="newTradeAmount_$!trade.id"/>
+    						#end
+    					*#
+    				</td>
+    				<td>
+    					<span id='pay_time_$!trade.id'>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!trade.payTime)</span>
+    				</td>
+    				<td>
+    					$!enumExpressDistPaymentMap.get($!trade.expressPayment)
+    				</td>
+    				<td>
+    					<span id='trade_status_$!trade.id'>
+    					#if("$!trade.status" == "trade_close")
+    						缺货
+    					#end
+    					</span>
+    				</td>
+    				<td>
+    					<span id='trade_dep_first_id'>$!depositoryNameMap.get($!trade.depFirstId)</span>
+    				</td>
+    				#if("${query.orderType}" == "w")
+    				<td>
+    					#if("$trade.isWholesale" == "w")批发#else代销#end
+    				</td>
+    				<td>
+    					#if($!trade.wholesaleStatus=="confirmed")
+    						已确认
+    					#elseif($!trade.wholesaleStatus=="wait_confirm")
+    						待确认
+    					#end
+    				</td>
+    				#end
+    				<td>
+    					<a href="$appServer.get("/trade/stockoutDetail.html").addQueryData("tradeId", $trade.tid)">查看</a>
+    				</td>
+    			</tr>
+    		#end
+    		</table>
+    		
+    		#if($page.items.size() > 0)
+    			#if($adminAccess.has("A_STOCKOUT_TRADE_CLOSE_USER"))
+        		<span>
+    				<input type="button" value="批量关闭订单" class="button" onclick="closeTradeBat();"/>
+            	</span>
+				#end
+    		#end
+    	</div>
+	</form>
+
+	<!-- 分页 -->
+	#if($page.items.size() > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/trade/showStockoutList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+	#else
+		没有结果！
+	#end
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+    jQuery().ready(function(){
+    	jQuery("input[name=checkall][type=checkbox]").click(function(){
+    		var checked = this.checked;
+    		jQuery("input[name=ids][type=checkbox]").each(function(){
+    			this.checked = checked;
+    		});
+    	});
+    	jQuery("input[name=ids][type=checkbox]").click(function(){
+    		var checked = true;
+    		jQuery("input[name=ids][type=checkbox]").each(function(){
+    			if(!this.checked){
+    				checked = false;
+    			}
+    		});
+    		jQuery("input[name=checkall][type=checkbox]").attr("checked",checked);
+    	});
+    });
+
+    function selectTradeId(relationIds){
+    	var ids='';
+     	jQuery("input[name="+relationIds+"][type=checkbox]").each(function(){
+    		if(this.checked){
+                ids=ids+this.value+',';
+            }
+    	});
+        return ids;
+    }
+
+    function closeTradeBat(){
+       	var slectId=selectTradeId('ids');
+       	if(slectId==''){
+         	alert("请选择要关闭的订单！");
+            return false;
+       	}
+       	var dateStart= document.getElementById('query.gmtCreateStart').value.replace(/-/g, "/");
+    	var dateEnd= document.getElementById('query.gmtCreateEnd').value.replace(/-/g, "/");
+    	var b_date=new Date(Date.parse(dateStart));
+    	var e_date=new Date(Date.parse(dateEnd));
+    	if(e_date < b_date){
+    		document.getElementById('query.gmtCreateStart').value="";
+    		document.getElementById('query.gmtCreateEnd').value="";
+    	}
+		
+		jQuery('#query.tid').val(jQuery.trim(jQuery('#query.tid').val()));
+		jQuery('#query.buyNick').val(jQuery.trim(jQuery('#query.buyNick').val()));
+		jQuery('#query.gmtCreateStart').val(jQuery.trim(jQuery('#query.gmtCreateStart').val()));
+		jQuery('#query.gmtCreateEnd').val(jQuery.trim(jQuery('#query.gmtCreateEnd').val()));
+
+       	document.forms[0].action = "$appServer.get("trade/closeStockoutTrade.html")";
+       	document.forms[0].submit();
+       	document.forms[0].action = "$appServer.get("/trade/showStockoutList.html")";
+    }
+
+	function formSubmit(){
+		var dateStart= document.getElementById('query.gmtCreateStart').value.replace(/-/g, "/");
+		var dateEnd= document.getElementById('query.gmtCreateEnd').value.replace(/-/g, "/");
+		var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+
+		jQuery('#query.tid').val(jQuery.trim(jQuery('#query.tid').val()));
+		jQuery('#query.buyNick').val(jQuery.trim(jQuery('#query.buyNick').val()));
+		jQuery('#query.gmtCreateStart').val(jQuery.trim(jQuery('#query.gmtCreateStart').val()));
+		jQuery('#query.gmtCreateEnd').val(jQuery.trim(jQuery('#query.gmtCreateEnd').val()));
+
+		document.forms[0].submit();
+	}
+
+	function clean(){
+		document.getElementById('query.tid').value='';
+		document.getElementById('query.buyNick').value='';
+		document.getElementById('query.gmtCreateStart').value='';
+		document.getElementById('query.gmtCreateEnd').value='';
+	}
+
+</script>

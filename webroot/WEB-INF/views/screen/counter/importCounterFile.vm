@@ -1,0 +1,96 @@
+#set($layout = 'layout\default.vm')
+#set($title = "对账管理 - 对账文件导入")
+<div class="main">
+
+<h2>对账文件导入</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>对账文件导入</span></h3>
+		    <form  name="theForm"  action="/counter/importCounterFile.html" method="post" enctype="multipart/form-data" >
+    <table>
+      <tr>
+
+
+
+
+
+
+
+
+
+
+
+			 #if($!{counterAccountAlipayFileExtentionError}) <font color="red"><B>$!{counterAccountAlipayFileExtentionError}</B></font> #end
+#if($!{counterAccountTenpayFileExtentionError}) <font color="red"><B>$!{counterAccountTenpayFileExtentionError}</B></font> #end
+#if($!{counterAccountChinabankFileExtentionError}) <font color="red"><B>$!{counterAccountChinabankFileExtentionError}</B></font> #end
+			 #if($!{counterAccountPostFileExtentionError}) <font color="red"><B>$!{counterAccountPostFileExtentionError}</B></font> #end
+			 #if($!{counterAccountTerminalFileExtentionError}) <font color="red"><B>$!{counterAccountTerminalFileExtentionError}</B></font> #end
+			 #if($!{counterAccountJsPointFileExtentionError}) <font color="red"><B>$!{counterAccountJsPointFileExtentionError}</B></font> #end
+             #if($!{counterAccountIcbcFileExtentionError}) <font color="red"><B>$!{counterAccountIcbcFileExtentionError}</B></font> #end
+			 #if($!{counterAccountOtherFileExtentionError}) <font color="red"><B>$!{counterAccountOtherFileExtentionError}</B></font> #end
+			 #if($!{counterAccountFileContentTypeError}) <font color="red"><B>$!{counterAccountFileContentTypeError}</B></font> #end
+
+		<td >选择对账类型：</td>
+		<td ><select name="compareAccountType" id="compareAccountType">
+				  <option value="" selected="selected">请选择</option>
+				  <option value="ICBC">中国工商银行</option>
+				  <option value="CCB">中国建设银行</option>
+				  <option value="CMB">招商银行</option>
+				  <option value="ABC">中国农业银行</option>
+				  <option value="CIB">兴业银行</option>
+				  <option value="SPDB">上海浦东发展银行</option>
+				  <option value="GDB">广东发展银行</option>
+				  <option value="SDB">深圳发展银行</option>
+				  <option value="CITIC">中信银行</option>
+				  <option value="ALIPAY">支付宝</option>
+				  <option value="POST">中国邮政</option>
+				  <option value="TENPAY">财付通</option>
+				  <option value="CHINABANK">网银在线</option>
+				  </select>
+				  #if($!{counterTypeInfoError}) <font color="red"><B>$!{counterTypeInfoError}</B></font> #end
+					</td>
+	</tr>
+	<tr>
+		<td >请选择对账文件：</td>
+		<td ><input type="file" name="compareAccountFile" size="35" />
+					 #if($!{counterAccountFileInfoError}) <font color="red"><B>$!{counterAccountFileInfoError}</B></font> #end
+					</td>
+	</tr>
+
+</table>
+<input name="" value="确定" type="submit" class="button">
+<input name="" value="取消" type="reset" class="button" onclick="window.location.href='addImportCounterFilePage.html'"/>
+
+</div>
+</form>
+</div>
+
+#if($!counterOutPintMessage)
+<div class="tab-div">
+  <table cellpadding="0" cellspacing="0">
+	<tr>
+	<td>
+                批次号:$!counterOutPintMessage.batchId  <br>
+                文件名:$!counterOutPintMessage.accountFileName  <br>
+                对账类型:
+                #if($!counterOutPintMessage.blankName=="TENPAY")
+                    财付通
+                #elseif($!counterOutPintMessage.blankName=="CHINABANK")
+                    网银在线
+                #elseif($!counterOutPintMessage.blankName=="ALIPAY")
+                    支付宝
+                #end
+                  <br>
+                导入成功条数:$!counterOutPintMessage.importSuccessCount  <br>
+                导入失败条数:$!counterOutPintMessage.importFailCount  <br>
+                导入失败明细:<br>
+                   #foreach($failDescription in $counterOutPintMessage.failDescriptionListu)
+                   	      $!failDescription<br>
+                   #end
+        </td>
+	</tr>
+
+</table>
+</div>
+#end
+

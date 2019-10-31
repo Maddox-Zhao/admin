@@ -1,0 +1,330 @@
+#parse("/velocity/taglibs.vm")
+<head>
+<title>管理中心 - 报残单新增 </title>
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css"  href="${ctx}/styles/${appConfig.get('csstheme')}/std_notice.css" />
+
+<script type="text/javascript" src="${ctx}/scripts/jquery.js"></script>
+
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+</head>
+
+<body>
+	<h1>
+		<span class="action-span"><a href="searchDamagedList.html">报残单列表</a></span>
+		<span class="action-span1"><a href="$request.getContextPath()/igc/index.html">管理中心</a> - 新增报残单 </span>
+		<div style="clear: both;"></div>
+		<div class="success_min" id="modifySuccess" style="display:none">修改合计成本成功</div>
+		<div class="warning_min" id="modifyError" style="display:none">修改合计失败</div>
+		<div class="success_min" id="modifyAmountSuccess" style="display:none">修改数量成功</div>
+		<div class="warning_min" id="modifyAmountError" style="display:none">修改数量失败</div>
+		<div class="success_min" id="modifyUnitCostSuccess" style="display:none">修改单价成本成功</div>
+		<div class="warning_min" id="modifyUnitCostError" style="display:none">修改单价成本失败</div>
+		#if($message)
+				#if($message == "edit")
+			<div class="warning_min" id="massage">报残单不是新建或验收不通过状态，不能执行编辑操作！</div>
+				#end
+		#end
+		<div style="clear: both;"></div>
+	</h1>
+	<script src="images/calendar" type="text/javascript"></script>
+	<link href="styles/calendar.css" type="text/css" rel="stylesheet">
+<div class="list-div" style="margin-bottom: 5px">
+
+	<table width="100%" cellpadding="3" cellspacing="1">
+			<tbody>
+				<tr>
+    			    <th colspan="4"  scope="col">报残单信息</th>
+    			</tr>
+				<tr>
+				<td class="label">报残单号</td>
+				<td>$!{damaged.damagedCode}</td>
+
+				<td class="label">仓库</td>
+				<td>$!{damaged.depName}</td>
+				</tr>
+
+				<tr>
+				<td class="label">报残时间</td>
+				<td>$!date.format("yyyy-MM-dd",$!{damaged.gmtDamaged})</td>
+
+				<td class="label">状态</td>
+				<td>$!enumDamagedStatus.get("${damaged.status}")</td>
+				</tr>
+
+				<tr>
+				<td class="label">制单人</td>
+				<td>$!{damaged.creater}</td>
+
+				<td class="label">经手人</td>
+				<td>$!{damaged.agent}</td>
+				</tr>
+
+				<tr>
+				<td class="label">创建时间</td>
+				<td>$!date.format('yyyy-MM-dd',${damaged.gmtCreate})</td>
+
+				<td class="label">修改时间</td>
+				<td>$!date.format('yyyy-MM-dd',${damaged.gmtModify})</td>
+				</tr>
+
+				<tr>
+				<td class="label">备注</td>
+				<td colspan="3"><textarea cols="80" rows="3" id="damaged.remark" name="damaged.remark" readonly="readonly">$!{damaged.remark}</textarea></td>
+
+				</tr>
+			</tbody>
+		</table>
+</div>
+<form  name="form1"  action="" method="post">
+	<input type="hidden" id="damagedId" name="damagedId" value="$!{damaged.id}"/>
+<div class="clearing"></div>
+  <div class="list-div" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+		<tr>
+    		<th colspan="14"  scope="col">报残产品列表</th>
+		</tr>
+      <tr>
+        <th>产品编码</th>
+        <th>产品名称</th>
+        <th>类目</th>
+        <th>属性</th>
+		<th>品牌</th>
+		<th>供应商</th>
+		<th>库位</th>
+		<th>批次</th>
+        <th>单位</th>
+		<th>数量</th>
+		<th>单位成本</th>
+		<th>合计成本</th>
+		<th>备注</th>
+		<th>操作</th>
+      </tr>
+	#if($damagedDetailViews)
+      #foreach($dam in $damagedDetailViews)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+         <td>&nbsp;$!dam.goodsCode</td>
+         <td>&nbsp;$!dam.goodsName</td>
+         <td title="$!dam.catCode">&nbsp;
+			#if ($!dam.catCode.length()<20)
+				$!dam.catCode
+			#else
+				$!controlUtil.getNoticesTitle($!dam.catCode,20)
+			#end
+		 </td>
+         <td title="$!dam.attrs">&nbsp;
+			#if ($!dam.attrs.length()<20)
+				$!dam.attrs
+			#else
+				$!controlUtil.getNoticesTitle($!dam.attrs,20)
+			#end
+		 </td>
+		 <td>&nbsp;$!dam.brandName</td>
+		 <td>&nbsp;$!dam.supplierName</td>
+		 <td>&nbsp;$!dam.locName</td>
+		 <td>&nbsp;$!dam.batchNum</td>
+		 <td>&nbsp;$!dam.unit</td>
+		 <td>&nbsp;
+			<input type="text" name="newAmount" value="$!dam.amount" id="newAmount_$!dam.id" size="6" maxLength="20" readonly=true/>
+         </td>
+		 <td>
+			￥<span id='damaged_unitCost_edit_$!dam.id'>
+				<input type="text" name="newUnitCost" value="$!moneyUtil.getFormatMoney($!dam.unitCost,'0.00')" id="newUnitCost_$!dam.id"  title="点击修改单位成本" onchange="editDwrUnitCost('$!dam.id',$!moneyUtil.getFormatMoney($!dam.unitCost,'0.00'));" size="10" maxLength="16"/>
+			</span>
+		 </td>
+         <td  class="r" align="right">
+			￥<span id='damaged_costCount_edit_$!dam.id'>
+				<input type="text" name="newCostCount" value="$!moneyUtil.getFormatMoney($!dam.costCount,'0.00')" id="newCostCount_$!dam.id"  title="点击修改合计成本" onchange="editDwrCostCount('$!dam.id',$!moneyUtil.getFormatMoney($!dam.costCount,'0.00'));" size="10" maxLength="16"/>
+			</span>
+         </td>
+		 <td title="$!dam.remark">&nbsp;
+			#if ($!dam.remark.length()<10)
+				$!dam.remark
+			#else
+				$!controlUtil.getNoticesTitle($!dam.remark,10)
+			#end
+		 </td>
+         <td  align="center">
+        	<a href="javascript:deleteGoods($!dam.id);">删除</a>&nbsp;
+         </td>
+      </tr>
+	  #end
+	#end
+    </table>
+    <!-- 分页 -->
+    #if($damagedDetailViews.size() == 0)
+		没有结果！
+    #end
+
+	<h1>
+		<span class="action-span"><a href="javascript:addGoods();">新增报残产品</a></span>
+	</h1>
+ </div>
+  <div align="center">
+	#if($damagedDetailViews.size() != 0)
+		&nbsp;&nbsp;<input type="button" name="finish" value=" 提交审核 " onclick="javascript:finished();"/>
+    #end
+ </div>
+ </form>
+ <script language="javascript" type="text/javascript">
+ 	function addGoods(){
+		document.form1.action = "searchStorageGoods.html?actionType=add";
+		document.form1.submit();
+	}
+
+ 	function deleteGoods(damId){
+  		var	mymes=confirm("确定删除报残商品？");
+		if(true==mymes){
+	  		document.form1.action = "deleteDamagedGoods.html?id="+damId+"&actionType=add";
+			document.form1.submit();
+	  	}
+	}
+
+	function finished(){
+		var amount;
+		var unitCost;
+		var costCount;
+
+		#if($damagedDetailViews)
+      		#foreach($goods in $damagedDetailViews)
+			amount = Number(document.getElementById("newAmount_$!goods.id").value);
+			costCount = Number(document.getElementById("newCostCount_$!goods.id").value);
+			unitCost = Number(document.getElementById("newUnitCost_$!goods.id").value);
+
+			if(amount == 0){
+				alert("报残产品[$!goods.goodsName]中的报残数量为空！");
+				return false;
+			}
+			if(costCount != (amount*unitCost)){
+				alert("报残产品[$!goods.goodsName]中的报残数量和单位成本的相乘结果不等于合计成本！");
+				return false;
+			}
+			#end
+		#end
+		if(true==confirm("点击提交审核后报残单将不能再被编辑，\r确定要将此报残单提交审核吗？")){
+			document.form1.action = "editDamagedAttribute.html?actionType=waitCheck";
+			document.form1.submit();
+		}
+	}
+
+	//DWR的方式修改单价成本
+	function editDwrUnitCost(goodsId,oldValue){
+		var newUnitCost=document.getElementById('newUnitCost_' + goodsId);
+		var newUnitCostValue=newUnitCost.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newUnitCostValue==null||newUnitCostValue.trim()==""){
+			alert("出错：您没有输入.");
+			newUnitCost.value=oldValue;
+			newUnitCost.select();
+            newUnitCost.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newUnitCostValue)){
+			alert("出错：您输入了不正确的成本单价.");
+			newUnitCost.value=oldValue;
+			newUnitCost.select();
+            newUnitCost.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newUnitCostValue>10000000000){
+			alert("出错：您输入的成本单价太大.");
+			newUnitCost.value=oldValue;
+			newUnitCost.select();
+            newUnitCost.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newUnitCostValue=parseFloat(newUnitCostValue);
+			jQuery.get('editDwrUnitCost.html',{param1:goodsId,param2:newUnitCostValue},function(message){callBackEditUnitCost(message,newUnitCost,goodsId);},'json');
+		}
+	}
+	function callBackEditUnitCost(msg,newUnitCost,goodsId){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValue = msg.substring(msg.indexOf("\',\'") + 3, msg.lastIndexOf("\']"));
+		var msgDiv=document.getElementById("modifyUnitCostSuccess");
+		var msgDiv2=document.getElementById("modifyUnitCostError");
+		var amount = document.getElementById('newAmount_' + goodsId).value;
+		var priceNum = Number(newUnitCost.value);
+		var amountNum = Number(amount);
+
+		if (msgType == 'true') {
+			msgDiv2.style.display="none";
+			msgDiv.style.display="";
+			document.getElementById('newCostCount_' + goodsId).value=(priceNum*amountNum).toFixed(2);
+		} else{
+			alert("修改成本单价失败!");
+			msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+	}
+
+	//DWR的方式修改合计成本
+	function editDwrCostCount(damId,oldValue){
+		var newCostCount=document.getElementById('newCostCount_' + damId);
+		var newCostCountValue=newCostCount.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newCostCountValue==null||newCostCountValue.trim()==""){
+			alert("出错：您没有输入.");
+			newCostCount.value=oldValue;
+			newCostCount.select();
+            newCostCount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newCostCountValue)){
+			alert("出错：您输入了不正确的合计成本.");
+			newCostCount.value=oldValue;
+			newCostCount.select();
+            newCostCount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newCostCountValue>10000000000){
+			alert("出错：您输入的合计成本太大.");
+			newCostCount.value=oldValue;
+			newCostCount.select();
+            newCostCount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newCostCountValue=parseFloat(newCostCountValue);
+			jQuery.get('editDwrCostCount.html',{param1:damId,param2:newCostCountValue},function(message){callBackEditCostCount(message,newCostCount);},'json');
+		}
+	}
+	function callBackEditCostCount(msg,newCostCount){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValue = msg.substring(msg.indexOf("\',\'") + 3, msg.lastIndexOf("\']"));
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if (msgType == 'true') {
+			msgDiv2.style.display="none";
+			msgDiv.style.display="";
+		} else{
+			alert("修改合计成本失败!");
+			msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+	function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00'
+              : ( (mnt*10 == Math.floor(mnt*10)) ?
+                       mnt + '0' : mnt);
+	}
+</script>
+</body>

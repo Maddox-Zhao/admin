@@ -1,0 +1,126 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>添加产品 </h2>
+	 	
+		#if($!message == "imgError")
+			<div class="mag-t2">
+					图片格式不正确或大于了200K！
+			</div>
+		#end
+		
+		 <center>
+		 <form action="add.html" id="saveConsignmentPro" name="saveConsignmentPro" method="post" enctype="multipart/form-data" onsubmit="return check()">
+				##寄卖号:
+				#springBind("consignmentPro.conId")
+			  <input type="hidden" name="${status.expression}" id="${status.expression}"  value="$!{status.value}" readonly="true"   class="inp inp-w105" /><br/><br/>
+			  
+			  寄卖编号：
+			  #springBind("consignmentPro.conCode")
+			  <input type="text" name="${status.expression}"  id="${status.expression}"  value="$!{status.value}" readonly="true" class="inp inp-w105" /><br/><br/>
+			  
+			    品&nbsp;&nbsp;牌：
+			  #springBind("consignmentPro.brandId")
+			  <select name="${status.expression}" id="${status.expression}" style="width:150px">
+					#foreach($brand in $brandList))
+							<option value="$!brand.id" class="inp inp-w105" style="width:150px">$!brand.brandName</option>
+					#end
+			  </select><br/><br/>
+			  
+			  
+			   品&nbsp;&nbsp;&nbsp;&nbsp;名：
+			  #springBind("consignmentPro.idSeries")
+			  <select name="${status.expression}" id="${status.expression}">
+					#foreach($series in ${seriesList.entrySet()})
+							<option value="$!series.key" class="inp inp-w105" size="10">&nbsp;&nbsp;$!{series.value}&nbsp;&nbsp;</option>
+					#end
+			  </select><br/><br/>
+			  
+			
+			  
+			   型号：
+			  #springBind("consignmentPro.type")
+			  <input type="text" name="${status.expression}"  id="${status.expression}" style="width:100px" value="$!{status.value}" class="inp inp-w105"  /><br/><br/>
+			  
+			  
+			  
+			  材质：
+			  #springBind("consignmentPro.material")
+			  <input type="text" name="${status.expression}" id="${status.expression}"  style="width:100px"  value="$!{status.value}" class="inp inp-w105" /><br/><br/>
+			  
+			
+			  颜色：
+			  #springBind("consignmentPro.color")
+			  <input type="text" name="${status.expression}" id="${status.expression}"  style="width:100px" value="$!{status.value}" class="inp inp-w105" /><br/><br/>
+			  
+			 
+			  
+			    
+			  价钱：
+			  #springBind("consignmentPro.price")
+			  <input type="text" name="${status.expression}"  id="${status.expression}"  style="width:100px" value="$!{status.value}" class="inp inp-w105" maxlength="10" onkeyup="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			  
+			 
+			  uuid：
+			  #springBind("consignmentPro.uuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}"  style="width:100px" class="inp inp-w105" maxlength="15" /><br/><br/>
+			  
+			    
+			  auuid：
+			  #springBind("consignmentPro.auuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}"  style="width:100px"class="inp inp-w105" maxlength="15" /><br/><br/>
+			  
+			    
+			  等级：
+			  #springBind("consignmentPro.level")
+			  <input type="text" name="${status.expression}"    value="$!{status.value}" style="width:100px" class="inp inp-w105" maxlength="10" /><br/><br/>
+			  
+			  图片：
+			  <input type="file" name="img"/><br/><br/>
+			    
+		<div class="form-but">
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="check()">确定</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.saveConsignmentPro.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/consignment/detail.html?id=$!{consignmentPro.conId}';">返回 </button>
+		</div>
+		
+</form>
+		 
+		 
+		 <br/>
+
+		 </center>
+    </div>
+<script type="text/javascript"> 
+function check()
+{
+	var material = jQuery("#material").val();
+	var type = jQuery("#type").val();
+	var color = jQuery("#color").val();
+	var price = jQuery("#price").val();
+	if(type == "")
+	{
+		alert("型号不能为空！");
+		return false;
+	}
+	if(price == "")
+	{
+		alert("价钱不能为空！");
+		return false;
+	}
+	if(isNaN(price))
+	{
+		alert("价钱必须为数字!")
+		return false;
+	}
+	document.getElementById("saveConsignmentPro").submit();
+}
+
+
+</script>

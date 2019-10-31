@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<!-- 表名:hx_moveframe_product -->
+<sqlMap namespace="moveframeProductDao">
+	<typeAlias alias="MoveFrameProduct" type="com.huaixuan.network.biz.domain.active.MoveframeProduct"/>
+	<typeAlias alias="MoveframeGoods" type="com.huaixuan.network.biz.domain.active.MoveframeGoods"/>
+	<typeAlias alias="MoveframeInstance" type="com.huaixuan.network.biz.domain.active.MoveframeInstance"/>
+	<typeAlias alias="MoveFrameLog"  type="com.huaixuan.network.biz.domain.active.MoveFrameLog"/>
+	<resultMap id="MoveFrameProductResult" class="MoveFrameProduct">
+		<result property="id" column="id"/>
+		<result property="moveframeId" column="moveframe_id"/>
+		<result property="productId" column="product_id"/>
+		<result property="goodsId" column="goods_id"/>
+		<result property="instanceId" column="instance_id"/>
+		<result property="note" column="note"/>
+		<result property="discountPrice" column="discount_price"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+		<result property="area" column="area"/>
+	</resultMap>
+	
+	<resultMap id="MoveframeGoodsResult" class="MoveframeGoods">
+		<result property="id" column="id"/>
+		<result property="moveframeId" column="moveframe_id"/>
+		<result property="goodsId" column="goods_id"/>
+		<result property="discountPrice" column="discount_price"/>
+		<result property="goodsNum" column="goods_num"/>
+		<result property="soldNum" column="sold_num"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	
+	<resultMap id="MoveframeInstanceResult" class="MoveframeInstance">
+		<result property="id" column="id"/>
+		<result property="moveframeId" column="moveframe_id"/>
+		<result property="goodsId" column="goods_id"/>
+		<result property="instanceId" column="instance_id"/>
+		<result property="instanceNum" column="instance_num"/>
+		<result property="soldNum" column="sold_num"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	
+	
+	<resultMap id="MoveframeLogResult" class="MoveFrameLog">
+		<result property="id" column="id"/>
+		<result property="moveframeId" column="moveframe_id"/>
+		<result property="note" column="note"/>
+		<result property="type" column="type"/>
+		<result property="isdeal" column="isDeal"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+		<result property="area" column="area"/>
+	</resultMap>
+	
+	
+	<resultMap id="MoveframeResult" class="com.huaixuan.network.biz.domain.active.MoveFrame">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="status" column="status"/>
+		<result property="area" column="area"/>
+		<result property="headAdminId" column="head_adminId"/>
+		<result property="note" column="note"/>
+		<result property="depCodes" column="dep_codes"/>
+		<result property="depNames" column="dep_names"/>
+		<result property="adminIds" column="admin_ids"/>
+		<result property="adminNames" column="admin_names"/>
+		<result property="customerIds" column="customer_ids"/>
+		<result property="customerRate" column="customer_rate"/>
+		<result property="customerType" column="customer_type"/>
+		<result property="amount" column="amount"/>
+		<result property="discountAmount" column="discount_amount"/>
+		<result property="soldAmount" column="sold_amount"/>
+		<result property="frameAmount" column="frame_amount"/>
+		<result property="productNum" column="product_num"/>
+		<result property="soldProduct" column="sold_product_num"/>
+		<result property="frameProduct" column="frame_product_num"/>
+		<result property="idcurrency" column="idCurrency"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+		<result property="gmtStart" column="gmt_start"/>
+		<result property="gmtEnd" column="gmt_end"/>
+	</resultMap>
+	
+	<sql id="MoveframeFields">
+			id,moveframe_id,product_id,goods_id,instance_id,note,discount_price,gmt_create,gmt_modify
+	</sql>
+	
+	
+	<!-- 根据活动框ID获取该客户所对应的活动产品 -->
+	<select id="getMoveFrameGoodsInfoByMoveFrameId" parameterClass="java.lang.Long" resultMap="MoveFrameProductResult">
+		SELECT id,moveframe_id,product_id,goods_id,instance_id,note,discount_price,gmt_create,gmt_modify,(SELECT `area` FROM hx_moveframe m WHERE m.id=g.moveframe_id) `area`
+		FROM 
+		hx_moveframe_product g
+		WHERE g.moveframe_id = #moveframeId#
+	</select>
+	
+	<!-- 根据客户ID得到他所对用的活动框ID -->
+	<select id="getMoveFrameIdsByCustomerId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		SELECT q.moveframe_id FROM hx_moveframe_user q,hx_moveframe m 
+		WHERE q.customer_id= #customerId# AND m.id = q.moveframe_id
+		AND m.status = 'open'
+	</select>
+	
+	<!-- 得到活动框的信息 -->
+	<select id="selectMoveframeById" parameterClass="java.lang.Long" resultMap="MoveframeResult">
+	SELECT mf.*
+	FROM 
+	hx_moveframe mf
+	WHERE mf.id =#moveframeId#	
+	</select>
+	
+	<select id="getHeaderEmail" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	SELECT email
+	FROM emall_admin a
+	WHERE a.user_name=(SELECT head_adminId FROM hx_moveframe m WHERE m.id = #moframeId#) LIMIT 1
+	</select>
+	
+	<!-- 通过ProductId得到MoveFramePoroduct（hx_moveframe_product）信息 -->
+	<select id="getMoveFrameProductsByPorductIdAndMfId" parameterClass="java.util.Map" resultMap="MoveFrameProductResult">
+		SELECT *,1 `area`
+		FROM
+		hx_moveframe_product
+		WHERE 
+		product_id = #productId#
+		AND
+		moveframe_id = #moveframeId#
+	</select>
+	
+	<select id="getMoveFrameProductsByPorductId" parameterClass="java.lang.Long" resultMap="MoveFrameProductResult">
+		SELECT *,1 `area`
+		FROM
+		hx_moveframe_product
+		WHERE 
+		product_id = #productId#
+	</select>
+	<!-- 通过goodsId和moveframeId得到moveFramGoods -->
+	<select id="getMoveFrameGoodsByGoodsIdAndMoveFramId" parameterClass="java.util.Map" resultMap="MoveframeGoodsResult">
+		SELECT * 
+		FROM 
+		hx_moveframe_goods
+		WHERE 
+		goods_id = #goodsId# AND
+		moveframe_id = #moveFrameId#
+	</select>
+	
+	<!-- 更新MoveFrameGoods -->
+	<update id="updateMoveFrameGoodsByMoveId" parameterClass="MoveframeGoods" >
+		update hx_moveframe_goods
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="moveframeId">
+				moveframe_id=#moveframeId#
+			</isNotNull>
+			<isNotNull prepend="," property="goodsId">
+				goods_id=#goodsId#
+			</isNotNull>
+			<isNotNull prepend="," property="discountPrice">
+				discount_price=#discountPrice#
+			</isNotNull>
+			<isNotNull prepend="," property="goodsNum">
+				goods_num=#goodsNum#
+			</isNotNull>
+			<isNotNull prepend="," property="soldNum">
+				sold_num=#soldNum#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtCreate">
+				gmt_create=#gmtCreate#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify=#gmtModify#
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+  </update>
+	
+	<!-- 通过goodsId和moveframeId和instanceId得到moveFramInstance（hx_moveframe_instance） -->
+	<select id="getMoveFrameInstanceByGoodsIdAndInstanceIdAndMfId" parameterClass="java.util.Map" resultMap="MoveframeInstanceResult">
+		SELECT * 
+		FROM 
+		hx_moveframe_instance
+		WHERE 
+		goods_id = #goodsId# AND
+		moveframe_id = #moveFrameId# AND
+		instance_id = #instanceId#
+	</select>
+	
+	
+	<!-- 通过instanceId得到moveFramInstance（hx_moveframe_instance） -->
+	<select id="getMoveFrameInstanceByInstanceId" parameterClass="java.lang.Long" resultMap="MoveframeInstanceResult">
+		SELECT * 
+		FROM 
+		hx_moveframe_instance
+		WHERE 
+		instance_id = #instanceId#
+	</select>
+	
+	<!-- 更新表hx_moveframe_instance -->
+	<update id="updateMoveFrameInstanceById" parameterClass="MoveframeInstance">
+		update hx_moveframe_instance
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="moveframeId">
+				moveframe_id=#moveframeId#
+			</isNotNull>
+			<isNotNull prepend="," property="goodsId">
+				goods_id=#goodsId#
+			</isNotNull>
+			<isNotNull prepend="," property="instanceId">
+				instance_id=#instanceId#
+			</isNotNull>
+			<isNotNull prepend="," property="instanceNum">
+				instance_num=#instanceNum#
+			</isNotNull>
+			<isNotNull prepend="," property="soldNum">
+				sold_num=#soldNum#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtCreate">
+				gmt_create=#gmtCreate#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify=#gmtModify#
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	
+	
+	<!--  得到未处理的添加的产品 -->
+	<select id="getMoveFrameProductByLog" resultMap="MoveFrameProductResult" parameterClass="java.util.Map">
+		SELECT mp.*,m.area
+		FROM 
+		hx_moveframe_product mp,hx_moveframe m
+		WHERE 
+		mp.product_id IN (
+		SELECT l.note 
+		FROM
+		hx_moveframe_log l
+		WHERE l.isDeal = 0
+		AND 
+		l.type = #type#
+		)
+		AND
+		m.id = mp.moveframe_id
+		AND m.area = #area#
+	</select>
+	
+	
+	<select id="selectNotDealLog" parameterClass="java.lang.Integer" resultMap="MoveframeLogResult">
+	SELECT
+	 l.*,(SELECT `area` FROM hx_moveframe WHERE id = l.moveframe_id)    AREA
+	FROM
+	hx_moveframe_log l
+	WHERE l.isDeal = 0
+	AND l.type = #type#
+	</select>
+		
+	<update id="updateLogDealStatus" parameterClass="java.util.Map">
+		UPDATE  hx_moveframe_log l SET l.isDeal = 1
+		WHERE l.note = #productId#
+		AND 
+		l.moveframe_id = #moveFrameId#
+		AND
+		l.type = #type#
+	</update>
+	
+	
+		
+	<insert id="insertMoveFrameLog" parameterClass="MoveFrameLog">
+		insert into hx_moveframe_log
+		values(null,#moveframeId#,1002001,#note#,4,default,sysdate(),sysdate())
+	</insert>
+</sqlMap>
+
+

@@ -1,0 +1,357 @@
+#set($layout = '')
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="loading">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta name="viewport" content="width=device-width, initial-scale=0.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<link rel="stylesheet" type="text/css" href="/phone/css/style1.css" />
+<link rel="stylesheet" type="text/css" href="/wap/style/form.css" />
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta content="telephone=no" name="format-detection">
+#set($isInstock = false) ##是否准入库
+#if($!{product.status}=="准入库")
+	#set($isInstock = true)
+#end
+
+#set($sizeNeed = false)
+#if("$product.seriesId" == "3" || "$product.seriesId" == "4" || "$product.seriesId" == "5" || "$product.seriesId" == "6")
+	#set($sizeNeed = true)
+#end
+
+
+#set($canUpdate = false)
+#set($canUpdateSKU = false)
+#set($canUpdateCost = false)
+#set($canUpdatePrice = false)
+#set($canShowCost = false)
+#if($!adminAccess.has('A_PRODUCT_UPDATE'))
+	#set($canUpdate = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_SKU_UPDATE'))
+	#set($canUpdateSKU = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_COST_UPDATE'))
+	#set($canUpdateCost = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_PRICE_UPDATE'))
+	#set($canUpdatePrice = true)
+#end
+#if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+	#set($canShowCost = true)
+#end
+<script>
+var logined = 0
+</script>
+<title>产品详情</title>
+</head>
+
+<body> 
+
+	<div id="header" class="head">
+		<div class="wrap">
+			<i class="menu_back"><a href="/m/product/productList.html"></a></i>
+			<div class="title">
+				<span class="title_d"  style="overflow: visible;"><p>产品详情</p></span>
+				<div class="clear"></div>
+			</div>
+ 
+		</div>
+	</div>
+	
+	<div id="container">
+		<div id="content">
+			<div style="height:1px"></div>
+						
+			<div id="works">
+				<div class="pd5">
+						<div class="clear"></div>
+						<div class="article_ct">
+							
+	<form id="main_form" action="#"  method="post" ccept-charset="utf-8">
+	
+							
+		 <div class="form_ctrl input_text"  >
+			  <img  id="picImg" src="$!{product.picture}"/>
+          </div>
+		  
+          <div class="form_ctrl input_text" title="idProduct">
+            <label class="ctrl_title">
+              idProduct
+            </label>
+            <input type="text" name="idProduct" class="form" placeholder="idProduct"   readonly="true" value="$!{product.idProduct}"   disabled="disabled"/>
+          </div>
+		  <div class="form_ctrl input_text" title="sku">
+            <label class="ctrl_title">
+              sku
+            </label>
+            <input type="text"   placeholder="sku" id="sku"   value="$!{product.sku}"   disabled="disabled"/>
+          </div>
+          <div class="form_ctrl form_select" title="品牌">
+            <label class="ctrl_title">
+              品牌
+            </label>
+            <select name="brandID" class="form" placeholder="品牌" #if(!$canUpdateSKU) disabled="disabled" #end>
+              #foreach($brandTemp in $brandList)
+              <option value="$brandTemp.id" #if( "$!{product.brandID}"=="$!brandTemp.id") selected #end>
+                $brandTemp.brandName
+              </option>
+              #end
+            </select>
+          </div>
+          <div class="form_ctrl form_select" title="品名">
+            <label class="ctrl_title">
+              品名
+            </label>	
+            <select name="seriesId" class="form" placeholder="品名" #if(!$canUpdateSKU) disabled="disabled" #end>
+              #foreach($seriesTemp in $sereisList)
+              <option value="$seriesTemp.id" #if( "$!{product.seriesId}"=="$!seriesTemp.id"
+              ) selected #end>
+                $seriesTemp.name
+              </option>
+              #end
+            </select>
+          </div>
+          
+          <div class="form_ctrl input_text" title="型号">
+            <label class="ctrl_title">
+              型号
+            </label>
+            <input type="text" name="type" #if(!$canUpdateSKU) disabled="disabled" #end vtype="required" class="form" value="$!{product.type}" placeholder="型号"
+            />
+          </div>
+          <div class="form_ctrl form_ctrl" title="材质">
+            <label class="ctrl_title">
+              材质
+            </label>
+            <input type="text" name="material" #if(!$canUpdateSKU) disabled="disabled" #end class="form" value="$!{product.material}" placeholder="材质" />
+          </div>
+          <div class="form_ctrl form_ctrl" title="颜色">
+            <label class="ctrl_title"> 颜色</label>
+            <input type="text" name="color" #if(!$canUpdateSKU) disabled="disabled" #end class="form" value="$!{product.color}"placeholder="颜色" />
+          </div>
+		  <div class="form_ctrl input_text" title="尺寸">
+            <label class="ctrl_title">尺寸</label>
+            <input id="sizeInput" style="-webkit-user-modify: read-write-plaintext-only" type="text" name="size"  #if(!$canUpdateSKU) disabled="disabled" #end class="form" #if($sizeNeed) vtype="required" #end value="$!{product.size}" placeholder="尺寸" />
+          </div>
+		   <div class="form_ctrl input_text" title="状态">
+            <label class="ctrl_title">状态</label>
+            <input type="text" id="pstatus" value="$!{product.status}" placeholder="状态" disabled="disabled" />
+          </div>
+		  
+		  
+		  <div class="form_ctrl input_text" title="位置">
+            <label class="ctrl_title">位置</label>
+            <input type="text"  value="$!{product.curSiteName}" placeholder="位置" disabled="disabled" />
+          </div>
+		  
+		  
+		  <div class="form_ctrl form_select" title="前位置">
+            <label class="ctrl_title">
+				前位置
+            </label>
+		   #foreach($site in $siteList)
+				#if("$!{site.id}"=="$!{product.idLastLocation}")
+				<input type="text"  value="$!{site.name}" placeholder="前位置" disabled="disabled" />
+				#end
+           #end
+   
+          </div>
+		  
+		  
+          <div class="form_ctrl form_select" title="客户群体">
+            <label class="ctrl_title">
+              客户群体
+            </label>
+            <select name="targetCustomers" class="form" placeholder="客户群体">
+              <option value="0" #if( "$!{product.targetCustomers}"=="0" ) selected #end>--选择--</option>
+              <option value="1" #if( "$!{product.targetCustomers}"=="1" ) selected #end>
+                男士
+              </option>
+              <option value="2" #if( "$!{product.targetCustomers}"=="2" ) selected #end>
+                女士
+              </option>
+              <option value="3" #if( "$!{product.targetCustomers}"=="3" ) selected #end>
+                中性
+              </option>
+            </select>
+          </div>
+         <div class="form_ctrl input_text"  title="名称"> 
+          <label class="ctrl_title">名称</label> 
+          <input type="text" name="name" class="form" value="$!{product.name}" placeholder="名称" /> 
+          </div>
+          <div class="form_ctrl input_text"   title="材质描述"> 
+          <label class="ctrl_title">材质描述</label> 
+          <input type="text" name="materialdes" class="form" value="$!{product.materialdes}" placeholder="材质描述" /> 
+          </div>
+          <div class="form_ctrl input_text"   title="颜色描述"> 
+          <label class="ctrl_title">颜色描述</label> 
+          <input type="text" name="colordes" class="form" value="$!{product.colordes}"  placeholder="颜色描述" /> 
+          </div>
+          <div class="form_ctrl input_text" id="6" title="长*宽*高"> 
+          <label class="ctrl_title">长*宽*高</label> 
+          <input type="text" name="sizedes" class="form" value="$!{product.sizedes}" placeholder="长*宽*高"  /> 
+          </div>
+     
+          <div class="form_ctrl input_text" title="uuid">
+            <label class="ctrl_title">
+              uuid
+            </label>
+            <input type="text" name="uuid" class="form" value="$!{product.uuid}" placeholder="uuid" />
+          </div>
+          <div class="form_ctrl input_text" title="auuid">
+            <label class="ctrl_title">
+              auuid
+            </label>
+            <input type="text" name="auuid" class="form" value="$!{product.auuid}" placeholder="auuid" />
+          </div>
+		  
+		  
+		  <div class="form_ctrl form_select"  title="类别"> 
+     <label class="ctrl_title">类别 </label> 
+	 <select name="secondHand"  vtype="required" placeholder="类别" #if(!$isInstock) disabled="disabled" #else class="form" #end>
+		 <option value="-1" #if($isInstock) selected #end> 采购产品</option>
+		 <option value="1" #if("$product.secondHand" == "1" && !$isInstock) selected #end>新品</option>
+		 <option value="2" #if("$product.secondHand" == "2" && !$isInstock) selected #end>二手</option>
+	 </select> 
+    </div>
+	
+	
+	<div class="form_ctrl form_select"  title="采购单号" #if(!$isInstock)  style="display:none" #end> 
+     <label class="ctrl_title" >采购单号</label> 
+	 <select name="idPurchase" #if($isInstock)  class="form" #end vtype="required" placeholder="采购单号" >
+		<option value="" >--选择--</option>
+		#foreach($purTemp in $purchaselifecycleList)
+			<option value="$purTemp.idPurchase"  #if("$!{purTemp.idPurchase}"=="$!product.idPurchase") selected #end >$!{purTemp.idPurchaseLifeCycle}</option>
+		#end
+	 </select> 
+    </div>
+	
+	
+	<div class="form_ctrl form_select"  title="供货商" #if($isInstock)  style="display:none"  #end> 
+     <label class="ctrl_title">供货商</label> 
+	 <select name="idSupply" vtype="required" placeholder="供货商" #if(!$isInstock)   disabled="disabled"  #end>
+			<option value="">--选择--</option>
+		 #foreach($supplierTemp in $supplierList)
+			#if("$!{supplierTemp.name}" != "")
+					<option value="$!{supplierTemp.id}"  #if("$!{supplierTemp.id}"=="$!product.idSupply") selected #end>$!{supplierTemp.name}</option>
+			#end
+		 #end
+	 </select> 
+    </div>
+		  
+		  
+		  <div class="form_ctrl form_select" title="真品卡">
+            <label class="ctrl_title">
+				真品卡
+            </label>
+			<select name="hasValidCard" class="form"  placeholder="真品卡"  >
+              <option value="0" #if("0"=="$!product.hasValidCard") selected #end>未制作</option>
+			  <option value="1" #if("1"=="$!product.hasValidCard") selected #end>已制作</option>
+            </select>
+          </div>
+		  
+          <div class="form_ctrl input_text" title="成本" #if(!$canShowCost) style="display:none" #end>
+            <label class="ctrl_title">
+              成本
+            </label>
+            <input style="width:40%" class="form" type="text" name="cost"  #if(!$canUpdateCost)  disabled="disabled" #end value="$!{product.cost}" placeholder="成本" vtype="required" />
+            <select style="width:20%" name="idCostCurrency" class="form" vtype="required" #if(!$canUpdateCost)  disabled="disabled" #end placeholder="成本币种">
+              <option value="2" #if( "$!{product.idCostCurrency}"=="2" ) selected #end>
+                EU
+              </option>
+              <option value="3" #if( "$!{product.idCostCurrency}"=="3" ) selected #end>
+                HKD
+              </option>
+              <option value="1" #if( "$!{product.idCostCurrency}"=="1" ) selected #end>
+                RMB
+              </option>
+              <option value="4" #if( "$!{product.idCostCurrency}"=="4" ) selected #end>
+               US
+              </option>
+            </select>
+          </div>
+          <div class="form_ctrl input_text" title="大陆价">
+            <label class="ctrl_title">
+              大陆价
+            </label>
+            <input type="text" #if(!$canUpdatePrice)  disabled="disabled" #end name="dlPrice" class="form" value="$!{product.dlPrice}"
+            placeholder="大陆价" vtype="required;float" />
+          </div>
+          <div class="form_ctrl input_text" title="欧洲价(EU)">
+            <label class="ctrl_title">
+              欧洲价
+            </label>
+            <input type="text" #if(!$canUpdatePrice)  disabled="disabled" #end name="euPrice" class="form" value="$!{product.euPrice}"
+            placeholder="欧洲价" vtype="required;float" />
+          </div>
+          <div class="form_ctrl input_text" title="代销价">
+            <label class="ctrl_title">
+              代销价
+            </label>
+            <input type="text" #if(!$canUpdatePrice)  disabled="disabled" #end name="dxPrice" class="form" value="$!{product.dxPrice}"
+            placeholder="代销价" vtype="required;float" />
+          </div>
+          <div class="form_ctrl input_text" title="尚美价">
+            <label class="ctrl_title">
+              尚美价
+            </label>
+            <input type="text" #if(!$canUpdatePrice)  disabled="disabled" #end name="smPrice" class="form" value="$!{product.smPrice}"
+            placeholder="尚美价" vtype="required;float" />
+          </div>
+          <div class="form_ctrl input_text" title="尚上价">
+            <label class="ctrl_title">
+              尚上价
+            </label>
+            <input type="text" #if(!$canUpdatePrice)  disabled="disabled" #end name="ssPrice" class="form" value="$!{product.ssPrice}"
+            placeholder="尚上价" vtype="required;float" />
+          </div>
+		  
+		  
+		  <div class="form_ctrl input_text" title="备注">
+            <label class="ctrl_title">
+					备注
+            </label>
+            <textarea   name="remark" class="form" value="$!{product.remark}" placeholder="备注"  />
+			</textarea>
+          </div>
+        </form>
+		
+		 <div class="form_ctrl form_submit"  title="点击下述按钮，提交信息。">
+			
+         
+		 <input type="submit"  #if($isInstock || !$canUpdate) style="display:none"  #end   name="submit"  id="updateProduct" value="更新" />
+		 
+		  #if($isInstock)
+			<input style="margin-top:10px" type="submit" name="submit"  id="product2Stock" value="确定入库" />
+		  #end
+        </div>
+		</div>
+		<div class="clear"></div>		
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	   
+	 
+	<div class="loading_dark"></div>
+	<div id="loading_mask">
+		<div class="loading_mask">
+			<ul class="anm">
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+		</div>
+	</div>
+	<script language="javascript" src="/phone/js/zepto.min.js"></script>
+	<script language="javascript" src="/phone/js/fx.js"></script>
+	<script language="javascript" src="/phone/js/script1.js"></script>
+
+</body>
+</html>

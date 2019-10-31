@@ -1,0 +1,561 @@
+#set($layout = '')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>订单列表</title>
+<!-- Sets initial viewport load and disables zooming  -->
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+<link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+<link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet.min.css">
+<link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet-theme-ios.css">
+<link rel="stylesheet" href="${imageServer}/wap/style/index.css">
+<script src="${imageServer}/wap/bower_components/ratchet/dist/js/ratchet.min.js"></script>
+<link type="text/css" rel="stylesheet" href="${imageServer}/wap/list/css/demo.css">
+<script src="${imageServer}/wap/list/js/jquery-1.8.2.min.js"></script>
+<script src="${imageServer}/wap/list/js/demo.js"></script>
+<style>
+html{padding:0px;margin:0px auto;-webkit-text-size-adjust:none;}
+body{background:#FFF;padding:0px;margin:0px auto;font-size:15px;color:#444;font-family:Helvetica,Microsoft YaHei,Microsoft JhengHei;}
+a{color:#444;text-decoration:none;}
+ol,ul,li,dl,dd,dt{padding:0;margin:0;list-style:none;}
+form,p{padding:0;margin:0;}
+i,em{font-style:normal;}
+textarea {resize:none}
+img{border:none;}
+.spanclass{display:none;}
+tr {height:50px;}
+.body {margin:0 auto;overflow:hidden;}
+.body{margin:0 10px;text-align:center;}
+.body img {max-width:60%;border: none;}
+.m-dt{width: 100%;height: 100%;overflow: hidden;display: none;}
+.m-dt .swipe-wrap,.m-dt .swipe-con{height: 100%;width: 100%;text-align: center;}
+.m-dt .pic{display:block;width: 100%;height: 100%;color: #fff;}
+.m-dt .pic:before,.m-dt a:before{display: inline-block;content:"";height: 100%;width: 0;vertical-align: middle;}
+.m-dt img{display:inline-block;max-width: 100%;max-height: 100%;width:auto;height:auto;vertical-align: middle;background:none;}
+.m-dt .slideBtm,.m-dt .slideTp{width:100%;height: 40px;line-height:40px;position: fixed;left:0;background:rgba(55,64,83,.5);overflow:hidden;}
+.m-dt .slideBtm{bottom: 0;}
+.m-dt .slideTp{top:0;}
+.m-dt .slideTp i{-webkit-transform:translate(0px, 0px) translateZ(0px);display:inline-block;width:30px;height:40px;float:left;}
+.m-dt .slideTp i::before{position: absolute;left: 10px;top: 50%;margin-top: -4px;content: "";width: 8px;height: 8px;border-width: 2px;overflow: hidden;border-color: transparent transparent #fff #fff;border-style: solid;-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);-o-transform: rotate(45deg);-ms-transform: rotate(45deg);transform: rotate(45deg);}
+.m-dt .swipe-num,.m-dt .swipe-cmtCount{color: #fff;font-size: 14px;}
+.m-dt .swipe-num{font-family:Arial, Helvetica, sans-serif;margin:0 30px;display:block;text-align:center;}
+.m-dt .swipe-cmtCount{float:right;width:30px;}
+.m-dt .swipe-cmtCount::after{position: absolute;right: 10px;top:50%;margin-top:-7px;content: "";width: 8px;height: 8px;border-width: 2px;overflow: hidden;border-color: transparent transparent #fff #fff;border-style: solid;-webkit-transform: rotate(-45deg);-moz-transform: rotate(-45deg);-o-transform: rotate(-45deg);-ms-transform: rotate(-45deg);transform: rotate(-45deg);}
+ 
+body{ margin:0 auto; font-size:12px;} 
+.data_list td{ width:100px;} 
+</style>
+<script type="text/javascript"> 
+    /* 当鼠标移到表格上是，当前一行背景变色 */ 
+    $(document).ready(function(){ 
+    $(".data_list tr td").mouseover(function(){ 
+    $(this).parent().find("td").css("background-color","#d5f4fe"); 
+    }); 
+    }) 
+    /* 当鼠标在表格上移动时，离开的那一行背景恢复 */ 
+    $(document).ready(function(){ 
+    $(".data_list tr td").mouseout(function(){ 
+    var bgc = $(this).parent().attr("bg"); 
+    $(this).parent().find("td").css("background-color",bgc); 
+    }); 
+    }) 
+    $(document).ready(function(){ 
+    var color="#ffeab3" 
+	/* 把背景色保存到属性中 */ 
+ 
+    $(".data_list tr:odd td").css("background-color",color); //改变偶数行背景色 
+    $(".data_list tr:odd").attr("bg",color); 
+    $(".data_list tr:even").attr("bg","#fff"); 
+ 
+    }) 
+</script>
+</head>
+<body >
+    <div id="main">
+        <header class="bar bar-nav" style="width:100%;">
+			<div id="main">
+            <a class="icon icon-left-nav pull-left" style="width:15%;" onClick="javascript:window.location.href='/m/index.html'"></a>
+            <form class="pull-right"  action="/m/order/list.html" id="orderList" style="width:85%;">
+                <input type="search" placeholder="订单号"   name="idorder"></input>
+            </form>
+			<!--
+            <a class="icon icon-search" onClick="formSubmithome()" style="right:none;left:5px;"></a>
+			-->
+        </header>
+        <div class="container bgwrite">
+            <!-- screening -->
+            <div class="screening">
+                <ul>
+                    <li class="meishi">
+						#if("$!idSellChannel" !="") 
+    						 #foreach($sc in $sellchannelList)
+                                #if($!sc.id == $idSellChannel)
+                                    $!sc.name
+                                #end
+							 #end
+							#else
+								渠道
+						#end
+                    </li>
+                    <li class="Regional">
+						#if("$!idSite" !="") 
+    						 #foreach($sc in $siteList)
+                                #if($!sc.id == $idSite)
+                                    $!sc.name
+                                #end
+							 #end
+							#else
+								地点
+						#end
+                        
+                    </li>
+                    <li class="Sort">
+						#if("$!status" !="")
+							#if($status == 0)
+								已付款
+							#elseif($status == 1)
+								未付款
+							#elseif($status == 2)
+								取消
+							#end
+						#else
+							状态
+						#end
+							 
+                    </li>
+                    <li class="Brand">
+						日期
+						#if("$!sellDateEnd" != "")
+							(1)
+						#end
+                        
+                    </li>
+                </ul>
+            </div>
+            <!-- End screening -->
+            <!-- grade -->
+            <div class="meishi22">
+                <ul class="meishia-w" id="meishia">
+                    <li onclick="checkSellchannel(this)" alt="">
+                        <div  class="all">全部</div>
+                    </li>
+                    #foreach($sc in $sellchannelList)
+                        #if($!sc.id != 31)
+                            <li onclick="checkSellchannel(this)" alt="$!sc.id">$!sc.name</li>
+                        #end
+                    #end  
+                </ul>
+            </div>
+            <div class="grade-eject">
+                <ul class="grade-w" id="gradew">
+                    <li onclick="checkSite(this)" alt="">全部</li>
+                    #foreach($site in $siteList)
+                        <li onclick="checkSite(this)" alt="$!site.id">$!site.name</li>
+                    #end
+                </ul>
+            </div>
+            <!-- End grade -->
+            <!-- Category -->
+            <div class="Sort-eject Sort-height">
+                <ul class="Sort-Sort" id="Sort-Sort">
+                    <li onclick="checkstatus(this)" alt="">全部</li>
+                    <li><a onclick = "checkstatus(this)"alt="0">已付款</a></li>
+					<li><a onclick = "checkstatus(this)"alt="1">未付款</a></li>
+                    <li><a onclick = "checkstatus(this)"alt="2">取消/部分取消</a></li>
+                </ul>
+            </div>
+            <!-- End Category -->
+            <!-- Category -->
+            <div class="Category-eject">
+                <ul class="Category-w" id="Categorytw">
+					<li >起止时间：
+					<input id="sellDateStart" style="width:150px;height:30px" name="sellDateStart" type="date"  format="yyyy-MM-dd" />——
+                    </li>
+					<li >
+					<input id="sellDateEnd" style="width:150px;height:30px" name="sellDateStart" type="date"  format="yyyy-MM-dd" />——
+                    </li>
+					<li >客户ID： 
+					<input id="idCustomer" style="width:150px;" name="idCustomer" type="text"   />
+                    </li>
+					<li> 订单总额: <span id="subTotal"> </span></li>
+					<li> 现金总额：<span id="cashTotal"> </span></li>
+						<li >
+                       <input type="submit" onclick="searchds()"></input>
+                        </li>
+                </ul>
+            </div>
+            <div class="clearfix" id="content" STYLE="margin-top:50px" style="width:100%">
+                <table  class="data_list" border="1"  cellpadding="0" cellspacing="0" width="100%";>
+                    <tr   align="center" bgcolor="#FFFFFF" style="height:80px; font-weight:bold">
+                        <td style="font-weight:bold">订单号</td>
+                        <td style="font-weight:bold">日期</td>
+                        <td style="font-weight:bold">总价</td>
+                        <td style="font-weight:bold">币种</td>
+                        <td style="font-weight:bold">状态</td>
+                        <td style="font-weight:bold">客户</td>
+                    </tr>
+                    #foreach($orderLists in $orderList)
+                        <tr align="center"  style="background-color: #fff" onClick="javascript:window.location.href='/m/order/getOrderByidorder.html?idorder=$orderLists.idorder'" >
+                            <td style="width:15%"> $orderLists.idorder </td>
+                            <td style="width:25%">  $!dateUtilHX.convertDateToString("yyyy-MM-dd",$!orderLists.date)</td>
+                            <td style="width:10%">$orderLists.subTotal</td>
+                            <td style="width:15%">$orderLists.currencyname</td>
+                            <td style="width:15%" class="judge">$orderLists.status</td>
+                            <td style="width:20%">$stringUtils.abbreviate($orderLists.customername, 8)</td>
+                        </tr>
+                    #end
+                </table>
+            </div>
+			
+			<div id="follow" style="text-align:center;">
+				#if(!$queryPage.isFirstPage())
+				  <a style="font-size:18px;" href="javascript:window.location.href='/m/order/list.html?$!{previousPage}'">上一页</a> </font>
+				#end
+				#if(!$queryPage.isLastPage())
+				  <a style="font-size:18px;" href="javascript:window.location.href='/m/order/list.html?$!{nextPage}'">下一页</a> </font>
+				#end
+				<!--
+			<div id="follow" style="text-align:center;"><font style="size:12px;">页面下拉自动加载内容</font></div>
+			-->
+<script type="text/javascript">
+var data= formatDate(new Date());
+var getMonthstartDate = document.getElementById("sellDateStart").value=data;
+var getMonthendDate = document.getElementById("sellDateEnd").value=data;
+function searchds()
+ {
+		var json = getObjectByUrl();
+		delete json.pageIndex;
+    	var start = document.getElementById("sellDateStart").value;
+		var end = document.getElementById("sellDateEnd").value;
+		var idCustomer = document.getElementById("idCustomer").value; 
+		json['sellDateStart'] = start;
+		json['sellDateEnd'] = end;	
+		json['idCustomer'] = idCustomer;
+		var resultUrl = getUrl(json);
+		window.location.href = "/m/order/list.html?" + resultUrl;
+		}
+//列表显示订单状态
+$(document).ready(function() {
+    $(".judge").each(function() {
+        if ($(this).html() == "0") {
+            $(this).html("已付款");
+        } else if ($(this).html() == "1") {
+            $(this).html("未付款");
+        } else if ($(this).html() == "2") {
+            $(this).html("部分取消/取消");
+        }
+    });
+});
+
+
+//url 参数转json对象
+function getObjectByUrl()
+{
+	var url = window.location.href;
+	var obj = {};
+	
+	var index = url.indexOf("?");
+    var param = url.substr(index + 1);
+    var paramArr = param.split("&");
+    for (var i = 0; i < paramArr.length; i++) 
+	{
+        var tempArr = paramArr[i].split("=");
+        if (tempArr.length == 2) 
+		{
+             var key =  tempArr[0];
+			 var val =  tempArr[1];
+			 obj[key] = val;
+        }
+	 }
+	 return obj;
+}
+
+
+//json对象转URL
+function getUrl(obj)
+{
+	var result = "";
+	for(var key in obj)
+	{
+		result += key + "=" + obj[key] + "&";
+	}
+	return result;
+}
+
+
+//搜索条件渠道选择查询
+function checkSellchannel(obj) {
+	var json = getObjectByUrl();
+	//当前选择的渠道
+	var idSellChannel = $(obj).attr('alt');
+	json['idSellChannel'] = idSellChannel;
+	delete json.pageIndex;
+
+	var resultUrl = getUrl(json);
+    window.location.href = "/m/order/list.html?" + resultUrl;
+}
+
+
+//搜索条件地点查询
+function checkSite(obj) {
+
+
+	var json = getObjectByUrl();
+	//当前选择的地点
+	var idSite = $(obj).attr('alt');
+	json['idSite'] = idSite;
+	delete json.pageIndex;
+
+	var resultUrl = getUrl(json);
+    window.location.href = "/m/order/list.html?" + resultUrl;
+}
+
+function formSubmithome() {
+    var form1 = document.getElementById('orderList');
+    form1.submit();
+}
+//搜索条件查询订单状态
+function checkstatus(obj) {
+
+	var json = getObjectByUrl();
+	
+	//当前选择的地点
+	var status = $(obj).attr('alt');
+	json['status'] = status;
+	delete json.pageIndex;
+
+	var resultUrl = getUrl(json);
+    window.location.href = "/m/order/list.html?" + resultUrl;
+  
+}
+
+
+//日期查找
+function checkdateByType(type) 
+{
+
+var json = getObjectByUrl();
+delete json.pageIndex;
+
+//type all-全部  day-当天 week-当周 month-当月
+var d = new Date();
+
+//默认当天
+var str = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+
+json['sellDateStart'] = str;
+json['sellDateEnd'] = str;
+
+if(type == 'all')
+{
+	delete json.sellDateStart;
+	delete json.sellDateEnd;
+}
+else if(type == 'week')
+{
+     var now=new Date();
+     var start=new Date();
+     var end=new Date();
+     var n=now.getDay();
+     start.setDate(now.getDate()-n+1);
+     end.setDate(now.getDate()-n+7);
+     start = start.getFullYear() + "-" + (start.getMonth()+1) + "-" + start.getDate(); 
+     end = end.getFullYear() + "-" + (end.getMonth()+1) + "-" + end.getDate();
+	 json['sellDateStart'] = start;
+	 json['sellDateEnd'] = end;
+	
+}
+else if(type == 'month')
+{
+	
+	
+	var getMonthStartDate = new Date(nowYear, nowMonth, 1);//获得本月开始时间
+    var getMonthStartDate =  formatDate(getMonthStartDate);
+    var getMonthEndDate = new Date(nowYear, nowMonth, getMonthDays(nowMonth));//获得本月结束时间
+    var getMonthEndDate =  formatDate(getMonthEndDate);
+    var sellDateStart = getMonthStartDate;//传入日期开始时间参数
+    var sellDateEnd = getMonthEndDate;//传入日期结束时间参数
+	 json['sellDateStart'] = sellDateStart;
+	 json['sellDateEnd'] = sellDateEnd;
+}
+var resultUrl = getUrl(json);
+window.location.href = "/m/order/list.html?" + resultUrl;
+
+}
+ 
+
+
+//格式化日期：yyyy-MM-dd
+function formatDate(date) {      
+    var myyear = date.getFullYear();     
+    var mymonth = date.getMonth()+1;     
+    var myweekday = date.getDate();      
+         
+    if(mymonth < 10){     
+        mymonth = "0" + mymonth;     
+    }      
+    if(myweekday < 10){     
+        myweekday = "0" + myweekday;     
+    }     
+    return (myyear+"-"+mymonth + "-" +  myweekday);      
+}
+
+
+var now = new Date();                    //当前日期
+var nowDayOfWeek = now.getDay();         //今天本周的第几天
+var nowDay = now.getDate();              //当前日
+var nowMonth = now.getMonth();           //当前月
+var nowYear = now.getYear();             //当前年
+nowYear += (nowYear < 2000) ? 1900 : 0; 
+
+//获得某月的天数
+function getMonthDays(myMonth){
+    var monthStartDate = new Date(nowYear, myMonth, 1);      
+    var monthEndDate = new Date(nowYear, myMonth + 1, 1);      
+    var   days   =   (monthEndDate   -   monthStartDate)/(1000   *   60   *   60   *   24);      
+    return   days;      
+}
+ 
+function strToDate(str) {
+ var tempStrs = str.split(" ");
+ var dateStrs = tempStrs[0].split("-");
+ var year = parseInt(dateStrs[0], 10);
+ var month = parseInt(dateStrs[1], 10) - 1;
+ var day = parseInt(dateStrs[2], 10);
+ var timeStrs = tempStrs[1].split("-");
+ var hour = parseInt(timeStrs [0], 10);
+ var minute = parseInt(timeStrs[1], 10) - 1;
+ var second = parseInt(timeStrs[2], 10);
+ var date = new Date(year, month, day, hour, minute, second);
+ return date;
+}
+
+//订单号查询
+function formSubmithome() {
+    var form1 = document.getElementById('orderList');
+    form1.submit();
+}
+
+
+function renderDates(date) {
+if (!date) return "";
+var d = new Date(parseInt(date));
+var da = formatDate(d, false);
+return da;
+}
+function formatDate(date, showTime) {
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var date = date.getDate();
+    var result = year + "-" + month + "-" + date;
+    if (showTime == true) {
+        result += " " + hour + ":" + minute + ":" + second;
+    }
+    return result;
+}
+
+function getTotalPrice()
+{
+	var url = window.location.href;
+	var arr = url.split("?");
+	var param1 = "";
+	if(arr.length >= 2)
+	{
+		param1 = arr[1];
+	}
+	var url = "/order1/getorderlistTotlPrice.html?"+param1;
+
+	//获取总金额
+	jQuery.get(url,function(text)
+	{
+			var arr = text.split(",");
+			document.getElementById("subTotal").innerHTML = arr[0];
+			document.getElementById("cashTotal").innerHTML = arr[1];
+	})
+}
+
+getTotalPrice();
+
+
+/*
+//下拉刷新
+	$(document).ready(function(){
+	var range = 400;
+	var totalnum = 0;
+	var totalheight = 0;
+	var pageIndex = 1;
+	var preSrollPos = 0;
+	var main = $("#content");
+	$(window).scroll(function(){
+	var srollPos = $(window).scrollTop();
+	totalheight = parseFloat($(window).height()) + parseFloat(srollPos);
+	 if(($(document).height()-range) <= totalheight && preSrollPos <= 0){
+	 	preSrollPos = srollPos;
+		jQuery.ajax({
+		url: '/m/order/orderlist.html',
+		dataType: "json",
+		data:"pageIndex="+pageIndex+"&idSellChannel=",
+		success:function(json){
+		var tempid=0;
+		var num = 1;
+		var array=json.data;
+		if(array.length == 0){
+			document.getElementById("follow").style.display= "none" 
+			}
+						   preSrollPos = 0;
+						   jQuery.each(array,
+	    				   function(){
+						   if(num <= array.length){
+						   var idorder = array[num-1].idorder;
+						   var date = array[num-1].date;
+						   var dates = renderDates(date);
+						   var subTotal = array[num-1].subTotal;
+						   var currencyname = array[num-1].currencyname;
+						   var status = array[num-1].status;
+						   var customername = array[num-1].customername;
+                		   var str = "<table class='data_list' border='1'  cellpadding='0' cellspacing='0' width='100%';>";
+						   str = str+"<tr align='center'  style='background-color: #ffeab3' onClick=javascript:window.location.href='/m/order/getOrderByidorder.html?idorder="+idorder+"'>";
+						   $('tr:even').css('background-color','#fff');
+                           str = str+"<td style='width:15%'>";
+                           str = str+"<a >"+idorder+"</a>";
+                           str = str+"</td>";
+                           str = str+"<td style='width:25%'>"+dates+"</td>";
+                           str = str+"<td style='width:10%'>"+subTotal+"</td>";
+                           str = str+"<td style='width:15%'>"+currencyname+"</td>";
+                           str = str+"<td style='width:15%' class='judge'>"+status+"</td>";
+			   				$(".judge").each(function() {
+        					if ($(this).html() == "0") {
+            				$(this).html("已付款");
+        					} else if ($(this).html() == "1") {
+            				$(this).html("未付款");
+        					} else if ($(this).html() == "2") {
+            				$(this).html("部分取消/取消");
+        					}
+    						});			   
+                           str = str+"<td style='width:20%'>"+customername+"</td>";
+                           str = str+"</tr>";
+                		   str += "</table>";
+						   main.append(str);
+						   num++;
+						   	}
+						
+						   });
+						}		
+				});
+					pageIndex++;
+			}
+		});
+	});
+	
+	*/
+</script>
+</body>
+</html>

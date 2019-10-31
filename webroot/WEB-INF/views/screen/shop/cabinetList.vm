@@ -1,0 +1,243 @@
+#set($layout = "layout/default.vm")
+
+
+
+<script language="javascript" type="text/javascript">
+	function showAddPanel(){
+		document.getElementById('addpanel').style.display='block';
+		document.getElementById('isadd').value='yes';
+	}
+
+	function setshowcase(id){
+		document.location='/shop/showcp.html?cabinetId='+id+'&pageFlag=first';
+	}
+
+</script>
+
+#set($title = "橱窗推荐位管理 - 新增橱窗位")
+<div id="addpanel" #if($!{cabinet.isadd} && $!{cabinet.isadd}=='yes') style="display:block" #else  style="display:none" #end class="list-div">
+		<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>新增橱窗位</span></h3>
+	<div class="content">
+<form __unmht_action="#" name="theForm"  action="/shop/addcab.html" method="post" enctype="multipart/form-data">
+	<input type="hidden" id="isadd" name="cabinet.isadd" value="$!{cabinet.isadd}"/>
+			<table>
+			<tbody>
+			<div class="form">
+				<ol>
+          <li>
+			<label>标题：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("cabinet.cabinetName")
+					<input type="text" name="${status.expression}" value="$!{cabinet.cabinetName}"/>
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>关键字：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("cabinet.cabinetKeyword")
+					<input type="text" name="${status.expression}" value="$!{cabinet.cabinetKeyword}"/>
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>橱窗图片：</label>
+			<span class="con">
+				<ul>
+					<li>
+						<input type="file" name="images" id="images" size="35" />
+					</li>
+					<li><em>*</em></li>
+					<li>
+						#springBind("cabinet.cabinetPic")
+						<label class="red">${status.errorMessage}</label>
+					</li>
+				</ul>
+			</span>
+          </li>
+		  <li>
+			<label>橱窗类型：</label>
+			<span class="con">
+			<ul>
+              <li>
+				#springBind("cabinet.cabinetType")
+                <select name="${status.expression}" value="$!{cabinet.cabinetType}">
+                    <option value="0" #if($!{cabinet.cabinetType}=='0') selected #end>请选择...</option>
+                    #foreach($enumCabinetType in $enumCabinetTypeMap.entrySet())
+                        <option value="$!{enumCabinetType.key}" #if($!{cabinet.cabinetType}==$!{enumCabinetType.key}) selected #end>$!{enumCabinetType.value}</option>
+                    #end
+                </select>
+			  </li>
+			  <li><label class="red">${status.errorMessage}</label></li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>是否显示：</label>
+					<span class="con">
+					<ul>
+              <li>
+							#springBind("cabinet.isShowstr")
+				  <select name="${status.expression}" value="$!{cabinet.isShowstr}">
+				    <option value="1" #if($!{cabinet.isShowstr}=='1') selected #end>是</option>
+				    <option value="0" #if($!{cabinet.isShowstr}=='0') selected #end>否</option>
+                        </select></li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  </table></form></div>
+  <div class="form-but">
+<input class="button" value="确定" type="submit" onClick="javascript:addcabinet();" > <input class="button" value="重置" type="reset" onClick="javascript:resetcabinet();"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+  </div></tbody></div></div></div>
+<script language="javascript" type="text/javascript">
+function addcabinet(){
+	var pi=document.getElementById("images").value;
+	if(pi==""){
+		alert("上传文件不能为空！");
+		return false;
+	}
+
+	var obj = document.getElementById("images");
+	var sUrl = getFullPath(obj);
+        var myImage = new Image();
+        myImage.src = sUrl;
+	if(myImage.fileSize>200*1024){
+	    alert("图片不大于200KB。");
+        return false;
+	}
+
+	document.theForm.submit();
+}
+function resetcabinet(){
+	document.theForm.reset();
+}
+
+//获取图片全路径（不同的浏览器下）
+function getFullPath(obj) {
+    if(obj){
+        //ie
+        if (window.navigator.userAgent.indexOf("MSIE")>=1)
+        {
+            obj.select();
+            return document.selection.createRange().text;
+        }
+        //firefox
+        else if(window.navigator.userAgent.indexOf("Firefox")>=1)
+        {
+            if(obj.files)
+            {
+                return obj.files.item(0).getAsDataURL();
+            }
+            return obj.value;
+        }
+        return obj.value;
+    }
+}
+</script>
+<div>
+<form name="listForm" action="" method="post"><!-- start ads list -->
+<div class="list-div" id="listDiv">
+	<div class="tool">
+
+            <span><a href="#"  onClick="showAddPanel();return false;" hidefocus="true" class="bt_add">新增橱窗</a></span>
+
+        </div>
+	<div class="listBox">
+			<h3><span>橱窗推荐列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+	#set($num = 1)
+	#foreach($cabinet in $cabinets)
+   <tr>
+      <td width="10%">橱窗位$num：&nbsp;&nbsp;
+        <input type="button" value="设置" onClick="javascript:setshowcase('$!{cabinet.id}')"></td>
+    </tr>
+   <tr>
+      <td colspan="3">标题：$!{cabinet.cabinetName}&nbsp;&nbsp;&nbsp;&nbsp;次序：$!{cabinet.sort} &nbsp;&nbsp;&nbsp;&nbsp;
+			是否显示：#if($!{cabinet.isShow} == 1) &nbsp; 是 #else 不是 #end &nbsp;&nbsp;&nbsp;&nbsp;关键字：$!{cabinet.cabinetKeyword}</td>
+    </tr>
+
+		#set($pnum = 1)
+		#set($pnum2 = 0)
+		#foreach($showcase in $!{cabinet.showcases})
+			#set($pnum2 = $pnum2+1)
+		#end
+		#foreach($showcase in $!{cabinet.showcases})
+
+			#if( $pnum%3 ==1)
+				<tr>
+              <td>
+				#if($!{showcase.imgMiddle})
+				<img src="${upServer}/$!{showcase.imgMiddle}" width="95" height="100">
+				#else
+        		<img src="$request.getContextPath()/images/nomiage100_100.gif"  width="95" height="100" />
+        		#end
+			  </td>
+				#if( $pnum ==$pnum2)
+					<td width="12%"></td>
+					 <td width="78%"></td>
+					</tr>
+				#end
+			#end
+			#if( $pnum%3 ==2)
+              <td width="12%">
+				#if($!{showcase.imgMiddle})
+				<img src="${upServer}/$!{showcase.imgMiddle}" width="95" height="100">
+				#else
+        		<img src="$request.getContextPath()/images/nomiage100_100.gif"  width="95" height="100" />
+				#end
+			 </td>
+				#if( $pnum ==$pnum2)
+					<td width="12%"></td>
+					 <td width="78%"></td>
+					</tr>
+				#end
+			#end
+			#if( $pnum%3 ==0)
+              <td width="78%">
+				#if($!{showcase.imgMiddle})
+				<img src="${upServer}/$!{showcase.imgMiddle}" width="95" height="100">
+				#else
+        		<img src="$request.getContextPath()/images/nomiage100_100.gif"  width="95" height="100" />
+				#end
+			  </td>
+				</tr>
+			#end
+
+			#set($pnum = $pnum+1)
+
+		#end
+
+	#set($num = $num + 1)
+	#end
+
+	  </tbody>
+  </table>
+  #if($!{cabinets.size()} > 0)
+	#else
+		没有结果！
+   #end
+</div>
+</form>
+  <p>&nbsp;</p>
+</div>
+
+

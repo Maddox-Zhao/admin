@@ -1,0 +1,377 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+        <!-- 表单模块 -->
+        <div class="formBox">
+        	<h3><i></i><span>会员查看</span></h3>
+        	<div class="content">
+        		<table class="c4">
+            	<tr>
+                	<th>用户名：</th>
+                    <td>$!{user.account}</td>
+                    <th>性别：</th>
+                    <td>
+                        #if($!user.sex==0)
+    							保密
+    					#elseif($!user.sex==1)
+    							女
+    					#else
+    							男
+						#end
+					</td>
+                </tr>
+                <tr>
+                	<th>用户昵称：</th>
+                    <td>$!{user.nickname}</td>
+                    <th>E-mail：</th>
+                    <td>$!{user.email}</td>
+                </tr>
+                <tr>
+                	<th>注册时间：</th>
+                    <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtCreate)</td>
+                    <th>状态：</th>
+                    <td>
+					    #if($!{user.stauts}==2)
+							冻结
+						#elseif($!{user.stauts}==0)
+							未激活
+						#else
+							正常使用
+						#end
+					</td>
+                </tr>
+                <tr>
+                	<th>登录系统次数：</th>
+                    <td>$!{user.visitCount}</td>
+                    <th>用户等级：</th>
+                    <td>#if("${user.userRank}"=="0") #else <img title="${user.userRank}级" src="$imageServer/images/grade/grade_${user.userRank}.gif"> #end</td>
+                  </tr>
+                <tr>
+                	<th>最后一次登录的时间：</th>
+                    <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtLast)</td>
+                    <th>最后一次登录时的IP：</th>
+                    <td>$!{user.ipLast}</td>
+                </tr>
+                <tr>
+                	<th>是否通过了身份证确认：</th>
+                    <td>
+					        #if($!{user.isValidated}==0)
+    							没有通过
+    						#else
+    							通过
+    						#end
+					</td>
+                    <th>是否代销会员：</th>
+                    <td>
+					    #if($user.type=="d")
+    						是
+    					#else
+    						否
+    					#end
+					</td>
+                </tr>
+
+				#if($user.type=="d")
+				<tr>
+				 <th>已使用点券：</th>
+				 <td>
+					$!agentInfo.ticketUsed
+				 </td>
+				 <th>剩余点卷：</th>
+				 <td>
+					$!agentInfo.ticketLeft
+				 </td>
+				</tr>
+				#end
+                </tr>
+              </table>
+            </div>
+
+				#if($isshow)
+				<h3><i></i><span>代销会员申请信息</span></h3>
+        	    <div class="content">
+				<table class="c4">
+				<tr>
+				     <th>真实姓名：</th>
+				     <td>
+				        $!agentInfo.realName
+				     </td>
+				     <th>电话：</th>
+				     <td>
+					    $!agentInfo.telNumber
+				     </td>
+				 </tr>
+				<tr>
+					 <th>邮政编码：</th>
+					 <td>
+						$!agentInfo.zip
+					 </td>
+				     <th>
+						网上联系方式：
+					 </th>
+				     <td>
+				         #if($agentInfo.chatType=="0")
+							旺旺
+						 #elseif($agentInfo.chatType=="1")
+							QQ
+						 #elseif($agentInfo.chatType=="2")
+							msn
+						 #end
+						 $!agentInfo.chatNumber
+					 </td>
+				</tr>
+
+				<tr>
+					<th> 联系地址： </th>
+				    <td>
+						#foreach($province in $provinceList)
+							#if($!{agentInfo.province}==$!{province.code})
+								$!{province.regionName}
+							#end
+						#end
+						#foreach($city in $cityListInit)
+							#if($!{agentInfo.city}==$!{city.code})
+								$!{city.regionName}
+							#end
+						#end
+						$!agentInfo.address
+				    </td>
+				    <th>性别：</th>
+					<td>
+						#if($agentInfo.sex==2)
+							男
+						#else
+							女
+						#end
+				    </td>
+			   </tr>
+			   <tr>
+				    <th>申请状态：</th>
+    				<td>
+        				#if($agentInfo.status=="init")
+        					申请中
+        				#elseif($agentInfo.status=="fail")
+        					申请失败
+        				#else
+        					申请成功
+        				#end
+    				</td>
+    				<th>代销数量限额：</th>
+    				<td>
+						$!{user.agentCount}
+					</td>
+				  </tr>
+                 </table>
+                </div>
+
+				<h3><i></i><span>周期结算信息</span></h3>
+        	    <div class="content">
+				 <table class="c4">
+				 <tr>
+    				<th><span style="color:red;">*</span> 是否可以周期结算：</th>
+    				<td>
+						#if("$!{user.isPeriodPay}"=="y")
+							可以
+						#else
+							不可以
+						#end
+					</td>
+					<td colspan="2"></td>
+				</tr>
+				<tr>
+					<th><span style="color:red;">*</span> 周期结算开始时间：</th>
+					<td>
+						$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtPeriodPayStart)
+					</td>
+					<th>周期结算结束时间：</th>
+    				<td>
+						$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtPeriodPayEnd)
+					</td>
+				</tr>
+				<tr>
+					<th><span style="color:red;">*</span> 周期（天）：</th>
+					<td>
+						$!{user.period}
+					</td>
+    				<th style="width:151px;"><span style="color:red;">*</span> 可周期结算的最大金额：</th>
+					<td>
+						$!moneyUtil.getFormatMoney($!{user.periodAmountMax},'0.00')元
+					</td>
+				</tr>
+				<tr>
+					<th style="width:169px;">当前周期内未结算订单金额：</th>
+    				<td>
+						$!moneyUtil.getFormatMoney($!user.periodAmountNow,'0.00') 元
+					</td>
+					<td colspan="2"></td>
+				</tr>
+                </table>
+                </div>
+
+				<h3><i></i><span>代销会员渠道信息</span></h3>
+        	    <div class="content">
+				 <table class="c4">
+				 #if($!agentInfo.taobaoUser&&$!agentInfo.taobaoUser.trim().length()>0)
+				 <tr>
+                    <th>淘宝用户名：$!agentInfo.taobaoUser</th>
+				    <th>店铺网址：$!agentInfo.taobaoShop</th>
+				    <th>信誉度：$tbYoua.get($!agentInfo.taobaoPrestige)</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.taobaoMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				  </tr>
+				#end
+				#if($!agentInfo.paipaiUser&&$!agentInfo.paipaiUser.trim().length()>0)
+				  <tr>
+				    <th>拍拍用户名：$!agentInfo.paipaiUser</th>
+				    <th>店铺网址：$!agentInfo.paipaiShop</th>
+				    <th>信誉度：$presgtige.get($!agentInfo.paipaiPrestige)</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.paipaiMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				  </tr>
+				#end
+				#if($!agentInfo.youaUser&&$!agentInfo.youaUser.trim().length()>0)
+				  <tr>
+				    <th>有啊用户名：$!agentInfo.youaUser</th>
+				    <th>店铺网址：$!agentInfo.youaShop</th>
+				    <th>信誉度：$tbYoua.get($!agentInfo.youaPrestige)</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.youaMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				  </tr>
+				#end
+				#if($!agentInfo.ebayUser&&$!agentInfo.ebayUser.trim().length()>0)
+				  <tr>
+				    <th>易趣用户名：$!agentInfo.ebayUser</th>
+				    <th>店铺网址：$!agentInfo.ebayShop</th>
+				    <th>信誉度：$presgtige.get($!agentInfo.ebayPrestige)</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.ebayMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				  </tr>
+				#end
+				#if($!agentInfo.selfshopName&&$!agentInfo.selfshopName.trim().length()>0)
+				  <tr>
+				    <th>自建商城：$!agentInfo.selfshopName</th>
+				    <th>店铺网址：$!agentInfo.selfshopAddress</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.selfshopMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				    <th></th>
+				    <th></th>
+				  </tr>
+				#end
+				#if($!agentInfo.otherUser&&$!agentInfo.otherUser.trim().length()>0)
+				  <tr>
+				    <th>其他渠道名称：$!agentInfo.otherUser</th>
+				    <th>店铺网址：$!agentInfo.otherShop</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.otherMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				    <th></th>
+				    <th></th>
+				  </tr>
+				#end
+				#if($!agentInfo.entityName&&$!agentInfo.entityName.trim().length()>0)
+				  <tr>
+				    <th>实体店名称：$!agentInfo.entityName</th>
+				    <th>店铺地址：$!agentInfo.entityAddress</th>
+				    <th>主营类别：
+						  #foreach($category in $categorys)
+	        				#if($agentInfo.entityMainBusiness==$category.catCode)
+								#if($category.catName.length()>12) $category.catName.substring(0,12)...#else $category.catName#end
+							#end
+					      #end
+					</th>
+				    <th></th>
+				    <th></th>
+				  </tr>
+				 #end
+                 </table>
+                </div>
+			    #end
+				#if(${user.type} && (${user.type}=='d'|| ${user.type}=='w'))
+				<h3><i></i><span>VIP会员审核</span></h3>
+        	    <div class="content">
+				 <table class="c4">
+                <tr>
+					<th>审核说明：</th>
+					<td>
+						$!user.vipRemark
+                    </td>
+				</tr>
+                 </table>
+                </div>
+				#end
+
+			 #if($isshow)
+				<h3><i></i><span>审核说明</span></h3>
+        	    <div class="content">
+				<table class="c4">
+                 <tr>
+					<th>审核说明：</th>
+					<td>
+						<textarea id="memotest" #if($agentInfo.status=="success" || $agentInfo.status=="fail") readOnly #end onmouseover="this.bgColor='#ffffff'">$!agentInfo.memo</textarea></label>
+						(*拒绝必填)
+                    </td>
+					<th>拓展人员：</th>
+					<td>
+						#foreach($user in $users)
+							#if($agentInfo.agent_manager_id==$!user.id)
+								$!{user.userName}
+							#end
+						#end
+                    </td>
+				 </tr>
+                </table>
+                </div>
+			#end
+
+            <div class="form-but"><!-- 表单按钮区 -->
+
+
+                <button type="button" class="button-s4" onclick="javascript:history.back(-1);">返回</button>
+			    #if($!adminAccess.has('A_BACK_ORDER_USER'))
+			       #if($!{user.stauts}==1 && $!{user.type}=='d')
+					 <button type="button" class="button-s4" onclick="backTrade();">下订单</button>
+			       #end
+			    #end
+
+          	</div><!-- 表单按钮区 END -->
+
+
+        </div> <!-- 表单模块 END -->
+
+    </div>
+<script language="javascript" type="text/javascript">
+  function backTrade(){
+     window.location.href="$appServer.get('/user/toBackOrderPage.html').addQueryData('userId',$!{user.id})";
+  }
+</script>

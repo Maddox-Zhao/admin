@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="IossGoodsInstanceSupplier">
+<typeAlias alias="iossGoodsInstanceSupplier" type="com.huaixuan.network.biz.domain.goods.GoodsInstanceSupplier"/>
+	<resultMap class="iossGoodsInstanceSupplier" id="iossGoodsInstanceSupplierResult">
+		<result column="id" property="id"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="consult_price" property="consultPrice"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="supplier_code" property="supplierCode"/>
+		<result column="instance_name" property="goodsInstanceName"/>
+		<result column="code" property="code" />
+		<result column="cat_code" property="catCode" />
+		<result column="goods_unit" property="goodsUnit" />
+	</resultMap>
+
+	<resultMap class="iossGoodsInstanceSupplier" id="iossGoodsInstanceSupplierWithNameResult" extends="iossGoodsInstanceSupplierResult">
+		<result column="supplier_name" property="supplierName"/>
+	</resultMap>
+<!-- create IossGoodsInstanceSupplier object -->
+<insert id="addIossGoodsInstanceSupplier" parameterClass="iossGoodsInstanceSupplier">
+<![CDATA[
+		insert into ioss_goods_instance_supplier
+  (id,
+   supplier_id,
+   goods_id,
+   goods_instance_id,
+   consult_price,
+   gmt_create,
+   gmt_modify,
+   supplier_code)
+values
+  (null,
+   #supplierId#,
+   #goodsId#,
+   #goodsInstanceId#,
+   #consultPrice#,
+   sysdate(),
+   sysdate(),
+   #supplierCode#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update IossGoodsInstanceSupplier object -->
+<update id="editIossGoodsInstanceSupplier" parameterClass="iossGoodsInstanceSupplier">
+		update ioss_goods_instance_supplier
+		set
+		<isNotNull property="consultPrice">
+			consult_price = #consultPrice#,
+		</isNotNull>
+		<isNotNull property="supplierCode">
+			supplier_code = #supplierCode#,
+		</isNotNull>
+		gmt_modify = sysdate()
+		 where id = #id#
+</update>
+<!-- delete IossGoodsInstanceSupplier object -->
+<delete id="removeIossGoodsInstanceSupplier" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_goods_instance_supplier where ioss_goods_instance_supplier.ID = #value#
+]]>
+</delete>
+<!-- search IossGoodsInstanceSupplier object -->
+<select id="getIossGoodsInstanceSupplier" parameterClass="java.lang.Long" resultMap="iossGoodsInstanceSupplierResult">
+<![CDATA[
+		select ioss_goods_instance_supplier.*,
+       ioss_goods_instance.instance_name,
+       ioss_goods_instance.code,
+       ioss_goods_instance.cat_code,
+       ioss_goods_instance.goods_unit
+  from ioss_goods_instance_supplier, ioss_goods_instance
+ where ioss_goods_instance_supplier.ID = #value#
+   and ioss_goods_instance_supplier.goods_instance_id =
+       ioss_goods_instance.id
+       ]]>
+</select>
+
+<!-- searchAll IossGoodsInstanceSupplier List -->
+<select id="getIossGoodsInstanceSuppliers" resultMap="iossGoodsInstanceSupplierResult">
+<![CDATA[
+		select ioss_goods_instance_supplier.* from ioss_goods_instance_supplier
+]]>
+</select>
+
+
+<select id="getIossGoodsInstanceSuppliersByParameterMap" resultMap="iossGoodsInstanceSupplierResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_goods_instance_supplier.* ,
+	            ioss_goods_instance.instance_name,
+				ioss_goods_instance.code,
+				ioss_goods_instance.cat_code,
+	            ioss_goods_instance.goods_unit
+		from ioss_goods_instance_supplier,ioss_goods_instance where 1=1 and ioss_goods_instance_supplier.goods_instance_id=ioss_goods_instance.id
+]]>
+		<isNotEmpty prepend="and" property="supplierId">
+			ioss_goods_instance_supplier.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="code">
+			ioss_goods_instance.code like CONCAT('%',#code#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierCode">
+			ioss_goods_instance_supplier.supplier_code like CONCAT('%',#supplierCode#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_goods_instance_supplier.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="title">
+		    ioss_goods_instance.instance_name like CONCAT('%',#title#,'%')
+		</isNotEmpty>
+		<include refid="pageSQLFoot"/>
+</select>
+
+	<select id="getIossGoodsInstanceSuppliersByParameterMapCount" resultClass="java.lang.Integer">
+      <![CDATA[
+		select count(ioss_goods_instance_supplier.id) from ioss_goods_instance_supplier,ioss_goods_instance where 1=1 and ioss_goods_instance_supplier.goods_instance_id=ioss_goods_instance.id
+      ]]>
+		<isNotEmpty prepend="and" property="supplierId">
+			ioss_goods_instance_supplier.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="code">
+			ioss_goods_instance.code like CONCAT('%',#code#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierCode">
+			ioss_goods_instance_supplier.supplier_code like CONCAT('%',#supplierCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_goods_instance_supplier.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="title">
+		    ioss_goods_instance.instance_name like CONCAT('%',#title#,'%')
+		</isNotEmpty>
+   </select>
+
+   <select id="findGoodsInstanceSuppliers" resultMap="iossGoodsInstanceSupplierWithNameResult">
+      <![CDATA[
+		select ioss_goods_instance_supplier.*,
+				ioss_goods_instance.instance_name,
+				ioss_goods_instance.code,
+				ioss_goods_instance.cat_code,
+				ioss_goods_instance.goods_unit,
+				ioss_supplier.name as supplier_name
+		from ioss_goods_instance_supplier,ioss_goods_instance,ioss_supplier
+		where ioss_goods_instance_supplier.goods_instance_id=ioss_goods_instance.id and ioss_goods_instance_supplier.supplier_id = ioss_supplier.id and ioss_goods_instance.id = #value#
+      ]]>
+   </select>
+</sqlMap>

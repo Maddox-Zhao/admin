@@ -1,0 +1,65 @@
+${admin.userName},你好!<br>
+以下商品的库存数量已经小于预警数量,请注意备货!
+<style>
+.list-div {
+	border-right: #DDF0FE 1px solid; border-top: #DDF0FE 1px solid; background: #eef8f9; border-left: #DDF0FE 1px solid; border-bottom: #DDF0FE 1px solid
+}
+.list-div table {
+	width: 100%
+}
+.list-div th {
+	background: #DDF0FE repeat-x; line-height: 24px; white-space: nowrap
+}
+.list-div td {
+	background: #fff; line-height: 22px
+}
+.list-div td.first-cell {
+	padding-left: 10px; font-weight: bold
+}
+
+.list-div a:visited {
+	color: #192e32; text-decoration: underline
+}
+.list-div a:link {
+	color: #192e32; text-decoration: underline
+}
+.list-div a:hover {
+	color: #9d7250
+}
+
+list-div img {
+	vertical-align: middle
+}
+.list-div .footer {
+	background: #F3F8FF; text-align: right
+}
+</style>
+
+ <div class="list-div" id="listDiv">
+    <table id="listTable" name="listTable"  class="list-table">
+      <tbody><tr>
+		    <th>产品名称</th>
+				<th>编码</th>
+        <th>单位</th>
+        <th>可用库存</th>
+        <th>实际库存</th>
+        <th>最小库存数量</th>
+      </tr>
+	  
+	#foreach($goodsInstance in $goodsInstanceList)
+		<tr #if($velocityCount%2==0) class="list_tdbg" #end>
+				<td  align="center">$!goodsInstance.instanceName</td>
+				<td  align="center">$!goodsInstance.code</td>
+				<td  align="center">$!goodsInstance.goodsUnit</td>
+				<td  align="center">$!goodsInstance.existNum</td>
+				<td  align="center">$!goodsInstance.storageNum</td>
+				<td  align="center">$!goodsInstance.minNum</td>
+	#end
+		</tr>
+
+		</tbody>
+		</table>
+		
+   </div>
+   
+发送时间为：$datenow

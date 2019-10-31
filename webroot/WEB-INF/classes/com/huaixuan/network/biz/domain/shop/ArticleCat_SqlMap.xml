@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ArticleCatSQL">
+<typeAlias alias="articleCat" type="com.huaixuan.network.biz.domain.shop.ArticleCat"/>
+	<resultMap class="articleCat" id="articleCatResult">
+		<result column="id" property="id"/>
+		<result column="code" property="code"/>
+		<result column="parent_code" property="parentCode"/>
+		<result column="cat_name" property="catName"/>
+		<result column="cat_type" property="catType"/>
+		<result column="keywords" property="keywords"/>
+		<result column="cat_desc" property="catDesc"/>
+		<result column="sort_order" property="sortOrder"/>
+	</resultMap>
+<!-- create ArticleCat object -->
+<insert id="addArticleCat" parameterClass="articleCat">
+<![CDATA[
+		insert into emall_article_cat
+		(id,code,parent_code,cat_name,cat_type,keywords,cat_desc,sort_order )values(
+		null,
+		#code#,
+		#parentCode#,
+		#catName#,
+		#catType#,
+		#keywords#,
+		#catDesc#,
+		#sortOrder#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ArticleCat object -->
+<update id="editArticleCat" parameterClass="articleCat">
+<![CDATA[
+		update emall_article_cat set code = #code#,
+		parent_code = #parentCode#,
+		cat_name = #catName#,
+		cat_type = #catType#,
+		keywords = #keywords#,
+		cat_desc = #catDesc#,
+		sort_order = #sortOrder#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete ArticleCat object -->
+<delete id="removeArticleCat" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_article_cat where emall_article_cat.ID = #value#
+]]>
+</delete>
+<!-- search ArticleCat object -->
+<select id="getArticleCat" parameterClass="java.lang.Long" resultMap="articleCatResult">
+<![CDATA[
+		select emall_article_cat.* from emall_article_cat where emall_article_cat.ID = #value#
+]]>
+</select>
+<!-- searchAll ArticleCat List -->
+<select id="getArticleCats" resultMap="articleCatResult">
+<![CDATA[
+		select emall_article_cat.* from emall_article_cat order by emall_article_cat.sort_order,id
+]]>
+</select>
+</sqlMap>

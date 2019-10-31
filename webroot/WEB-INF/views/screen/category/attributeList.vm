@@ -1,0 +1,169 @@
+#set($layout = "layout/default.vm")
+  <div class="main">
+   	<div class="searchBox">
+      <h3><span>商品属性管理</span></h3>
+    </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "addsuccess")
+		添加属性成功！
+	#end
+	#if($!message == "editsuccess")
+		修改属性成功！
+	#end
+	#if($!message == "removesuccess")
+		删除属性成功！
+	#end
+	#if($!message == "batchremovesuccess")
+		批量删除属性成功！
+	#end
+</div>
+ #end
+ 
+ #set($errormessage = $request.getParameter('errormessage'))
+ #if($!errormessage)
+<div class="mag-t1">
+	#if($!errormessage == "removefail")
+		删除属性失败！
+	#end
+	#if($!errormessage == "batchremovefail")
+		批量删除属性失败！
+	#end
+</div>
+ #end
+ 
+ #set($errormessagetwo = $request.getParameter('errormessagetwo'))
+ #if($!errormessagetwo)
+<div class="mag-t1">
+	$!errormessagetwo
+</div>
+ #end
+ 
+ #if($!adminAccess.has("A_AM_ADD_USER"))
+       <div class="tool">
+
+            <span><a href="/attr/addattr.html" hidefocus="true" class="bt_add">添加属性</a></span>
+
+        </div>
+ #end
+
+        <div class="clear"></div>
+
+   <form method="post" action="/attr/am.html" name="listForm">
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>属性列表</span></h3>
+            <table >
+                <tr>
+					<th><input type="checkbox" id="allbox" />全选</th>
+					<th>属性名称</th>
+					<th>属性值的录入方式</th>
+					<th>可选值列表</th>
+					<th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($attribute in $query.items)
+                <tr>
+					<td align="center">
+					    <input name="chk" type="checkbox" value="$!attribute.id"/>
+                    </td>
+                    <td align="center">
+						#if($!attribute.attrName.length()>20)
+							$!attribute.attrName.substring(0,20)....
+						#else
+							$!{attribute.attrName}
+						#end
+					</td>
+                    <td align="center">
+						#if($!{attribute.inputType}=="text")
+							手工录入
+						#elseif($!{attribute.inputType}=="radio")
+							单选
+						#elseif($!{attribute.inputType}=="checkBox")
+							复选
+						#elseif($!{attribute.inputType}=="textArea")
+							文本框录入
+						#end
+					</td>
+                	<td align="center">
+					    #if($!attribute.attrValues.length()>30)
+							$!attribute.attrValues.substring(0,30)....
+						#else
+							$!attribute.attrValues
+						#end
+					</td>
+					<td align="center">
+						    #if($!adminAccess.has("A_AM_MODIFY_USER"))
+							<a href="$appServer.get('/attr/edita.html').addQueryData('id',$!{attribute.id})">编辑</a>
+							#end
+							#if($!adminAccess.has("A_AM_DELETE_USER"))
+							<a href="#" onclick="confirmDel($!{attribute.id})">移除</a>
+							#end
+                    </td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+	 #if($!adminAccess.has("A_AM_DELETE_USER"))
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onclick="return save();">删除</button>
+    </div>
+	 #end
+	#end
+  </div>
+ </form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/attr/am.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有相关记录！
+	#end
+    </div>
+<script language="javascript" type="text/javascript">
+		function confirmDel(id)
+		{
+			if(confirm("确认删除？"))
+			{
+				window.location.href="/attr/ra.html?id="+id;
+			}
+		}
+
+		function save()
+		{
+
+		var obj=document.getElementsByName("chk");
+				var value="";
+				var length=obj.length;
+
+				for(var i=0;i<length;i++)
+					{
+						if(obj[i].checked)
+						{
+							value=value+obj[i].value;
+							value=value+",";
+						}
+					}
+			if(value=="")
+			{
+				alert("请至少选择一条记录");
+				return false;
+			}
+
+		if(confirm("确认删除？"))
+			{
+			window.location.href="/attr/batchdel.html?attributeChecked="+value;
+			return true;
+			}
+
+			return false;
+		}
+		
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=chk]:checkbox').attr("checked", this.checked );
+	        });
+			
+		});
+
+</script>

@@ -1,0 +1,207 @@
+#set($layout = "layout/default.vm")
+
+#if($message)
+      <div class="success" style="width:1003px">$message</div>
+#end
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<form  name="form1" action="" method="post">
+	<div class="searchBox">
+		<h3><span>库存退货申请单重新提交 </span></h3>
+    	<table>
+    		<input type="hidden" name="applyRelationNum" value="$!relationNum"/>
+    		<tr>
+    		  <th>产品编号：</th>
+    		  <td>$!{storageRefundApply.code}
+    		  </td>
+    	 	  <th>产品名称：</th>
+    		  <td>$!{storageRefundApply.instanceName}</td>
+
+    		  <th>类目：</th>
+    		  <td>$!categoryManager.getCatFullNameByCatcode($storageRefundApply.catCode)</td>
+    	 	  <th>属性：</th>
+    		  <td>$!attributeManager.getFullAttributeStringByAttrs($storageRefundApply.attrs)</td>
+    		</tr>
+
+    		<tr>
+    		  <th>单位：</th>
+    		  <td>$!storageRefundApply.goodsUnit
+    		  </td>
+    	 	  <th>成本均价：</th>
+    		  <td>$!moneyUtil.getFormatMoney($!storageRefundApply.refPrice,'0.00')
+    		  </td>
+
+    		  <th>仓库名称：</th>
+    		  <td>$!{storageRefundApply.depositoryName}</td>
+    		  <th>供应商：</th>
+    		  <td>$!{storageRefundApply.supplierName}
+    		  </td>
+    		</tr>
+    	</table>
+	</div>
+
+	<div class="listBox" id="listDiv">
+		<table  id="listTable" name="listTable">
+			<tr>
+	    		<th colspan="11"  scope="col">产品库存列表</th>
+			</tr>
+			<tr>
+				<th>序号</th>
+		        <th>库位名称</th>
+		        <th>批次</th>
+		        <th>库存类型</th>
+				<th>库存数量</th>
+		        <th>退货数量</th>
+				<th>成本均价</th>
+				<th>应收金额</th>
+				<th>实收金额</th>
+				<th>退货原因</th>
+				<th>备注</th>
+			</tr>
+			#if($storageRefundApplyList)
+				#foreach($obj in $storageRefundApplyList)
+	    		<tr #if($velocityCount%2==0) class="bg" #end>
+					<td align="center">$velocityCount
+						<input type="hidden" name="id" id="id_$velocityCount" value="$!obj.id"/>
+					</td>
+	      			<td>$!obj.depLocationName
+					</td>
+	      			<td>$!obj.batchNum
+					</td>
+					<td align="center">$!storTypeMap.get($!obj.storType)</td>
+					<td>$!obj.storageNum
+						<input type="hidden" name="storageNum" id="storageNum_$velocityCount" value="${obj.storageNum}" />
+					</td>
+					<td><input type="text" size="4" name="refNum" id="refNum_$velocityCount" value="$!obj.refundNum" maxlength="10" onchange="javascript:changeNum('$velocityCount',this.value);"/></td>
+					<td>￥<input type="text" size="6" name="refPrice" id="refPrice_$velocityCount" value="$!moneyUtil.getFormatMoney($!obj.refPrice,'0.00')" onchange="javascript:changePrice('$velocityCount',this.value);"  maxlength="10"/></td>
+	      			<td>￥<input type="text" size="6" name="dueFee" readonly="true" id="dueFee_$velocityCount" value="$!obj.dueFee"/></td>
+					<td>￥<input type="text" size="6" name="factFee" id="factFee_$velocityCount" value="$!obj.factFee" maxlength="10"/></td>
+					<td  align="center">
+            			<select name="reason" id="reason_$velocityCount">
+            			#foreach($reason in $enumShoppingRefundReason.entrySet())
+                            <option  value="$!{reason.key}" #if("$!reason.key"=="$!obj.reason") selected #end>$!{reason.value}</option>
+						#end
+            			</select>
+            		</td>
+					<td>
+						<input  type="text" name="remark" id="remark_$velocityCount" value="$!obj.memo" size="30" maxlength="120"/>
+					</td>
+				</tr>
+		  		#end
+			#end
+	    </table>
+		#if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0)
+	  		没有记录！
+		#end
+ </div>
+
+<div align="center">
+	#if($storageRefundApplyList)
+    <input type="button" name="finish" value="修改提交" #if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0) disabled="false" #else onclick="javascript:finishModify('$!relationNum');" #end/>
+	#end
+ </div>
+</form>
+<script language="javascript" type="text/javascript">
+
+
+
+function finishModify(relationNum){
+	    var refNum = 0;
+		var storageNum;
+
+		#if($storageRefundApplyList)
+      		#foreach($obj in $storageRefundApplyList)
+			refNum = Number(document.getElementById("refNum_$velocityCount").value);
+			if(document.getElementById("refNum_$velocityCount").value!= 0){
+				storageNum = Number(document.getElementById("storageNum_$velocityCount").value);
+				if(refNum > storageNum){
+					alert("第【"+ $velocityCount +"】条退货产品记录中的退货数量大于库存总数！");
+					return false;
+				}
+			}
+			#end
+		#end
+    if(confirm("确认修改并提交？")){
+		document.forms[0].action = "repeat_storage_refund_apply.html";
+		document.forms[0].submit();
+	}
+}
+
+function changeNum(count_no,refNum){
+		var obj_refNum=document.getElementById('refNum_' + count_no);
+		var unitPrice = document.getElementById('refPrice_' + count_no).value;
+		var storageNum = Number(document.getElementById('storageNum_' + count_no).value);
+		var priceNum = Number(unitPrice);
+		var refNum_num = Number(refNum);
+
+		if(refNum==null||refNum.trim()==""){
+			alert("出错：您没有输入.");
+			document.getElementById('dueFee_' + count_no).value="";
+			document.getElementById('factFee_' + count_no).value="";
+			obj_refNum.select();
+            obj_refNum.focus();
+			return false;
+		}
+		else if(!isIntNumber(refNum)){
+			alert("出错：您输入了不正确的数量.");
+			document.getElementById('refNum_' + count_no).value = "";
+			document.getElementById('dueFee_' + count_no).value="";
+			document.getElementById('factFee_' + count_no).value="";
+			obj_refNum.select();
+            obj_refNum.focus();
+			return false;
+		}else if(refNum_num > storageNum){
+			alert("出错：您输入的退货数量超出了库存数量.");
+			document.getElementById('refNum_' + count_no).value = "";
+			document.getElementById('dueFee_' + count_no).value="";
+			document.getElementById('factFee_' + count_no).value="";
+			obj_refNum.select();
+            obj_refNum.focus();
+			return false;
+		}else{
+			document.getElementById('dueFee_' + count_no).value=(priceNum*refNum_num).toFixed(2);
+			document.getElementById('factFee_' + count_no).value=(priceNum*refNum_num).toFixed(2);
+		}
+	}
+
+	function changePrice(count_no,refPrice){
+		var obj_refPrice=document.getElementById('refPrice_' + count_no);
+		var refNum = document.getElementById('refNum_' + count_no).value;
+		var refNum_num = Number(refNum);
+		var refPrice_num = Number(refPrice);
+
+		if(refPrice==null||refPrice.trim()==""){
+			alert("出错：您没有输入.");
+			document.getElementById('dueFee_' + count_no).value="";
+			document.getElementById('factFee_' + count_no).value="";
+			obj_refPrice.select();
+            obj_refPrice.focus();
+			return false;
+		}
+		else if(!isNumber(refPrice)){
+			alert("出错：您输入了不正确的数量.");
+			document.getElementById('dueFee_' + count_no).value="";
+			document.getElementById('factFee_' + count_no).value="";
+			obj_refPrice.value = "";
+			obj_refPrice.select();
+            obj_refPrice.focus();
+			return false;
+		}else{
+			document.getElementById('dueFee_' + count_no).value=(refNum_num*refPrice_num).toFixed(2);
+			document.getElementById('factFee_' + count_no).value=(refNum_num*refPrice_num).toFixed(2);
+		}
+	}
+
+	function isNumber(val)
+	{
+		var reg = /^[\d|\.|,]+$/;
+	    return reg.test(val);
+	}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+</script>
+</div>

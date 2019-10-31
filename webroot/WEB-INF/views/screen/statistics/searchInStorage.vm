@@ -1,0 +1,138 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>在库产品统计</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>在库产品统计</span></h3>
+<form name="searchform" id="searchform" action="searchInStorage.html" method="post">
+    <table>
+         <th>产品名称：</th>
+         <td><input type="text" id="instanceName" name="instanceName" value="$!{parMap.instanceName}" onblur="javascript:this.value=this.value.trim()"/></td>
+         <th>产品编码：</th>
+         <td><input type="text" id="code" name="code" value="$!{parMap.code}" onblur="javascript:this.value=this.value.trim()"/></td>
+		 <th> 类目：</th>
+    <td>			<select name="catCode" id="catCode" style="width:100px;">
+    				<option value="">-=请选择=-</option>
+    				#foreach($cat in $catList)
+    				<option value="$cat.catCode" #if("$cat.catCode"==$parMap.catCode) selected #end>$cat.catName</option>
+    				#end
+    			</select></td>
+		<th>类型：</th>
+    			<td><select name="storType" id="storType" style="width:100px;">
+    				<option value="">-=请选择=-</option>
+    				<option value="v" #if("$parMap.storType"=="v") selected #end>暂估</option>
+					    <option value="f" #if("$parMap.storType"=="f") selected #end>实际</option>
+    			</select></td>
+				</tr><tr>
+#set($allShow = "1")
+    			$contain.get('/storage/depSelect.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$!parMap)
+
+
+           <th> <input type="button" value="查询" class="button" onclick="document.searchform.submit();"/></th>
+            </tr>
+    </table>
+</form>
+</div>
+	<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="listBox">
+          <h3><span>在库产品统计列表</span></h3>
+
+    <table>
+
+                        <tr>
+                            <th width="">
+                                产品编码
+                            </th>
+                            <th width="">
+                                产品名称
+                            </th>
+                            <th width="">
+                                类目
+                            </th>
+                            <th width="">
+                                属性
+                            </th>
+                            <th width="">
+                                单位
+                            </th>
+                            <th width="">
+                                一级仓库
+                            </th>
+                            <th width="">
+                                仓库
+                            </th>
+                            <th width="">
+                                库存
+                            </th>
+                            <th width="">
+                                成本均价
+                            </th>
+                            <th width="">
+                                库存成本
+                            </th>
+                            <th width="">
+                                商城价
+                            </th>
+						    <th width="">
+							类型
+						    </th>
+                        </tr>
+                         #foreach($sa in $query.items)
+                        <tr>
+                                <td>
+                                    $!{sa.code}
+                                </td>
+                                <td>
+									$!controlUtil.getNoticesTitle($!{sa.instanceName},25)
+                                </td>
+							    <td title="$!categoryManager.getCatFullNameByCatcode($!ga.catCode)">
+									$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($!sa.catCode),20)
+                                </td>
+							    <td title="$!attributeManager.getFullAttributeStringByAttrs($ga.attrs)">
+								    $!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($sa.attrs),20)
+								</td>
+                                <td align="center">
+                                    $!{sa.goodsUnit}
+                                </td>
+							    <td>
+								    $!{sa.depFirstName}
+							    </td>
+                                <td>
+                                    $!{sa.depositoryName}
+                                </td>
+								<td align="center">
+                                    $!{sa.storageNumSum}
+                                </td>
+								<td align="right">
+									$!moneyUtil.getFormatMoney($!{sa.averagePrice},'0.00')
+                                </td>
+								 <td align="right">
+									$!moneyUtil.getFormatMoney($!{sa.storageCost},'0.00')
+                                </td>
+								 <td align="right">
+									$!moneyUtil.getFormatMoney($!{sa.goodsPrice},'0.00')
+                                </td>
+								<td>
+								#if("$!{sa.storType}" == "v")
+								暂估
+								#else
+								实际
+								#end
+							</td>
+                            </tr>
+                        #end
+
+                </table>
+			<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/statistics/searchInStorage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+             </div>

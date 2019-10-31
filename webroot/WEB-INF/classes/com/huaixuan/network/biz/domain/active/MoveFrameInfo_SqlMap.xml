@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="moveframeCURDdao">
+
+	<typeAlias alias="MoveFrame" type="com.huaixuan.network.biz.domain.active.MoveFrameInfo" />
+
+	<resultMap id="MoveFrameResult" class="MoveFrame">
+		<result property="moveFrameId" column="id" />
+		<result property="moveFrameName" column="name" />
+		<result property="depName" column="dep_names" />
+		<result property="author" column="author" />
+		<result property="gmtStart" column="gmt_start" />
+		<result property="gmtEnd" column="gmt_end" />
+		<result property="note" column="note"/>
+		<result property="area" column="area"/>
+	</resultMap>
+
+	<resultMap id="MoveFrameEmailResult" class="MoveFrame">
+		<result property="email" column="email" />
+		<result property="customerName" column="customerName" />
+		<result property="customerEmail" column="customerEmail"/>
+		<result property="userRank" column="userRank"/>
+	</resultMap>
+
+	<!-- 得到当前时间前一天创建的所有活动 -->
+	<select id="getYesterDayNewCreateMoveFrames" resultMap="MoveFrameResult" parameterClass="java.lang.Integer">
+		SELECT DISTINCT(m.id),m.name,m.dep_names,(SELECT `name` FROM Employee WHERE
+		idEmployee = m.head_adminId) author,m.gmt_start,m.gmt_end,ml.note,m.area
+		FROM
+		hx_moveframe m,hx_moveframe_log ml
+		WHERE ml.moveframe_id = m.id
+		AND ml.type =#type#
+		AND ml.isDeal = 0
+		AND ml.gmt_create >= (DATE_SUB(SYSDATE(), INTERVAL 1 DAY))
+	</select>
+	
+	
+	
+	
+	<!-- 更新日志状态 -->
+	<update id="updateMoveFrameLogStatus" parameterClass="java.lang.Integer">
+		UPDATE hx_moveframe_log SET isDeal = 1		
+		WHERE
+		gmt_create >= (DATE_SUB(SYSDATE(), INTERVAL 1 DAY))
+		AND
+		type = #type#
+	</update>
+	
+	<!-- 得到当前时间前一天修改的所有活动 -->
+	<select id="getYesterDayModifyMoveFrames" resultMap="MoveFrameResult" parameterClass="java.lang.Integer">
+		SELECT DISTINCT(m.id),m.name,m.dep_names,(SELECT `name` FROM Employee WHERE
+		idEmployee = m.head_adminId) author,m.gmt_start,m.gmt_end,ml.note,m.area
+		FROM
+		hx_moveframe m,hx_moveframe_log ml
+		WHERE ml.moveframe_id = m.id
+		AND ml.type =#type#
+		AND ml.isDeal = 0
+		AND ml.gmt_modify >= (DATE_SUB(SYSDATE(), INTERVAL 1 DAY));
+	</select>
+	
+	
+	
+	<!-- 根据活动框ID得到对应的客户信息和活动框所属员工的Email -->
+	<select id="getEmailAndCustomerName" resultMap="MoveFrameEmailResult" parameterClass="java.lang.Long">
+		SELECT (SELECT  email FROM emall_admin WHERE user_name = mu.admin_id) email,(SELECT `name` FROM Customer WHERE idCustomer = mu.customer_id) customerName
+		,(SELECT `email` FROM Customer WHERE idCustomer = mu.customer_id) customerEmail,(SELECT eu.user_rank FROM emall_users eu WHERE eu.email = customerEmail ) userRank
+		FROM 
+		hx_moveframe_user mu 
+		WHERE mu.moveframe_id = #id#		
+	</select>
+	
+	<!-- 通过GoodsId来得到对应的moveFrameId -->
+	<select id="getMoveFrameIdByGoodsId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+	SELECT mg.moveframe_id 
+	FROM
+	hx_moveframe_goods mg
+	WHERE 
+	mg.goods_id = #goodsId#
+	</select>
+	
+	
+</sqlMap>

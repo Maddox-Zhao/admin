@@ -1,0 +1,330 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+<script language="javascript" type="text/javascript">
+
+	function selectid(){
+ 		var id = document.getElementById("idstr").value;
+	  	var obj = document.getElementById("adPositionIdstr");
+		obj.value=id;
+	}
+
+	function grest(){
+		var obj = document.getElementById("articlecontentstr");
+		var oFCKeditor = FCKeditorAPI.GetInstance('articlecontent') ;
+		oFCKeditor.SetHTML(obj.value) ;
+		document.theForm.reset();
+	}
+
+	function newdialog(url)
+    {
+
+		window.open(url, 'window', '');
+
+
+    }
+
+	function setCpidValue(ss){
+		if(ss!=''){
+			var pps = document.getElementById("goodsInfoStr").value;
+			if(pps!=''){
+				ss = pps+"~@~"+ss;
+			}
+        	var vstr = ss.split("~@~");
+
+
+        	var ggg = document.getElementById("addgoods");
+			document.getElementById("goodsInfoStr").value=ss;
+        	var gstr="";
+        	var ids="";
+        	gstr = "<table width=\"100%\">";
+
+        	for(var i=0 ; i<vstr.length ; i++){
+        		var tstr = vstr[i].split("~!~");
+				var goodsidarry;
+				var tag = false;
+				if(ids !=null){
+					 goodsidarry = ids.split(";");
+				}
+				if(goodsidarry!='' && goodsidarry.length > 0){
+					for(var x=0 ; x<goodsidarry.length ; x++){
+						if(tstr[0] == goodsidarry[x]){
+							tag = true;
+						}
+					}
+				}
+				if(tag){
+
+				}else{
+            		strHtml = "<tr><td width=\"20%\"><img src=\"${imageServer}/";
+            		strHtml +=tstr[3];
+            		strHtml +="\" width=\"40\" height=\"40\" /> </td><td width=\"30%\">";
+            		strHtml += tstr[2];
+            		strHtml += "</td><td width=\"20%\">"+tstr[1]+"元</td><td width=\"30%\">";
+					strHtml += "<a href=\"javascript:deleteGoods(\'"+tstr[0]+"\')\">删除</a></td></tr>";
+            		gstr = gstr+strHtml;
+            		if(ids==""){
+            			ids = tstr[0];
+            		}else{
+            			ids = ids + ";" + tstr[0];
+            		}
+				}
+        	}
+        	gstr = gstr+"</table>";
+        	ggg.innerHTML = gstr;
+        	document.getElementById("goodsIds").value=ids;
+    	}
+	}
+
+	function deleteGoods(goodsId){
+
+		var ss = document.getElementById("goodsInfoStr").value;
+		if(ss==''){
+			return false;
+		}
+    	var vstr = ss.split("~@~");
+
+
+    	var ggg = document.getElementById("addgoods");
+		document.getElementById("goodsInfoStr").value=ss;
+    	var gstr="";
+    	var ids="";
+		var newGoodsInfoStr="";
+    	gstr = "<table width=\"100%\">";
+
+    	for(var i=0 ; i<vstr.length ; i++){
+    		var tstr = vstr[i].split("~!~");
+			var goodsidarry;
+			var tag = false;
+			if(tstr[0]!=goodsId){
+    			if(ids !=null){
+    				 goodsidarry = ids.split(";");
+    			}
+    			if(goodsidarry!='' && goodsidarry.length > 0){
+    				for(var x=0 ; x<goodsidarry.length ; x++){
+    					if(tstr[0] == goodsidarry[x]){
+    						tag = true;
+    					}
+    				}
+    			}
+    			if(tag){
+
+    			}else{
+            		strHtml = "<tr><td width=\"20%\"><img src=\"${imageServer}/";
+            		strHtml +=tstr[3];
+            		strHtml +="\" width=\"40\" height=\"40\" /> </td><td width=\"30%\">";
+            		strHtml += tstr[2];
+            		strHtml += "</td><td width=\"20%\">"+tstr[1]+"元</td><td width=\"30%\">";
+					strHtml += "<a href=\"javascript:deleteGoods(\'"+tstr[0]+"\')\">删除</a></td></tr>";
+            		gstr = gstr+strHtml;
+            		if(ids==""){
+            			ids = tstr[0];
+            		}else{
+            			ids = ids + ";" + tstr[0];
+            		}
+    			}
+				if(newGoodsInfoStr==''){
+					newGoodsInfoStr = vstr[i];
+				}else{
+					newGoodsInfoStr = newGoodsInfoStr + "~@~"+vstr[i];
+				}
+			}
+    	}
+    	gstr = gstr+"</table>";
+    	ggg.innerHTML = gstr;
+    	document.getElementById("goodsIds").value=ids;
+		document.getElementById("goodsInfoStr").value = newGoodsInfoStr;
+
+	}
+	
+		function submitOpt(){
+		    var name=jQuery.trim(document.getElementById("name").value);
+			if(name==""){
+			   alert("套餐名称不能为空！");
+			   return false;
+			}
+
+		   	var goodsIds=jQuery.trim(document.getElementById("goodsIds").value);
+		    if(goodsIds==""){
+				alert("套餐商品不能为空！");
+				return false;
+			}
+		
+			var dateStart1=document.getElementById("datestart").value;
+    		var dateEnd1=document.getElementById("dateend").value;
+			
+			if(dateStart1==""){
+			   alert("起始时间不能为空！");
+			   return false;
+			}
+			
+			if(dateEnd1==""){
+			   alert("结束时间不能为空！");
+			   return false;
+			}
+			
+			var price=jQuery.trim(document.getElementById("price").value);
+			if(price==""){
+			   alert("套餐价格不能为空！");
+			   return false;
+			}
+    		
+    		if(dateEnd1 < dateStart1){
+    			alert("套餐不能大于结束时间！");
+    			return false;
+    		} else if (dateEnd1 != '' && (dateEnd1 == dateStart1)) {
+				var hourStart = document.getElementById("promationStartHour");
+                hourStartTemp = hourStart.options[hourStart.selectedIndex].value;
+				var hourEnd = document.getElementById("promationEndHour");
+                hourEndTemp = hourEnd.options[hourEnd.selectedIndex].value;
+				if (hourEndTemp < hourStartTemp){
+					alert("套餐起始时间不能大于！");
+    				return false;
+				} else {
+					document.forms[0].submit();
+				}
+			} else {
+				document.forms[0].submit();
+			}
+		}
+
+</script>
+
+	<div class="main">
+		<div class="formBox">
+		<form __unmht_action="#" name="theForm"  action="/goods/addsale.html" method="post" enctype="multipart/form-data">
+		  <div class="content">
+			<input type="hidden" id="goodsIds" name="goodsIds" value="$!goodsIds" visible="true"/>
+			<input type="hidden" id="adPositionIdstr" name="ad.adPositionIdstr" value="$!{ad.adPositionIdstr}" />
+			<input type="hidden" id="goodsInfoStr" name="goodsInfoStr" value="$!goodsInfoStr" />
+			<input type="hidden" id="operateDo" name="operateDo" value="add" />
+			<input type="hidden"  id="articlecontentstr" name="articlecontentstr" value="$!stringEscapeUtil.escapeHtml($!{article.content})" />
+			<table id="general-table" width="100%">
+			<tbody>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span></span>
+					套餐类型
+				</td>
+				<td>组合销售
+				</td>
+				</tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐名称</td>
+				<td>
+			        #springBind("promation.name")
+                    <input type="text"  name="${status.expression}" id="name"  value="$!{status.value}"></input>
+		            <label class="red">${status.errorMessage}</label>
+				</td></tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐价格</td>
+				<td>
+					#springBind("promation.price")
+					<input  type="text" name="${status.expression}" id="price" value="$!number.format('####0.00',$!{status.value})" />
+					<label class="red">${status.errorMessage}</label>
+				</td></tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐时间</td>
+				<td>
+					#springBind("promation.startDate_str")
+					<input name="${status.expression}" id="datestart" size="15" readonly="true"/>
+					#springBind("promation.startDate_hour")
+					<select name="${status.expression}" id="promationStartHour">
+						<option #if($!{promation.startDate_hour} == '0') selected #end value='0'>  0</option>
+						<option #if($!{promation.startDate_hour} == '1') selected #end value='1'>  1</option>
+						<option #if($!{promation.startDate_hour} == '2') selected #end value='2'>  2</option>
+						<option #if($!{promation.startDate_hour} == '3') selected #end value='3'>  3</option>
+						<option #if($!{promation.startDate_hour} == '4') selected #end value='4'>  4</option>
+						<option #if($!{promation.startDate_hour} == '5') selected #end value='5'>  5</option>
+						<option #if($!{promation.startDate_hour} == '6') selected #end value='6'>  6</option>
+						<option #if($!{promation.startDate_hour} == '7') selected #end value='7'>  7</option>
+						<option #if($!{promation.startDate_hour} == '8') selected #end value='8'>  8</option>
+						<option #if($!{promation.startDate_hour} == '9') selected #end value='9'>  9</option>
+						<option #if($!{promation.startDate_hour} == '10') selected #end value='10'>  10</option>
+						<option #if($!{promation.startDate_hour} == '11') selected #end value='11'>  11</option>
+						<option #if($!{promation.startDate_hour}== '12') selected #end value='12'>  12</option>
+						<option #if($!{promation.startDate_hour} == '13') selected #end value='13'>  13</option>
+						<option #if($!{promation.startDate_hour} == '14') selected #end value='14'>  14</option>
+						<option #if($!{promation.startDate_hour} == '15') selected #end value='15'>  15</option>
+						<option #if($!{promation.startDate_hour} == '16') selected #end value='16'>  16</option>
+						<option #if($!{promation.startDate_hour} == '17') selected #end value='17'>  17</option>
+						<option #if($!{promation.startDate_hour} == '18') selected #end value='18'>  18</option>
+						<option #if($!{promation.startDate_hour} == '19') selected #end value='19'>  19</option>
+						<option #if($!{promation.startDate_hour} == '20') selected #end value='20'>  20</option>
+						<option #if($!{promation.startDate_hour} == '21') selected #end value='21'>  21</option>
+						<option #if($!{promation.startDate_hour} == '22') selected #end value='22'>  22</option>
+						<option #if($!{promation.startDate_hour} == '23') selected #end value='23'>  23</option>
+                    </select>
+					<label>到</label>
+					#springBind("promation.endDate_str")
+					<input name="${status.expression}" id="dateend" size="15" readonly="true"/>
+					#springBind("promation.endDate_hour")
+					<select  name="${status.expression}" id="promationEndHour">
+						<option #if($!{promation.endDate_hour} == '0') selected #end value='0'>  0</option>
+						<option #if($!{promation.endDate_hour} == '1') selected #end value='1'>  1</option>
+						<option #if($!{promation.endDate_hour} == '2') selected #end value='2'>  2</option>
+						<option #if($!{promation.endDate_hour} == '3') selected #end value='3'>  3</option>
+						<option #if($!{promation.endDate_hour} == '4') selected #end value='4'>  4</option>
+						<option #if($!{promation.endDate_hour} == '5') selected #end value='5'>  5</option>
+						<option #if($!{promation.endDate_hour} == '6') selected #end value='6'>  6</option>
+						<option #if($!{promation.endDate_hour} == '7') selected #end value='7'>  7</option>
+						<option #if($!{promation.endDate_hour} == '8') selected #end value='8'>  8</option>
+						<option #if($!{promation.endDate_hour} == '9') selected #end value='9'>  9</option>
+						<option #if($!{promation.endDate_hour} == '10') selected #end value='10'>  10</option>
+						<option #if($!{promation.endDate_hour} == '11') selected #end value='11'>  11</option>
+						<option #if($!{promation.endDate_hour} == '12') selected #end value='12'>  12</option>
+						<option #if($!{promation.endDate_hour} == '13') selected #end value='13'>  13</option>
+						<option #if($!{promation.endDate_hour} == '14') selected #end value='14'>  14</option>
+						<option #if($!{promation.endDate_hour} == '15') selected #end value='15'>  15</option>
+						<option #if($!{promation.endDate_hour} == '16') selected #end value='16'>  16</option>
+						<option #if($!{promation.endDate_hour} == '17') selected #end value='17'>  17</option>
+						<option #if($!{promation.endDate_hour} == '18') selected #end value='18'>  18</option>
+						<option #if($!{promation.endDate_hour} == '19') selected #end value='19'>  19</option>
+						<option #if($!{promation.endDate_hour} == '20') selected #end value='20'>  20</option>
+						<option #if($!{promation.endDate_hour} == '21') selected #end value='21'>  21</option>
+						<option #if($!{promation.endDate_hour} == '22') selected #end value='22'>  22</option>
+						<option #if($!{promation.endDate_hour} == '23') selected #end value='23'>  23</option>
+                    </select>
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "datestart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "dateend",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			</script>
+				</td></tr>
+				<tr>
+				<td style="width:100px;font-weight:bold;font-size:14px;"><span style="color:red">*</span>套餐商品</td>
+				<td>
+					<input  value=" 选择商品 " type="button" onclick="javascript:newdialog('$appServer/goods/addsalegoods.html?chtype=setCpidValue');">
+						<div id="addgoods">
+							#if($!goodsList)
+								<table width="100%">
+									#foreach($goods in $goodsList)
+                                        <tr><td width="20%"><img src="${upServer}/${goods.imgSmall}" width="40" height="40" /> </td><td width="30%">$goods.title</td><td width="20%"> $!{goods.goodsPrice}  元</td><td width="30%"><a href="javascript:deleteGoods('$!{goods.id}')">删除</a></td></tr>
+									#end
+                                </table>
+							#end
+                        </div>
+				</td></tr>
+ </tbody>
+ </table>
+  </div>
+ </form>
+	<div class="form-but">
+		<button type="button"  class="button-s4" onClick="javascript:submitOpt();">确定</button>
+		<button type="button"  class="button-s4" onClick="javascript:grest();">重置</button>
+		<input value="insert" name="act" type="hidden"> 
+		<input name="id" type="hidden">
+    </div>
+ </div>
+</div>

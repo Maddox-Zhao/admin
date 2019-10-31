@@ -1,0 +1,59 @@
+#set($layout = "layout/default.vm")
+#set($title = "打印库存盘点清单")
+<body>
+<div class="main">
+<h1>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+
+
+</span>
+<div style="clear:both"></div>
+</h1>
+<script type="text/javascript">
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+</script>
+<div class="main-div">
+	<div align="center"></div>
+
+<!-- 订单列表 -->
+<div class="clearing"></div>
+<div id="print">
+  <div class="listBox" id="listDiv">
+	<h3><span>库存盘点清单</span></h3>
+    <table>
+      <tr>
+      	<th>产品编码</th>
+        <th>产品名称</th>
+        <th>仓库名称</th>
+        <th>属性</th>
+        <th>库位名称</th>
+        <th>盘点数量</th>
+      </tr>
+	  #foreach($storageCheckList in $$query.items)
+
+	  <tr>
+	  	 <td  align="left">$!storageCheckList.code</td>
+		 <td  align="left">$!storageCheckList.goodsInstanceName</td>
+		 <td  align="center">$!storageCheckList.depName</td>
+         <td  align="left">
+			$!attributeManager.getFullAttributeStringByAttrs($storageCheckList.attribute)</td>
+		 <td  align="center">$!storageCheckList.locName</td>
+         <td  align="center">&nbsp</td>
+		 ##<td  align="center"><a href="viewStoreCheckDetail.html?checkId=$!storageCheckList.checkId&locId=$!storageCheckList.locId&goodsInstanceId=$!storageCheckList.goodsInstanceId">盘点明细</a></td>
+	  </tr>
+	  #end
+
+    </table>
+    </div>
+
+  </div>
+
+</div>
+</div>
+</body>

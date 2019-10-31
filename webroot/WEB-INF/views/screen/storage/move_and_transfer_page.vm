@@ -1,0 +1,312 @@
+#set($layout = "layout/default.vm")
+
+#if($!flag=="move")
+	#set($moveName="移库")
+#elseif($!flag=="transfer")
+	#set($moveName="外借")
+#end
+
+<div class="main">
+	<h2>管理中心 - 移库外借管理</h2>
+
+	<div class="tool">
+		#if( $!{returnMap.success} > 0)
+			<span><a href="$appServer/storage/list_move_storage.html"  hidefocus="true" class="bt_wu">${moveName}列表</a></span>
+			<span><a href="javascript:preview();" hidefocus="true" class="bt_wu">打印${moveName}单据</a></span>
+		#end
+	</div>
+	<div align="center"></div>
+	<form name="searchform" id="searchform" action="" method="post">
+		<input type="hidden" name="ids" id="ids" value="$!idstring"/>
+	    <input type="hidden" name="id" id="id" value="$!id"/>
+		<input type="hidden" name="flag" id="flag" value="$!flag"/>
+		<input type="hidden" name="operate" id="operate" value=""/>
+	<div class="searchBox">
+    	<h3><span>【选择结果：】</span></h3>
+    		<table>
+        		<tr>
+                    <th>产品个数：</th>
+    				<td >
+    					$!account 个&nbsp;&nbsp;&nbsp;&nbsp;
+                    </td>
+                    <th></th>
+    				<td >
+				#if($!returnMap.flag)
+            			<input class="button" value="返 回" type="button"  onclick="backPage();"/>
+					</td>
+				</tr>
+        		#else
+				<tr >
+            		【${moveName}至：】
+					#set($allShow = "1")
+					$contain.get('/storage/depSelectTransfer.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put("moveName",$moveName)
+                </tr>
+				<tr>
+					<td colspan="4">
+						<input type="button" value="确 定" class="button" onclick="checkMove();"/>
+						<input class="button" value="取 消" type="button"  onclick="javascript:history.go(-1);"/>
+                    </td>
+				</tr>
+        		#end
+			</table>
+	</div>
+            <center ><div id="result" style="color:red;">
+				#if("$!message"=="wrongtype")
+					其中有的记录为次品库或批发库记录，不能进行外借，请重新做选择！
+				#end
+				#if($!returnMap.flag == "true")
+					操作成功,成功处理了#if($!returnMap.success)$!returnMap.success#else 0 #end 条
+				#elseif($!returnMap.flag == "false"&&$!returnMap.failList)
+					成功处理了#if($!returnMap.success)$!returnMap.success#else 0 #end 条，失败了$returnMap.failList.size()条</br>
+					#foreach($gi in $query.items)
+						#foreach($si in $returnMap.failList)
+							#if($gi.id == $si.id)
+								$!{gi.code} ${gi.instanceName} $!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($gi.catCode),20) $!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($gi.attrs),20) $!{gi.depFirstName} $!{gi.depositoryName} $!{gi.depLocationName} $!{gi.storageNum};原因：
+								#if($!si.message=="check")库位被删除或处于盘点状态！
+						        #elseif($!si.message=="dep")仓库不存在或是失效状态！
+						        #elseif($!si.message=="number") 数量出错！
+						        #elseif($!si.message=="db")数据库操作失败！
+						        #elseif($!si.message=="empty")要移库的库存记录集合为空！
+						        #elseif($!si.message=="same")同一级仓库同仓库同库位不能移库或外借！
+								#elseif($!si.message=="ishas")对于外借未归还的库存记录不能移库或外借！
+							    #elseif($!si.message=="depfirst")一级仓库不存在！
+								#elseif($!si.message=="goodsnumber")外借数量大于该商品的一级仓库可用库存！
+								#elseif($!si.message=="typewrong")次品仓库不能外借！
+							    #elseif($!si.message=="movenumber")移库数量大于该商品的一级仓库可用库存！
+								#elseif($!si.message=="depfirstwrong")批发虚拟库不能外借！
+								#elseif($!si.message=="checkMemoLength")备注内容请控制在255个字符之内！
+						        #end
+								<BR>
+							#end
+						#end
+					#end
+				 #elseif($!returnMap.flag == "false"&&$!returnMap.message)
+			         			#if($!returnMap.message=="check")库位被删除或处于盘点状态！
+						        #elseif($!returnMap.message=="dep")仓库不存在或是失效状态！
+						        #elseif($!returnMap.message=="number") 数量出错！
+						        #elseif($!returnMap.message=="db")数据库操作失败！
+						        #elseif($!returnMap.message=="empty")要移库的库存记录集合为空！
+						        #elseif($!returnMap.message=="same")同一级仓库同仓库同库位不能移库或外借！
+								#elseif($!returnMap.message=="type1")不能将产品外借到普通仓库！
+								#elseif($!returnMap.message=="type3")不能将产品移动到外借仓库！
+								#elseif($!si.message=="depfirst")一级仓库不存在！
+								#elseif($!si.message=="goodsnumber")外借数量大于该商品的一级仓库可用库存！
+								#elseif($!si.message=="typewrong")次品仓库不能外借！
+								#elseif($!si.message=="movenumber")移库数量大于该商品的一级仓库可用库存！
+								#elseif($!si.message=="depfirstwrong")批发虚拟库不能外借！
+								#elseif($!returnMap.message=="sameDepfirst")所有移库或者外借的记录必须来自同一个一级仓库！
+								#elseif($!returnMap.message=="checkMemoLength")备注内容请控制在255个字符之内！
+						        #end
+				#end
+			</div>
+			</center>
+		<div class="listBox" id="listDiv">
+				<table  id="listTable" name="listTable"  class="list-table">
+				<tbody>
+					   <tr>
+						<th width="">
+							产品编码
+						</th>
+						<th width="">
+							产品名称
+						</th>
+						<th width="">
+							类目
+						</th>
+						<th width="">
+							属性
+						</th>
+						<th width="">
+							单位
+						</th>
+						<th width="">
+							一级仓库
+						</th>
+						<th width="">
+							仓库
+						</th>
+						<th width="">
+							库位
+						</th>
+						<th width="">
+							类型
+						</th>
+						<th width="">
+							供应商
+						</th>
+						<th width="">
+							库存数量
+                        </th>
+						<th width="">
+							${moveName}数量
+                        </th>
+					</tr>
+					 #foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td height="27">
+								$!{gi.code}
+							</td>
+							<td title="$!{gi.instanceName}">
+								$!controlUtil.getNoticesTitle($!{gi.instanceName},15)
+							</td>
+							<td title="$!categoryManager.getCatFullNameByCatcode($gi.catCode)">
+								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($gi.catCode),20)
+							</td>
+							<td title="$!attributeManager.getFullAttributeStringByAttrs($gi.attrs)">
+								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($gi.attrs),20)
+							</td>
+							<td>
+								$!{gi.goodsUnit}
+							</td>
+							<td>
+								$!{gi.depFirstName}
+							</td>
+							<td>
+								$!{gi.depositoryName}
+							</td>
+							<td>
+								$!{gi.depLocationName}
+							</td>
+							<td>
+								#if("$!{gi.storType}" == "v")
+								暂估
+								#else
+								实际
+								#end
+							</td>
+							<td title="$!{gi.supplierName}">
+								<a href="$appServer/supplier/viewSupplier.html?sid=$!{gi.supplierId}" target="_blank">$!controlUtil.getNoticesTitle($!{gi.supplierName},10)</a>
+							</td>
+							<td align="center">
+								$!{gi.storageNum}
+							</td>
+							<td align="center">
+								#if($!{gi.depType}!="out_borrow_dep")
+									#if($!{gi.depType} =="defect_dep"&& ${moveName} =="外借")
+										<input type="hidden" name="newamount" id="newamount_${velocityCount}" value=""/>
+									#else
+								        <input type="text" name="newamount" id="newamount_${velocityCount}" size="8" onchange="checkNum(${velocityCount},$!{gi.storageNum});" maxlength="8"/>
+									#end
+								#else
+								<input type="hidden" name="newamount" id="newamount_${velocityCount}" value=""/>
+								#end
+							</td>
+						</tr>
+					 #end
+                </tbody>
+                </table>
+				#if($!{jump}=="movebat")
+				<h1 id="addGoodsH">
+            		<span class="action-span"><a href="javascript:addGoods();">增加其他${moveName}产品</a></span>
+            	</h1>
+        		<h1 id="addGoodsHL" style="display:none">
+        			<span class="action-span"><img src="$imageServer/images/admin/loading.gif" /></span>
+        		</h1>
+				#end
+        </div>
+
+		#if($!flag=="move")
+            <table width="100%" cellpadding="3" cellspacing="1">
+                <tbody>
+                    <tr>
+						<td class="label">请输入备注</td>
+                        <td>
+    						<textarea name="memo" id="memo" width="300px" height="" style="width:310px;height:60px;overflow:scroll;OVERFLOW-X:hidden;OVERFLOW-Y:auto">$!memo</textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+		#end
+    </form>
+</div>
+<script language="javascript" type="text/javascript">
+    String.prototype.trim= function()
+    {
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+		function checkNum(count_no,storageNum){
+    		var obj_newamount=document.getElementById('newamount_' + count_no);
+    		var newamount = obj_newamount.value;
+    		if(!isIntNumber(newamount)){
+    			alert("出错：您输入了不正确的数量.");
+    			obj_newamount.value = "";
+    			obj_newamount.select();
+                obj_newamount.focus();
+    			return false;
+    		}else if(newamount > storageNum){
+    			alert("出错：您输入的数量超出了库存数量.");
+    			obj_newamount.value = "";
+    			obj_newamount.select();
+                obj_newamount.focus();
+    			return false;
+    		}
+			return true;
+		}
+
+		function checkMove(){
+		  var obj1=document.getElementById('depId').value;
+		  var obj2=document.getElementById('locId').value;
+		  var obj3=document.getElementById('depfirstId').value;
+
+		  if(obj1 == 0||obj1==null){
+		    alert("请选择仓库！");
+		    return false;
+		  }
+		  if(obj2 == 0||obj2==null){
+		    alert("请选择库位！");
+		    return false;
+		  }
+		  if(obj3 == 0||obj3==null){
+		    alert("请选择一级仓库！");
+		    return false;
+		  }
+
+		  document.getElementById('operate').value="move";
+		  document.getElementById('searchform').action="doMoveAndTransferPage.html";
+		  document.getElementById('searchform').submit();
+		}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+	function isNumberNoDot(val)
+	{
+	  var reg = /^\+?[1-9][0-9]*$/;
+	  return reg.test(val);
+	}
+
+	function preview(){
+		window.open("$appServer/storage/printBorrow.html?moveCode=$!{returnMap.moveCode}&printType=$!flag");
+	}
+
+	function addGoods(){
+		document.getElementById("addGoodsH").style.display="none";
+		document.getElementById("addGoodsHL").style.display="";
+		window.open("$appServer/storage/selectStorageGoods.html");
+	}
+
+	function backStorageInstance(ret){
+	   	var goodsId_str = document.getElementById('ids').value;
+
+		if(ret!=null &&　ret.length>0){
+			for(var i=0;i<ret.length;i++) {
+　				goodsId_str += ret[i].id + ',';
+			}
+		}
+		//alert(goodsId_str);
+		document.getElementById('ids').value=goodsId_str;
+        document.getElementById('searchform').action="doMoveAndTransferPage.html?jump=movebat&actionType=sel";
+        document.getElementById('searchform').submit();
+	}
+
+	function backPage(){
+		#if("$!idstring"!="")
+			document.getElementById('searchform').action="doMoveAndTransferPage.html?jump=movebat&actionType=sel";
+		#elseif("$id"!="")
+			document.getElementById('searchform').action="doMoveAndTransferPage.html?jump=move";
+		#end
+        document.getElementById('searchform').submit();
+	}
+</script>

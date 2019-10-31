@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RoleDao">
+	<typeAlias alias="Role" type="com.huaixuan.network.biz.domain.admin.Role"/>
+	<resultMap id="roleResult" class="com.huaixuan.network.biz.domain.admin.Role">
+	  <result column="id" property="id" />
+	  <result column="name" property="name" />
+	  <result column="display" property="display" />
+	  <result column="gmt_create" property="gmtCreate" />
+	  <result column="gmt_modify" property="gmtModify" />
+	  <result column="status" property="status" />
+	  <result column="dep_code" property="department" select="getDepartmentName"/>
+	</resultMap>
+	
+	
+	
+	<sql id="RoleDao.forSelectAll">
+		id, name, display, gmt_create, gmt_modify, status,dep_code
+    </sql>
+	
+	<select id="RoleDao.getAllRole" resultMap="roleResult" parameterClass="java.lang.String">
+		select 
+		<include refid="RoleDao.forSelectAll" />
+		FROM emall_role 
+		<!--  不通过部门来查询职务，直接把所有职务给查询出来
+		WHERE  emall_role.dep_code =
+		(SELECT emall_admin.dep_code FROM emall_admin WHERE emall_admin.id = #depCode# AND emall_admin.status = 1)
+		 -->
+    </select>
+
+	<select id="RoleDao.getRoleListByAdminId" parameterClass="java.lang.Long" resultMap="roleResult">
+		select er.id, er.name, er.display, er.gmt_create, er.gmt_modify, er.status
+		  from emall_admin_role ear, emall_role er
+		 where ear.admin_id = #value#
+		   and ear.role_id = er.id
+	</select>
+	
+    <select id="RoleDao.getRoleListByConditionWithPage" resultMap="roleResult" parameterClass="java.util.Map">
+       
+	   select
+	   <include refid="RoleDao.forSelectAll" />
+	   from emall_role 
+	   <dynamic prepend="where">
+	   <isNotEmpty property="name" prepend="and">
+		   name like concat('%',#name#,'%')
+       </isNotEmpty>
+       </dynamic>
+       order by gmt_modify desc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+    <select id="RoleDao.getRoleListByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(*) from emall_role
+		<dynamic prepend="where">
+	    <isNotEmpty property="name" prepend="and">
+		    name like concat('%',#name#,'%')
+        </isNotEmpty>
+        </dynamic>
+	</select>
+
+    <insert id="RoleDao.insertRole" parameterClass="Role">
+	    <![CDATA[
+	        INSERT INTO emall_role
+			  (id, name, display, status, gmt_create, gmt_modify,dep_code)
+			VALUES
+			  (null, #name#, #display#, #status#, sysdate(), sysdate(),#depCode#)
+	    ]]>
+	    <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+    </insert>
+
+	<select id="RoleDao.getRoleId" parameterClass="java.lang.Long" resultMap="roleResult">
+		 select 
+		 <include refid="RoleDao.forSelectAll" />
+		 from emall_role where id = #value#
+    </select>
+	
+    <update id="RoleDao.updateRole">
+		update emall_role 
+		set name = #name#, display = #display#,
+		    status = #status#,
+		    gmt_modify = sysdate()
+		where id = #id#
+	</update>
+	
+		
+	<resultMap id="RoleDao.DepartmentResult" class="com.huaixuan.network.biz.domain.hx.Department">
+		<result column="id" property="id" javaType="int" />
+		<result column="dep_code" property="depCode" javaType="string"/>
+		<result column="name" property="name" javaType="string"/>
+		<result column="parent_code" property="parentCode" javaType="string"/>
+		<result column="staff_num" property="staffNum" javaType="int"/>
+		<result column="role_ids" property="roleIds" javaType="string"/>
+		<result column="role_names" property="roleNames" javaType="string"/>
+		<result column="child_nums" property="childNums" javaType="int"/>
+		<result column="note" property="note"  javaType="string"/>
+		<result column="status" property="status" javaType="string"/>
+		<result column="gmt_create" property="gmtCreate"  javaType="string"/>
+		<result column="gmt_modify" property="gmtModify"  javaType="string"/>
+	</resultMap>
+
+	<select id="getDepartmentNameByDepcode" resultMap="RoleDao.DepartmentResult" parameterClass="java.lang.String" >
+		select id, dep_code, name, parent_code, staff_num, role_ids, role_names, child_nums, note, status, gmt_create, gmt_modify
+		from hx_department
+		where dep_code like '$depCode$.___'
+	</select>
+	
+	<cacheModel type="LRU" id="departmentCache" readOnly="true" serialize="true">
+		<flushInterval hours="24" />
+	</cacheModel>
+	<select id="getDepartmentName" parameterClass="java.lang.String" resultMap="RoleDao.DepartmentResult" cacheModel="departmentCache">
+		select id, dep_code, name, parent_code, staff_num, role_ids, role_names, child_nums, note, status, gmt_create, gmt_modify
+		from hx_department
+		where dep_code = #depCode#
+	</select>
+
+	<!-- 客户端角色 -->
+	
+	
+	<!-- 查询C客户端角色 -->
+	<select id="getClientRoles" resultMap="roleResult">
+	SELECT * 
+	FROM
+	hx_client_role		
+	</select>
+	
+	<select id="getClientRoleById" parameterClass="java.lang.Long" resultMap="roleResult">
+		SELECT  <include refid="RoleDao.forSelectAll"/>
+		FROM
+		hx_client_role
+		WHERE id = #value#
+	</select>
+	
+	<insert id="addClientRole" parameterClass="Role">
+	<![CDATA[
+	        INSERT INTO hx_client_role
+			  (id, name, display, status, gmt_create, gmt_modify,dep_code)
+			VALUES
+			  (null, #name#, #display#, #status#, sysdate(), sysdate(),#depCode#)
+	    ]]>
+	</insert>
+	
+	
+	<update id="updateClientRole" parameterClass="Role">
+		update hx_client_role 
+		set name = #name#, display = #display#,
+		 status = #status#,
+		  gmt_modify = sysdate()
+		where id = #id#
+	</update>
+	
+	
+</sqlMap>

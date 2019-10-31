@@ -1,0 +1,63 @@
+#set($layout = '')
+<script>
+	function goto$!{sliderRandom}(pg){
+		document.getElementById("clickchoose").value="true";
+		document.forms.page_slider_$!{sliderRandom}.$!{sliderPage}.value=pg;
+		document.forms.page_slider_$!{sliderRandom}.submit();
+	}
+	
+	function gosb$!{sliderRandom}(){
+		if(check$!{sliderRandom}()){
+		    document.getElementById("clickchoose").value="true";
+			document.forms.page_slider_$!{sliderRandom}.submit();
+		}
+	}
+	function check$!{sliderRandom}(){
+		var toPage = document.page_slider_$!{sliderRandom}.$!{sliderPage}.value;
+		var reg=/^\d+$/g;
+		if(reg.test(toPage)){
+			return true;
+		}
+		return false;
+	}
+</script>
+ <!-- 分页 -->
+<div class="pages-box">
+	<div class="pages">
+	#if($slider_borker)
+		#set($s_broker = $slider_borker)
+	#else
+		#set($s_broker = $appServer)	
+	#end
+	<form name="page_slider_$!{sliderRandom}" action="${s_broker.get("$sliderTarget")}" method="$!{sliderMethod}" onsubmit="return check$!{sliderRandom}();">
+		<input type="hidden" name="clickchoose" id="clickchoose" value="false"/>
+		#foreach($queryParam in $sliderQuery.parameters.entrySet())
+		<input type="hidden" name="$!{queryParam.key}" id="$!{queryParam.key}" value="$!{queryParam.value}"/>
+		#end
+	#if($sliderCurrent == '1')
+	<span style="font-weight:bold"> &laquo; </span>
+	#else
+	<a href="#" style="font-weight:bold" onclick="goto$!{sliderRandom}('1')">&laquo;首页</a>
+	<a href="#" style="font-weight:bold" onclick="goto$!{sliderRandom}('${sliderPrev}')">&laquo;</a>
+	#end
+	#foreach($grid in $grids)
+		#if($grid == 0)
+		<span style="font-weight:bold">...</span>
+		#elseif($grid == $sliderCurrent)
+			<b>${grid}</b>
+		#else
+		<a href="#" style="font-weight:bold" onclick="goto$!{sliderRandom}('${grid}')">${grid}</a>
+		#end
+	#end
+	#if($sliderCurrent >= $sliderTotal )
+		<span style="font-weight:bold"> &raquo; </span>
+	#else
+		<a href="#" style="font-weight:bold" onclick="goto$!{sliderRandom}('${sliderNext}')">&raquo;</a>
+		<a href="#" style="font-weight:bold" onclick="goto$!{sliderRandom}('${sliderTotal}')">末页 &raquo;</a>
+	#end
+	<input type="text" size="2" name="$!{sliderPage}" value="$sliderQuery.currentPage" title="输入页码按回车"/>
+	<a href="javascript:gosb$!{sliderRandom}();" style="color:#000">GO</a>
+	页数: [ $sliderCurrent / $sliderTotal ] 共$!{slider_query.totalItem}条
+	</form>
+	</div>
+</div>

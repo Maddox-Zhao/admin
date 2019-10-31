@@ -1,0 +1,29 @@
+#set($layout = "")
+<a href="$appServer/timetask/delisting.html">商品自动下架(0 0 2 * * ?, 每天凌晨2点)</a></br>
+<a href="$appServer/timetask/closeTrade.html">自动取消订单(0 0 1 * * ?, 每天凌晨1点)</a></br>
+<a href="$appServer/timetask/confirmTrade.html">自动确认收货(0 30 1 * * ?, 每天凌晨1点半)</a></br>
+<a href="$appServer/timetask/autoCanelFreeze.html">套餐过期自动取消冻结(startDelay:3600000,启动一个小时后执行任务;repeatInterval:3600000,隔一个小时运行一次)</a></br>
+<a href="$appServer/timetask/autoUpdateUserGrade.html">自动修改用户等级(20 40 3 * * ?, 每天凌晨3点40分20秒)</a></br>
+<a href="$appServer/timetask/autoCreatInOutReport.html">自动生成进出货统计报表(0 0 6 1 * ?, 每月1日上午6点)</a></br>
+<a href="$appServer/timetask/autoSendMail.html">自动发邮件(0 0/5 * * * ?, 每隔5分钟)</a></br>
+<a href="$appServer/timetask/autoStorageWarn.html">库存预警邮件(0 0 8 * * ?, 每天上午8点)</a></br>
+<a href="$appServer/timetask/autoStorageAgeExport.html">库龄分析导出(0 0 2 ? * 1, 每周日凌晨2点)</a></br>
+<a href="$appServer/timetask/autoCreatPeriod.html">周期结算订单金额更新(0 20 2 * * ?, 每天凌晨2点20分)</a></br>
+<a href="$appServer/timetask/autoCustomerReport.html">客户/销售人员销售排行报表(0 10 3 * * ?, 每天凌晨3点10分)</a></br>
+<a href="$appServer/timetask/autoGoodsInstanceReport.html">产品销售排行报表(0 40 3 * * ?, 每天凌晨3点40分)</a></br>
+<a href="$appServer/timetask/autoResumeTrade.html">自动恢复关闭的订单(0 15 2 * * ?, 每天凌晨2点15分)</a></br>
+<a href="$appServer/timetask/backSaleReport.html">修复销售排行表数据(无定时)</a></br>
+
+<a href="$appServer/timetask/autoComfirmTrade.html">自动审核订单(0 0/15 * * * ?, 每隔15分钟一次，每次最多1000条订单)</a></br>
+
+
+<a href="$appServer/timetask/autoSyncPaipaiTrade.html">同步拍拍的订单(0 0/30 * * * ?, 每隔半小时一次)</a></br>
+<a href="$appServer/timetask/autoPaipaiPublicGoods.html">同步拍拍商品发布(0 0/1 * * * ?, 每隔1分钟一次)</a></br>
+<a href="$appServer/timetask/autoPaipaiSyncNum.html">同步拍拍商品库存(0 0/1 * * * ?, 每隔1分钟一次)</a></br>
+<a href="$appServer/timetask/autoSyncTaobaoTrade.html">同步淘宝的订单(0 0/30 * * * ?, 每隔半小时一次)</a></br>
+<a href="$appServer/timetask/autoTaobaoSyncNum.html">同步淘宝库存数量(0 0/30 * * * ?, 每隔半小时一次)</a></br>
+<a href="$appServer/timetask/autoTaobaoPublicGoods.html">同步淘宝商品发布(0 0/1 * * * ?, 每隔1分钟一次)</a></br>
+
+ 
+
+

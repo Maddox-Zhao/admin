@@ -1,0 +1,148 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>魅力惠面单管理</span></h3>
+ <form  id="form1" name="form1" action="/plartFromOrderRecord/toSearchWaybill.html" method="post" onsubmit="doSubmit();">
+    <table>
+		<tr>
+				  <td class="form-label" style="width:60px;">订单号：</td>
+                    <td  style="width:100px">
+			       #springBind("platFormOrderRecord.orderId")
+			       <input type="text" name="${status.expression}" id="user_account" value="$!{status.value}" class="inp"/>
+    		     </td>
+				 <td class="form-label" style="width:40px;"></td>
+		        	 <td class="form-label" style="width:60px;" colspan="2">
+					  <button type="submit" class="btn">查询</button>
+				    </td>
+		</tr>
+    	
+    </table>
+</form>
+  </div>
+        <div class="clear"></div>
+
+        <!-- 列表模块 -->
+        <div  class="listBox">
+          <h3><span>魅力惠面单列表</span></h3>
+            <table>
+			<tr>
+			  <th width="10%;">订单号</th>
+			  <th width="55%;">打印面单</th>
+			  <th width="10%;">面单打印次数</th>
+              <th width="10%;">回传状态</th>
+			  <th width="15%;">操作</th>
+			</tr>
+			
+			#if($query && $query.items.size()>0)
+				#foreach($platFormOrderRecord in $query.items)
+			<tr>
+					<td style="text-align:center;">
+						$!platFormOrderRecord.orderId
+					</td>
+					<td style="text-align:center;">
+						<a href="$!platFormOrderRecord.billHref" target="_blank" id="tt$!platFormOrderRecord.orderId" onclick="print($!platFormOrderRecord.orderId)">
+							$!platFormOrderRecord.billHref
+						<a/>
+                    </td>
+					##获取面单次数
+					<td style="text-align:center;">
+					   <span id="ss$!platFormOrderRecord.orderId">
+						$!platFormOrderRecord.status
+                        </span>
+                    </td>
+					<td style="text-align:center;" id="back$!platFormOrderRecord.orderId">
+						$!platFormOrderRecord.backPackStatus
+                    </td>
+					<td style="text-align:center;"> 
+						 <a onclick="uploadSu($!platFormOrderRecord.orderId)">获取面单</a>&nbsp;&nbsp;
+						 <a onclick="uploadPack($!platFormOrderRecord.orderId)">回传打包状态</a>
+					</td>
+			   </tr>
+				#end
+			#end
+            </table>
+			##分页
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/plartFromOrderRecord/toSearchWaybill.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+	#else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+
+<script language="javascript" type="text/javascript">
+
+function uploadPack(orderCode){                    
+		    jQuery.ajax({  
+             url : "/plartFromOrderRecord/getOrderPack.html",  
+             type : 'POST',  
+             data :{orderCode:orderCode},  
+             success : function(data) {  
+			   if(data.code == "200"){
+			   jQuery('#back'+orderCode).html(data.codeMsg);
+				return;
+			   }else if(data.code == "300"){
+				 alert(data.codeMsg);
+				 return;
+			   }else if(data.code == "000"){
+				 alert(data.codeMsg);
+				 return;
+			   }else{
+			      alert(data.codeMsg);
+			   }
+                
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+	}
+
+function uploadSu(orderCode){                    
+		    jQuery.ajax({  
+             url : "/plartFromOrderRecord/getWaybill.html",  
+             type : 'POST',  
+             data :{orderCode:orderCode},  
+             success : function(data) {  
+			   if(data.code == "200"){
+			   jQuery('#tt'+orderCode).html(data.waybillUrl);
+			   jQuery('#tt'+orderCode).attr("href",data.waybillUrl);
+			   //jQuery('#ss'+orderCode).html(data.status);
+				return;
+			   }else if(data.code == "300"){
+				 jQuery('#tt'+orderCode).html(data.codeMsg);
+				 return;
+			   }else{
+			      jQuery('#tt'+orderCode).html(data.codeMsg);
+			   }
+                
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+	}
+	
+//获取打印的次数
+function print(orderCode){
+jQuery.ajax({  
+             url : "/plartFromOrderRecord/getPrintCount.html",  
+             type : 'POST',  
+             data :{orderCode:orderCode},  
+             success : function(data) {  
+			   jQuery('#ss'+orderCode).html(data.status);
+				return;
+             },  
+             error : function(data) {  
+                  
+             }  
+    });  
+
+
+}
+</script>

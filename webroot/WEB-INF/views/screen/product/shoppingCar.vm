@@ -1,0 +1,941 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>购物车</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	     <form id="excelForm"  action="/shoppingCar/exportProduct.html" method="post" target="excelIFrame">
+         #if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+			 <input name="showCost" class="mini-textbox" value="yes" style="display:none"/>
+		#else
+			 <input name="showCost" class="mini-textbox" value="no" style="display:none"/>
+		 #end
+         </form>
+#set($canActivePrice = false)
+
+#if($!adminAccess.has('A_PRODUCT_ACTIVE_PRICE'))
+	#set($canActivePrice = true)
+#end
+ 
+<div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+                <tr>
+                    <td >
+						<a class="mini-button" iconCls="icon-remove"  style="width:110px" onclick="removeAll()">清空购物车</a>
+                        <a class="mini-button" iconCls="icon-remove" style="width:110px"  onclick="remove()">删除选中</a>
+				        #if($!adminAccess.has('A_SHOPPINGCAR_SUOKU'))
+							<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="suoku()">锁    库</a>
+						#end
+						 #if($!adminAccess.has('A_SHOPPINGCAR_SALE'))
+							<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="sale()">销售出库</a>
+						 #end
+						 #if($!adminAccess.has('A_SHOPPINGCAR_DIAOHUOCHUKU'))
+						<a class="mini-button" iconCls="icon-add" style="width:110px" onclick="diaohuo()">调货出库</a>
+						 #end
+						
+						#if($!adminAccess.has('A_PRODUCT_CANCEL_YULIU'))
+							<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="yuding2Cansale()">取消预留</a>
+							<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="sale2Cansale()">销售入库</a>
+						#end
+						
+						#if($!adminAccess.has('A_PRODUCT_INSTOCK'))
+    						<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="piliangRuku()" >入库(转可售)</a>
+						#end
+						
+                    </td>
+					<td rowspan="2"><a class="mini-button" iconCls="icon-close"   onclick="CloseWindow('close')">关闭</a></td>
+                </tr>
+				
+				<tr>
+                    <td >
+						折扣:
+						<a class="mini-textbox" id="zhekoutext"  style="width:80px"></a>
+						<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="zhekou()" >折扣(售价)</a>
+						#if($canActivePrice)
+    						<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="activePriceZheKou()" >折扣(活动价)</a>
+    						<a class="mini-button" iconCls="icon-ok" style="width:110px" onclick="activePrice()" >设置活动价</a>
+						#end
+						#if($!adminAccess.has('A_SHOPPINGCAR_DIAOHUORUKU'))
+							<a class="mini-button" iconCls="icon-ok"  style="width:110px" onclick="ruku()">调货入库</a>
+						#end
+						<a class="mini-button" iconCls="icon-download" style="width:110px" onclick="exportProduct()">导出</a>
+		    			#if($!adminAccess.has('A_PRODUCT_MANAGER'))
+		 					<a class="mini-button" iconCls="icon-ok"  style="width:110px" onclick="UpdateNew()">批量修改</a>
+						#end
+                 	
+                    </td>
+					<td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:420px;" allowResize="true" pageSize="50" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        url="showShoppingCar.html"  idField="idProduct"  showPager="false" allowAlternating="true" 
+		 showSummaryRow="true" ondrawsummarycell="onDrawSummaryCell" onselectionchanged="showTotal" onCellcommitedit="onCellcommitedit"  onCellendedit="setSalePriceFn" >
+        <div property="columns">
+            <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+			<div name="action" width="60" headerAlign="center" align="center" renderer="onActionRenderer" cellStyle="padding:0;">#</div>
+            <div field="idProduct" width="100" headerAlign="center" align="center" allowSort="true">idProduct</div>
+            <div field="brandName" width="80" headerAlign="center" align="center"  allowSort="true">品牌
+			   <input property="editor" class="mini-textbox"/>
+			</div>
+            <div field="seriesName" width="40" headerAlign="center" align="center"  allowSort="true">品类
+			   <input property="editor" class="mini-textbox"/>
+			</div>
+            <div field="type" width="80" headerAlign="center" align="center"  allowSort="true">型号
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="size" width="40" headerAlign="center" align="center"  allowSort="true">size
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="status" width="60" headerAlign="center" align="center"  allowSort="true">状态</div>
+			 <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+			 <div field="activePrice" width="60" headerAlign="center" align="center"  allowSort="true">活动价
+				#if($canActivePrice)
+				<input property="editor" class="mini-spinner" minValue="0" maxValue="1000000"  decimalPlaces="2"  style="width:100%;" />
+				#end
+			 </div>
+			<div field="ssPrice" width="120" headerAlign="center" align="center"  allowSort="true">售价
+				<input property="editor" class="mini-spinner" minValue="0" maxValue="1000000"  decimalPlaces="2"  style="width:100%;" />
+			</div>
+			<div field="curSiteName" width="100" headerAlign="center" align="center"  allowSort="true">位置</div>
+			
+			<!--
+            <div field="dlPrice" width="60" headerAlign="center" align="center"  allowSort="true">大陆价</div>
+            <div field="euPrice" width="60" headerAlign="center" align="center"  allowSort="true">欧洲价</div>
+            <div field="dxPrice" width="60" headerAlign="center" align="center"  allowSort="true">代销价</div>
+            <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+            <div field="ssPrice" width="60" headerAlign="center"  align="center"  allowSort="true">尚上价</div>
+			-->
+            
+            
+        </div>
+    </div>
+    <script type="text/javascript">
+        var statusData = [{id: 1,value: "可售"  },  { id: 2, value: "运输在途" }, {id: 3, value: "预订"},{ id: 4, value: "已售" },{ id: 5,value: "寄卖已售未结算"},{ id: 6,value: "准入库"} ] ;
+		
+		
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		
+		function getCookieData()
+		{
+			var cookieStr = document.cookie;
+    		var cookiesData = new Object();
+    		if(cookieStr)
+    		{
+    			var arr = cookieStr.split(";");
+    			for(var i = 0; i < arr.length;i++)
+    			{
+    				var valueArr = arr[i].split("=")
+    				if(valueArr.length == 2)
+    				{
+    					var key = valueArr[0];
+    					var val = valueArr[1];
+						key = key.replace(/(^\s*)|(\s*$)/g, ""); 
+						val = val.replace(/(^\s*)|(\s*$)/g, "");
+						if(val)
+    						cookiesData[key] = val;
+    				}
+    			}
+    		}
+			return cookiesData;
+		}
+		
+        grid.load();
+		
+		
+		 function onActionRenderer(e) {
+            var s = '<a class="New_Button" href="javascript:remove()">删除</a>';      
+            return s;
+        }
+		
+        function renderDate(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, true);
+        }
+        function renderDate1(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, false);
+        }
+        function renderCurrency(row) {
+            if (!row.value) return "";
+            if (row.value == '1') return "RMB";
+            if (row.value == '2') return "EU";
+            if (row.value == '3') return "HKD";
+            if (row.value == '4') return "US";
+            return "";
+        }
+        function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		 
+		
+		
+        //清空购物车
+        function removeAll() {
+            if (confirm("确定删除？")) {
+                    grid.loading("操作中，请稍后......");
+                    jQuery.ajax({
+                        url: "/shoppingCar/removeAllProduct.html",
+                        success: function(text) {
+							grid.unmask(); 
+							grid.load();
+                        },
+                        error: function() {}
+                    });
+        	}
+		}
+		
+		//删除选中行
+        function remove() {
+            var rows = grid.getSelecteds();
+            if (rows.length > 0) {
+                if (confirm("确定删除？")) {
+					var rows = grid.getSelecteds();
+                    var ids = [];
+                    for (var i = 0, l = rows.length; i < l; i++) {
+                        var r = rows[i];
+                        ids.push(r.idProduct);
+                    }
+                    var id = ids.join(',');
+                    grid.loading("操作中，请稍后......");
+                    jQuery.ajax({
+                        url: "/shoppingCar/removeProduct.html?idProducts=" + id,
+                        success: function(text) {
+							grid.unmask(); 
+							grid.load();
+                        },
+                        error: function() {}
+                    });
+                }
+            } else {
+                mini.alert("请选中一条记录");
+            }
+        }
+		
+		
+		//全部销售
+       function sale()
+	   {
+	   		var data = grid.getData();
+			if(data == null || data.length == 0)
+			{
+				mini.alert("购物车为空");
+				return;
+			}
+			for (var i = 0, l = data.length; i < l; i++) {
+                var r = data[i];
+				var status = r.status;
+				if("可售" != status)
+				{
+                 	mini.alert("第" + (i+1) + "行不是可售状态,只能出售【可售】状态的产品");
+					return;
+				}
+            }
+	   		 mini.confirm("共" + data.length + "件产品,全部售出","提示",function(action)
+			 {
+					if('ok' == action)
+					{
+						mini.open({
+                            url: "/shoppingCar/toSettleAccount.html",
+                            title: "购物车结算",
+                            width: 450,
+                            height: 350,
+                            onload: function() {
+                                var iframe = this.getIFrameEl();
+                                iframe.contentWindow.SetData(data);
+                            },
+                            ondestroy: function(action) {
+                                 grid.reload();
+                            }
+                        });
+					}
+			 })
+	   }
+	   
+	  
+	   //全部锁库
+       function suoku()
+	   {
+	   		var data = grid.getData();
+			if(data == null || data.length == 0)
+			{
+				mini.alert("购物车为空");
+				return;
+			}
+			for (var i = 0, l = data.length; i < l; i++) {
+                var r = data[i];
+				var status = r.status;
+				if("可售" != status)
+				{
+                 	mini.alert("第" + (i+1) + "行不是可售状态,只能锁库【可售】状态的产品");
+					return;
+				}
+            }
+	   		 mini.confirm("共【<span style='color:red;font-weight:bold'>" + data.length + "</span>】件产品,全部锁库","提示",function(action)
+			 {
+					if('ok' == action)
+					{
+					   
+						mini.open({
+                            url: "/shoppingCar/toSuoKu.html",
+                            title: "锁库",
+                            width: 450,
+                            height: 350,
+                            onload: function() {
+                                var iframe = this.getIFrameEl();
+                                iframe.contentWindow.SetData(data);
+                            },
+                            ondestroy: function(action) {
+                                 grid.reload();
+                            }
+                        });
+					}
+			 })
+	   }
+	   
+	   
+	   
+	   //全部调货出库
+       function diaohuo()
+	   {
+	   		var data = grid.getData();
+			if(data == null || data.length == 0)
+			{
+				mini.alert("购物车为空");
+				return;
+			}
+
+			for (var i = 0, l = data.length; i < l; i++) {
+                var r = data[i];
+				var status = r.status;
+				if("可售" != status)
+				{
+                 	mini.alert("第" + (i+1) + "行不是可售状态,只能调货【可售】状态的产品");
+					return;
+				}
+            }
+			mini.open({
+                url: "/shoppingCar/toShowSite.html",
+                title: "选择站点",
+                width: 400,
+                height: 300,
+                onload: function() {
+                    var iframe = this.getIFrameEl();
+                    iframe.contentWindow.SetData(data);
+                },
+                ondestroy: function(action) {
+                     grid.reload();
+                }
+            });
+			
+	   }
+	   
+	   
+	   //全部取消预留
+       function yuding2Cansale()
+	   {
+	   		var data = grid.getData();
+			if(data == null || data.length == 0)
+			{
+				mini.alert("购物车为空");
+				return;
+			}
+			var ids = [];
+			for (var i = 0, l = data.length; i < l; i++) {
+                var r = data[i];
+				var status = r.status;
+				if("预订" == status)
+				{
+                	ids.push(r.idProduct);
+				}
+				else
+				{
+					mini.alert("第" + (i+1) + "行不是预订状态,只能取消【预订】状态的产品");
+					return;
+				}
+            }
+			var id = ids.join(',');
+	   		 mini.confirm("共【<span style='color:red;font-weight:bold'>" + data.length + "</span>】件产品,全部取消预订","提示",function(action)
+			 {
+					if('ok' == action)
+					{
+                           mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿关闭...'
+                            });
+                            jQuery.ajax({
+                                url: "/product/yuding2Cansale.html?idProducts=" + id,
+                                success: function(text) {
+        							mini.unmask(); 
+        							grid.load();
+                                },
+                                error: function() {}
+                            });
+					}
+			 })
+	   }
+	   
+	   
+	   
+	    //全部销售入库
+       function sale2Cansale()
+	   {
+	   		var data = grid.getData();
+			if(data == null || data.length == 0)
+			{
+				mini.alert("购物车为空");
+				return;
+			}
+			var ids = [];
+			for (var i = 0, l = data.length; i < l; i++) {
+                var r = data[i];
+				var status = r.status;
+				if("已售" == status)
+				{
+                	ids.push(r.idProduct);
+				}
+				else
+				{
+					mini.alert("第" + (i+1) + "行不是已售状态,只能入库【已售】状态的产品");
+					return;
+				}
+            }
+			var id = ids.join(',');
+	   		 mini.confirm("共【<span style='color:red;font-weight:bold'>" + data.length + "</span>】件产品,全部销售入库","提示",function(action)
+			 {
+					if('ok' == action)
+					{
+                           mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿关闭...'
+                            });
+							var sendData = {idProducts:id};
+                            jQuery.ajax({
+								type:'post',
+                                url: "/order1/batchSaleInStockByIdProduct.html",
+								data: sendData,
+                                success: function(text) {
+        							mini.unmask(); 
+        							grid.load();
+                                },
+                                error: function() {}
+                            });
+					}
+			 })
+	   }
+ 
+	   
+	   //总计
+	    function onDrawSummaryCell(e) {
+            var result = e.result;
+            var grid = e.sender;
+            var rows = e.data;
+			var totalRows = 0;
+			
+			
+		   
+            if (e.field == "ssPrice") {
+                var total = 0;
+				var cookieData = getCookieData();
+				 
+                for (var i = 0, l = rows.length; i < l; i++) {
+					totalRows = totalRows + 1;
+                    var row = rows[i];
+				    var idProduct = row.idProduct;
+					
+					idProduct = idProduct.replace(/(^\s*)|(\s*$)/g, ""); 
+					var t = row.ssPrice;
+					var cookiePrice = cookieData[idProduct];
+					if("modified" == row._state)
+					{
+						//setProductSalePrice2Cookie(idProduct,t);
+					}
+					else if(cookiePrice && ("modified" != row._state))
+					{
+						row.ssPrice = cookiePrice;
+						t = cookiePrice;
+					}
+ 
+                    if (isNaN(t)) continue;
+				    t = Number(t);
+                    total += t;
+                }
+
+                e.cellHtml = "总计: <span style='color:red;display:inline-block'>" + total +  "</span><br/>共" + totalRows + "条数据" ;
+            }
+        }
+	function showTotal(e)
+	{
+		var result = e.result;
+        var grid = e.sender;
+        var rows = grid.data;
+        if (e.field == "ssPrice") {
+            var total = 0;
+            for (var i = 0, l = rows.length; i < l; i++) {
+                var row = rows[i];
+                var t = row.ssPrice;
+				
+                if (isNaN(t)) continue;
+				t = Number(t);
+                total += t;
+            }
+
+            e.cellHtml = "总计: <span style='color:red'>" + total + "</span>";
+        }
+	}
+	
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+	
+	function zhekou()
+	{
+			var zhekoutext = mini.get("zhekoutext").getValue();
+			if(!zhekoutext) zhekoutext = 10;
+			if(isNaN(zhekoutext)){mini.alert("折扣请填数字");return;}; 
+			var idProductAndSalePrice = "";
+		    var rows = grid.getSelecteds();
+            if (rows.length > 0)
+			{
+				var rows = grid.getSelecteds();
+				for(var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i];
+					var smPrice = row.smPrice;
+					var resultPrice = smPrice*(zhekoutext/10);
+					resultPrice = resultPrice.toFixed(0);
+					grid.updateRow(row,{ssPrice:resultPrice});
+					var str = row.idProduct + ":" +resultPrice;
+					idProductAndSalePrice = idProductAndSalePrice + str + ";"
+					//setProductSalePrice2Cookie(row.idProduct,resultPrice);
+				}
+                
+            } 
+			else
+			{
+                mini.alert("请选中一条记录");
+				return;
+            }
+			mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '设置价格中,请勿关闭...'
+            });
+			jQuery.ajax({
+                        url: "/shoppingCar/updateShoppingCarSalePrice.html",
+						type: 'POST',
+						data: {idProductAndSalePrice: idProductAndSalePrice},
+                        success: function(text) {
+							mini.unmask();
+							if(text == "ok")
+							{
+								 mini.alert("ok")
+							}
+							
+                        },
+                        error: function() {}
+                    });
+                
+	}
+	
+	
+	function activePriceZheKou()
+	{
+			var zhekoutext = mini.get("zhekoutext").getValue();
+			if(!zhekoutext) zhekoutext = 10;
+			if(isNaN(zhekoutext)){mini.alert("折扣请填数字");return;};
+			var rows = grid.getSelecteds();
+            if (rows.length > 0)
+			{
+				var rows = grid.getSelecteds();
+				for(var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i];
+					var smPrice = row.smPrice;
+					var resultPrice = smPrice*(zhekoutext/10);
+					resultPrice = resultPrice.toFixed(0);
+					grid.updateRow(row,{activePrice:resultPrice});
+				}
+            } 
+			else
+			{
+                mini.alert("请选中一条记录");
+            }
+	}
+	
+	function activePrice()
+	{
+			mini.confirm("确定设置活动价","提示",function(action)
+			{
+					if('ok' == action)
+					{
+						var rows = grid.getSelecteds();
+                        if (rows.length > 0)
+            			{
+            				mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿关闭...'
+                            });
+            				var rows = grid.getSelecteds();
+            				for(var i = 0; i < rows.length; i++)
+            				{
+            					var row = rows[i];
+            					var activePrice = row.activePrice;
+								if(!activePrice) activePrice = 0;
+            					var data = {idProduct: row.idProduct,activePrice: activePrice};
+            					jQuery.post("/product/updateProductBaseInfo.html",data);
+            				}
+            				mini.unmask();
+            				mini.alert("设置成功");
+							grid.reload();
+                        } 
+            			else
+            			{
+                            mini.alert("请选中一条记录");
+                        }
+					}
+			});
+		    
+	}
+	
+	  //准入库才能编辑 onCellbeginedit="cellbeginedit"
+	 function cellbeginedit(e){
+            if(e.field == "size" && e.record.status != "准入库"){
+                e.cancel = true;
+            }
+			 if(e.field == "type" && e.record.status != "准入库"){
+                e.cancel = true;
+            }
+			 if(e.field == "material" && e.record.status != "准入库"){
+                e.cancel = true;
+            }
+			 if(e.field == "color" && e.record.status != "准入库"){
+                e.cancel = true;
+            }
+      }
+	
+	  //设置售价
+	 function setSalePriceFn(e){
+	
+            if(e.field == "ssPrice" && e.row._state == 'modified'){
+				var idProductAndSalePrice = e.row.idProduct + ":" + e.value;
+            	 jQuery.ajax({
+                        url: "/shoppingCar/updateShoppingCarSalePrice.html",
+						type: 'POST',
+						data: {idProductAndSalePrice: idProductAndSalePrice},
+                        success: function(text) {
+                        },
+                        error: function() {}
+                    });
+            }
+			
+      }
+	
+	
+        function piliangRuku() {   //#
+            var rows = grid.getData();
+			var total = rows.length;
+            if (rows.length > 0) {
+                var idProductAndSize = "";
+       			var ids = [];
+                for (var i = 0,l = rows.length; i < l; i++) {
+                    var r = rows[i];
+                    var idProduct = r.idProduct;
+                    var size = r.size;
+                    var seriesName = r.seriesName;
+                    var status = r.status;
+                    if (status != "准入库") {
+                        mini.alert("第" + (i + 1) + "行不是准入库状态");
+                        return;
+                    }
+    
+                    if (!size) {
+                        size = "";
+                    }
+    
+                    //尺寸是否必填
+                    if (("腰带" == seriesName || "服饰" == seriesName || "鞋履" == seriesName || "配饰" == seriesName) && size == "") {
+                        alert("第" + (i + 1) + "行尺寸必填");
+                        return;
+                    }
+    
+                    var type = r.type;
+                    if (!type) {
+                        alert("第" + (i + 1) + "行型号必填");
+                        return;
+                    }
+    
+                    var material = r.material;
+                    if (!material) {
+                        material = "";
+                    }
+    
+                    var color = r.color;
+                    if (!color) {
+                        color = "";
+                    }
+    
+                    //最后一个分号多个空格 防止没有size 数组获取出错
+                    idProductAndSize = idProductAndSize + r.idProduct + ":" + type + ":" + material + ":" + color + ":" + size + ":" + " ;";
+                }  
+				
+				if(idProductAndSize == "") {
+					mini.alert("没有数据");
+                    return;
+                }
+                if (confirm("共" + total + "条数据,确定入库？")) {
+                    mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿关闭...'
+                    });
+					var postData = {idProductAndSize: idProductAndSize};
+                    jQuery.ajax({
+                        type: "post",
+                        url: "/product/productBatchInStock.html",
+						data: postData,
+                        success: function(text) {
+                            mini.unmask();
+                            grid.reload();
+                        },
+                        error: function() {
+                            mini.unmask();
+							moni.alert("提交出错,请联系管理员");
+                            grid.reload();
+                        }
+                    });
+                }
+			}
+        }
+		
+		
+	//调货入库
+    function ruku() {
+        var rows = grid.getData();
+		var total = rows.length;
+        if (rows.length > 0) {
+			var ids = [];
+            for (var i = 0, l = rows.length; i < l; i++) {
+                var r = rows[i];
+                ids.push(r.idProduct);
+				var status = r.status;
+                if (status != "运输在途") {
+                    mini.alert("第" + (i + 1) + "行不是运输在途状态");
+                    return;
+                }
+            }
+            var id = ids.join(',');
+            if(confirm("共" + total + "条数据,确定入库？")) {
+              mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿关闭...'
+                 });
+				var postData = {idProducts: id};
+                jQuery.ajax({
+					type:"post",
+                    url: "/shoppingCar/diaohuoRuku.html",
+					data:postData,
+                    success: function(text) {
+						mini.unmask(); 
+						//mini.alert("入库成功!");
+						grid.reload();
+                    },
+                    error: function() {
+						grid.unmask(); 
+						mini.alert("提交出错,联系管理员!");
+						grid.reload();
+					}
+                });
+            }
+        } else {
+            mini.alert("请选中一条记录");
+        }
+    }
+		
+	function setProductSalePrice2Cookie(idProduct,price)
+	{
+		//console.log("setCokies " + idProduct + "=" + price);
+		idProduct = idProduct.replace(/(^\s*)|(\s*$)/g, ""); 
+		document.cookie = idProduct + "=" + price;
+	}
+	
+	//导出商品
+	function exportProduct(){
+		var excelForm = document.getElementById("excelForm");
+		excelForm.action = "/shoppingCar/exportProduct.html"
+		excelForm.submit();
+	}
+ 
+	
+	
+	
+	
+	
+	//将多个产品拼成字符串，产品与产品用分号隔开，放在一个变量中传给后面
+ function UpdateNew(){
+ 
+    var rows = grid.getSelecteds();
+   //var rows = grid.getData();
+  
+    if(rows.length>0){
+	
+	    var productAndUpdte="";
+	
+      if(confirm("确定修改吗？")){
+	     for(var i=0, l = rows.length; i < l;i++){	
+		
+	        var r = rows[i];
+	        var idProduct=r.idProduct;
+		   
+			 
+			 var type = r.type;		
+		    if (!type) {
+		        type="";
+		     }
+		  
+		  var material = r.material;
+		  if (!material) {
+		        material="";
+			}
+		  var color = r.color;
+		  if (!color) {
+		    color="";
+		  }
+		  
+		  var size = r.size;
+		  if (!size) {
+		     size="";
+		  }
+		  
+		   //最后一个分号多个   空格 防止没有size 数组获取出错
+		  productAndUpdte = productAndUpdte  + r.idProduct + ":" + type + ":" + material + ":" + color + ":"+  size +":"+";";
+		  
+	   }
+	   
+		if(productAndUpdte == "") {
+					mini.alert("没有数据");
+                    return;
+                }
+		 
+	  }
+    
+	   jQuery.ajax({
+		   type:"post",
+		   url:"/product/updateProducts.html",
+		   data:{productAndUpdte:productAndUpdte},
+		   success: function(text) {
+		            if(text==""+rows.length){
+						mini.unmask();
+						//alert(""+rows.length)
+						mini.alert("成功！");
+						
+						grid.reload();
+					}else{
+					
+					mini.alert("失败！");
+					}	
+                    },
+                    error: function() {
+						
+						mini.alert("提交出错,联系管理员!");
+						
+					}
+		 });
+	  
+	  
+	}else{
+     mini.alert("请选中一条记录");
+         }
+ }
+ 
+ //修改商品名
+ function onCellcommitedit(e){
+     var grid = e.sender;
+     var record = e.record;
+     var field = e.field, value = e.value;
+     var uid = record._uid;
+     var row = grid.getRowByUID(uid);
+	 var idProduct = e.row.idProduct;
+	 
+   if(e.field == "brandName"){
+    var brandName = e.value;
+	var idProductAndBrandName = idProduct+":"+e.value+":"+";";
+					jQuery.ajax({
+                        url: "/shoppingCar/updateBrandName.html",
+						type: 'POST',
+						data: {idProductAndBrandName: idProductAndBrandName},
+                        success: function(text) {
+						if(text=="ok"){
+						 grid.reload();
+						}
+                        if(text=="no")
+						mini.alert("没有此品牌");
+						grid.reload();
+                        },
+						
+                        error: function() {}
+                    });
+   
+   }
+   
+    if(e.field == "seriesName"){
+    var seriesName = e.value;
+	var idProductAndSeriesName = idProduct+":"+e.value+":"+";";
+					jQuery.ajax({
+                        url: "/shoppingCar/updateSeriesName.html",
+						type: 'POST',
+						data: {idProductAndSeriesName: idProductAndSeriesName},
+                        success: function(text) {
+						
+                       grid.reload();
+						
+                        },
+						
+                        error: function() {}
+                    });
+   
+   }
+   
+   
+ }
+ 
+</script>
+</body>
+</html>

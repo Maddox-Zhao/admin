@@ -1,0 +1,91 @@
+#set($layout = "layout/default.vm")
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>查询类目属性关联</span></h3>
+<form action="/category/attriass.html" method="post">
+	<input type="hidden"  name="sele"  id="sel" value="">
+    #springBind("catAttrRel.catCode")
+	<input type="hidden"  name="${status.expression}" id="catCode" value="$!catCode"/>
+    <table>
+      <tr>
+        <th>属性名：</th>
+        <td>
+			#springBind("catAttrRel.attrName")
+			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+		</td>
+		<th></th>
+		<td><button type="submit" class="btn">查 询</button></td>
+      </tr>
+    </table>
+</form>
+  </div>
+
+       <div class="tool">
+
+            <span><a href="#" hidefocus="true" class="bt_add" onclick="return checkSave();">设置关联</a></span>
+
+        </div>
+        <div class="clear"></div>
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>设置新的关联</span></h3>
+            <table >
+                <tr>
+				   <th>选择</th>
+				   <th>属性名</th>
+				   <th>属性值</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($attribute in $query.items)
+                <tr>
+                    <td align="center">
+					  <input type="checkbox"  name="chk" value="${attribute.attrCode}">
+					</td>
+                    <td align="center">
+					  #if($!attribute.attrName.length()>20)
+						$!attribute.attrName.substring(0,20)....  
+					  #else 
+						$!attribute.attrName   
+					  #end
+					</td>
+                	<td align="center">
+					  #if($!attribute.attrValues.length()>40) 
+						$!attribute.attrValues.substring(0,40) ....
+					  #else
+						$!attribute.attrValues 
+					  #end
+					</td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/category/attriass.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有符合条件的记录！
+    #end
+  </div>
+        </div>
+    </div>
+<script type="text/javascript">
+    function  checkSave(){
+	    var obj=document.getElementsByName("chk");
+		var catCode=document.getElementById("catCode").value;
+		var val=obj.length;
+		var objForSubmit=document.getElementById("sel");
+		var selected="";
+		for(var i=0;i<val;i++){
+		    if(obj[i].checked){
+			   selected=selected+obj[i].value+",";
+			}
+	    }
+		if(selected==""){
+		   alert("请至少选择一个属性");
+		   return false;
+		}
+		objForSubmit.value=selected;
+		window.location.href="/category/addca.html?sele="+objForSubmit.value+"&catCode="+catCode;
+		return true;
+	}
+</script>

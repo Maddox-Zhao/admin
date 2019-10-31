@@ -1,0 +1,25 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+#if($!message && $!message == "publishsuccess")
+<div class="r-success">
+    <h3>发布商品成功！</h3>
+</div>
+#end
+#if($!errorMessage && $!errorMessage == "publishfail")
+<div class="r-error">
+    <h3>发布商品失败！</h3>
+</div>
+#end
+#if($!message && $!message == "editsuccess")
+<div class="r-success">
+    <h3>修改商品成功！</h3>
+    <h3><a href="$!{liangpin99url}/l/gdetail_$!{goods.id}.htm" target="blank"><h4>查看商品详情</h4></a><a href="${appServer}/instance/goods_instance.html?gid=$!{goods.id}"><h4>产品维护</h4></a></h3>
+</div>
+#end
+#if($!errorMessage && $!errorMessage == "editfail")
+<div class="r-error">
+    <h3>修改商品失败！</h3>
+</div>
+#end

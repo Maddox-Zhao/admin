@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PayRecordSQL">
+<typeAlias alias="payRecord" type="com.huaixuan.network.biz.domain.trade.PayRecord"/>
+	<resultMap class="payRecord" id="payRecordResult">
+		<result column="id" property="id"/>
+		<result column="pay_platform" property="payPlatform"/>
+		<result column="tid" property="tid"/>
+		<result column="trade_time" property="tradeTime"/>
+		<result column="pay_amount" property="payAmount"/>
+		<result column="pay_id" property="payId"/>
+		<result column="pay_dest" property="payDest"/>
+		<result column="buy_account_nu" property="buyAccountNu"/>
+		<result column="buyer" property="buyer"/>
+		<result column="seller_account_no" property="sellerAccountNo"/>
+		<result column="seller" property="seller"/>
+		<result column="batch_no" property="batchNo"/>
+		<result column="voucher_no" property="voucherNo"/>
+		<result column="pay_status" property="payStatus"/>
+		<result column="gmt_platform_paytime" property="gmtPlatformPaytime"/>
+		<result column="platform_pay_demo" property="platformPayDemo"/>
+		<result column="platform_pay_type" property="platformPayType"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="finance_status" property="financeStatus"/>
+	</resultMap>
+	<resultMap class="payRecord" id="payRecordResult_2">
+		<result column="id" property="id"/>
+		<result column="pay_platform" property="payPlatform"/>
+		<result column="tid" property="tid"/>
+		<result column="trade_time" property="tradeTime"/>
+		<result column="pay_amount" property="payAmount"/>
+		<result column="pay_id" property="payId"/>
+		<result column="pay_dest" property="payDest"/>
+		<result column="buy_account_nu" property="buyAccountNu"/>
+		<result column="buyer" property="buyer"/>
+		<result column="seller_account_no" property="sellerAccountNo"/>
+		<result column="seller" property="seller"/>
+		<result column="batch_no" property="batchNo"/>
+		<result column="voucher_no" property="voucherNo"/>
+		<result column="pay_status" property="payStatus"/>
+		<result column="gmt_platform_paytime" property="gmtPlatformPaytime"/>
+		<result column="platform_pay_demo" property="platformPayDemo"/>
+		<result column="platform_pay_type" property="platformPayType"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="finance_status" property="financeStatus"/>
+		<result column="outBillNum" property="outBillNum"/>
+	</resultMap>
+	<resultMap class="payRecord" id="payRecordAmountResult">
+	    <result column="pay_amount_sum" property="payAmountSum"/>
+	    <result column="id" property="id"/>
+	</resultMap>
+	<resultMap class="payRecord" id="payRecordCodResult">
+	    <result column="id" property="id"/>
+	    <result column="tid" property="tid"/>
+	    <result column="type" property="type"/>
+	    <result column="cod_amount" property="codAmount"/>
+	    <result column="account" property="account"/>
+	    <result column="pay_time" property="payTime"/>
+	    <result column="finance_status" property="financeStatus"/>
+	    <result column="agent_sell_amount" property="agentSellAmount" />
+	    <result column="shipping_amount" property="shippingAmount" nullValue="0.00"/>
+	</resultMap>
+	<resultMap class="payRecord" id="payRecordAmountByCodResult">
+	    <result column="id" property="id"/>
+	    <result column="pay_cod_sum" property="payCodSum"/>
+	</resultMap>
+<!-- create PayRecord object -->
+<insert id="addPayRecord" parameterClass="payRecord">
+<![CDATA[
+insert into emall_pay_record
+  (id,
+   pay_platform,
+   tid,
+   trade_time,
+   pay_amount,
+   pay_id,
+   pay_dest,
+   buy_account_nu,
+   buyer,
+   seller_account_no,
+   seller,
+   batch_no,
+   voucher_no,
+   pay_status,
+   gmt_platform_paytime,
+   platform_pay_demo,
+   platform_pay_type,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #payPlatform#,
+   #tid#,
+   #tradeTime#,
+   #payAmount#,
+   #payId#,
+   #payDest#,
+   #buyAccountNu#,
+   #buyer#,
+   #sellerAccountNo#,
+   #seller#,
+   #batchNo#,
+   #voucherNo#,
+   #payStatus#,
+   #gmtPlatformPaytime#,
+   #platformPayDemo#,
+   #platformPayType#,
+   sysdate(),
+   sysdate())
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update PayRecord object -->
+<update id="editPayRecord" parameterClass="payRecord">
+<![CDATA[
+		update emall_pay_record set pay_platform = #payPlatform#,
+		tid = #tid#,
+		trade_time = #tradeTime#,
+		pay_amount = #payAmount#,
+		pay_id = #payId#,
+		pay_dest = #payDest#,
+		buy_account_nu = #buyAccountNu#,
+		buyer = #buyer#,
+		seller_account_no = #sellerAccountNo#,
+		seller = #seller#,
+		batch_no = #batchNo#,
+		voucher_no = #voucherNo#,
+		pay_status = #payStatus#,
+		gmt_platform_paytime = #gmtPlatformPaytime#,
+		platform_pay_demo = #platformPayDemo#,
+		platform_pay_type = #platformPayType#,
+		gmt_modify = sysdate(),
+		finance_status = #financeStatus#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete PayRecord object -->
+<delete id="removePayRecord" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_pay_record where emall_pay_record.ID = #value#
+]]>
+</delete>
+<!-- search PayRecord object -->
+<select id="getPayRecord" parameterClass="java.lang.Long" resultMap="payRecordResult">
+<![CDATA[
+		select emall_pay_record.* from emall_pay_record where emall_pay_record.ID = #value#
+]]>
+</select>
+<!-- searchAll PayRecord List -->
+<select id="getPayRecords" resultMap="payRecordResult">
+<![CDATA[
+		select emall_pay_record.* from emall_pay_record
+]]>
+</select>
+
+<update id="updatePayRecordByNotify" parameterClass="payRecord">
+<![CDATA[
+		update emall_pay_record set
+		pay_platform = #payPlatform#,
+		trade_time = #tradeTime#,
+		pay_amount = #payAmount#,
+		pay_id = #payId#,
+		pay_dest = #payDest#,
+		buy_account_nu = #buyAccountNu#,
+		buyer = #buyer#,
+		seller_account_no = #sellerAccountNo#,
+		seller = #seller#,
+		batch_no = #batchNo#,
+		voucher_no = #voucherNo#,
+		pay_status = #payStatus#,
+		gmt_platform_paytime = #gmtPlatformPaytime#,
+		platform_pay_demo = #platformPayDemo#,
+		platform_pay_type = #platformPayType#,
+		gmt_modify = sysdate()
+		 where tid = #tid#
+
+]]>
+</update>
+
+<select id="getPayRecordByTid" parameterClass="java.lang.String" resultMap="payRecordResult">
+<![CDATA[
+		select emall_pay_record.* from emall_pay_record where emall_pay_record.tid = #value#
+]]>
+</select>
+
+<select id="getPayRecordListsCount" resultClass="int">
+<![CDATA[
+		select count(emall_pay_record.id)
+		  from emall_pay_record
+		 where pay_platform is not null
+		   and pay_status = 'TRADE_FINISHED'
+		   and pay_platform <> '货到付款'
+]]>
+		<isNotEmpty prepend="and" property="payPlatform">
+			pay_platform like CONCAT('%',#payPlatform#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyer">
+			buyer like CONCAT('%',#buyer#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="seller">
+		    seller like CONCAT('%',#seller#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="batchNo">
+		    batch_no like CONCAT('%',#batchNo#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="voucherNo">
+		    voucher_no like CONCAT('%',#voucherNo#,'%')
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="finance">
+            finance_status = #finance#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="platformTimeStart">
+<![CDATA[			gmt_modify >= STR_TO_DATE(#platformTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="platformTimeEnd">
+<![CDATA[			gmt_modify < DATE_ADD(STR_TO_DATE(#platformTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</select>
+
+<select id="getPayRecordLists" resultMap="payRecordResult_2">
+	
+<![CDATA[
+	select t.*,
+       (select o.bill_num
+          from ioss_out_depository o
+         where o.relation_num = (select p.merge_tid
+                                   from emall_trade_package p
+                                  where t.tid = p.tid
+                                    LIMIT 1)) as outBillNum
+	  from emall_pay_record t
+	 where pay_platform is not null
+	   and pay_status = 'TRADE_FINISHED'
+	   and pay_platform <> '货到付款'
+]]>
+		<isNotEmpty prepend="and" property="payPlatform">
+			pay_platform like CONCAT('%',#payPlatform#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyer">
+			buyer like CONCAT('%',#buyer#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="seller">
+		    seller like CONCAT('%',#seller#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="batchNo">
+		    batch_no like CONCAT('%',#batchNo#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStatus">
+            pay_status = #payStatus#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="voucherNo">
+		    voucher_no like CONCAT('%',#voucherNo#,'%')
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="finance">
+            finance_status = #finance#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="platformTimeStart">
+<![CDATA[			gmt_modify >= STR_TO_DATE(#platformTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="platformTimeEnd">
+<![CDATA[			gmt_modify < DATE_ADD(STR_TO_DATE(#platformTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		order by gmt_modify DESC
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getPayAmountByPlatform" resultMap="payRecordAmountResult" >
+  <![CDATA[
+  	select
+  		count(id) as id,
+  		coalesce(sum(emall_pay_record.pay_amount),0) as pay_amount_sum
+  		from emall_pay_record
+		where pay_platform is not null and pay_status='TRADE_FINISHED' and pay_platform <> '货到付款'
+  ]]>
+  <isNotEmpty prepend="and" property="payPlatform">
+        pay_platform = #payPlatform#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="tid">
+        tid like CONCAT('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="buyer">
+        buyer like CONCAT('%',#buyer#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="batchNo">
+        batch_no like CONCAT('%',#batchNo#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="finance">
+        finance_status = #finance#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="platformTimeStart">
+<![CDATA[			gmt_modify >= STR_TO_DATE(#platformTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="platformTimeEnd">
+<![CDATA[			gmt_modify < DATE_ADD(STR_TO_DATE(#platformTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+
+<select id="getCodPayRecordListsCount" resultClass="int">
+   <![CDATA[
+    select count(1) from
+      ( select
+        a.id as id,
+        a.tid,
+        b.amount,
+        c.account,
+        b.pay_time,
+        a.finance_status
+      from
+        emall_pay_record a, emall_trade b, emall_users c
+      where a.tid = b.tid and b.buy_id = c.id and a.pay_platform = '货到付款' and b.status = 'trade_finish' and b.pay_status = 'paid'
+   ]]>
+  <isNotEmpty prepend="and" property="tid">
+        a.tid like CONCAT('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="account">
+        c.account like CONCAT('%',#account#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="finance">
+        a.finance_status = #finance#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="codTimeStart">
+<![CDATA[			b.pay_time >= STR_TO_DATE(#codTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="codTimeEnd">
+<![CDATA[			b.pay_time < DATE_ADD(STR_TO_DATE(#codTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+  ) aa
+</select>
+
+<select id="getPayRecordListsByCod" resultMap="payRecordCodResult">
+	
+ <![CDATA[
+    select
+        a.id as id,
+        a.tid as tid,
+        b.amount as cod_amount,
+        b.type ,
+        b.agent_sell_amount ,
+        b.SHIPPING_AMOUNT ,
+        c.account as account,
+        b.pay_time as pay_time,
+        a.finance_status as finance_status
+      from
+        emall_pay_record a, emall_trade b, emall_users c
+      where a.tid = b.tid and b.buy_id = c.id and a.pay_platform = '货到付款' and b.status = 'trade_finish' and b.pay_status = 'paid'
+   ]]>
+  <isNotEmpty prepend="and" property="tid">
+        a.tid like CONCAT('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="account">
+        c.account like CONCAT('%',#account#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="finance">
+        a.finance_status = #finance#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="codTimeStart">
+<![CDATA[			b.pay_time >= STR_TO_DATE(#codTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="codTimeEnd">
+<![CDATA[			b.pay_time < DATE_ADD(STR_TO_DATE(#codTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+  </isNotEmpty>
+      order by b.tid DESC
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getPayAmountByCod" resultMap="payRecordAmountByCodResult" parameterClass="java.util.Map">
+  <![CDATA[
+  	select
+  		count(a.id) as id,
+  		coalesce(sum(b.amount),0) as pay_cod_sum
+  		from emall_pay_record a, emall_trade b, emall_users c
+		where a.tid = b.tid and b.buy_id = c.id and a.pay_platform = '货到付款' and b.status = 'trade_finish' and b.pay_status = 'paid'
+  ]]>
+  <isNotEmpty prepend="and" property="tid">
+        a.tid like CONCAT('%',#tid#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="account">
+        c.account like CONCAT('%',#account#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="finance">
+        a.finance_status = #finance#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="codTimeStart">
+<![CDATA[			b.pay_time >= STR_TO_DATE(#codTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="codTimeEnd">
+<![CDATA[			b.pay_time < DATE_ADD(STR_TO_DATE(#codTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+</sqlMap>

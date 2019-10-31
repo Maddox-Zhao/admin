@@ -1,0 +1,244 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<body>
+	<div class="main">
+    	 <h2>现货查看</h2>
+		
+		 
+		 <form action="productHistoryList.html" name="searchForm" method="post">
+			<input type="hidden" name="datestr" value="$!{datestr}" />
+			<input type="hidden" name="idStatus" value="$!{idStatus}" />
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+					#*<th>状态：</th>
+                    <td>
+            			#springBind("productViewAll.idStatus")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+                            <option value="1" #if("1"=="$!{status.value}") selected #end>可售</option>
+                            <option value="2" #if("2"=="$!{status.value}") selected #end>运输在途</option>
+							<option value="3" #if("3"=="$!{status.value}") selected #end>预订</option>
+							<option value="4" #if("4"=="$!{status.value}") selected #end>已售</option>
+							<option value="6" #if("6"=="$!{status.value}") selected #end>准入库</option>
+							<option value="7" #if("7"=="$!{status.value}") selected #end>已退货</option>
+                        </select>
+            		</td>
+					
+					<th>销售渠道：</th>
+                    <td>
+            			#springBind("productViewAll.idchannel")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+                            #foreach($sellch in $sellChannelMap.entrySet())
+                            <option value="$!sellch.key" #if("$!sellch.key"=="$!{status.value}") selected #end>$!sellch.value</option>
+                            #end
+                        </select>
+            		</td>*#
+					<th>品牌：</th>
+                    <td>
+            			#springBind("productViewAll.idBrand")
+            			<select name="${status.expression}" class="select">
+                            <option value="">-=请选择=-</option>
+                            #foreach($bp in $brandList)
+                            <option value="$!bp.id" #if("$!bp.id"=="$!{status.value}") selected #end>$!bp.brandName</option>
+                            #end
+                        </select>
+            		</td>
+					<th>品名：</th>
+                    <td>
+            			#springBind("productViewAll.idSeries")
+            			<select name="${status.expression}" class="select" >
+                            <option value="">-=请选择=-</option>
+                            #foreach($seri in $seriesMap.entrySet())
+                            <option value="$!seri.key" #if("$!seri.key"=="$!{status.value}") selected #end>$!seri.value</option>
+                            #end
+                        </select>
+            		</td>
+					
+					<th>销售日期：从</th>
+        			<td style="width:240px;">
+						#springBind("productViewAll.dateStart")
+        				<input type="text" name="${status.expression}" id="dateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    
+        			&nbsp; 到  &nbsp; 
+        			
+						#springBind("productViewAll.dateEnd")
+        				<input type="text" name="${status.expression}" id="dateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "dateStart",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "dateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+                </tr>
+				<tr>
+        			<th>型号：</th>
+                    <td>
+            			#springBind("productViewAll.type")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					<th>材质：</th>
+                    <td>
+            			#springBind("productViewAll.material")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+					
+					
+					<th>入库日期：从</th>
+        			<td style="width:240px;">
+						#springBind("productViewAll.storeDateStart")
+        				<input type="text" name="${status.expression}" id="storeDateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    
+        			&nbsp; 到  &nbsp; 
+        			
+						#springBind("productViewAll.storeDateEnd")
+        				<input type="text" name="${status.expression}" id="storeDateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "storeDateStart",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "storeDateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+					
+                </tr>
+				<tr>
+					
+					<th>颜色：</th>
+                    <td>
+            			#springBind("productViewAll.color")
+            			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" />
+            		</td>
+				<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+				</tr>
+    		</table>
+		</div>
+	</form>
+		 
+	<div class="tool">
+     #foreach($pvs in $productViewAllSumList )
+		<div align="right">
+			<font size='4'><strong><label>【 销售额: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${pvs.priceSum},'0.00') </label></strong></font>
+			<font size='4'><strong><label> $!pvs.priceCurrencySum 】</label></strong></font>
+		</div>
+	 #end
+	 #foreach($pvcost in $productViewCostSumList )
+		<div align="right">
+			<font size='4'><strong><label>【 成本: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${pvcost.costAll},'0.00') </label></strong></font>
+			<font size='4'><strong><label> $!pvcost.costCurrency 】</label></strong></font>
+		</div>
+     #end
+ </div>
+	
+		 
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品列表</span></h3>
+            <table >
+                <tr>
+                    <th>产品id</th>
+					<th>图片</th>
+					<th>可售数量</th>
+                    <th>品牌</th>
+                    <th>品名</th>
+                    <th>型号</th>
+					<th>材质</th>
+					<th>颜色</th>
+					<th>入库日期</th>
+					<th>成本</th>
+					<th>欧洲价</th>
+					<th>香港售价</th>
+					#if($!idStatus == 3 )
+					<th>现状态</th>
+					<th>订单id</th>
+					<th>客户</th>
+					#end
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($hview in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+                    <td>$!hview.idProduct</td>
+					<td><a href="$upServer/$!hview.imgLarge" target="_blank" ><img src="$upServer/$!hview.imgMiddle" style="width:120px;height:120px;"/></a></td>
+					<td>$!hview.hkGoodsNumber</td>
+					<td>$!hview.brand</td>
+					<td>$!hview.series</td>
+					<td>$!hview.type</td>
+					<td>$!hview.material</td>
+					<td>$!hview.color </td>
+					<td>$!dateUtil.countDays($!hview.inDate,$!dateUtilHX.getTodayToString(),"yyyy-MM-dd")</td>
+					<td>$!moneyUtil.getFormatMoney(${hview.cost},'0.00')</td>
+					<td>$!moneyUtil.getFormatMoney(${hview.euPrice},'0.00')</td>
+					<td>$!moneyUtil.getFormatMoney(${hview.hKHXPrice},'0.00')</td>
+					#if( $!idStatus == 3 )
+						<td>$!hview.status</td>
+						<td>$!hview.idOrder</td>
+						<td width="60px;">$!hview.customerName &nbsp; </td>
+					#end
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/productview/productHistoryList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+
+
+    </div>
+	<script language="javascript" type="text/javascript">
+	
+	function cursor(str,evt){
+
+        var id = document.getElementById("Layer3");
+        //id.innerHTML = str; //文字
+        evt = evt||window.event;
+
+        id.innerHTML = "<img src='" + str + "' height=\"270px\" width=\"270px\">"; //图片
+        id.style.visibility = "visible";
+        id.style.position = "absolute";
+        id.style.left = evt.clientX -350+"px";
+        id.style.top = evt.clientY -270+document.documentElement.scrollTop+"px";
+    }
+    
+    function hidecursor(){
+        var id = document.getElementById("Layer3");
+        id.style.visibility = "hidden";
+    }
+	function szietarDis(num){
+		var ser = document.getElementById("sizetar");
+		if(num=="1"||num=="2"){
+			ser.style.display="none";
+		}else{
+			ser.style.display="";
+		}
+	}
+</script>
+	<div id="Layer3" style="visibility:hidden; border:#E1E1E1 1px solid; padding:3px;">Hello</div>
+</body>

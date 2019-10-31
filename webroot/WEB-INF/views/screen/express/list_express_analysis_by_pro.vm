@@ -1,0 +1,114 @@
+#set($layout = "layout/default.vm")
+#set($title = "物流分析（省份）")
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+	<div class="searchBox">
+	<h3><span>物流分析（省份）</span></h3>
+		<form action="/express/list_express_analysis_by_pro.html" id="singleForm" name="singleForm" method="post">
+			<table>
+				<tr>
+					<th>统计时间：</th>
+					<td>
+    					#springBind("expressDistQuery.gmtOutDepStart")
+    					<input type="text" id="gmtOutDepStart" name="${status.expression}" value="$!{status.value}" size="8" readonly="true"/>
+    					-
+    					#springBind("expressDistQuery.gmtOutDepEnd")
+    					<input type="text" id="gmtOutDepEnd" name="${status.expression}" value="$!{status.value}" size="8" readonly="true"/>
+            			  <script type="text/javascript">
+            			      Calendar.setup({
+            			          inputField : "gmtOutDepStart",
+            			          ifFormat   : "%Y-%m",
+            			          align      : "BR"
+            			      });
+            			      Calendar.setup({
+            			          inputField : "gmtOutDepEnd",
+            			          ifFormat   : "%Y-%m",
+            			          align      : "BR"
+            			      });
+            			</script>
+    				</td>
+					<th>省份：</th>
+					<td>
+						#springBind("expressDistQuery.regionCode")
+						<select name="${status.expression}" id="regionCode" class="inp">
+                                <option value="">-=请选择=-</option>
+                                #foreach($province in $provinceList)
+                                    <option value="$!{province.code}" #if("$!{status.value}"=="$!{province.code}") selected #end>$!{province.regionName}</option>
+                                #end
+						</select>
+                    </td>
+					<td>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="button" value=" 搜索 " class="btn"  onclick="formSubmit();"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="button" value=" 导出 " class="btn"  onclick="exportOutDepAnalysis();"/>
+					</td>
+				</tr>
+			</table>
+    	</form>
+	</div>
+	#if($!message)<div class="mag-t2"> $!message </div>#end
+
+  <div class="listBox" id="listDiv">
+	<table  id="listTable" name="listTable">
+		<th>省份</th>
+        <th>统计时间</th>
+        <th>单量</th>
+        <th>实际运费</th>
+		<th>系统运费</th>
+      </tr>
+    #if($query && $query.items.size()>0)
+		#foreach($ea in $query.items)
+		<tr    #if($velocityCount%2==0) class="bg" #end>
+				<td>
+			#foreach($province in $provinceList)
+					#if("$!{ea.regionCode}"=="$!{province.code}")
+					$!{province.regionName}
+					#end
+			#end
+				</td>
+				<td>
+					$!ea.gmtOutDep
+                </td>
+				<td>$!ea.outDepSum</td>
+				<td>￥$!moneyUtil.getFormatMoney("$!ea.actualInventorySum","0.00") &nbsp;</td>
+				<td>￥$!moneyUtil.getFormatMoney("$!ea.shippingAmountSum","0.00") &nbsp;</td>
+		</tr>
+		#end
+	#end
+	</table>
+    #if($query && $query.items.size()>0)
+    #else
+    	没有结果！
+    #end
+ </div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+
+		function formSubmit(){
+			var s=document.getElementById("gmtOutDepStart").value.replace(/-/g, "/");
+    		var e=document.getElementById("gmtOutDepEnd").value.replace(/-/g, "/");
+    		var s_date=new Date(Date.parse(s));
+            var e_date=new Date(Date.parse(e));
+    		if(e_date < s_date){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}else if(s==null||s.length<=0||e==null||e.length<=0){
+				alert("请选择时间！");
+    			return false;
+			}s
+			document.singleForm.submit();
+	   }
+
+
+	   function exportOutDepAnalysis(){
+	   	var form1=document.forms[0];
+		form1.action="/express/export_analysis_by_pro.html";
+		form1.submit();
+		form1.action="/express/list_express_analysis_by_pro.html";
+	   }
+</script>
+</div>

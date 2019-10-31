@@ -1,0 +1,94 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>位置</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	<div id="form1"  style="margin-left:80px">
+        <table >
+            
+            <tr>
+                <td>
+                    <label >订单号：</label>
+                </td>
+                <td>
+					<input id="tradeId"  name="tradeId" style="width:120px"  class="mini-textbox"/>
+                </td>
+            </tr>
+			<tr><td></td><td></td></tr>
+			<tr><td></td><td></td></tr>
+			<tr><td></td><td></td></tr>
+            <tr>
+					<td>
+						  <a class="mini-button" id="submit" iconCls="icon-ok" onclick="submit()">添加</a>
+					</td>
+					<td>
+						  <a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	
+
+	function submit()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		mini.confirm("确定添加？", "提示", function(action) {
+				 if (action == "ok") {
+        				var formData = form.getData();//form表单填写的数据
+                		mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '提交中,请勿关闭...'
+                        });
+                		jQuery.post("/provider/addOrderByHand.html",formData,function(text)
+                		{
+                		 	mini.unmask(document.body);
+                			if("ok" == text)
+                			{
+                				CloseWindow('close');
+                			}
+                			else if("no" == text)
+                			{
+                				mini.alert("未获取到订单详情");
+                			}else if("non" == text)
+                			{
+                				mini.alert("订单号错误");
+                			}else if("has" == text)
+                			{
+							   
+                				mini.alert("订单号已存在");
+								
+                			}
+                			else
+                			{   
+							    CloseWindow('close');
+                				mini.alert("提交出错,联系管理员");
+                			}
+                		});
+				 }
+			
+		});
+		
+		
+	}
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+</script>
+</body>
+</html>

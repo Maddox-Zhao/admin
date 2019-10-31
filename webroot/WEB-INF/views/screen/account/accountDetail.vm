@@ -1,0 +1,234 @@
+#set($layout = 'layout\default.vm')
+<style type="text/css">
+.title { height: 1em; }
+</style>
+<script type="text/javascript">
+function iniWin(){
+    var availX = window.screen.availWidth;
+    var availY = window.screen.availHeight;
+    var winWidth = availX-100;
+    var winHeight = availY-100;
+    window.resizeTo(winWidth,winHeight);
+    window.moveTo(50,50);
+}
+
+function showTipMsg(msg,isError){
+	var msgDiv = document.getElementById("msgDiv");
+	msgArr = msg.split("$$");
+	if(msgDiv){
+		if(isError){
+			var showMsg = "<font color='red'>◆提醒：</font>";
+			for(var i=0;i<msgArr.length;i++){
+				showMsg += "<br><font color='red'>　"+msgArr[i]+"</font>"
+			}
+		}else{
+			var showMsg = "<font color='blue'>◆提醒：</font>";
+			for(var i=0;i<msgArr.length;i++){
+				showMsg += "<br><font color='blue'>　"+msgArr[i]+"</font>"
+			}
+		}
+		msgDiv.innerHTML=showMsg;
+	}
+}
+
+function processAccount(accountNo,enabledStatus){
+    var tipMSG = "";
+    if(enabledStatus=="T"){
+        tipMSG = "确定要解冻帐户吗？"
+    }
+    if(enabledStatus=="B"){
+        tipMSG = "确定要冻结帐户吗？"
+    }
+    if(confirm(tipMSG)){
+        var memo = showModalDialog("accountProcessReason.html","processReason","dialogHeight:300px;scroll:no");
+        if(typeof(memo)!="undefined"){
+            theForm.all("account.memo").value = memo;
+            theForm.action="doProcessAccount.html";
+            theForm.submit();
+        }
+    }
+}
+
+function doFreezeMoney(flag){
+    var param = {};
+    if(flag){
+        param.tip = "冻结帐户金额";
+    }else{
+        param.tip = "解冻帐户金额";
+    }
+    var moneyAccount = showModalDialog("showBalanceReq.html",param,"dialogHeight:340px;dialogWidth:450px;scroll:no");
+    if(typeof(moneyAccount)!="undefined"){
+        if(flag){
+            theForm.action="doFreezeBalanceReq.html";
+        }else{
+            theForm.action="doUnFreezeBalanceReq.html";
+        }
+        theForm.all("balanceAmount").value = moneyAccount[0];
+        theForm.all("account.memo").value = moneyAccount[1];
+        theForm.submit();
+    }
+}
+</script>
+#macro( showMsg $code)
+    #set($thismsg="")
+    #set($isError=true)
+    #if("$!code"!="")
+    	#if("$!code"=="update_ok")
+	    	#set($thismsg="更新成功！")
+	        #set($isError=false)
+	    #elseif("$!code"=="update_error")
+	        #set($thismsg="更新失败！")
+	    #elseif("$!code"=="process_ok")
+	        #set($thismsg="操作成功！")
+	        #set($isError=false)
+	    #elseif("$!code"=="process_error")
+	        #set($thismsg="操作失败！")
+	    #elseif("$!code"=="TXN_RESULT_SUCCESS")
+	        #set($thismsg="操作成功！")
+	        #set($isError=false)
+	    #elseif("$!code"=="TXN_RESULT_REQ_PARA_NOT_MATCH")
+	        #set($thismsg="参数有误！")
+	    #elseif("$!code"=="TXN_RESULT_TRANS_NOT_SUPPORT")
+	        #set($thismsg="不支持该操作！")
+	    #elseif("$!code"=="TXN_RESULT_TRANS_NOT_ALLOWED")
+	        #set($thismsg="该操作不允许！")
+	    #elseif("$!code"=="TXN_RESULT_NO_SUCH_ACCOUNT")
+	        #set($thismsg="该账户不存在！")
+	    #elseif("$!code"=="TXN_RESULT_ACCOUNT_STATUS_NOT_VALID")
+	        #set($thismsg="账户状态不正常！")
+	    #elseif("$!code"=="TXN_RESULT_ACCOUNT_BALANCE_NOT_ENOUGH")
+	        #set($thismsg="账户余额不足,无法完成该操作！")
+	    #elseif("$!code"=="TXN_RESULT_TRANSFER_OUT_CAN_NOT_EQUAL_IN")
+	        #set($thismsg="转入转出账户不能相同！")
+	    #elseif("$!code"=="TXN_RESULT_TRANSFER_MONEY_MUST_POSITIVE")
+	        #set($thismsg="交易金额必须大于0！")
+	    #elseif("$!code"=="TXN_RESULT_UNFREEZE_BALANCE_NOT_ENOUGH")
+	        #set($thismsg="该类型的冻结金额不足,不能完成解冻！")
+	    #elseif("$!code"=="TXN_RESULT_NO_NEEDED_INNER_ACCOUNT")
+	        #set($thismsg="未创建交易需要的内部户,请在后台创建后操作！")
+	    #else
+	        #set($thismsg="未知错误！")
+	    #end
+    #end
+    #if("$!thismsg"!="")
+
+    	<script>
+	   	   showTipMsg("$!thismsg",$!isError)
+	   </script>
+
+    #end
+#end
+<form name="theForm" action="doAccountsListByCondition.html" method="post">
+<div id="msgDiv" class=""></div>
+<div class="searchBox">
+	<div id="print">
+		              <div class="list-div" style="margin-bottom: 5px">
+				<h3><span>帐户详细页面</span></h3>
+    <table cellpadding="3" cellspacing="1" width="80%" align="center">
+        <tr>
+            <td width="20%">帐户号</td>
+            <td width="80%">$!{account.accountNo}</td>
+        </tr>
+        <tr>
+            <td>用户ID</td>
+            <td>$!{account.userId}</td>
+        </tr>
+        <tr>
+            <td>帐户类型</td>
+            <td>$!accountUtil.getAccountTypeNameByCode("$!{account.accountType}")</td>
+        </tr>
+        <tr>
+            <td>帐户子类型</td>
+            <td>$!accountUtil.getSubAccountTypeNameByCode("$!{account.accountSubType}")</td>
+        </tr>
+        <tr>
+            <td>帐户余额</td>
+            <td>
+               #set($divAmountYuan=$!{moneyUtil.div("$!{account.balance}","100")})
+               	￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')
+            </td>
+        </tr>
+        <tr>
+            <td>帐户可用余额</td>
+            <td>
+                #set($freeAmount=$!{moneyUtil.sub($!{account.balance},$!{account.freezeAmount})})
+    			#set($divAmountYuan=$!{moneyUtil.div("$!freeAmount","100")})
+               	￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')
+            </td>
+        </tr>
+        <tr>
+            <td>帐户冻结余额</td>
+            <td>
+                #set($divAmountYuan=$!{moneyUtil.div("$!{account.freezeAmount}","100")})
+               	￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')
+            </td>
+        </tr>
+        <tr>
+            <td>帐户状态</td>
+            <td>
+                #if("$!account.enabledStatus"=="T")
+                	正常帐户
+                #elseif("$!account.enabledStatus"=="B")
+                    冻结帐户
+                #else
+                    $!account.enabledStatus
+                #end
+            </td>
+        </tr>
+        <tr>
+        	<td>创建时间</td>
+            <td>
+                $date.format("yyyy-MM-dd HH:mm:ss",${account.gmtCreate})
+            </td>
+         </tr>
+         <tr>
+        	<td>最后修改时间</td>
+            <td>
+                $date.format("yyyy-MM-dd HH:mm:ss",${account.gmtModified})
+            </td>
+         </tr>
+         <tr>
+        	<td>创建人</td>
+            <td>
+                $!account.creator
+            </td>
+         </tr>
+         <tr>
+        	<td>最后修改人</td>
+            <td>
+                $!account.modifier
+            </td>
+         </tr>
+         <tr>
+        	<td>备注</td>
+            <td>
+                $!account.memo
+            </td>
+         </tr>
+    </table>
+ </div>
+    </div>
+</div>
+ <br>
+#set($processAccountName="")
+#set($processAccountStatus="")
+#if("$!{account.enabledStatus}"=="T")
+	#set($processAccountName="冻结帐户")
+	#set($processAccountStatus="B")
+#elseif("$!{account.enabledStatus}"=="B")
+    #set($processAccountName="解冻帐户")
+    #set($processAccountStatus="T")
+#end
+#if("$!{account.accountType}"=="1" || "$!{account.accountType}"=="2")
+	#if($action.hasAnyAuthority("ROLE_ADMIN,PERM_COUNTER_COMMON,PERM_COUNTER_COMPARE,PERM_COUNTER_RECOVER,PERM_COUNTER_ADVANCED"))
+	<input type="button" value="$!processAccountName" class="submitbt"  onclick='processAccount("$!{account.accountNo}","$!processAccountStatus");'/>
+	<input type="button" value="冻结余额" class="submitbt"  onclick='doFreezeMoney(true);'/>
+	<input type="button" value="解冻余额" class="submitbt"  onclick='doFreezeMoney(false);'/>
+	#end
+#end
+<input type="hidden" name="account.enabledStatus" value="$!processAccountStatus">
+<input type="hidden" name="account.accountNo" value="$!{account.accountNo}">
+<input type="hidden" name="account.memo">
+<input type="hidden" name="balanceAmount">
+</form>
+#showMsg("$!processCode")

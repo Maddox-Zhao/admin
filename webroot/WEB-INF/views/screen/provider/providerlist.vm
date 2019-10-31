@@ -1,0 +1,286 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+  <div class="main">
+	<form name="form1" id="form1" action="/provider/searchProvider.html" method="post">
+		#springBind("provider.id")
+		<input type="hidden" id="id" name="${status.expression}" value ="$!{status.value}" />
+
+		<div class="searchBox">
+			<h3><span>搜索供应商</span></h3>
+		 <table>
+            <tr>
+			   <th>银泰sku：</th>
+               <td>
+			     #springBind("provider.prodId")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   <th>尚上sku：</th>
+               <td>
+				 #springBind("provider.ssProdid")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" min="0" />
+               </td>
+			   <th>品牌名：</th>
+               <td>
+				 #springBind("provider.brandName")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   
+			    <th>商品类目：</th>
+               <td>
+			     #springBind("provider.detailDescription")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   #*
+			   <th>商品名：</th>
+               <td>
+				 #springBind("provider.prodName")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			    *#
+            </tr>
+			<tr>
+				
+			   <th>库存大于：</th>
+               <td>
+				  #springBind("provider.stockStr")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" min="0" />
+              </td>
+			    
+			  
+			   
+			   
+			   #*
+			   <th>售价：</th>
+               <td>
+			     #springBind("provider.salePriceStart")
+                 <input id="salePriceStart" style="width:52px;" type="text" name="${status.expression}" value ="$!{status.value}" class="inp" />~
+				 #springBind("provider.salePriceEnd")
+				 <input id="salePriceEnd" style="width:52px;" type="text" name="${status.expression}" value ="$!{status.value}" class="inp" />
+               </td>
+			   *#
+			   
+			   <th>库存：</th>
+               <td>
+			     #springBind("provider.stock")
+                 <input type="text" name="stock" id="stock" onblur="stockNumber()" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+                 <span class="Validform_checktip" id="attr" style="color: red" datatype="url"></span>
+			   </td>
+            </tr>
+			<tr>
+			   <th> </th>
+               <td><button type="button" onclick="javascript:doSearch()" class="btn">查询商品</button></td>
+				<td><button type="button" onclick="javascript:downExportProvideGou()" class="btn">excel下载</button></td>
+				<td><button type="button" onclick="javascript:downLoadImg()" class="btn">图片下载</button></td>
+			   <td style="width:200px;"><button style="width:130px;"type="button" onclick="javascript:downLoadImgByDir()" class="btn">图片分文件夹下载</button></td>
+	        </tr>
+         </table>
+        </div>
+
+ 
+  #if($!errormessage)
+	<div class="mag-t1">
+		$!errormessage
+    </div>
+  #end
+        <div class="clear"></div>
+        <ul class="form-tab">
+            ##<li #if($!pageFlag=="on_sale") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_sale')">出售中的商品</a></span></li>
+            ##<li #if($!pageFlag=="on_depot") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_depot')">仓库中的商品</a></span></li>
+        </ul>
+		<div class="clear"></div>
+		<div class="listBox">
+			<ul class="hover">
+				<h3><span>供应商列表</span></h3>
+				<table>
+                    <tr>
+					  <th><input type="checkbox" id="allbox" />全选</th>
+                      ##<th>商品编码</th>
+					  <th>银泰sku</th>
+					  <th>尚上sku</th>
+					  <th>商品图片</th>
+					  <th>品牌名</th>
+					  <th>商品名</th>
+					  <th>税率</th>
+                      <th>库存</th>
+                      </th>
+					  ##<th>供应商名称</th>
+					  ##<th>售价</th>
+					  
+					  <th>市场价</th>
+					  <th style="width:50px">尚上售价</th>
+					  <th>供货价</th>
+					  <th>大小</th>
+					  <th>颜色</th>
+					  <th>商品类目</th>
+					</tr>
+					#if($query.items.size()>0)
+						#springBind("provider.id")
+						#foreach($provider in $query.items)
+                            <tr>
+                              <td><input name="ids" type="checkbox" value="$!provider.prodId"/></td>
+							  ##<td style="text-align:center;width:52px">$!provider.id</td>
+							  <td>$!provider.prodId</td>
+							  <td>$!provider.ssProdid</td>
+							  <td>
+								<a href="$provider.imageAddresses" target="blank"  >
+									##<img alt="$provider.prodName" src="http://img.hkshangshang.com/$provider.imageAddresses" title="$provider.title" style="width:80px;height:80px;"/>
+								    <img alt="$provider.prodName" src="$upServer/$provider.imageAddresses" title="$provider.title" style="width:80px;height:80px;"/>
+								</a> 
+							  </td>
+							  <td style="text-align:center;">$!provider.brandName</td>
+							  <td style="text-align:center;">$!provider.prodName</td>
+							  <td style="text-align:center;width:22px">$!provider.taxRate</td>
+							  <td style="text-align:center;width:22px">$!provider.stock</td>
+							  ##<td style="text-align:center;">$!provider.providerName</td>
+							  ##<td style="text-align:center;">$!provider.price</td>
+							  <td style="text-align:center;">$!provider.marketPrice</td>
+							  <td style="text-align:center;width:22px">$!provider.ourSalePrice</td>
+							  <td style="text-align:center;">$!provider.cost<a herf="" onclick="return select($!provider.prodId)">详情</a></td>
+							  <td style="text-align:center;">$!provider.size</td>
+							  <td style="text-align:center;">$!provider.color</td>
+							  <td style="text-align:center;">$!provider.detailDescription</td>
+							</tr>
+						#end
+					#end
+                </table>
+            </ul>
+        </div>
+    </form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/provider/searchProvider.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+</body>
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+		function checkIds(){
+		    var objs = document.getElementsByName("ids");
+		  	for(var i = 0; i < objs.length; i++) {
+            	if(objs[i].type.toLowerCase() == "checkbox" ){
+    			   	if(objs[i].checked){
+    			     	return true;
+    			   	}
+				}
+		  	}
+			alert('至少选择一条商品信息');
+			return false;
+			 
+		}
+
+function doSearch(){
+    document.getElementById('form1').submit();
+}	
+//验证输入库存为数字
+function stockNumber() {
+	var obj = document.getElementById('stock').value;
+	if(obj==""){
+	}else{
+        reg = /^[-+]?\d+$/;
+        if (!reg.test(obj)) {
+            $("#attr").text("");
+            $("#attr").append("请输入数字");
+        } else {
+            //这里加入
+            if(obj*1>=0){
+            	$("#attr").text("");
+            	$("#attr").append("");
+        	}else{
+                $("#attr").text("");
+                $("#attr").append("大于零");
+        	}
+        }
+	}
+}
+
+function check(){
+		    var objs = document.getElementsByName("ids");
+		  	for(var i = 0; i < objs.length; i++) {
+            	if(objs[i].type.toLowerCase() == "checkbox" ){
+    			   	if(objs[i].checked){
+    			     	return true;
+    			   	}
+				}
+		  	}
+			return false;
+			 
+		}
+
+ function downExportProvideGou(){
+		var flag =check(); 
+	       var form1=document.getElementById('form1');
+		   if(flag){
+    	    form1.action="/provider/exportProvideExcel.html";
+            form1.submit();
+            form1.action="/provider/searchProvider.html";
+    	  }else{
+		   form1.action="/provider/exportProvideExcel.html";
+            form1.submit();
+            form1.action="/provider/searchProvider.html";
+		  }
+		}
+		
+		
+function downExportProvide(){
+    var form1=document.getElementById('form1');
+       form1.action="/provider/exportProvideExcel.html";
+       form1.submit();
+       form1.action="/provider/searchProvider.html";
+}
+
+
+
+
+//下载图片
+function downLoadImg(){
+
+
+    //var form1=document.getElementById('form1');
+	var flag = checkIds()
+    if(flag){
+		form1.action="/provider/providerDownLoadImg.html";
+    	form1.submit();
+    	form1.action="/provider/searchProvider.html";
+	}
+}
+
+//下载分文件夹图片
+function downLoadImgByDir(){
+
+
+    //var form1=document.getElementById('form1');
+	var flag = checkIds()
+    if(flag){
+		form1.action="/provider/providerDownLoadImgByDir.html";
+    	form1.submit();
+    	form1.action="/provider/searchProvider.html";
+	}
+}
+
+function select(id) {
+	  mini.open({
+                url: "/provider/providerSaleInfo.html?id="+id,
+                title: "选择列表",
+                width: 1100,
+                height: 500,
+            });
+}
+
+
+</script>

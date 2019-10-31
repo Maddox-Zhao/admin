@@ -1,0 +1,77 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>收藏管理</span></h3>
+<form id="form1" action="/goods/searchCollection.html" method="post" name="form1">
+    <table>
+      <tr>
+        <th>用户名：</th>
+        <td>
+			#springBind("myCollection.userAccount")
+			<input type="text" name="${status.expression}" id="userAccount" value="$!{status.value}" class="inp" />
+		</td>
+        <th>商品名：</th>
+        <td>
+			#springBind("myCollection.goodTitle")
+			<input type="text" name="${status.expression}" id="goodTitle" value="$!{status.value}" class="inp" />
+		</td>
+        <th>商品编码：</th>
+        <td>
+			#springBind("myCollection.goodSn")
+			<input type="text" name="${status.expression}" id="goodSn" value="$!{status.value}" class="inp" />
+		</td>
+		<th></th>
+		<td><button type="button" class="btn" onclick="formValidator();">查 询</button></td>
+      </tr>
+    </table>
+</form>
+  </div>
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>收藏列表</span></h3>
+            <table >
+                <tr>
+                    <th>用户名</th>
+                    <th>商品名</th>
+                    <th>商品编码</th>
+                    <th>收藏时间</th>
+                </tr>##items
+				#if($query && $query.items.size()>0)
+				 #foreach($mc in $query.items)
+                <tr>
+                    <td align="center">$!{mc.account}</td>
+                    <td align="center">
+						#if($!mc.title.length()>20)
+							$!mc.title.substring(0,20)....
+						#else $!mc.title
+						#end
+					</td>cashStatusMap
+                	<td align="center">$!{mc.goodSn}</td>
+                    <td align="center">$!dateUtil.convertDateToString("yyyy-MM-dd",$!mc.gmtCreate)</td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/goods/searchCollection.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+<script language="javascript" type="text/javascript">
+function formValidator(){
+  document.getElementById("userAccount").value=jQuery.trim(document.getElementById("userAccount").value);
+  document.getElementById("goodTitle").value=jQuery.trim(document.getElementById("goodTitle").value);
+  document.getElementById("goodSn").value=jQuery.trim(document.getElementById("goodSn").value);
+  document.forms[0].ssubmitubmit();
+}
+</script>

@@ -1,0 +1,274 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>供应商产品订单详情子详情</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+
+</head>
+<body>
+	     <form id="excelForm"  action="/shoppingCar/exportProduct.html" method="post" target="excelIFrame">
+         #if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+			 <input name="showCost" class="mini-textbox" value="yes" style="display:none"/>
+		#else
+			 <input name="showCost" class="mini-textbox" value="no" style="display:none"/>
+		 #end
+         </form>
+#set($canActivePrice = false)
+
+#if($!adminAccess.has('A_PRODUCT_ACTIVE_PRICE'))
+	#set($canActivePrice = true)
+#end
+ 
+<div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;" id="form1">
+            <table style="width:60%;">
+                <tr>
+					
+					<th class="form-label" >平台订单号:</th>
+                    <td >
+		 					<input id="originalTradeId" name="originalTradeId" class="mini-textbox" onenter="search()"/>
+                    </td>
+					<th class="form-label" >推送订单号:</th>
+                    <td >
+						<input id="tradeId" name="tradeId" class="mini-textbox" onenter="search()"/>
+                    </td>
+					<td ><a class="mini-button" iconCls="icon-close"   onclick="CloseWindow('close')">关闭</a></td>
+                </tr>
+				<tr>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:420px;" allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"   
+        url="getOneProviderOrder.html" OnCellCommitEdit="OnCellCommitEdit"  idField="tradeId" multiSelect="false"  pageSize="100" allowAlternating="true">
+		<div property="columns">
+            <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+            <div field="tradeId" width="150" headerAlign="center" align="center" allowSort="true">订单编号</div>
+			<div field="prodId" width="80" headerAlign="center" align="center" allowSort="true">银泰ID</div>
+			<div field="itemId" width="100" headerAlign="center" align="center" allowSort="true">sku</div>
+            <div field="userName" width="80" headerAlign="center" align="center"  allowSort="true">收件人
+			   <input property="editor" class="mini-textbox"/>
+			</div>
+            <div field="phone" width="100" headerAlign="center" align="center"  allowSort="true">联系电话
+			   <input property="editor" class="mini-textbox"/>
+			</div>
+			
+			#*
+			
+            <div field="totalPrice" width="70" headerAlign="center" align="center"  allowSort="true">订单总额
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="payPrice" width="80" headerAlign="center" align="center"  allowSort="true">实付金额
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+		   *#
+			<div field="sellPrice" width="60" headerAlign="center" align="center"  allowSort="true">商品供货价
+			</div>
+			<div field="ourSellPrice" width="60" headerAlign="center" align="center"  allowSort="true">商品售价
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			
+			<div field="title" width="80" headerAlign="center" align="center"  allowSort="true">商品名称
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			<div field="tax" width="60" headerAlign="center" align="center"  allowSort="true">税费</div>
+			<div field="qty" width="60" headerAlign="center" align="center"  allowSort="true">数量
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			<div field="freight" width="60" headerAlign="center" align="center"  allowSort="true">运费金额
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			<div field="sellPlatform" width="60" headerAlign="center" align="center"  allowSort="true" renderer="ptype">售卖平台
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			<div field="provider" width="60" headerAlign="center" align="center"  allowSort="true" renderer="pty">供货商平台
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+
+
+			<div field="province" width="60" headerAlign="center" align="center"  allowSort="true">省
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="city" width="60" headerAlign="center" align="center"  allowSort="true">市
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="region" width="60" headerAlign="center" align="center"  allowSort="true">区
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="location" width="100" headerAlign="center" align="center"  allowSort="true">详细地址
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			
+				<div field="sellerMemo" width="100" headerAlign="center" align="center"  allowSort="true">卖家备注
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			
+			<div field="cardNo" width="60" headerAlign="center" align="center"  allowSort="true">身份证号（云尚）
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			
+			<div field="shopCoupon" width="100" headerAlign="center" align="center"  allowSort="true">云尚的优惠金额（云尚）
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			<div field="platformCoupon" width="100" headerAlign="center" align="center"  allowSort="true">我们的优惠金额（云尚）
+				 <input property="editor" class="mini-textbox"/>
+			</div>
+			
+			
+			
+			<div field="createTime" width="160" headerAlign="center" align="center"  allowSort="true">下单时间
+				 <input property="editor" class="mini-datepicker" showClearButton="false" format="yyyy-MM-dd H:mm"  showTime="true" showOkButton="true"/>
+			</div>
+			<div field="payTime" width="160" headerAlign="center" align="center"  allowSort="true">支付时间时间
+				 <input property="editor" class="mini-datepicker" showClearButton="false" format="yyyy-MM-dd H:mm" showTime="true" showOkButton="true"/>
+			</div>
+            
+        </div>
+    </div>
+    <script type="text/javascript">
+        var statusData = [{id: 1,value: "可售"  },  { id: 2, value: "运输在途" }, {id: 3, value: "预订"},{ id: 4, value: "已售" },{ id: 5,value: "寄卖已售未结算"},{ id: 6,value: "准入库"} ] ;
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		
+		
+		
+		
+		function ptype(row){
+		 if(row.value =='Mlh') return "魅力惠";
+		 else if (row.value=='xhs') return "小红书";
+		 else if (row.value=='Ofashion') return "Ofashion";
+		 else if (row.value=='weimob') return "weimob";
+		 else if (row.value=='zp') return "珍品";
+		 else if (row.value=='kaola') return "考拉";
+		 else if (row.value=='tmall') return "天猫";
+		 else if (row.value=='fql') return "分期乐";
+		 else if (row.value=='pdd') return "拼多多";
+		 else if (row.value=='siku') return "寺库";
+		 else if (row.value=='yinTai') return "银泰";
+		 else if (row.value=='sikunew') return "寺库香港";
+		 else if (row.value=='shepin') return "天猫奢品";
+		 else return "";
+		}
+		
+		function pty(row){
+		 if(row.value =='xiyou') return "西有银泰";
+		 else if (row.value=='yshang') return "云尚";
+		 else return "";
+		}
+		
+		
+		function getCookieData(){
+			var cookieStr = document.cookie;
+    		var cookiesData = new Object();
+    		if(cookieStr){
+    			var arr = cookieStr.split(";");
+    			for(var i = 0; i < arr.length;i++){
+    				var valueArr = arr[i].split("=")
+    				if(valueArr.length == 2){
+    					var key = valueArr[0];
+    					var val = valueArr[1];
+						key = key.replace(/(^\s*)|(\s*$)/g, ""); 
+						val = val.replace(/(^\s*)|(\s*$)/g, "");
+						if(val)
+    						cookiesData[key] = val;
+    				}
+    			}
+    		}
+			return cookiesData;
+		}
+		
+        //grid.load();
+		
+        function renderDate1(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, false);
+        }
+        function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+	
+	function CloseWindow(action) {            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+
+	
+	// 接收上一级页面传递的参数 tradeId/orderId
+	function  setData(data){
+		var tradeId = data.tradeId;
+		var originalTradeId = data.originalTradeId;
+		//alert(tradeId+"--1")
+		mini.get("tradeId").setValue(tradeId);//设置tradeId中的数据
+		mini.get("originalTradeId").setValue(originalTradeId);
+		search();//查询
+	}
+	
+	function search(){
+		var form = new mini.Form("#form1");//获取form1中的数据
+		var data = form.getData();//获取表单多个控件的数据
+		//alert(data.tradeId+"--2")
+		grid.load(data);
+
+	}
+
+//修改站点名和地址
+    function OnCellCommitEdit(e) {
+		var id = e.row.id;
+		var tradeId = e.row.tradeId;
+		var prodId = e.row.prodId;
+		var itemId = e.row.itemId;
+		var field = e.field, value = e.value;
+		//alert(field);
+        if(field=="createTime" || field=="payTime"){
+			value = formatDate(value);
+			//alert(value);
+		}
+		//totalPrice payPrice sellPrice title tax qty freight sellPlatform provider province city region location
+		value = tradeId+"#"+prodId+"#"+itemId+"#"+field+"#"+value+"#"+";";
+		jQuery.ajax({
+			url:"/provider/editProviderOrderDetial.html",
+    		type:'POST',
+    		data:{provideOrderDetailId:value,
+			},
+    		success: function(text) {
+    			grid.reload();
+             },
+             error: function() {}
+    			
+    	})
+		
+  	}
+	function formatDate(now) {
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var date = now.getDate();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        var second = now.getSeconds();
+        var result = year + "-" + month + "-" + date+" "+hour+":"+minute+":"+second ;
+        
+        return result;
+    }
+		
+		
+</script>
+</body>
+</html>

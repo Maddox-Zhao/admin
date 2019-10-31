@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RefundSQL">
+	<typeAlias alias="refund" type="com.huaixuan.network.biz.domain.trade.Refund"/>
+
+	<resultMap class="refund" id="refundResult">
+		<result column="id" property="id"/>
+		<result column="refund_id" property="refundId"/>
+		<result column="tid" property="tid"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="status" property="status"/>
+		<result column="buy_id" property="buyId"/>
+		<result column="buy_nick" property="buyNick"/>
+		<result column="seller_id" property="sellerId"/>
+		<result column="seller_nick" property="sellerNick"/>
+		<result column="goods_amount" property="goodsAmount"/>
+		<result column="shipping_amount" property="shippingAmount"/>
+		<result column="amount" property="amount"/>
+		<result column="is_goods_recevied" property="isGoodsRecevied"/>
+		<result column="is_goods_untread" property="isGoodsUntread"/>
+		<result column="refund_amount" property="refundAmount"/>
+		<result column="note" property="note"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="type" property="type"/>
+		<result column="ticket_amount" property="ticketAmount" nullValue="0"/>
+		<result column="creater" property="creater"/>
+		<result column="is_refund" property="isRefund"/>
+		<result column="service_note" property="serviceNote"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="REL_REFUND_ID" property="relRefundId"/>
+	</resultMap>
+    <!--add by jinxx start-->
+	<resultMap id="refundAllResult" class="refund" extends="refundResult">
+		<result column="reason" property="reason"/>
+	</resultMap>
+		<!--add by jinxx end-->
+<!-- create Refund object -->
+<insert id="addRefund" parameterClass="refund">
+<![CDATA[
+insert into emall_refund
+  (id,
+   refund_id,
+   tid,
+   shop_id,
+   status,
+   buy_id,
+   buy_nick,
+   seller_id,
+   seller_nick,
+   goods_amount,
+   shipping_amount,
+   amount,
+   is_goods_recevied,
+   is_goods_untread,
+   refund_amount,
+   note,
+   gmt_create,
+   gmt_modify,
+   type,
+   ticket_amount,
+   creater,
+   is_refund,
+   dep_first_id,
+   REL_REFUND_ID)
+values
+  (null,
+   #refundId#,
+   #tid#,
+   #shopId#,
+   #status#,
+   #buyId#,
+   #buyNick#,
+   #sellerId#,
+   #sellerNick#,
+   #goodsAmount#,
+   #shippingAmount#,
+   #amount#,
+   #isGoodsRecevied#,
+   #isGoodsUntread#,
+   #refundAmount#,
+   #note#,
+   sysdate(),
+   sysdate(),
+   #type#,
+   #ticketAmount#,
+   #creater#,
+   #isRefund#,
+   #depFirstId#,
+   #relRefundId#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Refund object -->
+<update id="editRefund" parameterClass="refund">
+<![CDATA[
+		update emall_refund set refund_id = #refundId#,
+		tid = #tid#,
+		shop_id = #shopId#,
+		status = #status#,
+		buy_id = #buyId#,
+		buy_nick = #buyNick#,
+		seller_id = #sellerId#,
+		seller_nick = #sellerNick#,
+		goods_amount = #goodsAmount#,
+		shipping_amount = #shippingAmount#,
+		amount = #amount#,
+		is_goods_recevied = #isGoodsRecevied#,
+		is_goods_untread = #isGoodsUntread#,
+		refund_amount = #refundAmount#,
+		note = #note#,
+		gmt_modify = sysdate(),
+	type=#type#,
+	ticket_amount=#ticketAmount#,
+	is_refund=#isRefund#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Refund object -->
+<delete id="removeRefund" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_refund where emall_refund.ID = #value#
+]]>
+</delete>
+<!-- search Refund object -->
+<select id="getRefund" parameterClass="java.lang.Long" resultMap="refundAllResult">
+<![CDATA[
+		select e.*,
+	       		(select t.reason
+		          from emall_refund_order t
+		         where t.refund_id = e.refund_id
+		           and e.ID = #value#
+		           LIMIT 1) reason
+		  from emall_refund e
+		 where e.ID = #value#
+]]>
+</select>
+<!-- search Refund object -->
+<select id="getRefundByRefundId" parameterClass="java.lang.String" resultMap="refundAllResult">
+<![CDATA[
+		select e.*,
+	       		(select t.reason
+		          from emall_refund_order t
+		         where t.refund_id = #value#
+		           LIMIT 1) reason
+		  from emall_refund e
+		 where e.refund_id = #value#
+]]>
+</select>
+<!-- search Refund object -->
+<select id="getRefundByOrder" parameterClass="java.lang.String" resultMap="refundAllResult">
+<![CDATA[
+		select e.*,
+	       		(select t.reason
+		          from emall_refund_order t
+		         where t.refund_id = e.refund_id
+		           and e.tid = #value#
+		           LIMIT 1) reason
+		  from emall_refund e
+		 where e.tid = #value#
+]]>
+</select>
+<!-- searchAll Refund List -->
+<select id="getRefunds" resultMap="refundResult">
+<![CDATA[
+		select emall_refund.* from emall_refund
+]]>
+</select>
+
+
+<select id="getRefundByTradeStatus" resultMap="refundResult">
+<![CDATA[
+        select r.* from emall_refund r , emall_trade t
+        where t.tid=r.tid and t.status='trade_finish' and t.is_point='y' and r.type!='c'
+]]>
+        <isNotEmpty prepend="and" property="status">
+            r.status=#status#
+        </isNotEmpty>
+          <isNotEmpty prepend="and" property="buyId">
+            r.buy_id=#buyId#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="isRefund">
+            r.is_refund=#isRefund#
+        </isNotEmpty>
+</select>
+
+
+
+<update id="updateRefundStatusAndNote" parameterClass="refund">
+<![CDATA[
+		update emall_refund set
+		status = #status#,
+		creater = #creater#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<select id="getRefundByParameterMap" resultMap="refundResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_refund.* from emall_refund where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			buy_id in (select id from emall_users t where t.account like CONCAT('%',#buyNick#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+	<isNotEmpty property="type" prepend="and">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty property="depFirstId" prepend="and">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = #gmtCreate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+		<![CDATA[ gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+		<![CDATA[ gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		order by gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getRefundCountByParameterMap" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(emall_refund.id) from emall_refund where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			buy_id in (select id from emall_users t where t.account like CONCAT('%',#buyNick#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+	<isNotEmpty property="type" prepend="and">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty property="depFirstId" prepend="and">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = #gmtCreate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+		<![CDATA[ gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+		<![CDATA[			gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		order by gmt_create desc
+</select>
+
+<update id="updateRefundStatusByRefId" parameterClass="java.util.Map">
+	update emall_refund set
+		status = #status#,
+		gmt_modify = sysdate(),
+		is_goods_recevied = #isGoodsRecevied#
+		 where refund_id = #refundId#
+</update>
+
+<select id="getRefundByStatus" resultMap="refundResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_refund.* from emall_refund where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+            status in(
+         <iterate property="status" conjunction=",">
+          #status[]#
+         </iterate>
+         )
+         </isNotEmpty>
+	     <isNotEmpty property="type" prepend="and">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			gmt_modify = STR_TO_DATE(#gmtModify#,'%Y-%m-%d %H:%i:%s')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = STR_TO_DATE(#gmtCreate#,'%Y-%m-%d %H:%i:%s')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+		<![CDATA[ gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+		<![CDATA[ gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="depFirstId" prepend="and">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		order by gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getRefundCountByStatus" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(emall_refund.id) from emall_refund where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+            status in(
+         <iterate property="status" conjunction=",">
+          #status[]#
+         </iterate>
+         )
+        </isNotEmpty>
+	    <isNotEmpty property="type" prepend="and">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			gmt_modify = STR_TO_DATE(#gmtModify#,'%Y-%m-%d %H:%i:%s')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = STR_TO_DATE(#gmtCreate#,'%Y-%m-%d %H:%i:%s')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+		<![CDATA[ gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+		<![CDATA[			gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="depFirstId" prepend="and">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		order by gmt_create desc
+</select>
+
+
+
+<update id="updateMessageForRefundByTradeId" parameterClass="java.util.Map">
+	update emall_refund set service_note = #message# where emall_refund.refund_id=#refundId#
+</update>
+
+</sqlMap>

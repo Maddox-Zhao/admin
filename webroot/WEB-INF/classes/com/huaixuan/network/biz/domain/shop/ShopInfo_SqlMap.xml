@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShopInfo">
+	<cacheModel id="shopInfo-cache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="addShopInfo"/>
+		<flushOnExecute statement="editShopInfo"/>
+		<flushOnExecute statement="removeShopInfo"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+<typeAlias alias="shopInfo" type="com.huaixuan.network.biz.domain.shop.ShopInfo"/>
+	<resultMap class="shopInfo" id="shopInfoResult">
+		<result column="id" property="id"/>
+		<result column="shop_name" property="shopName"/>
+		<result column="shop_title" property="shopTitle"/>
+		<result column="shop_logo" property="shopLogo"/>
+		<result column="shop_desc" property="shopDesc"/>
+		<result column="user_id" property="userId"/>
+		<result column="qq" property="qq"/>
+		<result column="ww" property="ww"/>
+		<result column="ym" property="ym"/>
+		<result column="msn" property="msn"/>
+		<result column="email" property="email"/>
+		<result column="phone" property="phone"/>
+		<result column="mobile" property="mobile"/>
+		<result column="receive_account" property="receiveAccount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="address_id" property="addressId"/>
+		<result column="service_tel" property="serviceTel"/>
+	</resultMap>
+<!-- create ShopInfo object -->
+<insert id="addShopInfo" parameterClass="shopInfo">
+<![CDATA[
+insert into emall_shop_info
+  (id,
+   shop_name,
+   shop_title,
+   shop_logo,
+   shop_desc,
+   user_id,
+   qq,
+   ww,
+   ym,
+   msn,
+   email,
+   phone,
+   mobile,
+   receive_account,
+   gmt_create,
+   gmt_modify,
+   address_id,
+   service_tel)
+values
+  (null,
+   #shopName#,
+   #shopTitle#,
+   #shopLogo#,
+   #shopDesc#,
+   #userId#,
+   #qq#,
+   #ww#,
+   #ym#,
+   #msn#,
+   #email#,
+   #phone#,
+   #mobile#,
+   #receiveAccount#,
+   #gmtCreate#,
+   #gmtModify#,
+   #addressId#,
+   #serviceTel#)
+
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ShopInfo object -->
+<update id="editShopInfo" parameterClass="shopInfo">
+update emall_shop_info
+   set shop_name       = #shopName#,
+       shop_title      = #shopTitle#,
+<isNotEmpty property = "shopLogo">
+	     shop_logo       = #shopLogo#,
+</isNotEmpty>
+       shop_desc       = #shopDesc#,
+       qq              = #qq#,
+       ww              = #ww#,
+       ym              = #ym#,
+       msn             = #msn#,
+       email           = #email#,
+       phone           = #phone#,
+       mobile          = #mobile#,
+       receive_account = #receiveAccount#,
+       gmt_modify      = #gmtModify#,
+       address_id      = #addressId#,
+       service_tel     = #serviceTel#
+ where id = #id#
+</update>
+<!-- delete ShopInfo object -->
+<delete id="removeShopInfo" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_shop_info where emall_shop_info.ID = #value#
+]]>
+</delete>
+<!-- search ShopInfo object -->
+<select id="getShopInfo" parameterClass="java.lang.Long" resultMap="shopInfoResult" cacheModel="shopInfo-cache">
+<![CDATA[
+		select emall_shop_info.* from emall_shop_info where emall_shop_info.ID = #value#
+]]>
+</select>
+<!-- searchAll ShopInfo List -->
+<select id="getShopInfos" resultMap="shopInfoResult">
+<![CDATA[
+		select emall_shop_info.* from emall_shop_info
+]]>
+</select>
+<select id="getShopInfoByUserId" parameterClass="java.lang.Long" resultMap="shopInfoResult">
+<![CDATA[
+		select emall_shop_info.* from emall_shop_info where emall_shop_info.user_id = #userId#
+]]>
+</select>
+
+</sqlMap>

@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="clientOrderDao">
+	<typeAlias alias="orderdetails" type="com.huaixuan.network.biz.domain.order.Orderdetails"/>
+		<resultMap class="com.huaixuan.network.biz.domain.order.Orderdetails" id="OrderResult">
+			<result property="idorder" column="idorder"/>
+			<result property="customername" column="customername"/>
+			<result property="sellchannelname" column="sellchannelname"/>
+			<result property="sitename" column="sitename"/>
+			<result property="deliverymeno" column="deliverymeno"/>
+			<result property="date" column="date"/>
+			<result property="remark" column="remark"/>
+			<result property="idPayment" column="idPayment"/>
+			<result property="subTotal" column="subTotal"/>
+			<result property="amountCash" column="amountCash"/>
+			<result property="amountCard" column="amountCard"/>					
+			<result property="deliverystatus" column="deliverystatus"/>
+			<result property="currencyname" column="currencyname"/>
+			<result property="idCurrency" column="idCurrency"/>
+			<result property="paymentname" column="paymentname"/>
+			<result property="gmtpay" column="gmtpay"/>
+			<result property="deliverydate" column="deliverydate"/>
+			<result property="idSite" column="idSite"/>
+			<result property="status" column="status"/>
+			<result property="idCustomer" column="idCustomer"/>
+			<result property="idSellChannel" column="idSellChannel"/>
+			<result property="customerManager" column="customerManager"/>
+			<result property="employeename" column="employeename"/>
+			<result property="idEmployee" column="idEmployee"/>
+		</resultMap>
+		
+		
+		<resultMap class="com.huaixuan.network.biz.domain.order.Orderdetails" id="OrderResults">
+			<result property="idorder" column="idorder"/>
+			<result property="customername" column="customername"/>
+			<result property="sellchannelname" column="sellchannelname"/>
+			<result property="sitename" column="sitename"/>
+			<result property="deliverymeno" column="deliverymeno"/>
+			<result property="date" column="date"/>
+			<result property="remark" column="remark"/>
+			<result property="idPayment" column="idPayment"/>
+			<result property="subTotal" column="subTotal"/>
+			<result property="amountCash" column="amountCash"/>
+			<result property="amountCard" column="amountCard"/>					
+			<result property="deliverystatus" column="deliverystatus"/>
+			<result property="currencyname" column="currencyname"/>
+			<result property="idCurrency" column="idCurrency"/>
+			<result property="paymentname" column="paymentname"/>
+			<result property="gmtpay" column="gmtpay"/>
+			<result property="deliverydate" column="deliverydate"/>
+			<result property="idSite" column="idSite"/>
+			<result property="status" column="status"/>
+			<result property="idCustomer" column="idCustomer"/>
+			<result property="idSellChannel" column="idSellChannel"/>
+			<result property="customerManager" column="customerManager"/>
+			<result property="employeename" column="employeename"/>
+			<result property="idEmployee" column="idEmployee"/>
+			<result property="empName" column="empName"/>
+		</resultMap>
+		
+	 <resultMap id="clinetProductByidorder" class="com.huaixuan.network.biz.domain.product.Product">
+	 <result column="idProduct" property="idProduct"/>
+	 <result column="brandName" property="brandName"/>
+	 <result column="seriesName" property="seriesName"/>
+	 <result column="type" property="type"/>
+	 <result column="material" property="material"/>
+	 <result column="color" property="color"/>
+	 <result column="size" property="size"/>
+	 <result column="ssPrice" property="ssPrice"/>
+	 <result column="smPrice" property="smPrice"/>
+	 <result column="salePrice" property="salePrice"/>
+	 <result column="salePriceCurrency" property="salePriceCurrency"/>
+	 <result column="sku" property="sku"/>
+	 </resultMap>
+	 
+		<sql id="ORDER.GETIDORDER">
+		<isNotEmpty property="idorder">
+		     and c.idorder = #idorder#
+		</isNotEmpty>
+		<isNotEmpty property="idEmployee">
+		     and e.idEmployee = #idEmployee#
+		</isNotEmpty>
+		<isNotEmpty property="idSite">
+		     and si.idSite  in($idSite$)
+		</isNotEmpty>
+		<isNotEmpty property="status">
+		     and c.status = #status#
+		</isNotEmpty>
+		<isNotEmpty property="idCustomer">
+		     and cus.idCustomer = #idCustomer#
+		</isNotEmpty>
+		<isNotEmpty property="subTotal">
+		     and c.subTotal = #subTotal#
+		</isNotEmpty>
+		<isNotEmpty property="amountCash">
+		     and c.amountCash = #amountCash#
+		</isNotEmpty>
+
+		<isNotEmpty property="deliverystatus">
+		     and c.delivery_status = #deliverystatus#
+		</isNotEmpty>
+		<isNotEmpty property="idSellChannel">
+		     and s.idSellChannel = #idSellChannel#
+		</isNotEmpty>
+		<isNotEmpty property="sellDateStart">
+				<![CDATA[ and c.date >= #sellDateStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="sellDateEnd">
+					<![CDATA[ and c.date <= #sellDateEnd#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="idCustomerManager">
+					<![CDATA[ and cus.customer_operate = #idCustomerManager#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="hkOperator">
+					 and idChannel in (
+					 	SELECT idSellChannel
+						FROM site 
+						WHERE 
+						city = '香港'
+					)
+		</isNotEmpty>
+				<isNotEmpty property="hqgOperator">
+					 and c.idSite = 216
+		</isNotEmpty>
+		
+		
+		
+		
+		
+		</sql>
+	<select id="productByidorder" parameterClass="java.util.Map" resultMap="clinetProductByidorder">
+	select * from (
+		SELECT p.idProduct,
+		b.name brandName,
+		s.name seriesName,
+		p.sku,
+		p.type type,
+		p.Material material,
+		p.Color color,
+		p.Size size,
+		l.HXPrice ssPrice,
+		l.HKHXPrice smPrice,
+		l.Price salePrice,
+		l.idPriceCurrency salePriceCurrency
+		FROM lifecycle l,
+		series s,
+		product p,
+		currency c,
+		brand b
+		WHERE ( l.idorder = #idorder# or l.idorder2 = #idorder#)
+		AND p.idBrand = b.idBrand
+		AND l.idProduct = p.idProduct
+		AND p.idSeries = s.idSeries
+		AND c.idCurrency=l.idCostCurrency
+		) ps
+		
+		<isNotEmpty property="sortField" >
+			<isNotEmpty property="sortOrder">
+				order by $sortField$ $sortOrder$
+			</isNotEmpty>
+		</isNotEmpty>
+		<isEmpty property="sortField" >
+			order by brandName,type,material,color,size
+		</isEmpty>
+		
+		
+	</select>
+	<select id="getOrderListCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+        SELECT count(c.idorder)
+		FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay
+		WHERE   c.idcustomer = cus.idCustomer
+		AND c.idChannel = s.idSellChannel
+		AND c.idSite = si.idSite
+		AND c.idCurrency = cur.idCurrency
+		AND c.idPayment = pay.idPayment
+		AND c.operator = e.idEmployee
+		<isEqual  property="searchAll" compareValue="true" >
+			AND cus.customer_operate =  $userName$
+		</isEqual>
+		<include refid="ORDER.GETIDORDER" />
+	</select>
+	
+	<select id="getOrderListCountExport" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+        SELECT count(c.idorder)
+		FROM
+		customerorder c,
+		customer cus,
+		sellchannel s,
+		site si,
+		currency cur,
+		payment pay,
+		employee emp,
+		emall_admin ema
+		WHERE c.idcustomer = cus.idCustomer
+		AND c.idChannel = s.idSellChannel
+		AND c.idSite = si.idSite
+		AND c.idCurrency = cur.idCurrency
+		AND c.idPayment = pay.idPayment
+		AND c.operator = ema.user_name
+		AND c.operator2 = emp.idEmployee
+		<isEqual  property="searchAll" compareValue="true" >
+			AND cus.customer_operate =  $userName$
+		</isEqual>
+		<include refid="ORDER.GETIDORDER" />
+	</select>
+	
+	<!-- 根据查询条件统计订单总金额  -->
+	<select id="getOrderListTotalPrice" resultClass="java.lang.String" parameterClass="java.util.Map">
+        SELECT CONCAT(ROUND(SUM(c.subTotal),2) ,',', ROUND(SUM(c.amountCash),2) ) a
+		FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay
+		WHERE   c.idcustomer = cus.idCustomer
+		AND c.idChannel = s.idSellChannel
+		AND c.idSite = si.idSite
+		AND c.idCurrency = cur.idCurrency
+		AND c.idPayment = pay.idPayment
+		AND c.operator = e.idEmployee
+		<isEqual  property="searchAll" compareValue="true" >
+			AND cus.customer_operate =  $userName$
+		</isEqual>
+		<include refid="ORDER.GETIDORDER" />
+	</select>
+	
+	
+	
+	<select id="getOrderbyidorder" parameterClass="java.util.Map" resultMap="OrderResults">
+	SELECT  c.idorder,
+	c.date,
+	c.delivery_meno deliverymeno,
+	c.subTotal, subTotal,
+	cur.name currencyname,
+	cur.idCurrency,
+	pay.name paymentname, 
+	pay.idPayment idPayment,
+	c.amountCash,
+	c.amountCard,
+	cus.name customername,
+	s.name sellchannelname,
+	s.idSellChannel idSellChannel,
+	si.name sitename,
+	si.idSite idSite,
+	c.status status,
+	c.remark,
+	cus.idCustomer idCustomer,
+	c.gmt_pay gmtpay,
+	c.delivery_status deliverystatus,
+	c.delivery_date deliverydate,
+	(SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,
+	(SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,
+    (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,
+    (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager
+	FROM
+	customerorder c,
+	customer cus,
+	sellchannel s,
+	site si,
+	currency cur,
+	payment pay	
+	WHERE c.idcustomer = cus.idCustomer
+	AND c.idChannel = s.idSellChannel
+	AND c.idSite = si.idSite
+	AND c.idCurrency = cur.idCurrency
+	AND c.idPayment = pay.idPayment
+	<isEqual  property="searchAll" compareValue="true" >
+			AND cus.customer_operate =  $userName$
+		</isEqual>
+	<include refid="ORDER.GETIDORDER" />
+	    ORDER BY c.idorder DESC	    
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+    </isNotEmpty>
+
+	</select>
+	
+	
+	<!-- client_role 为9的才需要加查询权限 -->
+	<select id="canSearchAllOrderOrCustomer" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+	    SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  $userName$
+	</select>
+	
+	
+	<select id="orderbyidorder" parameterClass="java.lang.String" resultMap="OrderResult">
+	SELECT  c.idorder,
+	c.date,
+	c.subTotal, 
+	c.delivery_meno deliverymeno,
+	cur.name currencyname,
+	cur.idCurrency,
+	pay.name paymentname, 
+	pay.idPayment idPayment,
+	c.amountCash,
+	c.amountCard,
+	cus.name customername,
+	s.name sellchannelname,
+	s.idSellChannel idSellChannel,
+	si.name sitename,
+	ema.name employeename,
+	ema.user_name idEmployee,
+	si.idSite idSite,
+	c.status status,
+	cus.idCustomer idCustomer,
+	c.gmt_pay gmtpay,
+	c.remark,
+	c.delivery_status deliverystatus,
+	c.delivery_date deliverydate,
+	(SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager
+	FROM
+	customerorder c,
+	customer cus,
+	sellchannel s,
+	site si,
+	currency cur,
+	payment pay,
+	emall_admin ema
+	WHERE c.idorder = #vaule#
+	AND c.idcustomer = cus.idCustomer
+	AND c.idChannel = s.idSellChannel
+	AND c.idSite = si.idSite
+	AND c.idCurrency = cur.idCurrency
+	AND c.idPayment = pay.idPayment
+	AND c.operator = ema.user_name
+	</select>
+	
+	<insert id="insertIntoCustomerOrder" parameterClass="java.util.Map">
+		insert into customerorder values(null,sysdate(),$idCustomer$,$idChannel$,$subTotal$,$idCurrency$,'$operator$','$operator2$',$idPayment$,$amountCard$,$amountCash$,$status$,'$remark$',$site$,default,null,null,sysdate(),$gmtPay$)
+		 <selectKey resultClass="int" keyProperty="id" > 
+            SELECT @@IDENTITY AS ID 
+        </selectKey> 
+	</insert>
+	
+	
+	<update id="updateCustomerOrder" parameterClass="com.huaixuan.network.biz.domain.order.Orderdetails">
+			update customerorder set date = date
+			<isNotEmpty property="status" prepend=",">
+		   	  	status = #status#
+			</isNotEmpty>
+			
+			<isNotEmpty property="remark" prepend=",">
+		   	  	remark = #remark#
+			</isNotEmpty>
+			<isNotEmpty property="subTotal" prepend=",">
+		   	  	subTotal = #subTotal#
+			</isNotEmpty>
+			<isNotEmpty property="idEmployee" prepend=",">
+		   	  	operator = #idEmployee#
+			</isNotEmpty>
+			<isNotEmpty property="deliverystatus" prepend=",">
+		   	  	delivery_status = #deliverystatus#
+			</isNotEmpty>
+			<isNotEmpty property="deliverymeno" prepend=",">
+		   	  	delivery_meno = #deliverymeno#
+			</isNotEmpty>
+			
+			<isNotEmpty property="deliverydate" prepend=",">
+		   	  	delivery_date = sysdate()
+			</isNotEmpty>
+			<isNotEmpty property="gmtpay" prepend=",">
+		   	  	gmt_pay = sysdate()
+			</isNotEmpty>
+			<isNotEmpty property="amountCash" prepend=",">
+		   	  	amountCash = #amountCash#
+			</isNotEmpty>
+			<isNotEmpty property="amountCard" prepend=",">
+		   	  	amountCard = #amountCard#
+			</isNotEmpty>
+			<isNotEmpty property="idPayment" prepend=",">
+		   	  	idPayment = #idPayment#
+			</isNotEmpty>
+			where idOrder = #idorder#
+	</update>
+
+	
+	
+	<!--  购物车  增 删 改-->
+	
+	<insert id="addShoppingCar" parameterClass="com.huaixuan.network.biz.domain.order.ProductShoppingCar">
+		insert into hx_shopping_car(id,user_name,idProduct,create_time) value(null,#userName#,#idProduct#,sysdate())
+	</insert>
+	<select id="getShoppingCar" parameterClass="com.huaixuan.network.biz.domain.order.ProductShoppingCar" resultClass="java.lang.Integer">
+		select count(*) from  hx_shopping_car where  1=1
+		<isNotNull property="idProduct">
+			and idProduct = #idProduct#
+		</isNotNull>
+		<isNotNull property="userName">
+			 and user_name = #userName#
+		</isNotNull>
+	</select>
+	<delete id="deleteShoppingCar" parameterClass="com.huaixuan.network.biz.domain.order.ProductShoppingCar">
+		delete from hx_shopping_car where user_name = #userName# and idProduct = #idProduct#
+	</delete>
+	<delete id="deleteAllShoppingCar" parameterClass="java.lang.String">
+		delete from hx_shopping_car where user_name = #userName#
+	</delete>
+	
+	<!-- 保存售价  防止购物车关闭后 再次填写售价-->
+	<update id="updateShoppingCarSalePrice" parameterClass="java.util.List">
+		<iterate   conjunction=";" close="" open=""  >
+	  		update hx_shopping_car set sale_price =  #list[].salePrice# 
+	  		where idProduct =#list[].idProduct# and user_name = #list[].userName#
+	 	 </iterate>
+	</update>
+</sqlMap>

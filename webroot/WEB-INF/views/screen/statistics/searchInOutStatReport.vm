@@ -1,0 +1,195 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>当月进出货统计报表</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>当月进出货统计报表</span></h3>
+<form action="searchInOutStatReport.html" name="searchForm" method="post">
+    <table>
+
+<tr>
+		<th>查询月份：</th>
+		<td colspan="2">
+		<select id="year" name="year" style="width:60px;"></select>年
+			   <select id="month" name="month" style="width:45px;"></select>月		</td>
+		<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+				</tr>
+				<tr>
+	#set($allShow = "1")
+     <th>商品名称：</th>
+     <td><input type="text" name="goodsName" id="goodsName" value="$!parMap.goodsName" style="width:100px;" maxlength="30"/></td>
+		  <th>商品编码：</th>
+		  <td><input type="text" name="goodsCode" id="goodsCode" value="$!parMap.goodsCode" style="width:100px;" maxlength="30"/></td>
+		  	#set($allShow = "1")
+#set($allShow = "1")
+    			$contain.get('/storage/depSelect.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$!parMap)
+		  	</tr>
+		  	<tr>
+		  			<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						  			<th>&nbsp;</th>
+					<td colspan="2"><input name="search" value="查询" class="button" type="button" onclick="formSubmit();"/>&nbsp;&nbsp;
+	<input type="button" value="Excel导出" class="button" onclick="doExport();"/></td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+						<th>&nbsp;</th>
+				<td>&nbsp;</td>
+</tr>
+
+	<script language="javascript" type="text/javascript">
+	function formSubmit(){
+		var depId = document.getElementById("depId").value;
+		if(depId==""){
+			alert("请选择仓库！");
+			return false;
+		}else{
+			document.searchForm.submit();
+		}
+	}
+	function initDateMonth(){
+		var today = new Date();
+		var year = today.getYear();
+		var startYear = 2009;
+		var month = today.getMonth()+1;
+		for(t_year = year;t_year>=startYear;t_year--){
+			$("<option value='"+t_year+"'>"+t_year+"</option>").appendTo("#year");
+		}
+		#if(!$!parMap.year)
+
+		for(t_month = month;t_month>=1;t_month--){
+			tt_month = t_month<10?"0"+t_month:""+t_month;
+			$("<option value='"+tt_month+"'>"+tt_month+"</option>").appendTo("#month");
+		}
+
+		#else
+		if(year==$!parMap.year){
+			for(t_month = month;t_month>=1;t_month--){
+				tt_month = t_month<10?"0"+t_month:""+t_month;
+				$("<option value='"+tt_month+"'>"+tt_month+"</option>").appendTo("#month");
+			}
+		}else{
+			for(t_month = 12;t_month>=1;t_month--){
+				tt_month = t_month<10?"0"+t_month:""+t_month;
+				$("<option value='"+tt_month+"'>"+tt_month+"</option>").appendTo("#month");
+			}
+		}
+		#end
+		$("#year").val('$!parMap.year');
+		$("#month").val('$!parMap.month');
+	}
+	$("#year").change(function(){
+		var today = new Date();
+		var year = today.getYear();
+		var month = today.getMonth()+1;
+		var selectedMonth = $("#month").val();
+		if(this.value<year){
+			$("#month").empty();
+			for(t_month = 12;t_month>=1;t_month--){
+				tt_month = t_month<10?"0"+t_month:""+t_month;
+				$("<option value='"+tt_month+"'>"+tt_month+"</option>").appendTo("#month");
+			}
+		}else{
+			$("#month").empty();
+			for(t_month = month;t_month>=1;t_month--){
+				tt_month = t_month<10?"0"+t_month:""+t_month;
+				$("<option value='"+tt_month+"'>"+tt_month+"</option>").appendTo("#month");
+			}
+		}
+		$("#month").val(selectedMonth);
+	});
+	initDateMonth();
+	function doExport(){
+		var depId = document.getElementById("depId").value;
+		if(depId==""){
+			alert("请选择仓库！");
+			return false;
+		}else{
+			document.searchForm.action="exportInOutStatReport.html";
+			document.searchForm.submit();
+			document.searchForm.action="searchInOutStatReport.html";
+		}
+	}
+</script>
+</tr>
+    </table>
+</form>
+</div>
+	<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="listBox">
+          <h3><span>当月进出货统计报表</span></h3>
+
+    <table>
+ #set( $sum_lastRemainAmount =0)
+ #set( $sum_lastRemainMoney =0)
+ #set( $sum_thisInAmount =0)
+ #set( $sum_thisInMoney =0)
+ #set( $sum_thisOutAmount =0)
+ #set( $sum_thisOutMoney =0)
+ #set( $sum_thisRemainAmount =0)
+ #set( $sum_thisRemainMoney =0)
+<!-- 订单列表 -->
+
+      <tr>
+		<th>商品名称</th>
+        <th>商品编码</th>
+        <th>上月结余数量</th>
+		<th>上月结余金额(￥)</th>
+		<th>本月进货数量</th>
+		<th>本月进货金额(￥)</th>
+		<th>本月出货数量</th>
+		<th>本月出货金额(￥)</th>
+		<th>本月结余数量</th>
+		<th>本月结余金额(￥)</th>
+      </tr>
+
+	  #foreach($obj in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+		 <td>$!obj.goodsName</td>
+		 <td>$!obj.goodsCode</td>
+		 <td align="right">$!obj.lastRemainAmount</td>
+		 <td align="right">$!moneyUtil.getFormatMoney($!obj.lastRemainMoney,'0.00')</td>
+		 <td align="right">$!obj.thisInAmount</td>
+		 <td align="right">$!moneyUtil.getFormatMoney($!obj.thisInMoney,'0.00')</td>
+		 <td align="right">$!obj.thisOutAmount</td>
+		 <td align="right">$!moneyUtil.getFormatMoney($!obj.thisOutMoney,'0.00')</td>
+		 <td align="right">$!obj.thisRemainAmount</td>
+		 <td align="right">$!moneyUtil.getFormatMoney($!obj.thisRemainMoney,'0.00')</td>
+		 #set( $sum_lastRemainAmount = $moneyUtil.addNumber( $sum_lastRemainAmount,$!obj.lastRemainAmount))
+		 #set( $sum_lastRemainMoney = $moneyUtil.add( $sum_lastRemainMoney,$!obj.lastRemainMoney))
+		 #set( $sum_thisInAmount = $moneyUtil.addNumber( $sum_thisInAmount,$!obj.thisInAmount))
+		 #set( $sum_thisInMoney = $moneyUtil.add( $sum_thisInMoney,$!obj.thisInMoney))
+		 #set( $sum_thisOutAmount = $moneyUtil.addNumber( $sum_thisOutAmount,$!obj.thisOutAmount))
+		 #set( $sum_thisOutMoney = $moneyUtil.add( $sum_thisOutMoney,$!obj.thisOutMoney))
+		 #set( $sum_thisRemainAmount = $moneyUtil.addNumber( $sum_thisRemainAmount,$!obj.thisRemainAmount))
+		 #set( $sum_thisRemainMoney = $moneyUtil.add( $sum_thisRemainMoney,$!obj.thisRemainMoney))
+	  </tr>
+	  #end
+	  <tr>
+		<td align="center" colspan="2"><font size='4'>合   计</font></td>
+		<td align="right">$sum_lastRemainAmount</td>
+		<td align="right">￥$!moneyUtil.getFormatMoney($sum_lastRemainMoney,'0.00')</td>
+		<td align="right">$sum_thisInAmount</td>
+		<td align="right">￥$!moneyUtil.getFormatMoney($sum_thisInMoney,'0.00')</td>
+		<td align="right">$sum_thisOutAmount</td>
+		<td align="right">￥$!moneyUtil.getFormatMoney($sum_thisOutMoney,'0.00')</td>
+		<td align="right">$sum_thisRemainAmount</td>
+		<td align="right">￥$!moneyUtil.getFormatMoney($sum_thisRemainMoney,'0.00')</td>
+	  </tr>
+
+    </table>
+  </div>
+	</div>

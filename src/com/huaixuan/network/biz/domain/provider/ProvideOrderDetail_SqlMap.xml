@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideOrderDetail" type="com.huaixuan.network.biz.domain.provider.ProvideOrderDetail"/>
+   
+	<resultMap id="provideOrderDetailResult" class="com.huaixuan.network.biz.domain.provider.ProvideOrderDetail" >
+		<result column="id" property="id"/>
+		<result column="original_trade_id" property="originalTradeId"/>
+		<result column="trade_id" property="tradeId"/>
+		<result column="user_name" property="userName"/>
+		<result column="phone" property="phone"/>
+		<result column="province" property="province"/>
+		
+		
+		<result column="city" property="city"/>
+		<result column="region" property="region"/>
+		<result column="location" property="location"/>
+		<result column="total_price" property="totalPrice"/>
+		<result column="seller_memo" property="sellerMemo"/>
+		<result column="pay_price" property="payPrice"/>
+		
+		
+		<result column="insert_time" property="insertTime"/>
+		<result column="create_time" property="createTime"/>
+		<result column="pay_time" property="payTime"/>
+		<result column="ProdId" property="prodId"/>
+		<result column="item_id" property="itemId"/>
+		
+		<result column="title" property="title"/>
+		<result column="sell_price" property="sellPrice"/>
+		<result column="our_sell_price" property="ourSellPrice"/>	
+		<result column="tax" property="tax"/>
+		<result column="qty" property="qty"/>	
+		<result column="freight" property="freight"/>
+		
+		<result column="sell_platform" property="sellPlatform"/>	
+		<result column="provider" property="provider"/>
+		
+		<result column="card_no" property="cardNo"/>	
+		<result column="shop_coupon" property="shopCoupon"/>
+		<result column="platform_coupon" property="platformCoupon"/>	
+		
+	</resultMap>
+	
+	
+	<select id="selectOrderDetailByMap" resultMap="provideOrderDetailResult" parameterClass="java.util.Map">
+        SELECT *
+		FROM  provide_order_detail 
+		where 1=1
+		<isNotEmpty prepend="and" property="originalTradeId">
+			original_trade_id =#originalTradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			trade_id =#tradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="prodId">
+			ProdId =#prodId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="itemId">
+			item_id =#itemId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateStart" >
+			create_time >=#createDateStart#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateEnd" >
+		    <![CDATA[
+			create_time <='$createDateEnd$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sellPlatform">
+			sell_platform=#sellPlatform#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="provider">
+			provider=#provider#
+		</isNotEmpty>	
+		ORDER BY insert_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	
+	
+	<select id="selectOrderDetailCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+        SELECT count(*)
+		FROM  provide_order_detail where 1=1
+		<isNotEmpty prepend="and" property="prodId">
+			ProdId =#prodId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="originalTradeId">
+			original_trade_id =#originalTradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			trade_id =#tradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateStart" >
+			create_time >=#createDateStart#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateEnd" >
+		    <![CDATA[
+			create_time <='$createDateEnd$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sellPlatform">
+			sell_platform=#sellPlatform#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="provider">
+			provider=#provider#
+		</isNotEmpty>	
+		ORDER BY create_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	
+	
+	
+	
+	
+	
+	<insert  id ="insertOrderDetailList"   parameterClass ="java.util.List"> 
+     <![CDATA[
+insert into provide_order_detail(id,original_trade_id,trade_id,user_name,phone,province,city,region,location,total_price,pay_price,insert_time,create_time,pay_time,ProdId,item_id,title,sell_price,our_sell_price,tax,qty,freight,sell_platform,provider) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgList[].originalTradeId#,#pgList[].tradeId#,#pgList[].userName#,#pgList[].phone#,#pgList[].province#,#pgList[].city#,#pgList[].region#
+            ,#pgList[].location#,#pgList[].totalPrice#,#pgList[].payPrice#,sysdate(),#pgList[].createTime#,#pgList[].payTime#,
+            #pgList[].prodId#,#pgList[].itemId#,#pgList[].title#,#pgList[].sellPrice#,#pgList[].ourSellPrice#,#pgList[].tax#,#pgList[].qty#,#pgList[].freight#,#pgList[].sellPlatform#,#pgList[].provider#
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+
+
+
+
+
+
+
+<select id="selectProviderOrderId" resultMap="provideOrderDetailResult" >
+SELECT * from provide_order_detail where  1=1  
+	<!-- 订单ID -->
+	and trade_id=#value#
+	order by  id 
+
+</select>
+
+	<!-- 修改订单 -->
+	<update id="updateProviderOrderDetailDao" parameterClass="java.util.Map">
+	  update provide_order_detail
+	   <dynamic prepend="set">
+		   <isNotNull prepend="," property="userName">
+		      user_name=#userName#
+		   </isNotNull>
+		   <isNotNull prepend="," property="phone">
+		      phone=#phone#
+		   </isNotNull>
+		   <isNotNull prepend="," property="totalPrice">
+		      total_price=#totalPrice#
+		   </isNotNull>
+		   <isNotNull prepend="," property="sellerMemo">
+		      seller_memo=#sellerMemo#
+		   </isNotNull>
+		   <isNotNull prepend="," property="payPrice">
+		      pay_price=#payPrice#
+		   </isNotNull>
+		   <isNotNull prepend="," property="title">
+		      title=#title#
+		   </isNotNull>
+		   <isNotNull prepend="," property="tax">
+		      tax=#tax#
+		   </isNotNull>
+		   <isNotNull prepend="," property="qty">
+		      qty=#qty#
+		   </isNotNull>
+		   <isNotNull prepend="," property="freight">
+		      freight=#freight#
+		   </isNotNull>
+		   <isNotNull prepend="," property="tax">
+		      tax=#tax#
+		   </isNotNull>
+		   <isNotNull prepend="," property="sellPlatform">
+		      sell_platform=#sellPlatform#
+		   </isNotNull>
+		   <isNotNull prepend="," property="provider">
+		      provider=#provider#
+		   </isNotNull>
+		   <isNotNull prepend="," property="sellPrice">
+		      sell_price=#sellPrice#
+		   </isNotNull>
+		    <isNotNull prepend="," property="ourSellPrice">
+		      our_sell_price=#ourSellPrice#
+		   </isNotNull>
+		   <isNotNull prepend="," property="province">
+		      province=#province#
+		   </isNotNull>
+		   <isNotNull prepend="," property="city">
+		      city=#city#
+		   </isNotNull>
+		   <isNotNull prepend="," property="region">
+		      region=#region#
+		   </isNotNull>
+		   <isNotNull prepend="," property="location">
+		      location=#location#
+		   </isNotNull>
+		   
+		   
+		   
+		   <isNotNull prepend="," property="cardNo">
+		      card_no=#cardNo#
+		   </isNotNull>
+		   <isNotNull prepend="," property="shopCoupon">
+		      shop_coupon=#shopCoupon#
+		   </isNotNull>
+		   <isNotNull prepend="," property="platformCoupon">
+		      platform_coupon=#platformCoupon#
+		   </isNotNull>
+		   
+		   
+		   
+		   <isNotNull prepend="," property="createTime">
+		      create_time=#createTime#
+		   </isNotNull>
+		   <isNotNull prepend="," property="payTime">
+		      pay_time=#payTime#
+		   </isNotNull>
+	     where 1=1
+	     	<isNotNull prepend="and" property="tradeId">
+				trade_id=#tradeId# 
+			</isNotNull>
+			<isNotNull prepend="and" property="prodId">
+				ProdId=#prodId#
+			</isNotNull>
+			<isNotNull prepend="and" property="itemId">
+				 item_id=#itemId#
+			</isNotNull>
+	   </dynamic>
+	</update>	  		
+
+</sqlMap>
+
+

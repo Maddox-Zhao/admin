@@ -1,0 +1,61 @@
+#set($layout = '')
+<html>
+<head>
+	<title>尚上后台管理系统 </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link href="/styles/basic.css" rel="stylesheet" type="text/css" />
+	<link href="/styles/admin.css" rel="stylesheet" type="text/css" />
+	<!--
+	<link href="${imageServer}/styles/basic.css" rel="stylesheet" type="text/css" />
+	<link href="${imageServer}/styles/admin.css" rel="stylesheet" type="text/css" />
+	-->
+<script type="text/javascript">
+/*
+* 智能机浏览器版本信息:
+*
+*/
+function browserRedirect() {
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+            var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+            var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+            var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+            var bIsAndroid = sUserAgent.match(/android/i) == "android";
+            var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+            var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+            if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+                return true;
+            } else {
+               return false;
+            }
+}
+if(browserRedirect())
+{
+	#if(!$!adminAccess.has("A_DX_PRODUCT_MANAGER"))	  
+		window.location.href = "/m/index.html";
+	#end
+}
+ 
+</script>
+
+</head>
+
+<frameset rows="64,*,25"  frameborder="no" border="0" framespacing="0">
+
+	<frame src="admin_top.html" noresize="noresize" frameborder="NO" name="topFrame" scrolling="no" marginwidth="0" marginheight="0" target="main" />
+	
+    <frameset cols="202,*" framespacing="0px" border="0" id="frame">
+		<frame src="admin_left.html" name="leftFrame"  frameborder="0" scrolling="yes" noresize target="main"/>
+		<frame src="admin_right.html" name="main" frameborder="0" scrolling="yes" target="_self" />
+	</frameset>
+    
+    <frame src="admin_foot.html" noresize="noresize" frameborder="NO" name="footFrame" scrolling="no" marginwidth="0" marginheight="0" target="main" />
+    
+</frameset>
+
+<noframes> 
+	<body>您的浏览器无法处理框架</body>
+</noframes>
+
+</html>

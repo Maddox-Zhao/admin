@@ -1,0 +1,81 @@
+/*关于我们*/
+
+.xl-about{ height:auto;clear: both;margin:8px auto; width:800px;}
+.line{ height:1px; background:#d5d5d5; font-size:1px; overflow:hidden; clear:both;}
+.hide { display: none;}
+.leftside_about{border: #d5d5d5 1px solid; border-right: none; border-left:none;  float: left; width: 178px; margin:5px 0; background:#f6f6f6;}
+
+.about-t {background: url(../../images/about/message-bg-about.gif) no-repeat; border-bottom: #d5d5d5 1px; height: 60px;}
+
+.about-list {background: #e7e7e7; padding-bottom: 5px}
+.about-list dt.first {	background: url(../../images/service/message-bg.gif) no-repeat left -157px; height:33px; line-height:31px; position:relative;}
+.about-list dt {border-TOP: #d5d5d5 1px solid; font-weight: bold; font-size: 13px; background: url(../../images/service/message-bg.gif) no-repeat 12px -200px; cursor: pointer; color: #404040; text-indent: 31px; line-height: 32px; height: 32px;}
+.about-list dt a{ font-size:13px; color:#333;}
+.about-list dt a:hover{ color:#404040; text-decoration: underline;}
+.about-list dd {padding:5px 0 0 22px; background: #fff; padding-bottom: 5px; margin: auto; width:150px;}
+.about-list dd ul li {display: block; font-size: 12px; background: url(../../images/service/d.gif) no-repeat 11px center; text-indent: 20px; line-height:20px;}
+.about-list dd ul li.selected{}
+.about-list dd ul li.selected a{color:#f60;}
+
+
+.xl-main-about{ float: right; width: 605px; color: #333; text-indent: 0; margin:5px 0;  }
+.about-banner{ width:605pxp; height:130px; background: url(../../images/about/about_01.jpg);  }
+.about-banner-news{ width:605pxp; height:130px; background: url(../../images/about/news.jpg);  }
+
+.about-title{ height:35px; line-height:35px; width:603px; margin:20px 0 0 0; background:url(../../images/about/about_title_bj.gif) no-repeat;border:#d5d5d5 1px solid; border-bottom:none; border-top: none;}
+.about-title h1{ font-size:16px; line-height:30px; padding:5px 0 0 30px;}
+.xl-main-about h2{ font-size:14px; line-height:20px; margin:5px 0 0px 0; padding:0;}
+.xl-main-about-c{  height:auto; float:left; clear:both; line-height:18px; padding:10px 15px; width:573px; border:#d5d5d5 1px solid; border-top:none; *height: auto !important;  *height:250px; min-height:250px; background:#;}
+.xl-main-about-c p{ margin:10px 0 5px 0; text-indent:0;}
+
+/*本网动态̬*/
+.bwdt_con{ padding:5px 5px 15px 0px;}
+.bwdt_con li{ height:30px;line-height:30px;border-bottom:1px solid #ebeaea; background:url(../../images/about/gywm_int.png) left center no-repeat; padding-left:15px;}
+.bwdt_con li font{float:left; font-size:12px; padding-right:30px;}
+.bwdt_con li small{ float:right; font-variant:normal; font-size:12px; color:#999}
+.new{ background:url(../../images/about/new.png) right 5px no-repeat; }
+.new_a{color:#ff0000}
+
+.bwdt-xx-con{font-size:14px; line-height:26px; margin-top:10px; border:#d5d5d5 1px solid; padding:5px 15px;}
+.bwdt-xx-con h2{ font-size:16px; color:#464646; text-align:center; border-bottom:1px dashed #d3d3d3; line-height:35px;}
+.bwdt-xx-con div{ color:#989898; font-size:12px; text-align:center;}
+.bwdt-xx-con p{ text-indent:24px; }
+
+
+/* -- 分页 --start 使用和myspace.css一样的分页*/
+.pagination{ height:30px; background:#eee; margin:10px 0; border-top:3px solid #eee;border-bottom:3px solid #eee;}
+.pagination a, .page-start, .page-end, .page-prev{background-image:url(../../images/list.png);background-repeat:no-repeat;}
+.list-nav li.pagination{float:right;width:150px;margin:0;}
+.pagination{height:22px;font-family:tahoma;font-size:12px;}
+.page-top{ margin-top:5px;}
+.page-top,.page-bottom{float:right;}
+.pagination a,.page-info,.page-prev,.page-cur,.page-start,.page-end,.page-break,.page-skip, .page-next{
+    float:left;height:18px;margin:0 3px 0 0;text-align:center;white-space:nowrap;vertical-align:middle;line-height:18px;}
+.page-start,.pagination a,.page-end, .page-prev, .page-next{padding:0 5px;border:solid 1px #ccc;}
+.page-start{width:20px;padding:0!important;background-position:7px -175px;}
+a.page-prev{width:20px;padding:0!important;background-position:-68px -175px!important;}
+.page-cur,.page-break{padding:0 3px;}
+a.page-next{padding-right:16px;background-position:-179px -175px!important;}
+.page-end{padding-right:16px;background-position:-104px -175px;}
+.page-cur{border-color:#fff;color:#ff6400;font-weight:700;}
+.page-skip{padding:0 3px;}
+.page-skip input[type="text"]{width:30px;height:18px;margin:0 3px;border:solid 1px #ccc;vertical-align:top;}
+.page-skip button{width:37px;height:19px;margin:0 0 0 2px;border:0 none;background-position:-260px -123px;text-indent:-999px;}
+.page-prev span,.page-start span,.page-mini .page-next span,.page-mini .page-end span,.page-skip button span{display:none!important;}
+
+/* -- 按钮 -- */
+.pagination input[type="submit"]{background:url(../../images/submit_btn.png) no-repeat;background-position:-2px -1px;
+border:1px solid #ccc;height:20px;line-height:20px;color:#404040;padding:0px 5px;cursor:pointer;}
+
+.list .pagination{background:#f9f9f9;margin:10px; padding:3px; border-top:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;}
+.list .pagination .checkbox{ float:left; width:200px; vertical-align:middle;}
+.list .pagination .checkbox input{ margin-right:5px;}
+.list .pagination .checkbox .but{ line-height:18px; height:20px; margin-top:4px; width:60px; margin-left:15px;}
+/* -- 分页 -- end */
+
+
+
+/*end 本网动态*/
+
+
+

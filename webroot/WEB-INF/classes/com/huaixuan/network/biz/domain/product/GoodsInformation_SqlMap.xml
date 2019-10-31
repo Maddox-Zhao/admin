@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="product">	
+  <typeAlias alias="goodsInfromaction" type="com.huaixuan.network.biz.domain.product.GoodsInformation"/>	
+	 <resultMap id="goodsInformationResultMap" class="com.huaixuan.network.biz.domain.product.GoodsInformation" >
+		<result column="gId" property="gId"/>		
+		<result column="idproduct" property="idproduct"/>
+		<result column="beforeLocation" property="beforeLocation"/>		
+	</resultMap>
+	
+	
+	<resultMap id="goodsInformationList" class="com.huaixuan.network.biz.domain.product.GoodsInformation">	  	
+		  <result column="gId" property="gId"/>
+		  <result column="idproduct" property="idproduct"/>
+		  <result column="beforeLocation" property="beforeLocation"/>
+		  <result column="brandName" property="brandName" />
+		  <result column="seriesName" property="seriesName" />
+		  <result column="type" property="type" />
+		  <result column="material" property="material" />
+		  <result column="color" property="color" />
+		  <result column="size" property="size" />
+		  <result column="curSiteId" property="curSiteId"/>
+		  <result column="status" property="status" />
+		  <result column="remark" property="remark" />
+		  <result column="cname" property="cname" />
+	</resultMap>
+	
+	
+	
+	
+	 <!-- 添加调货产品 -->
+	  <insert id="addGoodsInformation" parameterClass="goodsInfromaction">
+	  	insert into hx_goodsinformation values(#gId#,#idproduct#,#beforeLocation#,#idStatus#)
+	  </insert>
+	  
+	 <!-- 修改调货产品 -->
+	  <update id="updateGoodSInformation" parameterClass="goodsInfromaction">
+	  	update hx_goodsinformation set idStatus = #idStatus# where idproduct = #idproduct# and gId = #gId#
+	  </update>
+	  
+	
+ 	<!-- 查找调货产品的总数量GoodsInformation -->
+ 	<select id="selectGoodsListCountCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+ 		SELECT COUNT(hg.idproduct) FROM hx_goodsinformation hg,hx_transfer ht WHERE hg.gId=ht.id 
+ 	
+ 		<isNotEmpty prepend="and" property="id">
+			ht.id =#id#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gid">
+			hg.gId =#gid#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idproduct">
+			hg.idproduct =#idproduct#  
+		</isNotEmpty>
+	</select>	
+	
+	<!-- 查找调货产品信息GoodsInformation -->	
+	<select id="selectSDiaoHuoProductsList" parameterClass="java.util.Map"  resultMap="goodsInformationList">
+		SELECT
+		hg.gId gId,hg.idproduct idproduct,hg.beforeLocation beforeLocation,b.name brandname,
+		ser.name seriesName,p.Type type,p.Material material,p.Color color,p.Size size,sit.name curSiteId,sta.status status,ht.remark remark,c.name cname
+		FROM hx_goodsinformation hg,product p,brand b,series ser,hx_transfer ht,site sit,STATUS sta,customer c
+		WHERE 
+		hg.idproduct = p.idProduct
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = ser.idSeries
+		AND hg.gId = ht.id
+		AND ht.afterLocation = sit.idSite
+		AND hg.idStatus = sta.idStatus
+		AND ht.idCustomer = c.idCustomer
+		<isNotEmpty prepend="and" property="id">
+			ht.id =#id#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gid">
+			hg.gId =#gid#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idproduct">
+			hg.idproduct =#idproduct#  
+		</isNotEmpty>
+ 		<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		 </isNotEmpty>			
+	</select>
+	<select id="getMyGoodsTestCountWithParmap" parameterClass="java.util.Map" resultClass="int">
+	<![CDATA[
+ 		 select count(1) from(
+ 		 	SELECT
+		hg.gId gId,hg.idproduct idproduct,hg.beforeLocation beforeLocation,b.name brandname,
+		ser.name seriesName,p.Type type,p.Material material,p.Color color,p.Size size,sit.name curSiteId,sta.status status
+		FROM hx_goodsinformation hg,product p,brand b,series ser,hx_transfer ht,site sit,STATUS sta
+		WHERE 
+		hg.idproduct = p.idProduct
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = ser.idSeries
+		AND hg.gId = ht.id
+		AND ht.afterLocation = sit.idSite
+		AND hg.idStatus = sta.idStatus
+ 		  ]]>
+ 	<isNotEmpty prepend="and" property="id">
+			ht.id =#id#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gid">
+			hg.gId =#gid#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idproduct">
+			hg.idproduct =#idproduct#  
+		</isNotEmpty>
+ 		<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		 </isNotEmpty>
+		 ) aa;
+	</select>
+</sqlMap>

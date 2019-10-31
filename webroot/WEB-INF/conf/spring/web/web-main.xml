@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<bean id="ResourceConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>WEB-INF/conf/server.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- view -->
+	<bean id="velocityViewCache" class="com.hundsun.network.melody.common.util.cache.local.SimpleHashMapCompactCache"></bean>
+	
+	<bean id="velocityConfigurer" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="WEB-INF/views/" />
+		<property name="velocityProperties">
+			<map>
+				<entry key="input.encoding" value="${file.encoding}"></entry>
+				<entry key="output.encoding" value="${web.encoding}"></entry>
+				<!-- cache directive 相关配置 -->
+				<entry key="userdirective" value="com.hundsun.network.melody.common.web.velocity.directive.CacheDirective"></entry>
+				<!-- direcitive.cache.provider　配置cache的提供者 -->
+				<entry key="direcitive.cache.provider" value-ref="velocityViewCache"></entry>
+				<!-- direcitive.cache.dev.mode 控制是否打开cache,如果是true,则关闭 -->
+				<entry key="direcitive.cache.dev.mode" value="${system.devMode}"></entry>
+			</map>
+		</property>
+		<property name="configLocation" value="WEB-INF/conf/velocity.properties"></property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="com.hundsun.network.melody.common.web.velocity.resolver.FixedVelocityLayoutViewResolver"> 
+		<property name="order" value="10" />
+		<property name="suffix" value=".vm" />
+		<property name="prefix" value="screen/" />
+		<property name="layoutUrl" value="layout/default.vm" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="dateToolAttribute" value="dateTool" />
+		<property name="numberToolAttribute" value="numberTool" />
+		<property name="toolboxConfigLocation" value="WEB-INF/conf/spring/vm-toolbox.xml" />
+		<property name="contentType" value="${web.contentType}"></property>
+		<property name="templateEncoding" value="${file.encoding}"></property>
+	</bean>
+
+<!--  jsp view 支持
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="100" />
+		<property name="prefix" value="/WEB-INF/views/screen/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+-->
+	<!-- interceptors -->
+	<bean id="brokersInterceptor"
+		class="com.hundsun.network.melody.common.web.url.URLBrokerLauncherInterceptor">
+		<property name="brokers">
+			<map>
+				<entry key="appServer" value-ref="appServerBroker"></entry>
+				<entry key="imageServer" value-ref="imageServerBroker"></entry>
+				<entry key="upServer" value-ref="upServerBroker"></entry>
+				<entry key="liangpin99Server" value-ref="liangpin99ServerBroker"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- adapters -->
+	<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter" />
+	<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+	<bean
+		class="com.hundsun.network.melody.common.web.adapter.ExtendableAnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter" >
+				   <property name="supportedMediaTypes">
+                     <list>
+                         <value>text/plain;charset=UTF-8</value>
+                     </list>
+                   </property>
+                </bean>
+                 <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>  
+				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+		<property name="customArgumentResolvers">
+			<list>
+				<!-- 只要在method声明Cookyjar对象,则自动注入 -->
+				<bean class="com.hundsun.network.melody.common.web.cookyjar.CookyjarArgumentResolver"></bean>
+				<bean class="com.huaixuan.network.web.resolve.AdminAgentResolve"></bean>
+			</list>
+		</property>
+		<property name="methodInvokeInterceptors">
+			<list>
+				<bean class="com.huaixuan.network.web.action.interceptor.AdminInterceptor"></bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- url mapping -->
+	<bean id="defaultHandlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="order" value="0" />
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="100" />
+		<property name="urlMap">
+			<map>
+			</map>
+		</property>
+	</bean>
+
+	<context:component-scan base-package="com.huaixuan.network.web.action" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="200" />
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="lastHandlerMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="999" />
+		<property name="defaultHandler">
+			<bean
+				class="org.springframework.web.servlet.mvc.UrlFilenameViewController"></bean>
+		</property>
+		<property name="interceptors">
+			<list>
+				<ref bean="brokersInterceptor" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 文件上传解析-->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="${web.encoding}" />
+	</bean>
+
+	<!-- exception resolver -->
+	<!--
+	<bean class="com.hundsun.network.melody.demo.web.resolver.MelodyDmoExceptionResolver">
+		<property name="webEncoding" value="${web.encoding}"></property>
+		<property name="errorPage" value="/error"></property>
+		<property name="adminLoginPath" value="/admin/login.htm"></property>
+		<property name="adminDeniedPage" value="/admin/accessDenied"></property>
+		<property name="adminLoginReturnParameterName" value="returnurl"></property>
+	</bean>
+	-->
+
+	<!-- exception resolver -->
+	<bean class="com.huaixuan.network.web.action.exception.AdminExceptionResolver"></bean>
+
+
+	<import resource="web-validation.xml"/>
+	
+	
+	<!-- 1.job(做什么) -->
+	<bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="goodsAction"></property>
+		<property name="targetMethod" value="checkGoodsNums"></property>
+	</bean>
+	<bean id="jobDetail3" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="providerAction"></property>
+		<property name="targetMethod" value="getAllProducts"></property>
+	</bean>
+	
+	<bean id="jobDetail4" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="providerAction"></property>
+		<property name="targetMethod" value="getProductCostChange"></property>
+	</bean>
+	
+	<bean id="jobDetail5" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="providerAction"></property>
+		<property name="targetMethod" value="getAllYShangGoods"></property>
+	</bean>
+	
+	
+	
+	<!-- 2.触发器(什么时间发生)	 -->
+	<bean id="t2" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="jobDetail"></property>
+		<property name="cronExpression">		
+				<!-- 依次：
+					秒(0-59) 
+					分(0-59) 
+					时(0-23) 
+					日(1-31)  可出现？
+					月(0-11) 
+					星期(1-7) 可出现？（必须至少有一个？）
+					年(可省) 
+					特殊符号 ： (时分秒)/每   (星期)#第   (通用),和
+					实例：
+					（1）每秒都执行：* * * * * ? *
+					（2）每整分的时候执行：0 * * * * ? * -->
+				
+			<value>0 20 22 * * ? *</value>
+		</property>
+	</bean>
+	
+	<bean id="t3" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="jobDetail3"></property>
+		<property name="cronExpression">		
+				<!-- 依次：
+					秒(0-59) 
+					分(0-59) 
+					时(0-23) 
+					日(1-31)  可出现？
+					月(0-11) 
+					星期(1-7) 可出现？（必须至少有一个？）
+					年(可省) 
+					特殊符号 ： (时分秒)/每   (星期)#第   (通用),和
+					实例：
+					（1）每秒都执行：* * * * * ? *
+					（2）每整分的时候执行：0 * * * * ? * 
+					(3)每月每周一的23点5分执行
+					0 5 23 ? * MON
+				每天6點12分觸發WED
+			<value>0 55 18 * * ? *</value> -->
+			<!-- <value>0 5 23 ? * SUN *</value>  意思是每个星期天晚上23点05执行-->
+			<value>0 5 23 ? * SUN *</value>
+		</property>
+	</bean>
+	
+	<bean id="t4" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="jobDetail4"></property>
+		<property name="cronExpression">		
+				<!-- 依次：
+					秒(0-59) 
+					分(0-59) 
+					时(0-23) 
+					日(1-31)  可出现？
+					月(0-11) 
+					星期(1-7) 可出现？（必须至少有一个？）
+					年(可省) 
+					特殊符号 ： (时分秒)/每   (星期)#第   (通用),和
+					实例：
+					（1）每秒都执行：* * * * * ? *
+					（2）每整分的时候执行：0 * * * * ? * 
+					(3)每月每周一的23点5分执行
+					0 5 23 ? * MON
+				每天6點12分觸發WED
+			<value>0 55 18 * * ? *</value> -->
+			<!-- <value>0 10 6 * * ? *</value> 意思是每天早上4点10执行-->
+			<value>0 10 4 * * ? *</value>
+		</property>
+	</bean>
+	
+	
+	<bean id="t5" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="jobDetail5"></property>
+		<property name="cronExpression">		
+				<!-- 依次：
+					秒(0-59) 
+					分(0-59) 
+					时(0-23) 
+					日(1-31)  可出现？
+					月(0-11) 
+					星期(1-7) 可出现？（必须至少有一个？）
+					年(可省) 
+					特殊符号 ： (时分秒)/每   (星期)#第   (通用),和
+					实例：
+					（1）每秒都执行：* * * * * ? *
+					（2）每整分的时候执行：0 * * * * ? * 
+					(3)每月每周一的23点5分执行
+					0 5 23 ? * MON
+				每天6點12分觸發WED
+			<value>0 55 18 * * ? *</value> -->
+			<!-- <value>0 10 6 * * ? *</value> 意思是每天早上4点10执行-->
+			<value>0 10 5 * * ? *</value>
+		</property>
+	</bean>
+	
+	<!-- 3.日程表(保证几件事一起做) -->
+	<bean id="schedul" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<array>
+				<ref bean="t2"/>
+				<!-- <ref bean="t3"/>
+				<ref bean="t4"/>
+				<ref bean="t5"/> -->
+			</array>
+		</property>
+	</bean>
+</beans>

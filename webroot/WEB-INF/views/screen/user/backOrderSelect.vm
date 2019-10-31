@@ -1,0 +1,1144 @@
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+ <script language="javascript" type="text/javascript">
+ 	function addGoods(){
+		window.open('$appServer/instance/select_back_instance.html?type=goods', 'window', '');
+	}
+
+	function getgoodsInstanceInfo(ret){
+		var goodsId_str = '';
+
+		if(ret!=null &&　ret.length>0){
+           for(var i=0;i<ret.length;i++) {
+			 var newEle;
+			 var con = document.getElementById("goodsIns");
+             var ff	 = document.getElementById("ag");
+             var newEle	= document.createElement("DIV");
+             newEle	= ff.insertBefore(newEle,con);
+　			 goodsId_str += ret[i].id + ',';
+             newEle.innerHTML = "\n<div><input name=\"goodsInstanceId\" type=\"hidden\" value=\""+ret[i].id+"\" /><input name=\"goodsWeight\" type=\"hidden\" value=\""+ret[i].goodsWeight+"\" /><input name=\"goodsId\" type=\"hidden\" value=\""+ret[i].goodsId+"\" />产品名称:<input name=\"goodsInstanceName\" type=\"text\" size=\"15\" value=\""+ret[i].instanceName+"\" readonly=\"readonly\"/> 产品编码<input name=\"goodsInstanceCode\" type=\"text\"  size=\"15\" value=\""+ret[i].code+"\" readonly=\"readonly\"/> 产品单价(￥)<input name=\"goodsPrice\" type=\"text\" size=\"15\" value=\""+ret[i].agentPrice+"\"  onchange=\"validateprice(this.value,"+ret[i].id+");\" id=\"agentPrice"+ret[i].id+"\" /> 输入数量：<input name=\"count\"  id=\"count"+ret[i].id+"\" type=\"text\"  size=\"15\" value=\"\" onchange=\"validatenum(this.value,"+ret[i].id+");\" /><input type=\"button\" name=\"removebutton\" value=\"\u5220\u9664\" onclick=\"javascript:return removeOption(this);\" /></div>\n";
+			}
+		}
+	}
+	
+	
+	function getgiftInstanceInfo(ret){
+		var goodsId_str = '';
+
+		if(ret!=null &&　ret.length>0){
+           for(var i=0;i<ret.length;i++) {
+			 var newEle;
+			 var con = document.getElementById("zpgoodsIns");
+             var ff	 = document.getElementById("zp");
+             var newEle	= document.createElement("DIV");
+             newEle	= ff.insertBefore(newEle,con);
+　			 goodsId_str += ret[i].id + ',';
+             newEle.innerHTML = "\n<div><input name=\"zpgoodsInstanceId\" type=\"hidden\" value=\""+ret[i].id+"\" /><input name=\"zpgoodsWeight\" type=\"hidden\" value=\""+ret[i].goodsWeight+"\" /><input name=\"zpgoodsId\" type=\"hidden\" value=\""+ret[i].goodsId+"\" />赠品名称:<input name=\"zpgoodsInstanceName\" type=\"text\" size=\"15\" value=\""+ret[i].instanceName+"\" readonly=\"readonly\"/> 赠品编码<input name=\"zpgoodsInstanceCode\" type=\"text\"  size=\"15\" value=\""+ret[i].code+"\" readonly=\"readonly\"/> 输入数量：<input name=\"zpcount\" id=\"zpcount"+ret[i].id+"\"  type=\"text\"  size=\"15\" value=\"\" onchange=\"validatezpnum(this.value,"+ret[i].id+");\" /><input type=\"button\" value=\"\u5220\u9664\" name=\"removebuttonzp\" onclick=\"javascript:return removeZpOption(this);\" /></div>\n";
+			}
+		}
+	}
+
+ 	function addZpGoods(){
+	    window.open('$appServer/instance/select_back_instance.html?type=gift', 'window', '');
+	}
+
+    function removeOption(e){
+	     var tar = e.parentNode.parentNode;	//\u83b7\u53d6\u5220\u9664\u5bf9\u8c61
+	     var con = document.getElementById("ag");//\u83b7\u53d6Form\u5143\u7d20\u7684\u5bb9\u5668
+	     if(!tar || !con) return;
+         if(e.name=="true"){alert("\u8be5\u9009\u9879\u5df2\u6295\u8fc7\u7968\uff0c\u4e0d\u80fd\u5220\u9664\uff01");return;}
+	     con.removeChild(tar);
+		 calcutor();
+    }
+
+    function removeZpOption(e){
+	     var tar = e.parentNode.parentNode;	//\u83b7\u53d6\u5220\u9664\u5bf9\u8c61
+	     var con = document.getElementById("zp");//\u83b7\u53d6Form\u5143\u7d20\u7684\u5bb9\u5668
+	     if(!tar || !con) return;
+         if(e.name=="true"){alert("\u8be5\u9009\u9879\u5df2\u6295\u8fc7\u7968\uff0c\u4e0d\u80fd\u5220\u9664\uff01");return;}
+	     con.removeChild(tar);
+		 calcutor();
+    }
+
+	function removeAll(){
+        var n = document.getElementById('ag').childNodes.length;
+		if(n > 0){
+        for ( var i = 0; i < n; i++) {
+              document.getElementById('ag').removeChild(document.getElementById('ag').firstChild);
+        }
+		}
+        var y = document.getElementById('zp').childNodes.length;
+	    if(y > 0){
+        for ( var j = 0; j < y; j++) {
+              document.getElementById('zp').removeChild(document.getElementById('zp').firstChild);
+        }
+		}
+		calcutor();
+	}
+
+    function checkForm(){
+       if(document.getElementById("depFirstId").value == ""){
+          alert("请选择一级仓库!");
+          return false;
+       }
+
+	   var goodslength = document.getElementsByName("goodsId").length;
+	   var zpgoodslength = document.getElementsByName("zpgoodsId").length;
+	   if(goodslength == 0 & zpgoodslength == 0){
+	     alert("请选择产品或者赠品!");
+		 return false;
+	   }
+
+	   var goodsIdArray = new Array();
+	   var numsArray = new Array();
+	   var goodsPriceArray = new Array();
+	   var zpgoodsIdArray = new Array();
+	   var zpnumsArray = new Array();
+	   var goodsIds=document.getElementsByName("goodsId");
+	   var nums = document.getElementsByName("count");
+	   var goodsPrices = document.getElementsByName("goodsPrice");
+	   var zpgoodsIds = document.getElementsByName("zpgoodsId");
+	   var zpnums = document.getElementsByName("zpcount");
+	   if(goodsIds.length > 0){
+	       for(var i=0;i<goodsIds.length;i++){
+		      goodsIdArray[i] = goodsIds[i].value;
+	       }
+	   }
+	   if(nums.length > 0){
+	      for(var j=0;j<nums.length;j++){
+	           if(nums[j].value == ""||nums[j].value == 0){
+		          alert("请输入数量");
+			      return false;
+		        }
+		      numsArray[j] = nums[j].value;
+	      }
+	   }
+	   if(goodsPrices.length > 0){
+	      for(var k=0;k<goodsPrices.length;k++){
+		      if(goodsPrices[k].value == ""){
+			      alert("请输入价格");
+				  return false;
+			  }
+		      goodsPriceArray[k] = goodsPrices[k].value;
+	      }
+	   }
+	   if(zpgoodsIds.length > 0){
+	       for(var m=0;m<zpgoodsIds.length;m++){
+		      zpgoodsIdArray[m] = zpgoodsIds[m].value;
+	       }
+	   }
+	   if(zpnums.length > 0){
+	      for(var n=0;n<zpnums.length;n++){
+	           if(zpnums[n].value == ""||zpnums[n].value == 0){
+		          alert("请输入数量");
+			      return false;
+		        }
+		      zpnumsArray[n] = zpnums[n].value;
+	      }
+	   }
+	   var depFirstId = document.getElementById("depFirstId").value;
+	   var goodsInstanceIdArray = new Array();
+	   var zpgoodsInstanceIdArray = new Array();
+	   var goodsInstanceIdIds=document.getElementsByName("goodsInstanceId");
+	   var zpgoodsInstanceIdIds=document.getElementsByName("zpgoodsInstanceId");
+	   if(goodsInstanceIdIds.length > 0){
+	       for(var a=0;a<goodsInstanceIdIds.length;a++){
+		      goodsInstanceIdArray[a] = goodsInstanceIdIds[a].value;
+	       }
+	   }
+	   if(zpgoodsInstanceIdIds.length > 0){
+	       for(var b=0;b<zpgoodsInstanceIdIds.length;b++){
+		      zpgoodsInstanceIdArray[b] = zpgoodsInstanceIdIds[b].value;
+	       }
+	   }
+
+	   if(goodslength > 0 || zpgoodslength > 0){
+		    var params="goodsInstanceIdArray="+goodsInstanceIdArray+"&numsArray="+numsArray+"&zpgoodsInstanceIdArray="+zpgoodsInstanceIdArray+"&zpnumsArray="+zpnumsArray+"&depFirstId="+depFirstId;
+            jQuery.ajax({
+			          type:"post",
+			          url: '/user/verifyallnum.html',
+			          async:true,
+			          dataType: "json",
+			          data:params,
+			          success:function(json){
+				if(json == "addovernum"){
+			       alert("有选择产品总数量大于可用库存");
+				   return false;
+			     }else if(json =="overnum"){
+				   alert("选择产品中有超过可用库存");
+				   return false;
+				 }else if(json == "nonum"){
+				   alert("选择产品中有可用库存不存在");
+				   return false;
+				 }else if(json == "zpnonum"){
+				   alert("选择赠品中有可用库存不存在");
+				   return false;
+				 }else if(json == "zpovernum"){
+				   alert("选择赠品中有超过可用库存");
+				   return false;
+				 }else if(json == "warming"){
+				   alert("有选择产品总数量小于库存预警，请备货")
+				   return false;
+				 }else if(json == "goodsSame"){
+				   alert("产品有重复，请重选");
+				   return false;
+				 }else if(json == "zpgoodsSame"){
+				   alert("赠品有重复，请重选");
+				   return false;
+				 }else{
+				   firstConfirm();
+				 }
+				}
+			});
+			  
+	   }
+	}
+
+
+	function firstConfirm(){
+	   var goodsIdArray = new Array();
+	   var numsArray = new Array();
+	   var goodsPriceArray = new Array();
+	   var zpgoodsIdArray = new Array();
+	   var zpnumsArray = new Array();
+	   var goodsIds=document.getElementsByName("goodsId");
+	   var nums = document.getElementsByName("count");
+	   var goodsPrices = document.getElementsByName("goodsPrice");
+	   var zpgoodsIds = document.getElementsByName("zpgoodsId");
+	   var zpnums = document.getElementsByName("zpcount");
+	   if(goodsIds.length > 0){
+	       for(var i=0;i<goodsIds.length;i++){
+		      goodsIdArray[i] = goodsIds[i].value;
+	       }
+	   }
+	   if(nums.length > 0){
+	      for(var j=0;j<nums.length;j++){
+	           if(nums[j].value == ""||nums[j].value == 0){
+		          alert("请输入数量");
+			      return false;
+		        }
+		      numsArray[j] = nums[j].value;
+	      }
+	   }
+	   if(goodsPrices.length > 0){
+	      for(var k=0;k<goodsPrices.length;k++){
+		      if(goodsPrices[k].value == ""){
+			      alert("请输入价格");
+				  return false;
+			  }
+		      goodsPriceArray[k] = goodsPrices[k].value;
+	      }
+	   }
+	   if(zpgoodsIds.length > 0){
+	       for(var m=0;m<zpgoodsIds.length;m++){
+		      zpgoodsIdArray[m] = zpgoodsIds[m].value;
+	       }
+	   }
+	   if(zpnums.length > 0){
+	      for(var n=0;n<zpnums.length;n++){
+	           if(zpnums[n].value == ""||zpnums[n].value == 0){
+		          alert("请输入数量");
+			      return false;
+		        }
+		      zpnumsArray[n] = zpnums[n].value;
+	      }
+	   }
+	  var depFirstId = document.getElementById("depFirstId").value;
+	  if(confirm("点击确认后产品不能再进行编辑,确认选择吗？")){			
+		    var params="goodsIdArray="+goodsIdArray+"&numsArray="+numsArray+"&goodsPriceArray="+goodsPriceArray+"&zpgoodsIdArray="+zpgoodsIdArray+"&zpnumsArray="+zpnumsArray+"&depFirstId="+depFirstId;
+            jQuery.ajax({
+			          type:"post",
+			          url: '/user/getWeightAndMoney.html',
+			          async:true,
+			          dataType: "json",
+			          data:params,
+			          success:function(json){
+		         var buffer1 = "产品总数量：<strong class='f16'>";
+				 var buffer2 = "</strong>&nbsp;&nbsp;&nbsp;产品总价格：<strong class='f16'>";
+				 var buffer3 = "元</strong>&nbsp;&nbsp;&nbsp; 产品总重量：<strong class='f16'>";
+				 var buffer4 = "</strong>";
+				 var buffer = buffer1+json.buyNum+buffer2+json.totalPrice+buffer3+json.totalWeight+buffer4;
+				 jQuery("#allWeightPrice").html(buffer);
+				 document.getElementById('goodsWeightTotal').value = json.totalWeight;
+				 document.getElementById('epGoodsWeightTotal').value = json.totalEpWeight;
+				 document.getElementById('goodsPriceTotal').value = json.totalPrice;
+	             document.getElementById("firstDepId").value = depFirstId;
+				}
+			});
+	      document.getElementById("dz-box-address").style.display = "";
+		  document.getElementById("checkbutton").style.display = "none";
+		  document.getElementById("resetbutton").style.display = "none";
+		  document.getElementById("selectGs").style.display = "none";
+		  document.getElementById("selectZp").style.display = "none";
+		  document.getElementById("depFirstId").disabled = true;
+		  var removebuttons = document.getElementsByName("removebutton");
+		  var zpremovebuttons = document.getElementsByName("removebuttonzp");
+		  document.getElementById("nowWeightPrice").style.display = "none";
+	      if(nums.length > 0){
+	         for(var e=0;e<nums.length;e++){
+			    nums[e].readOnly=true;
+	         }
+	      }
+	      if(zpnums.length > 0){
+	         for(var f=0;f<zpnums.length;f++){
+			    zpnums[f].readOnly=true;
+	         }
+	      }
+	      if(goodsPrices.length > 0){
+	         for(var t=0;t<goodsPrices.length;t++){
+			    goodsPrices[t].readOnly=true;
+	         }
+	      }
+		  if(removebuttons.length > 0){
+	         for(var g=0;g<removebuttons.length;g++){
+			    removebuttons[g].style.display = "none";
+	         }
+		  }
+		  if(zpremovebuttons.length > 0){
+	         for(var h=0;h<zpremovebuttons.length;h++){
+			    zpremovebuttons[h].style.display = "none";
+	         }
+		  }
+	   }
+	}
+
+    function getWenZi(val,addressId,provinceTemp,cityTemp,districtTemp){
+        	jQuery("#amountMoneyAll").html("");
+			jQuery("#expressSel").html("");
+	        var userId = document.getElementById("userId").value;
+        	var obj = document.getElementById("city");
+            var obj2 = document.getElementById("district");
+            var province =document.getElementById("s1");
+            province[0].selected=true;
+            obj.length=0;
+            obj2.length=0;
+            obj.options[0] = new Option("请选择", "");
+            obj2.options[0] = new Option("请选择", "");
+
+            var rid = document.getElementById(val);
+            var add = document.getElementById('address_list');
+            if(rid.checked && rid.id=="r0"){
+                add.style.display="block";
+            }
+            else{
+				jQuery.post('/user/tobeDefaultbackAddress.html',{param1:addressId,param2:userId},function(jsonMap){});
+                add.style.display="none";
+            }
+            disPaymentSel(provinceTemp,cityTemp,districtTemp);
+        }
+
+        function selectCity(code){
+			jQuery("#expressSel").html("");
+			jQuery("#paymentSel").html("");
+			jQuery("#amountMoneyAll").html("");
+            var obj = document.getElementById("city");
+            var obj2 = document.getElementById("district");
+            var length = obj.length = 0;
+
+            obj.style.display='';
+            obj2.style.display='';
+            jQuery.ajax({
+		          type:"post",
+		          url: '/user/getBackRightCitys.html',
+		          dataType: "json",
+		          data:"code="+code,
+		          success:function(json){
+			          var tempid=0;
+			          var array=json.array;
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(array,
+				          function(){
+							  obj.options[tempid] = new Option(array[tempid-1].regionName,array[tempid-1].code);
+							  tempid=tempid+1;
+
+			          	 }
+		          	 )
+		          }
+		        });
+            var obj2 = document.getElementById("district");
+            var length2 = obj2.length = 0;
+            obj2.options[length2] = new Option("请选择", "");
+
+
+       }
+
+        function selectDistinc(code){
+	        jQuery("#expressSel").html("");
+			jQuery("#paymentSel").html("");
+			jQuery("#amountMoneyAll").html("");
+	        var obj = document.getElementById("district");
+	            var length = obj.length = 0;
+	            jQuery.ajax({
+		          type:"post",
+		          url: '/user/getBackRightDistincs.html',
+		          dataType: "json",
+		          data:"code="+code,
+		         success:function(json)
+				 {
+			          var tempid=0;
+			          var array=json.array;
+			          if(array[0]==null)
+					  {
+					  	  disPaymentSel();
+                          jQuery("#district").hide();
+			          }else
+					  {
+			          	jQuery("#district").show();
+			          }
+			          obj.options[tempid++] = new Option("请选择", "");
+			          jQuery.each(array,
+				          function()
+						  {
+							  obj.options[tempid] = new Option(array[tempid-1].regionName,array[tempid-1].code);
+							  tempid=tempid+1;
+				          }
+			         	)
+		          }
+		        });
+
+         }
+
+        function disPaymentSel(provinceTemp,cityTemp,districtTemp){
+            jQuery("#amountMoneyAll").html("");
+            var regionCodeEndTemp = convertRegionCode(provinceTemp,cityTemp,districtTemp);
+			var userId = document.getElementById('userId').value;
+			var goodsPriceAmount = document.getElementById('goodsPriceTotal').value;
+            var params="regionCodeEndTemp="+regionCodeEndTemp+"&userId="+userId+"&goodsPriceAmount="+goodsPriceAmount;
+            jQuery.ajax({
+			          type:"post",
+			          url: '/user/disPaymentSelBack.html',
+			          async:true,
+			          dataType: "json",
+			          data:params,
+			          success:function(json){
+
+			          var temp="";
+			          if(json.payBybank!=null){
+
+			          temp="<ul><li><input type='radio' name='paymentType' id='paymentType' value='alipayFirst' onclick='disExpressSel("
+				      + json.regionCodeEndTemp
+				      + ","
+				      + "1"
+				      + ");' />先款后货</li></ul>"
+				      }
+			          if(json.payByPeriod!=null){
+					    temp=temp+"<ul><li><input type='radio' name='paymentType' id='paymentType' value='periodFirst' onclick='disExpressSel("
+				      + json.regionCodeEndTemp
+				      + ","
+				      + "3"
+				      + ");' />周期结算</li></ul>"
+				      }
+
+			          jQuery("#paymentSel").html(temp);
+
+			          }
+			          });
+			         jQuery("#expressSel").html("");
+
+        }
+
+        function convertRegionCode(provinceTemp,cityTemp,districtTemp){
+            var r0 = document.getElementById("r0");
+            if(r0.checked){
+
+                //省份
+                var s1 = document.getElementById("s1");
+                provinceTemp = s1.options[s1.selectedIndex].value;
+
+
+                    //城市
+                    var city = document.getElementById("city");
+                    //街区
+                    var district = document.getElementById("district");
+
+					var tempid=city.selectedIndex;
+					if(tempid>-1){
+                    cityTemp = city.options[tempid].value;
+                    }
+                    if(provinceTemp != '990000' && provinceTemp != '810000'&& provinceTemp != '820000'){
+					var tempid2=district.selectedIndex;
+					if(tempid2>-1){
+                    districtTemp = district.options[district.selectedIndex].value;
+					}
+					else{
+					districtTemp='';
+					}
+                }else{
+                    districtTemp='';
+                }
+            }
+            var regionCodeEndFinishTemp = "";
+            if(districtTemp == '') {
+                if(cityTemp==''){
+                    regionCodeEndFinishTemp = provinceTemp;
+                } else {
+                    regionCodeEndFinishTemp = cityTemp;
+                }
+            } else {
+                regionCodeEndFinishTemp = districtTemp;
+            }
+            return regionCodeEndFinishTemp;
+        }
+
+    function disExpressSel(regionCodeEndSel,paymentTempSel){
+		   if(paymentTempSel == 3){
+			   paymentTempSel = "payment_first";
+			   document.getElementById("expressPayment").value = "period_pay";
+		   }else{
+		       document.getElementById("expressPayment").value = "payment_first";
+		   }
+		   var goodsWeightTotal=document.getElementById('goodsWeightTotal').value;
+		   var epGoodsWeightTotal=document.getElementById('epGoodsWeightTotal').value;
+           paymentTempSel = "payment_first";
+           document.getElementById("expressSel").style.display = "block";
+            var depositoryFirstId=document.getElementById('firstDepId').value;
+
+			var goodsIdArray = new Array();
+			var goodsNumArray = new Array();
+			var zpgoodsIdArray = new Array();
+			var zpgoodsNumArray = new Array();
+			var goodsIds=document.getElementsByName("goodsId");
+			var goodsNum=document.getElementsByName("count");
+			var zpgoodsIds = document.getElementsByName("zpgoodsId");
+			var zpgoodsNum = document.getElementsByName("zpcount");
+			
+		    if(goodsIds.length > 0){
+	           for(var i=0;i<goodsIds.length;i++){
+		         goodsIdArray[i] = goodsIds[i].value;
+	           }
+	        }
+			if(goodsNum.length > 0){
+	           for(var i=0;i<goodsNum.length;i++){
+		         goodsNumArray[i] = goodsNum[i].value;
+	           }
+	        }
+	        if(zpgoodsIds.length > 0){
+	           for(var m=0;m<zpgoodsIds.length;m++){
+		         zpgoodsIdArray[m] = zpgoodsIds[m].value;
+	           }
+	        }
+			if(zpgoodsNum.length > 0){
+	           for(var m=0;m<zpgoodsNum.length;m++){
+		         zpgoodsNumArray[m] = zpgoodsNum[m].value;
+	           }
+	        }
+
+            var params="regionCodeEndSel="+regionCodeEndSel+"&paymentTempSel="+paymentTempSel+"&epGoodsWeightTotal="+epGoodsWeightTotal+"&depositoryFirstId="+depositoryFirstId+"&goodsIdArray="+goodsIdArray+"&goodsNumArray="+goodsNumArray+"&zpgoodsIdArray="+zpgoodsIdArray+"&zpgoodsNumArray="+zpgoodsNumArray;
+            jQuery.ajax({
+			          type:"get",
+			          url: '/user/disExpressSelBack.html',
+			          async:true,
+			          dataType: "json",
+			          data:params,
+			          success:function(json){
+			          var temp="";
+			          var tempid=0;
+			          var array=json.array;
+					  var expressUrlBuff1 = "<ul><li><input type='radio' name='expressId' id='expressId' onclick='disMoneyAll(";
+                      var expressUrlBuff2 = ");' value='";
+					  var expressUrlBuff3 = "'>";
+					  var expressUrlBuff4 = "&nbsp;";
+					  var expressUrlBuff5 = "元&nbsp;";
+					  var expressUrlBuff6 = "预计&nbsp;";
+					  var expressUrlBuff7 = "天到达";
+					  var expressUrlBuff8 = "(首重&nbsp;";
+					  var expressUrlBuff9 = "kg,首重价格&nbsp;";
+					  var expressUrlBuff10 = "元;续重&nbsp;";
+					  var expressUrlBuff11 = "kg,续重价格&nbsp;";
+					  var expressUrlBuff12 = "元)</li></ul>";
+                      var expressUrlBuff13 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>(注意请到该地址自行提取：浙江省义乌市北苑区景一路10号厂房4楼)</strong>";
+			          jQuery.each(array,function(){
+					  	 var expressPaymentValue =document.getElementById("expressPayment").value;
+					     if(expressPaymentValue=="period_pay"){
+					        paymentTempSel = "period_pay";
+					     }
+
+					  temp=temp+expressUrlBuff1+array[tempid].weightMoney+expressUrlBuff2+(array[tempid].expressId + "-" + paymentTempSel+ "-" + array[tempid].weightMoney)+ expressUrlBuff3 + array[tempid].expressName+expressUrlBuff4 + array[tempid].weightMoney+ expressUrlBuff5 + array[tempid].youJiPao + expressUrlBuff4;
+					  if(array[tempid].spendTime!=null && array[tempid].spendTime != " "){
+					  temp=temp+expressUrlBuff6+array[tempid].spendTime+expressUrlBuff7;
+					  }
+					  temp=temp+expressUrlBuff8+array[tempid].weightFirst+expressUrlBuff9+array[tempid].weightFirstMoney+expressUrlBuff10+array[tempid].weightNext+expressUrlBuff11+array[tempid].weightNextMoney;
+					  temp = temp + expressUrlBuff12;
+					  if(array[tempid].expressId == '3'){
+					   temp = temp + expressUrlBuff13;
+					  }
+					  tempid=tempid+1;
+					  }
+			          )
+			          jQuery("#expressSel").html(temp);
+			          }
+			        });
+        }
+
+       function disMoneyAll(experssMoney){
+	        document.getElementById('submitbutton').style.display = "";
+            var moneyAllFinish = "";
+            var moneyAllUrl1 = "<font size='4' color='red'><strong><label>支付金额合计:";
+            var moneyAllUrl2 = "元</label></strong></font>";
+            if(experssMoney != '' && document.getElementById('goodsPriceTotal').value!= '' && typeof(experssMoney)!='undefined'){
+                moneyAllFinish = moneyAllUrl1 + (experssMoney*1+document.getElementById('goodsPriceTotal').value*1).toFixed(2) + moneyAllUrl2;
+            } else {
+                moneyAllFinish = moneyAllUrl1 + (document.getElementById('goodsPriceTotal').value*1) + moneyAllUrl2;
+            }
+            jQuery("#amountMoneyAll").html(moneyAllFinish);
+        }
+
+     function checkTrade(){
+         var userAddress = document.getElementsByName("userAddress.id");
+		 var check=0;
+         for(var i=0;i<userAddress.length;i++){
+            if(userAddress[i].checked){
+                check=1;
+            }
+         }
+         if( check == 0){
+            alert("请选择收货地址!");
+            return false;
+         }
+
+         if(document.getElementById("paymentType") == null){
+            alert("当前地址无可用物流,请重新选择!");
+            return false;
+         }
+
+         var checkPayFlag=jQuery(":radio[name=paymentType][checked]").val();
+         if(checkPayFlag == undefined){
+            alert("请选择支付方式!");
+            return false;
+         }
+
+         if(document.getElementById("expressId") == null){
+            alert("当前支付方式无可用的物流，请重新选择!");
+            return false;
+         }
+
+         var checkExpressFlag=jQuery(":radio[name=expressId][checked]").val();
+         if(checkExpressFlag == undefined){
+            alert("请选择物流公司!");
+            return false;
+         }
+
+         var buyerNote=document.getElementById("buyerNote");
+         var ctv=buyerNote.value;
+         var ss=jQuery.trim(ctv);
+         if(ss.length>200 || ss.length == 200){
+            alert("您输入的买家备注内容过长，超出字数限制!");
+            return false;
+         }
+
+         var r0 = document.getElementById("r0");
+         var s1 = document.getElementById("s1");
+         var provinceCode= jQuery("#s1").val();
+         var city = document.getElementById("city");
+         var district = document.getElementById("district");
+         var zipcode = jQuery.trim(document.getElementById("zipcode").value);
+         var tradeAddress = jQuery.trim(document.getElementById("tradeAddress").value);
+         var receiver = jQuery.trim(document.getElementById("receiver").value);
+         var mobile = jQuery.trim(document.getElementById("mobile").value);
+
+         if(r0.checked){
+            if(s1.options[s1.selectedIndex].text=="请选择"){
+                alert("请选择省份!");
+                return false;
+            }
+
+            if(provinceCode != '990000' && provinceCode != '810000'&& provinceCode != '820000'){
+                if(city.options[city.selectedIndex].text=="请选择"){
+                   alert("请选择城市!");
+                   return false;
+                }
+
+			}
+
+            if(zipcode==null||zipcode.length==0){
+                alert("请输入邮政编码!");
+                return false;
+             }else if(!zipCodeCheck(zipcode)){
+                return false;
+             }
+
+            if(tradeAddress==null|| jQuery.trim(document.getElementById("tradeAddress").value).length == 0 ){
+                alert("请输入详细地址!");
+                return false;
+             }
+
+            if(receiver==null|| jQuery.trim(document.getElementById("receiver").value).length == 0){
+                alert("请输入收货人姓名!");
+                return false;
+            }else if(!recieverCheck(jQuery.trim(document.getElementById("receiver").value))){
+                return false;
+            }
+
+            if(mobile==null||jQuery.trim(document.getElementById("mobile").value).length == 0){
+                alert("请输入电话号码!");
+                return false;
+            }else if(!mobileCheck(mobile)){
+                return false;
+            }
+          }
+            document.backOrder.submit();
+        }
+
+       function zipCodeCheck(code){
+            var msg='邮政编码格式不正确';
+            var reg= /^[0-9]\d{5}(?!\d)$/;
+            if(!reg.test(code)){
+                alert(msg);
+                return false;
+            }
+
+            return true;
+        }
+
+        function recieverCheck(str){
+            var msg='收货人姓名长度为3到32个字符';
+            var intLength=0;
+            var reg=/[\u4E00-\u9FA5]/;
+            for (var i=0;i<str.length;i++){
+              var obj = str.substring(i,i+1);
+              if (reg.test(obj)){
+                intLength=intLength+2;
+                }
+              else{
+                intLength=intLength+1;
+                }
+            }
+            if(intLength<3 || intLength>32){
+                alert(msg);
+                return false;
+            }
+
+            return true;
+        }
+
+        function mobileCheck(code){
+            var msg='电话号码格式不正确';
+            var reg = /^((((13|15|18)[0-9]{1}))+\d{8})$/;
+            var _reg = /^[\d-]{7,13}$/;
+            if(!_reg.test(code) && !reg.test(code)){
+                alert(msg);
+                return false;
+            }
+
+            return true;
+        }
+
+		function validatenum(num,id){
+		    if(num==null||jQuery.trim(num)==""){
+			   alert("出错：您没有输入.");
+			   document.getElementById('count' + id).value ="";
+			   return false;
+		    }
+		    else if(!isIntNumber(num)){
+			   alert("出错：您输入了不正确的数量.");
+			   document.getElementById('count' + id).value ="";
+			   return false;
+		    }else if(num>100000000000){
+			   alert("出错：您输入的数量太大.");
+			   document.getElementById('count' + id).value ="";
+			   return false;
+		    }
+           if(document.getElementById("depFirstId").value == ""){
+                alert("请先选择一级仓库!");
+				document.getElementById('count' + id).value ="";
+                return false;
+           }
+		   var depFirstId = document.getElementById("depFirstId").value;
+		   jQuery.post('/user/validatenum.html',{param1:num,param2:id,param3:depFirstId},function(message){
+		       if(message == "success"){
+			     alert("修改成功");
+			   }else if(message == "nonum"){
+				 document.getElementById('count' + id).value ="";
+			     alert("该产品可用库存不存在");
+
+			   }else if(message == "overnum"){
+			     document.getElementById('count' + id).value ="";
+			     alert("输入数量超过该产品可用库存");
+			   }else if(message == "warming"){
+			    document.getElementById('count' + id).value ="";
+				alert("小于库存预警，请备货");
+			   }
+			   calcutor();
+		   });
+		}
+
+
+		function validatezpnum(num,id){
+		    if(num==null||jQuery.trim(num)==""){
+			   alert("出错：您没有输入.");
+			   document.getElementById('zpcount' + id).value ="";
+			   return false;
+		    }
+		    else if(!isIntNumber(num)){
+			   alert("出错：您输入了不正确的数量.");
+			   document.getElementById('zpcount' + id).value ="";
+			   return false;
+		    }else if(num>100000000000){
+			   alert("出错：您输入的数量太大.");
+			   document.getElementById('zpcount' + id).value ="";
+			   return false;
+		    }
+           if(document.getElementById("depFirstId").value == ""){
+                alert("请先选择一级仓库!");
+				document.getElementById('zpcount' + id).value ="";
+                return false;
+           }
+		   var depFirstId = document.getElementById("depFirstId").value;
+		   jQuery.post('/user/validatenum.html',{param1:num,param2:id,param3:depFirstId},function(message){
+		       if(message == "success"){
+			     alert("修改成功");
+			   }else if(message == "nonum"){
+			     document.getElementById('zpcount' + id).value ="";
+			     alert("该产品可用库存不存在");
+
+			   }else if(message == "overnum"){
+			     document.getElementById('zpcount' + id).value ="";
+			     alert("输入数量超过该产品可用库存");
+			   }else if(message == "warming"){
+			    document.getElementById('zpcount' + id).value ="";
+				alert("小于库存预警，请备货");
+			   }
+			   calcutor();
+		   });
+		}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function validateprice(price,id){
+	  var regg = /^\d+(\.\d+)?$/;
+	  var errMsg = '价格出错，请核对后再输入';
+	  if(!regg.test(price)){
+	     alert(errMsg);
+		 document.getElementById('agentPrice' + id).value="";
+		 document.getElementById('agentPrice' + id).select();
+		 document.getElementById('agentPrice' + id).focus();
+		 return;
+	  }
+	  var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	  if(!reg.test(price)){
+	     alert(errMsg);
+		 document.getElementById('agentPrice' + id).value="";
+		 document.getElementById('agentPrice' + id).select();
+		 document.getElementById('agentPrice' + id).focus();
+		 calcutor();
+		 return;
+	  }else{
+		 jQuery.post('/user/priceRecord.html',{param1:id,param2:price},function(message){
+			   document.getElementById('modifyRecord').value = message;
+		 });
+		 alert('修改价格成功');
+		 calcutor();
+		 return;
+	  }
+	}
+	
+	function calcutor(){
+	    var totalNum = 0;
+		var totalPrice = 0.00;
+		var totalWeight = 0.00;
+	  	var goodsNumArray = new Array();
+		var zpgoodsNumArray = new Array();
+	    var goodsPriceArray = new Array();
+	    var goodsWeightArray = new Array();
+		var zpgoodsWeightArray = new Array();
+	    var nums = document.getElementsByName("count");
+		var zpnums = document.getElementsByName("zpcount");
+	    var goodsPrices = document.getElementsByName("goodsPrice");
+		var goodsWeight = document.getElementsByName("goodsWeight");
+		var zpgoodsWeight = document.getElementsByName("zpgoodsWeight");
+	    if(nums.length > 0){
+	        for(var i=0;i<nums.length;i++){
+			   if((nums[i].value != "") && (nums[i].value != 0)){
+			     goodsNumArray[i] = nums[i].value;
+			   }
+			   for(var j=0;j<goodsWeight.length;j++){
+			     if((i == j)&&(nums[i].value != "") && (nums[i].value != 0)){
+				    goodsWeightArray[i] = (nums[i].value * goodsWeight[j].value).toFixed(2);
+				 }
+			   }
+		    }
+	    }
+	    if(zpnums.length > 0){
+	        for(var i=0;i<zpnums.length;i++){
+			   if((zpnums[i].value != "") && (zpnums[i].value != 0)){
+			     zpgoodsNumArray[i] = zpnums[i].value;
+			   }
+			   for(var j=0;j<zpgoodsWeight.length;j++){
+			     if((i == j)&&(zpnums[i].value != "") && (zpnums[i].value != 0)){
+				    zpgoodsWeightArray[i] = (zpnums[i].value * zpgoodsWeight[j].value).toFixed(2);
+				 }
+			   }
+		    }
+	    }
+		if(nums.length > 0 && goodsPrices.length > 0){
+	        for(var i=0;i<nums.length;i++){
+			   for(var j=0;j<goodsPrices.length;j++){
+			     if((i == j)&&(nums[i].value != "") && (nums[i].value != 0)&&(goodsPrices[j].value != "")){
+				    goodsPriceArray[i] = (goodsPrices[j].value * nums[i].value).toFixed(2);
+				 }
+			   }
+		    }
+	    }
+		if(goodsNumArray.length > 0){
+		   for(var i=0;i < goodsNumArray.length;i++){
+		    if(goodsNumArray[i] !=null){
+			  totalNum += goodsNumArray[i]*1; 
+			}
+		   }
+		}
+		if(zpgoodsNumArray.length > 0){
+		   for(var i=0;i < zpgoodsNumArray.length;i++){
+		    if(zpgoodsNumArray[i] != null){
+			  totalNum += zpgoodsNumArray[i]*1;
+			}
+		   }
+		}
+		if(goodsWeightArray.length > 0){
+		   for(var i=0;i < goodsWeightArray.length;i++){
+		    if(goodsWeightArray[i] !=null){
+			  totalWeight += goodsWeightArray[i]*1; 
+			}
+		   }
+		}
+		if(zpgoodsWeightArray.length > 0){
+		   for(var i=0;i < zpgoodsWeightArray.length;i++){
+		     if(zpgoodsWeightArray[i] !=null){
+			   totalWeight += zpgoodsWeightArray[i]*1;
+			 }
+		   }
+		}
+		if(goodsPriceArray.length > 0){
+		   for(var i=0;i < goodsPriceArray.length;i++){
+		    if(goodsPriceArray[i] !=null){
+			   totalPrice += goodsPriceArray[i]*1;
+			}
+		   }
+		}
+		var buffer1 = "产品总数量：<strong class='f16'>";
+		var buffer2 = "</strong>&nbsp;&nbsp;&nbsp;产品总价格：<strong class='f16'>";
+		var buffer3 = "元</strong>&nbsp;&nbsp;&nbsp; 产品总重量：<strong class='f16'>";
+		var buffer4 = "</strong>";
+		var buffer = buffer1+totalNum+buffer2+totalPrice.toFixed(2)+buffer3+totalWeight.toFixed(2)+buffer4;
+		jQuery("#nowWeightPrice").html(buffer);
+	}
+</script>
+
+<div class="main">
+	<div class="searchBox">
+    <h3><span>后台下订单</span></h3>
+    </div>
+	
+#set($errormessage = $request.getParameter('errormessage'))
+ #if($!errormessage)
+<div class="mag-t1">
+	#if($!errormessage && $!errormessage == "addovernum")
+		有选择产品总数量大于可用库存
+	#elseif($!errormessage && $!errormessage == "overnum")
+		选择产品中有超过可用库存
+	#elseif($!errormessage && $!errormessage == "nonum")
+		选择产品中有可用库存不存在
+	#elseif($!errormessage && $!errormessage == "zpnonum")
+		选择赠品中有可用库存不存在
+	#elseif($!errormessage && $!errormessage == "zpovernum")
+		选择赠品中有超过可用库存
+	#elseif($!errormessage && $!errormessage == "goodsSame")
+		产品有重复
+	#elseif($!errormessage && $!errormessage == "zpgoodsSame")
+		赠品有重复
+	#elseif($!errormessage && $!errormessage == "wrongprice")
+		商品价格错误
+	#end
+</div>
+ #end
+
+
+<div class="formBox">
+  <form  name="backOrder"   action="/user/backOrder.html" method="post">
+	<div class="content">
+	<input type="hidden" name="userId" id="userId" value="$!{user.id}"/>
+	<input type="hidden" name="goodsWeightTotal" id="goodsWeightTotal" value=""/>
+	<input type="hidden" name="epGoodsWeightTotal" id="epGoodsWeightTotal" value=""/>
+    <input type="hidden" name="goodsPriceTotal" id="goodsPriceTotal" value=""/>
+	<input type="hidden" name="firstDepId" id="firstDepId" value=""/>
+	<input type="hidden" name="expressPayment" id="expressPayment" value=""/>
+	<input type="hidden" name="modifyRecord" id="modifyRecord" value=""/>
+		  <table width="100%" cellpadding="3" cellspacing="1">
+			<tbody>
+				<tr><td colspan="4"><font color="red">#if($!message)$!message#end</font></td></tr>
+
+				<tr>
+					<td colspan="2">用户名称：$!{user.account}
+						<input class="btn"  type="button" name="selectGs"  value="选择产品" onclick="addGoods();" id="selectGs"/>
+						<input class="btn"  type="button" name="selectZp"  value="选择赠品" onclick="addZpGoods();" id="selectZp"/>
+					</td>
+                     <td class="label">选择一级仓库：
+                           <select name="depository.depFirstId" id="depFirstId" class="select">
+                                 <option value="">-=请选择=-</option>
+                                  #foreach($depFirst in $depositoryFirstList)
+                                  <option value="$!{depFirst.id}" #if("$!{depository.depFirstId}" == "${depFirst.id}") selected="true" #end  >$!{depFirst.depFirstName}</option>
+                                  #end
+                            </select>
+					 </td>
+                </tr>
+				<tr>
+					<td colspan="4">
+						<div id="ag">
+						  <div id="goodsIns"></div>
+						</div>
+				     </td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div id="zp">
+						  <div id="zpgoodsIns"></div>
+						</div>
+				     </td>
+				</tr>
+                <tr>
+				    <td colspan="4" id="nowWeightPrice" align="left" style="font-weight:bold;" id="nowWeightPrice">
+                        <strong class="f16">产品总数量：0&nbsp;&nbsp;&nbsp;产品总价格：0元&nbsp;&nbsp;&nbsp; 产品总重量：0</strong>
+					</td>
+				</tr>
+                <tr>
+                     <td class="label"></td>
+                     <td align="center"><input class="btn" value=" 确定 " type="button" onclick="checkForm();" id="checkbutton"> <input class="btn" value=" 重置 " type="reset" onclick="removeAll();" id="resetbutton"></td>
+					 <td>
+					    <div id="newdep"></div>
+					 </td>
+                </tr>
+				
+                <tr>
+				    <td colspan="4" id="allWeightPrice" align="left" style="font-weight:bold;"></td>
+				</tr>
+				<tr>
+				   <td colspan="4">
+					 <div  style="display:none;" id="dz-box-address">
+		                <div id="uniteHide">
+                          <h4>确认收货地址</h4>
+                        </div>
+                         <ul id="address">
+                       #set($i=1)
+                       #foreach($userAddressMap in $userAddressMap.entrySet())
+                            <li>
+                                 <input id="r$i" type="radio" value="$userAddressMap.key.id" #if($userAddressMap.key.id == $loginUserInfo.tradeAddressId) checked #end onclick="getWenZi('r$i',$userAddressMap.key.id,'$!userAddressMap.key.province','$!userAddressMap.key.city','$!userAddressMap.key.district')"  name="userAddress.id" />
+                              <label>
+                                 <span class="buyer-name">$!{userAddressMap.key.contextName}</span>
+                                 <span title="$userAddressMap.value">详细地址：$!controlUtil.getNoticesTitle($userAddressMap.value,55)</span>
+                                 <span>邮编：$!{userAddressMap.key.zipcode}</span>
+							  #if("$!{userAddressMap.key.mobile}"!="")
+								  <span>移动电话：$!{userAddressMap.key.mobile}</span>
+							  #elseif("$!{userAddressMap.key.tel}"!="")
+								  <span>固定电话：$!{userAddressMap.key.tel}</span>
+							  #end
+                              </label>
+                            </li>
+
+                      #set($i=$i+1)
+                      #end
+                           <li class="selected">
+                                 <input id="r0" type="radio" value="-1"  name="userAddress.id" #if($i==1) checked #else onclick="getWenZi('r0')" #end/>
+                             <label>
+                                  <span>使用其它地址</span>
+                             </label>
+                           </li>
+                        </ul>
+                        <ul>
+                            <table id="address_list"  #if($i!=1) style="display:none;" #end>
+                               <tr>
+                                  <th><span>*</span>地区：</th>
+                                  <td>
+				                       <select name="userAddress.province" id="s1"  onchange="selectCity(this.value);" >
+                                               <option value="0">请选择</option>
+                                                 #foreach($province in $provinceList)
+                                                  <option value="$!{province.code}" >$!{province.regionName}</option>
+                                                 #end
+                                       </select>
+                                       <select id="city"  name="userAddress.city" onchange="selectDistinc(this.value);">
+                                               <option value="0">请选择</option>
+                                                 #foreach($city in $cityListInit)
+                                                  <option value="$!{city.code}">$!{city.regionName}</option>
+                                                 #end
+                                       </select>
+									   <select id="district"  name="userAddress.district" onchange="disPaymentSel();">
+                                               <option value="0">请选择</option>
+                                        </select>
+                                 </td>
+                               </tr>
+                              <tr>
+                                  <th><span class="red">*</span>邮政编码：</th>
+                                  <td>
+									  <input type="text" name="trade.zipcode" maxlength="6" id="zipcode"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <th><span class="red">*</span>详细地址：</th>
+                                  <td>
+									  <input name="trade.address" type="text" maxlength="255" id="tradeAddress"/>
+                                   </td>
+                              </tr>
+                              <tr>
+                                  <th><span class="red">*</span>收货人姓名：</th>
+                                  <td>
+									  <input name="trade.receiver" type="text" maxlength="32" id="receiver"/>
+                                  </td>
+                              </tr>
+                              <tr>
+                                   <th><span class="red">*</span>电话：</th>
+                                   <td>
+									  <input name="trade.mobile" type="text" maxlength="20" id="mobile"/>
+                                   </td>
+                                    <td>请填写手机或固定电话</td>
+                              </tr>
+                            </table>
+                        </ul>
+
+
+                    <div  id="payTypeHide"><h4>支付方式</h4></div>
+
+                    <div class="dz-box" id="paymentSel">
+                      <br/>请先选择收货地址<br/>
+                    </div>
+                    <div class="clearing"></div>
+
+                    <div id="expressCompany"><h4>物流公司选择</h4></div>
+
+                    <div class="dz-box" id="expressSel"></div>
+			        <div class="clearing"></div>
+
+					<div class="f-price" id="amountMoneyAll" ></div>
+
+                    <h3>买家备注</h3>
+                    <div class="dz-box">
+                    <table class="dz-table">
+                    <tr>
+                      <th>给商家留言： </th>
+                      <td>
+                        <textarea cols="80" rows="5" name="trade.buyerNote" id="buyerNote"></textarea>
+                        (字数限制最多255字,可以为空)
+                      </td>
+                    </tr>
+                    </table>
+                    </div>
+                    <tr style="display:none" id="submitbutton"><td colspan="4" align="center"><input type="button" onclick="checkTrade();" value="提交订单" class="btn"/></td></tr>
+				   </td>
+				</tr>
+             </tbody>
+           </table>
+<script type="text/javascript">
+    var ii = 1;
+    #foreach($userAddressMap in $userAddressMap.entrySet())
+        if('$userAddressMap.key.id' == '$loginUserInfo.tradeAddressId'){
+            getWenZi('r'+ii,'$userAddressMap.key.id','$!userAddressMap.key.province','$!userAddressMap.key.city','$!userAddressMap.key.district')
+        }
+        ii=ii+1;
+    #end
+</script>
+    </div>
+   </form>
+  </div>
+</div>
+		

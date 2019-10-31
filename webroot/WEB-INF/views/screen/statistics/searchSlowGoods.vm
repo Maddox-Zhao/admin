@@ -1,0 +1,154 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>滞销商品列表</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>滞销商品统计</span></h3>
+      <form action="searchSlowGoods.html" name="searchForm" id="searchForm" method="post">
+    <table>
+
+	<th> 商品编码：</th><td><input type="text" name="goodsCode" id="parMap.goodsCode" value="$!parMap.goodsCode"  onblur="javascript:this.value=this.value.trim()"/></td>
+    <th> 商品类目：</th>
+			<td><select name="catCode" id="catCodeSearch" style="width:100px;">
+				<option value="">-=请选择=-</option>
+				#foreach($cat in $catList)
+				<option value="$cat.catCode" #if("$cat.catCode"==${parMap.catCode}) selected #end>$cat.catName</option>
+				#end
+			</select></td>
+				<th>销售数量小于等于</th><td><input  type="text" name="goodsNum"  value="$!parMap.goodsNum" size="3"/>件</td>
+				</tr><tr>
+<th> 日期&nbsp;&nbsp;</th>
+  												<td>
+
+											<input name="dateStart"  id="dateStart" value="$!parMap.dateStart"  size="6" readonly="true"/>到
+
+			<input  name="dateEnd" id="dateEnd" value="$!parMap.dateEnd"   size="6" readonly="true"/>
+			</td>
+<script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "dateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "dateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+
+<th>
+
+<input type="button" value="查询" class="button"  onclick="formSubmit();"/>
+<input type="hidden" name="dosearch" id="dosearch" value="$!parMap.dosearch">
+</th>
+<td><input type="button" value="Excel导出" class="button" onclick="doExport();"/>&nbsp;</td>
+<th>&nbsp;</th>
+<td>&nbsp;</td>
+</tr>
+	<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var dateStart=document.getElementById("dateStart").value.replace(/-/g, "/");
+    		var dateEnd=document.getElementById("dateEnd").value.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(dateStart));
+            var e_date=new Date(Date.parse(dateEnd));
+    		if(e_date < b_date){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}
+	    document.getElementById("dateStart").value=document.getElementById("dateStart").value.trim();
+	    	document.getElementById("dateEnd").value=document.getElementById("dateEnd").value.trim();
+	     					document.getElementById("dosearch").value='';
+        		document.getElementById('searchForm').submit();
+	    }
+</script>
+</table>
+ </form>
+</div>
+<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="listBox">
+          <h3><span>滞销商品统计列表</span></h3>
+
+    <table>
+    #foreach($member in $sumMap.entrySet())
+		<div align="right">
+			<font size='4'><strong><label>【 商品种类: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.goodsId}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总量: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.saleNum}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总金额: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${member.value.salePrice})</label></strong></font>
+			<font size='4'><strong><label>元 </label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总成本: </label></strong></font>
+			<font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney($member.value.goodsInPrice)</label></strong></font>
+			<font size='4'><strong><label>元 】</label></strong></font>
+		</div>
+     #end
+      <tr>
+      <th>商品编码</th>
+        <th>商品名称</th>
+        <th>类目</th>
+        <th>单位</th>
+        <th>销量</th>
+        <th>销售成本</th>
+        <th>销售额</th>
+		<th>毛利</th>
+		<th>毛利率</th>
+		<th>可用库存</th>
+      </tr>
+	  #foreach($slowSalesGood in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+	  <td  align="left">$!slowSalesGood.goodsSn</td>
+		 <td  align="left">$!slowSalesGood.goodsName</td>
+
+		 <td  align="left">$!slowSalesGood.catName</td>
+
+		 <td  align="center">$!slowSalesGood.unit</td>
+		 <td  align="center">$!slowSalesGood.saleSum</td>
+		 <td  align="right">$!moneyUtil.getFormatMoney($!slowSalesGood.inPrice,'0.0')</td>
+		 <td  align="right">$!moneyUtil.getFormatMoney($!slowSalesGood.outPrice,'0.0')</td>
+		 <td  align="right">$!moneyUtil.getFormatMoney($!slowSalesGood.profit,'0.0')</td>
+		 <td  align="center">$!slowSalesGood.profitPer %</td>
+		 <td  align="center">$!slowSalesGood.availableNum</td>
+	</tr>
+	  #end
+
+    </table>
+    <!-- 分页 -->
+				<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/statistics/searchSlowGoods.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+
+  </div>
+
+</div>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function doExport(){
+		var form1=document.getElementById('searchForm');
+		form1.action="/goods/doExportSlowGoods.html";
+		form1.submit();
+		form1.action="searchSlowGoods.html";
+	}
+</script>
+</body>

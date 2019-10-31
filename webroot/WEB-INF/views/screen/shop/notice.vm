@@ -1,0 +1,155 @@
+#set($layout = "layout/default.vm")
+#set($title = "公告管理")
+<body>
+
+<form name="listForm" id="listForm" action="/shop/list.html" method="post"><!-- start ads list -->
+	<input type="hidden" id="noticeId" name="noticeId" value="" />
+##<div class="main" id="listDiv">
+	<div class="tool">
+
+            <span><a href="/shop/anp.html" hidefocus="true" class="bt_add">添加公告</a></span>
+<span>
+		#if($!{query.items.size()} > 0)
+			<a href="#" hidefocus="true" class="bt_del" onclick="javascript:deletenotices()">批量删除公告</a>
+			#end
+	  </span>
+        </div>
+
+        <div class="clear"></div>
+
+	<div class="listBox">
+<div class="listBox">
+			<ul class="hover">
+				<h3><span>公告列表</span></h3>
+				<table>
+                    <tr>
+      <th><input type="checkbox" id="allbox" />全选</th>
+	  <th>公告类型</th>
+      <th>公告标题</th>
+      <th>发布日期</th>
+      <th>发布人</th>
+	  <th>当前显示状态</th>
+      <th>操作</th>
+    </tr>
+	#foreach( $notice in $query.items)
+    <tr align="center">
+      <td><label>
+        <input type="checkbox" name="ids" value="${notice.id}" />
+      </label></td>
+	  <td><label>
+        $!enumNoticeTypeMap.get("$!{notice.noticeType}")
+      </label></td>
+      <td><span>#if($!notice.title.length()>12)
+                <div title="$!notice.title">$!notice.title.substring(0,12)...</div>
+				#else
+					$!notice.title
+				#end</span></td>
+      <td><!-- #BeginDate format:Ch2 -->$!dateUtil.convertDateToString("yyyy-MM-dd",${notice.gmtCreate})<!-- #EndDate --></td>
+      <td>$!{notice.author}</td>
+	   <td>#if($!{notice.isShow} && $!{notice.isShow}==1)显示 #else 不显示 #end</td>
+      <td>#if($!{notice.isShow}==1)<a href="javascript:isnoshow('$!{notice.id}')">不显示公告</a>
+			#else <a href="javascript:isshow('$!{notice.id}')">显示公告</a>
+			#end
+			<a href="javascript:updateNotice('$!{notice.id}')">修改</a>
+			<a href="javascript:previewNotice('$!{notice.id}')" name="预览" id="预览">公告详细</a>
+			<a href="javascript:deletenotice('$!{notice.id}')">删除</a>
+	  </td>
+    </tr>
+	#end
+	</tbody></table>
+</div>
+</form>
+	#if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/list.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果
+   #end
+</body>
+<script type="text/javascript" src="${ctx}/scripts/jquery.js"></script>
+<script type="text/javascript">
+
+     jQuery(function(){
+			var div_a =jQuery(".form-tab li");
+			div_a.hover(function(){
+				jQuery(".form-tab li").removeClass("c");
+				jQuery(this).addClass("c");
+				var index =  div_a.index(this);
+				jQuery(".listBox ul")
+						.eq(index).show()
+						.siblings().hide();
+			});
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+			function checkIds(){
+		     var objs = document.getElementsByName("ids");
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   if(objs[i].checked){
+				     return true;
+				   }
+				}
+			  }
+			  alert('至少选择一条公告信息');
+			  return false;
+		}
+
+		function deletenotices(){
+    if(!checkIds())return;
+	if(confirm("确定删除？")){
+    document.getElementById('listForm').action="/shop/deleten.html";
+    document.getElementById('listForm').submit();
+	}
+}
+
+	function isshow(id){
+ 		var obj = document.getElementById("noticeId");
+	  	obj.value = id;
+
+		var	mymes=confirm("确定把公告设置成显示的状态？");
+			 if(true==mymes){
+		  		document.listForm.action = "/shop/showno.html";
+  				document.listForm.submit();
+		  	}else {
+
+		  	}
+
+	}
+
+	function isnoshow(id){
+ 		var obj = document.getElementById("noticeId");
+	  	obj.value = id;
+
+		var	mymes=confirm("确定把公告设置成不显示的状态？");
+			 if(true==mymes){
+		  		document.listForm.action = "/shop/showno.html";
+  				document.listForm.submit();
+		  	}else {
+
+		  	}
+
+	}
+
+	function updateNotice(id){
+		window.location.href = "$appServer/shop/unp.html?noticeId="+id;
+	}
+
+	function previewNotice(id){
+ 		var obj = document.getElementById("noticeId");
+	  	obj.value = id;
+  		document.listForm.action = "/shop/previewn.html";
+		document.listForm.submit();
+	}
+
+	function deletenotice(id){
+ 		var obj = document.getElementById("noticeId");
+	  	obj.value = id;
+		if(confirm("确定删除？")){
+  		document.listForm.action = "/shop/deletens.html";
+		document.listForm.submit();
+		}
+	}
+</script>

@@ -1,0 +1,239 @@
+#set($layout = "layout/default.vm")
+
+#set($t_title = "新增")
+#if("$!actionType" == "update")
+	#set($t_title = "编辑")
+#end
+
+#set($title = "管理中心 - ${t_title}一级仓库")
+
+<body>
+	<div class="main">
+	<h2>管理中心 - ${t_title}一级仓库</h2>
+
+	#if($message)
+		<div class="mag-t1">${message}</div>
+	#end
+
+	<div class="tool">
+		<span><a href="searchDepFirst.html" hidefocus="true" class="bt_ren">一级仓库列表</a></span>
+	</div>
+
+	<!-- 表单模块 -->
+	<form name="form1" action="saveDepFirst.html" method="post">
+		<input type="hidden" id="flag" name="flag" value="add" />
+		<input type="hidden" id="actionType" name="actionType" value="$!actionType" />
+		<input type="hidden" id="areaLength" name="areaLength" />
+		#springBind("depositoryFirst.regionCode")
+		<input type="hidden" id="reginCode" name="${status.expression}"  value="$!{status.value}"/>
+		#springBind("depositoryFirst.isStocked")
+		<input type="hidden" id="depositoryFirst.isStocked" name="${status.expression}" value="$!{status.value}"/>
+		#springBind("depositoryFirst.id")
+		<input type="hidden" id="depositoryFirst.id" name="${status.expression}" value="$!{status.value}" />
+
+		<div class="formBox">
+			<h3><i></i><span>一级仓库信息</span></h3>
+			<div class="content">
+				<table class="c2">
+					<tr>
+						<th>仓库名称</th>
+						<td>
+							#springBind("depositoryFirst.depFirstName")
+							<input type="text" name="${status.expression}" id="depFirstName" value="$!{status.value}" maxlength="50" class="inp"/>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>物流地址</th>
+						<td>
+							#if("$!actionType" == "update")
+								#foreach($province in $provinceList)
+									#if("${depositoryFirst.province}" == "$!{province.code}")
+										<input type="text" value="$!{province.regionName}" readonly="true" maxlength="50" class="inp-w70"/>
+									#end
+								#end
+								#foreach($cityStart in $cityListInit)
+									#if("${depositoryFirst.city}" == "$!{cityStart.code}")
+										<input type="text" value="$!{cityStart.regionName}" readonly="true" maxlength="50" class="inp-w70"/>
+									#end
+								#end
+								#foreach($districtStart in $distincListInit)
+									#if("${depositoryFirst.district}" == "$!{districtStart.code}")
+										<input type="text" value="$!{districtStart.regionName}" readonly="true" maxlength="50" class="inp-w70"/>
+									#end
+								#end
+								#springBind("depositoryFirst.district")
+								<input type="hidden" id="districtStart" name="${status.expression}" value="$!{status.district}" />
+							#else
+								#springBind("depositoryFirst.province")
+								<select id="s1" name="${status.expression}" onchange="selectCity(this.value,'cityStart','districtStart');" class="select">
+									<option value="">请选择</option>
+									#foreach($province in $provinceList)
+										<option value="$!{province.code}" #if("${status.value}" == "$!{province.code}") selected="selected" #end>$!{province.regionName}</option>
+									#end
+								</select>
+								#springBind("depositoryFirst.city")
+								<select id="cityStart" name="${status.expression}" onchange="selectDistinc(this.value,'districtStart');" class="select">
+									<option value="">请选择</option>
+									#foreach($cityStart in $cityListInit)
+										<option value="$!{cityStart.code}" #if("${status.value}" == "$!{cityStart.code}") selected="selected" #end>$!{cityStart.regionName}</option>
+									#end
+								</select>
+								#springBind("depositoryFirst.district")
+								<select id="districtStart" name="${status.expression}" class="select">
+									<option value="">请选择</option>
+									#foreach($districtStart in $distincListInit)
+										<option value="$!{districtStart.code}" #if("${status.value}" == "$!{districtStart.code}") selected="selected" #end>$!{districtStart.regionName}</option>
+									#end
+								</select>
+								<span class="red">*</span>
+							#end
+						</td>
+					</tr>
+					<tr>
+						<th>一级仓库类型</th>
+						<td>
+							#if($!actionType=='update')
+								<input type="text" value='$!enumDepositoryFirstType.get("$!{depositoryFirst.type}")' readonly="true" maxlength="50"/>
+							#else
+								#springBind("depositoryFirst.type")
+								<select name="${status.expression}" class="select" style="width:205px;">
+									#foreach($en in $enumDepositoryFirstType.entrySet())
+										<option value="$!en.key" #if("${status.value}" == "$en.key") selected="selected" #end>$!en.value</option>
+									#end
+                                </select>
+							#end
+						</td>
+					</tr>
+					<tr>
+						<th>仓库地址</th>
+						<td>
+							#springBind("depositoryFirst.address")
+							<input type="text" name="${status.expression}" id="address" value="$!{status.value}"  maxlength="50" class="inp"/>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>仓库详细地址</th>
+						<td>
+							#springBind("depositoryFirst.particularAddress")
+							<input type="text" name="${status.expression}" id="particularAddress" value="$!{status.value}" maxlength="50" class="inp"/>
+						</td>
+					</tr>
+					<tr>
+						<th>是否备货</th>
+						<td>
+							<input type="checkbox" id="isStocked" #if("$!depositoryFirst.isStocked" == "y") checked="true" #end/>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<!-- 表单按钮区 -->
+			<div class="form-but">
+				<button type="button" class="button-s4" onclick="javascript:formSubmit();">保存</button>
+				<button type="reset" class="button-s4">重置</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+    var objCityList = new Array();
+    var objDistincList = new Array();
+    var j=0;
+    var i=0;
+    #foreach($objCity in $cityList)
+        objCityList[j] = new Array("$!{objCity.code}","$!{objCity.parentCode}","$!{objCity.regionName}");
+        j++;
+    #end
+    #foreach($objDistinc in $distincList)
+        objDistincList[i] = new Array("$!{objDistinc.code}","$!{objDistinc.parentCode}","$!{objDistinc.regionName}");
+        i++;
+    #end
+    var count=j;
+    var num=i;
+
+    function selectCity(code,cityVar,districtVar){
+        var obj = document.getElementById(cityVar);
+        var length = obj.length = 0;
+        obj.options[length++] = new Option("请选择", "");
+        for(var m=0; m<count; m++){
+            if( objCityList[m][1] == code){
+                obj.options[length] = new Option();
+				obj.options[length].value = objCityList[m][0];
+				obj.options[length].innerHTML = objCityList[m][2];
+                length++;
+            }
+        }
+        var obj2 = document.getElementById(districtVar);
+        var length2 = obj2.length = 0;
+        obj2.options[length2] = new Option("请选择", "");
+    }
+	
+    function selectDistinc(code,districtVar){
+        var obj = document.getElementById(districtVar);
+        var length = obj.length = 0;
+        obj.options[length++] = new Option("请选择", "");
+        for(var m=0; m<num; m++){
+            if( objDistincList[m][1] == code){
+                obj.options[length] = new Option();
+				obj.options[length].value = objDistincList[m][0];
+				obj.options[length].innerHTML = objDistincList[m][2];
+                length++;
+            }
+         }
+		 document.getElementById("areaLength").value=length;
+
+     }
+
+	function formSubmit(){
+		var name=document.getElementById("depFirstName").value.replace(/-/g, "/");
+		if(name==""){
+			alert("仓库名称必须填写！");
+			return false;
+		}
+
+        var districtStart=document.getElementById("districtStart").value.replace(/-/g, "/");
+
+		var actionType=document.getElementById("actionType").value;
+		if(actionType=="add"){
+					var areaLength=document.getElementById("areaLength").value;
+		if(areaLength== '1'){
+       		var cityStart=document.getElementById("cityStart").value.replace(/-/g, "/");
+    		 if(cityStart==""){
+                alert("物流地址必须填写！");
+                return false;
+            }
+				document.getElementById("reginCode").value=cityStart;
+		}else{
+    	     if(districtStart==""){
+                alert("物流地址必须填写！");
+                return false;
+            }
+			document.getElementById("reginCode").value=districtStart;
+		}
+		}
+
+         var address=document.getElementById("address").value.replace(/-/g, "/");
+        if(address==""){
+            alert("仓库地址必须填写！");
+            return false;
+        }
+		name=name.trim();
+		if(document.getElementById("isStocked").checked){
+			document.getElementById("depositoryFirst.isStocked").value="y";
+		}else{
+			document.getElementById("depositoryFirst.isStocked").value="n";
+		}
+    	document.form1.submit();
+    }
+
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+</script>

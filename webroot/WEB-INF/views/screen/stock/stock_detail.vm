@@ -1,0 +1,250 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购单详情")
+
+<div class="main">
+	<h2>采购管理 - 采购单详情</h2>
+    <div class="tool">
+		<span><a href="javascript:window.history.back(-1);" hidefocus="true" class="bt_wu">返回</a></span>
+		<span><a href="javascript:preview(1);" hidefocus="true" class="bt_wu">打印</a></span>
+		#if("$!{stockFinished}"=="$!{shoppingList.status}")
+		<span class="action-span"><a href="#" onclick="doExportDetail();" hidefocus="true" class="bt_wu">Excel导出</a></span>
+		#end
+		#if("$!{stockNew}"=="$!{shoppingList.status}")
+		<span class="action-span"><a href="$appServer/stock/edit_stock_page.html?stockId=$!{shoppingList.id}" hidefocus="true" class="bt_add">编辑</a></span>
+		#end
+		##if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+		##<span class="action-span"><a href="stockCheckPage.html?stockId=$!{shoppingList.id}">验收</a></span>
+		##end
+		<div style="clear: both;"></div>
+		#if($message)
+			#if($message == "yssb")
+		<div class="warning_min" id="massage">采购订单不是等待验收状态，不能执行验收操作！</div>
+			#elseif($message == "bjsb")
+		<div class="warning_min" id="massage">采购订单不是新建状态，不能执行提交验收操作！</div>
+			#elseif($message == "slbd")
+		<div class="warning_min" id="massage">存在验收、拒收、缺货数量之和不等于采购数量的记录，不能执行验收操作！</div>
+			#elseif($message == "jsth")
+		<div class="warning_min" id="massage">拒收退货记录已存在！</div>
+			#elseif($message == "djth")
+		<div class="warning_min" id="massage">单据退货记录已存在！</div>
+			#elseif($message == "notCopy")
+		<div class="warning_min" id="massage">供应商已失效或订单是批发采购单，不能对其采购单进行复制操作！</div>
+			#elseif($message == "wrk")
+		<div class="warning_min" id="massage">采购单中的商品未入库，不能执行采购完成操作！</div>
+			#elseif($message == "yjck")
+		<div class="warning_min" id="massage">验收时一级仓库不能为空！</div>
+			#end
+		<div style="clear: both;"></div>
+		#end
+    </div>
+
+	<form  name="form1"  action="" method="post">
+    	<input type="hidden" value="$!{shoppingList.id}" name="stockId" id="stockId"/>
+			<div id="print">
+				<div class="formBox">
+				<div class="content">
+                 <table class="c6">
+    				#if("${shoppingList.isWholesale}"=="w")
+    				<tr>
+    				<th style="width:10%;">订单类型:</th>
+    				<td style="width:40%;">$!enumStockTypeMap.get("${shoppingList.isWholesale}")</td>
+
+    				<th style="width:10%;">交易订单号:</th>
+    				<td style="width:40%;">$!{shoppingList.tid}</td>
+    				</tr>
+    				#end
+               		<tr>
+    				<th style="width:10%;">采购单号:</th>
+    				<td style="width:40%;">$!{shoppingList.shoppingNum}</td>
+
+    				<th style="width:10%;">关联单号:</th>
+    				<td style="width:40%;">$!{shoppingList.relationShoppingNum}</td>
+    				</tr>
+
+    				<tr>
+    				<th style="width:10%;">供应商:</th>
+    				<td>$!{shoppingList.supplierName}</td>
+
+    				<th style="width:10%;">合同编号:</th>
+    				<td>$!{shoppingList.primitiveNum}</td>
+    				</tr>
+
+    				<tr>
+    				<th style="width:10%;">采购时间:</th>
+    				<td>$!date.format('yyyy-MM-dd',${shoppingList.shoppingTime})</td>
+
+    				<th style="width:10%;">预期到货时间:</th>
+    				<td>$!date.format('yyyy-MM-dd',${shoppingList.arriveTime})</td>
+    				</tr>
+
+    				<tr>
+    				<th style="width:10%;">实际到货时间:</th>
+    				<td>$!date.format('yyyy-MM-dd',${shoppingList.factArriveTime})</td>
+
+    				<th style="width:10%;">状态:</th>
+    				<td>$!enumStockStatusMap.get("${shoppingList.status}")</td>
+
+    				</tr>
+
+    				<tr>
+        				<th style="width:10%;">创建人:</th>
+        				<td>$!{shoppingList.creater}</td>
+
+        				<th style="width:10%;">创建时间:</th>
+        				<td>$!date.format('yyyy-MM-dd',${shoppingList.gmtCreate})</td>
+    				</tr>
+
+    				<tr>
+        				<th style="width:10%;">库存类型:</th>
+        				<td>$!storTypeMap.get("${shoppingList.storType}")</td>
+
+        				<th style="width:10%;">一级仓库:</th>
+        				<td>&nbsp;$!{shoppingList.depFirstName}</td>
+    				</tr>
+
+    				<tr>
+        				<th style="width:10%;">备注:</th>
+        				<td colspan="3"><textarea cols="80" rows="3" id="shoppingList.remark" name="shoppingList.remark" readonly="readonly">$!{shoppingList.remark}</textarea></td>
+    				</tr>
+        		 </table>
+        	</div>
+        </div>
+    </div>
+
+    	<div class="listBox">
+               <table width="100%" cellpadding="3" cellspacing="1">
+           		  <tr>
+    			    <th colspan="13"  scope="col">采购产品列表</th>
+    			  </tr>
+               	  <tr>
+                    <th>产品编码</th>
+                    <th>产品名称</th>
+					<th>供应商产品编码</th>
+                    <th>类目</th>
+                    <th>属性</th>
+                    <th>单位</th>
+            		<th>单价</th>
+            		<th>采购数量</th>
+					<th>缺货数量</th>
+					<th>拒收数量</th>
+					<th>验收数量</th>
+            		<th>应付金额</th>
+            		<th>实付金额</th>
+                  </tr>
+				  #if($shoppingMoreDetails)
+                    #foreach($goods in $shoppingMoreDetails)
+                        <tr   #if($velocityCount%2==0) class="bg" #end>
+                            <td>$!goods.goodsInstanceCode</td>
+                            <td>$!goods.instanceName</td>
+							<td>$!goods.supplierCode</td>
+                            <td title="$!goods.catCode">&nbsp;
+                    			#if ($!goods.catCode.length()<20)
+                    				$!goods.catCode
+                    			#else
+                    				$!controlUtil.getNoticesTitle($!goods.catCode,20)
+                    			#end
+                    		 </td>
+                             <td title="$!goods.attrs">&nbsp;
+                    			#if ($!goods.attrs.length()<20)
+                    				$!goods.attrs
+                    			#else
+                    				$!controlUtil.getNoticesTitle($!goods.attrs,20)
+                    			#end
+                    		 </td>
+							<td>$!goods.units</td>
+							<td>￥$!moneyUtil.getFormatMoney($!goods.unitPrice,'0.00')</td>
+							<td>$!goods.amount</td>
+							<td>$!goods.missingNum</td>
+							<td>$!goods.rejectNum</td>
+							<td>$!goods.receiveNum</td>
+							<td>￥$!moneyUtil.getFormatMoney($!goods.dueFee,'0.00')</td>
+							<td>￥$!moneyUtil.getFormatMoney($!goods.factFee,'0.00')</td>
+
+                        </tr>
+					#end
+				 #end
+    		  	</table>
+    		  <table width="100%" cellpadding="3" cellspacing="1" class="list-div">
+        		  <tr>
+                      <td>实付金额总计</td><td>$!moneyUtil.getFormatMoney($!factFee,'0.00')</td>
+                      <td>采购数量总计</td><td>$!totalNum</td>
+                      <td>拒收数量总计</td><td>$!rejectNum</td>
+                      <td>验收数量总计</td><td>$!receiveNum</td>
+                      <td>缺货数量总计</td><td>$!missingNum</td>
+                  </tr>
+              </table>
+			</div>
+
+			<div class="tool">
+    			<span class="action-span"><a href="$appServer/stock/copyAdd.html?stockId=$!{shoppingList.id}" class="bt_wu">复制</a></span>
+        			##if("$!{stockWaitCheck}"=="$!{shoppingList.status}")
+        			##<span class="action-span"><a href="javascript:doExport();">导出条码</a></span>
+        			##end
+        		#set($isOver=true)
+        		#if("$!{stockChecked}"=="$!{shoppingList.status}")
+        			#if($missingNum && "0"!="$!{missingNum}" && "0"=="$!{danjuNum}")
+        				#set($isOver=false)
+        			<span class="action-span"><a href="refund.html?type=danju&stockId=$!{shoppingList.id}" class="bt_wu">单据退货</a></span>
+        			#end
+        			#if($rejectNum && "0"!="$!{rejectNum}" && "0"=="$!{jushouNum}")
+        				#set($isOver=false)
+        			<span class="action-span"><a href="refund.html?type=jushou&stockId=$!{shoppingList.id}" class="bt_wu">拒收退货</a></span>
+        			#end
+        		#end
+                </h1>
+            	#if("$!{stockChecked}"=="$!{shoppingList.status}" && $isOver)
+            	<div id="btnFinish" align="center">
+            		<input type="button" name="finish" value=" 采购完成  " onclick="javascript:finishShopping();"/>
+            	</div>
+            	#end
+            	#if($shoppingMoreDetails.size() != 0 && "stock_new"=="$!{shoppingList.status}")
+            		<div align="center">
+            		<input type="button" name="finish" value=" 提交验收 " onclick="javascript:finished();"/>
+            		</div>
+        		#end
+			</div>
+     </form>
+</div>
+  <script language="javascript" type="text/javascript">
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+        window.document.body.innerHTML=bdhtml;
+	}
+	function doExportDetail(){
+		var form1=document.forms[0];
+		form1.action="exportShoppingDetail.html";
+		form1.submit();
+		form1.action="stockDetail.html";
+	}
+
+	function finishShopping(){
+		var	mymes=confirm("确定要完成此采购订单吗？");
+		if($isInFinished){
+			if(true==mymes){
+    			document.getElementById("btnFinish").style.display="none";
+    			document.form1.action = "$appServer/stock/edit_stock_attribute.html?actionType=finished";
+    			document.form1.submit();
+    		}
+		}else{
+			alert("采购单中的商品未入库，不能执行采购完成操作！");
+			return false;
+		}
+	}
+
+	function doExport(){
+		document.form1.action="exportBarCode.html";
+		document.form1.submit();
+		document.form1.action="";
+	}
+
+	function finished(){
+		if(true==confirm("点击完成后采购订单将不能再被编辑，\r确定要完成此采购订单吗？")){
+			document.form1.action = "$appServer/stock/edit_stock_attribute.html?actionType=waitCheck";
+			document.form1.submit();
+		}
+	}
+  </script>
+</body>

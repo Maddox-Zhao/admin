@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>第一个Flash图表页面</title>
+		<!-- 引入FusionCharts 需要的JS脚本文件 -->
+		<script language="JavaScript" src="fusionCharts.js"></script>
+	</head>
+	<body>
+		<div id="chartDiv1" align="center"></div>
+		<div id="chartDiv2" align="center"></div>
+		<div id="chartDiv3" align="center"></div>
+		<div id="chartDiv4" align="center"></div>
+		<div id="chartDiv5" align="center"></div>
+		
+		<script type="text/javascript">
+     var myColumn2D1 = new FusionCharts("swf/Column2D.swf", "myColumn2D1", "600", "350");
+     myColumn2D1.setDataURL("Data.xml");       
+     myColumn2D1.render("chartDiv1"); 
+     
+     var myColumn3D1 = new FusionCharts("swf/Column3D.swf", "myColumn3D1", "600", "350");
+     myColumn3D1.setDataURL("Data.xml");       
+     myColumn3D1.render("chartDiv2"); 
+     
+     var myPie3D1 = new FusionCharts("swf/Pie3D.swf", "myPie3D1", "600", "350");
+     myPie3D1.setDataURL("Data.xml");       
+     myPie3D1.render("chartDiv3"); 
+     
+     var myPie2D1 = new FusionCharts("swf/Pie2D.swf", "myPie2D1", "600", "350");
+     myPie2D1.setDataURL("Data.xml");       
+     myPie2D1.render("chartDiv4"); 
+     
+     var myLine1 = new FusionCharts("swf/Line.swf", "myLine1", "600", "350");
+     myLine1.setDataURL("Data.xml");       
+     myLine1.render("chartDiv5"); 
+
+  </script>
+
+	</body>
+
+</html>
+
+

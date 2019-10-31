@@ -1,0 +1,92 @@
+FusionCharts_Evaluation_V3
+
+使用办法:
+1:引入JS文件:FusionCharts.js (<script language="JavaScript" src="FusionCharts/FusionCharts.js"></script>)
+
+2:加入图表显示的位置的容器DIV: 
+  <div id="chartDiv" align="center">
+      First Chart Container Pie 3D
+  </div>
+  
+3:加入javascript:
+  <script type="text/javascript">
+     var myChart1 = new FusionCharts("Column2D.swf", "myChartId", "600", "350");
+     myChart1.setDataURL("Data.xml");  //加载XML文件
+     myChart1.render("chartDiv");      //将数据显示在那个DIV上
+  </script>
+  
+4:XML数据:(以下是一个数据示例)
+    <?xml version="1.0" encoding="UTF-8"?>
+    <graph caption='中文测试' xAxisName='月' yAxisName='数量'
+        showNames='1' decimalPrecision='0' formatNumberScale='0'>
+        <set name='列名Jan' value='462' color='AFD8F8' />
+        <set name='Feb' value='857' color='F6BD0F' />
+        <set name='Mar' value='671' color='8BBA00' />
+        <set name='Apr' value='494' color='FF8E46' />
+        <set name='May' value='761' color='008E8E' />
+        <set name='Jun' value='960' color='D64646' />
+        <set name='Jul' value='629' color='8E468E' />
+        <set name='Aug' value='622' color='588526' />
+        <set name='Sep' value='376' color='B3AA00' />
+        <set name='Oct' value='494' color='008ED6' />
+        <set name='Nov' value='761' color='9D080D' />
+        <set name='Dec' value='960' color='A186BE' />
+    </graph>
+
+
+请参考:http://yongboy.javaeye.com/blog/270092
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FusionCharts,FusionGadgets,PowerCharts,FusionMaps是能帮你创建其引人注目的动态图像效果的Macromedia Flash控件。
+
+
+其主页是：http://www.fusioncharts.com/ 
+
+提供试用版本下载，试用版本在生成的每个Macromedia Flash的左上角有一个链接到产品主页的文字。 
+但是其它功能与正式版一样。 
+所以此处提供了我们一个破解这些控件的功能，我们只要把正式版的的那些swf文件拿过来就可以了。 
+因此，我们只要在Google中搜索那个SWF文件的名字就能实现破解了。 
+不过对于那种需要源代码进行进行开发的，那么就得出$4999美元见购买Enterprise Bundle授权了。 
+
+不过要把四个产品都找出来可不是那么容易噢。 
+
+不想去找的朋友可以去我的论坛下载破解文件：http://www.zxlm.cn/ 
+
+FusionCharts是一个能帮你创建其引人注目的动态图像效果的Macromedia Flash控件。充分利用Macromedia Flash所具有的流畅功能来创建简洁的、交互式的和引人注目的动态图像。
+
+FusionGadgets 是一个测量控件和仪表控件的集合，开发人员可以利用它来开发金融应用程序、仪表板、执行状况面板、实时股票监视器以及生产过程监视程序等等。本产品对于那 些有数据可视化以及数据分析需要的应用特别适合，如："关键绩效指标"以及其它鉴定数据被实时监控的应用程序。凭借其所拥有的一整套无与伦比的简单易用的 控件，本产品将给您带来程序员和图形艺术家的双重体验。有内置的Macromedia Flash支持，本产品帮助您创建引人注目的仪表工具控件。还能够结合任何脚本语言来使用，以便创建交互的、实时的图表。因为本产品能够识别XML格式的 数据，所以它同样能够适用于任何类型的数据库。
+
+PowerCharts Plug是一组高级绘图窗口部件，通过它，可以绘制出视觉上引人注目的、交互式功能强大的图表。使用 Adobe Flash（以前为 Macromedia Flash）提供的丰富特征集，PowerCharts Plug中的图表允许给 web应用程序中添加 Rich Internet Applications (RIA)功能，因此，终端用户可以拥有与此前完全不一样的体验。
+这些表可以用于多种目的，如：模拟、仿真、可视化数据选择、科学绘图、财务分析等。
+
+FusionMaps能够帮助你给动态网页添加动画的、交互的以及数据驱动的 Flash Maps.这些图片是由XML数据源驱动，并且可以被整合到任何脚本技术 (ASP.NET, ASP, PHP, JSP, CF等)以及数据库中。 
+目前，FusionMaps包含了 186张图片，包括陆地、主要的城市以及所有美国城市。
+•    动态以及数据驱动的flash图片。
+•    添加数据以及配置图片的可视化GUI.
+•    能够与任何数据库以及脚本语言如：ASP, ASP.NET, PHP, JSP, ColdFusion等整合。
+•    支持自定义标记以指出点位置如：城市、商场、交汇处、办公室等。
+•    无需修改源代码就可以动态调整到任何大小。
+•    支持由数据范围着色，可以显示/隐藏图例。
+•    支持不同的动画风格。
+•    支持在同一窗口、新窗口、框架或者弹出窗口中钻取。
+•    使用斜角以及阴影效果的2D/3D.
+•    对高级客户端交互以及动态图片更改提供了完整的 AJAX.
+•    支持多语言(UTF-8)命名。
+

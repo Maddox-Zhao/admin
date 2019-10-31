@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="platformstock">	
+    <typeAlias alias="stockUpdate" type="com.huaixuan.network.biz.domain.platformstock.StockUpdate"/>
+    <typeAlias alias="stockUpdateLog" type="com.huaixuan.network.biz.domain.platformstock.StockUpdateLog"/>
+    <typeAlias alias="platFormOrderRecord" type="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord"/>
+    
+	<resultMap id="stockUpdateResultMap" class="com.huaixuan.network.biz.domain.platformstock.StockUpdate" >
+		<result column="id" property="id"/>
+		<result column="sku" property="sku"/>
+		<result column="now_stock" property="nowStockNum"/>
+		<result column="last_update_stock" property="lastUpdateStockNum"/>
+		<result column="order_stock" property="orderStockNum"/>
+		<result column="type" property="type"/>
+		<result column="shangpin_sku" property="shangpinSku"/>
+		<result column="kaola_sku" property="kaolaSku"/>
+		<result column="kaola_key" property="kaolaKey"/>
+		<result column="kaolaHT_sku" property="kaolahtSku"/>
+		<result column="kaolaHT_key" property="kaolahtKey"/>
+		<result column="zhenpin_sku" property="zhenpinSku"/>
+		<result column="siku_sku" property="sikuSku"/>
+		<result column="sikunew_sku" property="sikunewSku"/>
+        <result column="yunshang_sku" property="yunshangSku"/>
+		<result column="yhd_sku" property="yhdSku"/>
+		<result column="tmall_sku" property="tmallSku"/>
+		<result column="higo_sku" property="higoSku"/>
+		<result column="fql_sku" property="fqlSku"/>
+		<result column="jd_sku" property="jdSku"/>
+		<result column="pdd_sku" property="pddSku"/>
+		<result column="pddnew_sku" property="pddnewSku"/>
+		<result column="Mlh_sku" property="MlhSku"/>
+		<result column="Mlhnew_sku" property="MlhnewSku"/>
+		<result column="Mlhnewsec_sku" property="MlhnewsecSku"/>
+		<result column="xhs_sku" property="xhsSku"/>
+		<result column="ofashion_sku" property="ofashionsku"/>
+		<result column="weimob_sku" property="weimobsku"/>
+		<result column="yinTai_sku" property="yinTaiSku"/>
+		<result column="shepin_sku" property="shepinSku"/> 
+		<result column="suning_sku" property="suningSku"/>
+		<result column="xhsitem_id" property="xhsitemId"/>
+		<result column="product_id" property="product_id"/>
+		<result column="xiyou_prod_id" property="xiyouProdId"/>
+		<result column="yshang_sku_id" property="yshangSkuId"/>
+		
+		<result column="shangpin_order_stock" property="shangpinOrderStock"/>
+		<result column="kaola_order_stock" property="kaolaOrderStock"/>
+		<result column="kaolaHT_order_stock" property="kaolahtOrderStock"/>
+		<result column="zhenpin_order_stock" property="zhenpinOrderStock"/>
+		<result column="siku_order_stock" property="sikuOrderStock"/>
+		<result column="sikunew_order_stock" property="sikunewOrderStock"/>
+		<result column="yunshang_order_stock" property="yunshangOrderStock"/>
+		<result column="yhd_order_stock" property="yhdOrderStock"/>
+		<result column="tmall_order_stock" property="tmallOrderStock"/>
+		<result column="higo_order_stock" property="higoOrderStock"/>
+		<result column="fql_order_stock" property="fqlOrderStock"/>
+		<result column="jd_order_stock" property="jdOrderStock"/>
+		<result column="pdd_order_stock" property="pddOrderStock"/>
+		<result column="pddnew_order_stock" property="pddnewOrderStock"/>
+		<result column="Mlh_order_stock" property="MlhOrderStock"/>
+		<result column="xhs_order_stock" property="xhsOrderStock"/>
+		<result column="ofashion_order_stock" property="ofashionOrderStock"/>
+		<result column="weimob_order_stock" property="weiMobOrderStock"/>
+		<result column="yinTai_order_stock" property="yinTaiOrderStock"/>	
+		<result column="shepin_order_stock" property="shepinOrderStock"/>
+		<result column="suning_order_stock" property="suningOrderStock"/>
+		<result column="ofashionMc_order_stock" property="ofashionMcOrderStock"/>
+		<result column="last_order_time" property="lastOrderTime"/>
+		<result column="update_time" property="updateTime"/>
+	</resultMap>
+	
+	
+	<resultMap id="stockUpdateLogResultMap" class="stockUpdateLog" >
+		<result column="sku" property="sku"/>
+		<result column="location" property="location"/>
+		<result column="psku" property="psku"/>
+		<result column="name" property="name"/>
+		<result column="stock" property="stock"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="type" property="type"/>
+		<result column="error" property="error"/>
+	</resultMap>
+	
+	
+	
+	<resultMap class="com.huaixuan.network.biz.domain.platformstock.StockUpdateHistory" id="stockUpdateHistoryResultMap">
+		<result column="idHistory" property="idHistory"/>
+		<result column="sku" property="sku"/>
+		<result column="idOperation" property="idOperation"/>
+		<result column="idProduct" property="idProduct"/>
+		<result column="date" property="date"/>
+		<result column="idOperator" property="idOperator"/>
+		<result column="idCurStation" property="idLocation"/>
+		<result column="idStatus" property="idStatus"/>
+		<result column="idSupply" property="idSupply"/>
+		<result column="idCustomer" property="idCustomer"/>
+		<result column="idLastLocation" property="idLastLocation"/>
+		<result column="sku" property="sku"/>
+		<result column="customerName" property="customerName"/>
+		<result column="customerName2" property="customerName2"/>
+	</resultMap>
+	
+	
+	
+	<resultMap id="kaolaOrderResultMap" class="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord" >
+		<result column="id" property="id"/>
+		<result column="order_id" property="orderId"/>
+		<result column="idPlartform" property="idPlartform"/>
+		<result column="idStatus" property="idStatus"/>
+	</resultMap>
+	
+	
+	
+	
+	
+	
+	
+	
+ 
+<select id="selectStockUpdateByMap" parameterClass="java.util.Map" resultMap="stockUpdateResultMap">
+	select * from
+	hx_stock_update
+	where 1=1
+	
+	<isNotNull prepend="and" property="type">
+		type=#type#
+	</isNotNull>
+	<isNotNull prepend="and" property="sku">
+		sku=#sku#
+	</isNotNull>
+	<isNotNull prepend="and" property="shangpinSku">
+		shangpin_sku=#shangpinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolaSku">
+		kaola_sku=#kaolaSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolaKey">
+		kaola_key=#kaolaKey#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolahtSku">
+		kaolaHT_sku=#kaolahtSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolahtKey">
+		kaolaHT_key=#kaolahtKey#
+	</isNotNull>
+	<isNotNull prepend="and" property="zhenpinSku">
+		zhenpin_sku=#zhenpinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="sikuSku">
+		siku_sku=#sikuSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="sikunewSku">
+		sikunew_sku=#sikunewSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="yunshangSku">
+		yunshang_sku=#yunshangSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="yhdSku">
+		yhd_sku=#yhdSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="higoSku">
+		higo_sku=#higoSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="pddSku">
+		pdd_sku=#pddSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="pddnewSku">
+		pddnew_sku=#pddnewSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="MlhSku">
+		Mlh_sku=#MlhSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="MlhnewSku">
+		Mlhnew_sku=#MlhnewSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="MlhnewsecSku">
+		Mlhnewsec_sku=#MlhnewsecSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="xhsSku">
+		xhs_sku=#xhsSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="ofashionsku">
+		ofashion_sku=#ofashionsku#
+	</isNotNull>
+	<isNotNull prepend="and" property="weimobsku">
+		weimob_sku=#weimobsku#
+	</isNotNull>
+	<isNotNull prepend="and" property="yinTaiSku">
+		yinTai_sku=#yinTaiSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="shepinSku">
+		shepin_sku=#shepinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="suningSku">
+		suning_sku=#suningSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="xiyouProdId">
+		xiyou_prod_id=#xiyouProdId#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="yshangSkuId">
+		yshang_sku_id=#yshangSkuId#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="xhsitemId">
+		xhsitem_id=#xhsitemId#
+	</isNotNull>
+	<isNotNull prepend="and" property="product_id">
+		product_id=#product_id#
+	</isNotNull>
+	<isNotNull prepend="and" property="tmallSku">
+		tmall_sku=#tmallSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="fqlSku">
+		fql_sku=#fqlSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="jdSku">
+		jd_sku=#jdSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="searchCanSale">
+		(now_stock-order_stock) > 0
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="order_stock">
+		$order_stock$ > 0
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="searchNeedSync">
+		(now_stock-order_stock)!= last_update_stock
+	</isNotNull>
+	<isNotNull prepend="and" property="skuisnotnull">
+	 	$skuisnotnull$ != ''
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="provideisnotnull">
+	 	$provideisnotnull$ != ''
+	</isNotNull>
+	
+	ORDER BY last_order_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+</select>
+
+
+
+
+<select id="selectStockUpdateLogByMap" parameterClass="java.util.Map" resultMap="stockUpdateLogResultMap">
+	select * from
+	hx_stock_update_log
+	where 1=1
+	<isNotEmpty prepend="and" property="sku">
+		sku=#sku#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="location">
+		location=#location#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="name">
+		name=#name#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		type=#type#
+	</isNotEmpty>
+
+	ORDER BY update_time desc 
+	
+</select>
+
+<select id="selectStockUpdateLogByMapAndError" parameterClass="java.util.Map" resultMap="stockUpdateLogResultMap">
+	select * from
+	hx_stock_update_log
+	where 1=1
+	<isNotEmpty prepend="and" property="sku">
+		sku=#sku#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="location">
+		location=#location#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="name">
+		name=#name#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		type=#type#
+	</isNotEmpty>
+	
+    <isNotEmpty prepend="and" property="updateTime" >
+			update_time >#updateTime#
+	</isNotEmpty>
+	ORDER BY update_time desc 
+	
+</select>
+
+<select id="selectStockUpdateByMapCount" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+	select count(id) from
+	hx_stock_update
+	where 1=1
+	
+	<isNotNull prepend="and" property="type">
+		type=#type#
+	</isNotNull>
+	<isNotNull prepend="and" property="sku">
+		sku=#sku#
+	</isNotNull>
+	<isNotNull prepend="and" property="shangpinSku">
+		shangpin_sku=#shangpinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolaSku">
+		kaola_sku=#kaolaSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolaKey">
+		kaola_key=#kaolaKey#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolahtSku">
+		kaolaHT_sku=#kaolahtSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="kaolahtKey">
+		kaolaHT_key=#kaolahtKey#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="zhenpinSku">
+		zhenpin_sku=#zhenpinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="sikuSku">
+		siku_sku=#sikuSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="sikunewSku">
+		sikunew_sku=#sikunewSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="yunshangSku">
+		yunshang_sku=#yunshangSku#
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="yhdSku">
+		yhd_sku=#yhdSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="higoSku">
+		higo_sku=#higoSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="tmallSku">
+		tmall_sku=#tmallSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="fqlSku">
+		fql_sku=#fqlSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="jdSku">
+		jd_sku=#jdSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="pddsku">
+		pdd_sku=#pddSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="pddnewSku">
+		pddnew_sku=#pddnewSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="MlhSku">
+		Mlh_sku=#MlhSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="MlhnewSku">
+		Mlhnew_sku=#MlhnewSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="MlhnewsecSku">
+		Mlhnewsec_sku=#MlhnewsecSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="xhsSku">
+		xhs_sku=#xhsSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="ofashionsku">
+		ofashion_sku=#ofashionsku#
+	</isNotNull>
+	<isNotNull prepend="and" property="weimobsku">
+		weimob_sku=#weimobsku#
+	</isNotNull>
+	<isNotNull prepend="and" property="yinTaiSku">
+		yinTai_sku=#yinTaiSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="shepinSku">
+		shepin_sku=#shepinSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="suningSku">
+		suning_sku=#suningSku#
+	</isNotNull>
+	<isNotNull prepend="and" property="xhsitemId">
+		xhsitem_id=#xhsitemId#
+	</isNotNull>
+	<isNotNull prepend="and" property="product_id">
+		product_id=#product_id#
+	</isNotNull>
+	<isNotNull prepend="and" property="searchCanSale">
+		(now_stock-order_stock) > 0
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="order_stock">
+		$order_stock$ > 0
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="searchNeedSync">
+		(now_stock-order_stock)  != last_update_stock
+	</isNotNull>
+	<isNotNull prepend="and" property="skuisnotnull">
+	 	$skuisnotnull$ != ''
+	</isNotNull>
+</select>
+
+
+<!-- 从历史表插入 -->
+<insert id="insertStockUpdate" parameterClass="stockUpdate">
+	insert into hx_stock_update(id,sku,now_stock,last_update_stock,order_stock,type,shangpin_sku,kaola_sku,kaola_key,zhenpin_sku,siku_sku,yhd_sku,TYPES,material,color,size,idBrand,idSeries,xiyou_prod_id,yshang_sku_id,generate_time) 
+	value(null,#sku#,#nowStockNum#,#lastUpdateStockNum#,#orderStockNum#,#type#,#shangpinSku#,#kaolaSku#,#kaolaKey#,#zhenpinSku#,#sikuSku#,#yhdSku#,#typename#,#materialname#,#colorname#,#sizename#,#idBrand#,#idSeries#,#xiyouProdId#,#yshangSkuId#,sysdate())
+	<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<!-- 更新 -->
+<update id="updateStockByNotNull" parameterClass="stockUpdate">
+	update hx_stock_update
+	<dynamic prepend="set">
+		update_time= sysdate()
+		<isNotNull  property="nowStockNum">
+			,now_stock=#nowStockNum#
+		</isNotNull>
+		<isNotNull property="lastUpdateStockNum">
+			,last_update_stock=#lastUpdateStockNum#
+		</isNotNull>
+		<isNotNull property="orderStockNum">
+			,order_stock=#orderStockNum#
+		</isNotNull>
+		<isNotNull  property="type">
+			,type=#type#
+		</isNotNull>
+		<isNotNull  property="shangpinSku">
+			,shangpin_sku=#shangpinSku#
+		</isNotNull>
+		<isNotNull  property="kaolaSku">
+			,kaola_sku=#kaolaSku#
+		</isNotNull>
+		<isNotNull  property="kaolaKey">
+			,kaola_key=#kaolaKey#
+		</isNotNull>
+		<isNotNull  property="kaolahtSku">
+			,kaolaHT_sku=#kaolahtSku#
+		</isNotNull>
+		<isNotNull  property="kaolahtKey">
+			,kaolaHT_key=#kaolahtKey#
+		</isNotNull>
+		<isNotNull  property="zhenpinSku">
+			,zhenpin_sku=#zhenpinSku#
+		</isNotNull>
+		
+		<isNotNull property="sikuSku">
+			,siku_sku=#sikuSku#
+		</isNotNull>
+		
+		<isNotNull property="sikunewSku">
+			,sikunew_sku=#sikunewSku#
+		</isNotNull>
+		
+		<isNotNull property="yunshangSku">
+			,yunshang_sku=#yunshangSku#
+		</isNotNull>
+		
+		<isNotNull  property="yhdSku">
+			,yhd_sku=#yhdSku#
+		</isNotNull>
+		
+		<isNotNull  property="higoSku">
+			,higo_sku=#higoSku#
+		</isNotNull>
+		
+		<isNotNull  property="tmallSku">
+			,tmall_sku=#tmallSku#
+		</isNotNull>
+		
+		<isNotNull  property="fqlSku">
+			,fql_sku=#fqlSku#
+		</isNotNull>
+		
+		<isNotNull  property="jdSku">
+			,jd_sku=#jdSku#
+		</isNotNull>
+		
+		<isNotNull  property="pddSku">
+			,pdd_sku=#pddSku#
+		</isNotNull>
+		
+		<isNotNull  property="pddnewSku">
+			,pddnew_sku=#pddnewSku#
+		</isNotNull>
+		
+		<isNotNull  property="MlhSku">
+			,Mlh_sku=#MlhSku#
+		</isNotNull>
+		
+		<isNotNull  property="xhsSku">
+			,xhs_sku=#xhsSku#
+		</isNotNull>
+		
+		<isNotNull property="yinTaiSku">
+		,yinTai_sku=#yinTaiSku#
+	    </isNotNull>
+	    
+	    <isNotNull property="shepinSku">
+		,shepin_sku=#shepinSku#
+	    </isNotNull>
+	    
+	    <isNotNull property="suningSku">
+		,suning_sku=#suningSku#
+	    </isNotNull>
+	    
+		<isNotNull prepend="and" property="ofashionsku">
+			,ofashion_sku=#ofashionsku#
+		
+		</isNotNull>
+		<isNotNull  property="xhsitemId">
+			,xhsitem_id=#xhsitemId#
+		</isNotNull>
+		
+		<isNotNull  property="xiyouProdId">
+			,xiyou_prod_id=#xiyouProdId#
+		</isNotNull>
+		
+		
+		<isNotNull  property="shangpinOrderStock">
+			,shangpin_order_stock=#shangpinOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="kaolaOrderStock">
+			,kaola_order_stock=#kaolaOrderStock#
+		</isNotNull>
+		<isNotNull  property="kaolahtOrderStock">
+			,kaolaHT_order_stock=#kaolahtOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="ofashionOrderStock">
+			,ofashion_order_stock=#ofashionOrderStock#
+			</isNotNull>
+		
+		<isNotNull  property="zhenpinOrderStock">
+			,zhenpin_order_stock=#zhenpinOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="sikuOrderStock">
+			,siku_order_stock=#sikuOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="sikunewOrderStock">
+			,sikunew_order_stock=#sikunewOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="yunshangOrderStock">
+			,yunshang_order_stock=#yunshangOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="yhdOrderStock">
+			,yhd_order_stock=#yhdOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="higoOrderStock">
+			,higo_order_stock=#higoOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="tmallOrderStock">
+			,tmall_order_stock=#tmallOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="fqlOrderStock">
+			,fql_order_stock=#fqlOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="jdOrderStock">
+			,jd_order_stock=#jdOrderStock#
+		</isNotNull>
+		<isNotNull  property="pddOrderStock">
+			,pdd_order_stock=#pddOrderStock#
+		</isNotNull>
+		
+		<isNotNull  property="pddnewOrderStock">
+			,pddnew_order_stock=#pddnewOrderStock#
+		</isNotNull>
+
+		<isNotNull  property="MlhOrderStock">
+			,Mlh_order_stock=#MlhOrderStock#
+		</isNotNull>
+		
+		<isNotNull property="xhsOrderStock">
+			,xhs_order_stock = #xhsOrderStock#
+		</isNotNull>
+		
+		<isNotNull property="weiMobOrderStock">
+	    	,weimob_order_stock=#weiMobOrderStock#
+		</isNotNull>
+		
+		<isNotNull property="yinTaiOrderStock">
+	    	,yinTai_order_stock=#yinTaiOrderStock#
+		</isNotNull>
+		
+		<isNotNull property="shepinOrderStock">
+	    	,shepin_order_stock=#shepinOrderStock#
+		</isNotNull>
+		
+		<isNotNull property="suningOrderStock">
+	    	,suning_order_stock=#suningOrderStock#
+		</isNotNull>
+
+		<isNotNull property="ofashionMcOrderStock">
+	    	,ofashionMc_order_stock=#ofashionMcOrderStock#
+		</isNotNull>
+		
+		
+		<isNotNull  property="lastOrderTime">
+			,last_order_time=sysdate()
+		</isNotNull>
+	 where id = #id#
+	</dynamic>
+</update>
+  
+  
+  <!-- 批量更新库存 -->
+<update id="updateStockBatchBySkuAndType" parameterClass="java.util.Map">
+  <iterate   conjunction=";" close="" open=""  property="list">
+  		update hx_stock_update set update_time= sysdate(),now_stock = #list[].nowStockNum#
+  		where sku =#list[].sku# and type = #list[].type#
+  </iterate>
+</update>
+
+
+
+
+  <!-- 更新单个库存 -->
+<update id="updateStockBySkuAndTypeForOne" parameterClass="stockUpdate">
+  		update hx_stock_update set update_time= sysdate(),last_update_stock = #lastUpdateStockNum#
+  		where sku =#sku# and type = #type#
+</update>
+
+
+ <!-- 更新单个库存 -->
+<update id="updateNowStockBySku" parameterClass="stockUpdate">
+  		update hx_stock_update set update_time= sysdate(),now_stock = #nowStockNum#
+  		where sku =#sku# and type = #type#
+</update>
+
+
+
+
+
+  <!-- 更新库存为0-->
+<update id="updateStockB2ZeroByType" parameterClass="java.lang.String">
+	update hx_stock_update set  now_stock= 0
+	where   type = #type#
+</update>
+
+
+  <!-- 同步订单库存总数(总数量=寺库+尚品+珍品+考拉+1号店)-->
+<update id="syncOrderStock">
+
+	UPDATE hx_stock_update SET order_stock = (shangpin_order_stock+kaola_order_stock+zhenpin_order_stock+siku_order_stock+yhd_order_stock+tmall_order_stock+higo_order_stock+fql_order_stock+jd_order_stock+pdd_order_stock+Mlh_order_stock+xhs_order_stock+weimob_order_stock+ofashion_order_stock+yinTai_order_stock+shepin_order_stock+ofashionMc_order_stock+suning_order_stock+sikunew_order_stock+yunshang_order_stock+kaolaHT_order_stock)
+
+</update>
+
+  <!-- 更新订单数为0-->
+<update id="updatePlatformOrderStock2ZeroByType" parameterClass="java.util.Map">
+    	<isNotEmpty property="field">
+    			update hx_stock_update set  $field$ = 0
+    	</isNotEmpty>
+</update>
+  
+<!--根据我们的sku和类型获取对应平台的sku-->
+<select id="getPlatformSkuByOurSkuAndType" parameterClass="java.util.Map"  resultClass="java.lang.String">
+			SELECT $field$ platformSku FROM  hx_stock_update WHERE sku = '$sku$' and type = #type# and $field$ != ''
+</select>
+
+ 
+
+
+<!--1 更新平台SKU为NULL 在重新更新下来 防止一些平台已删除的数据存在 -->
+<update id="updateStockSkuToNull" parameterClass="java.lang.String">
+	update hx_stock_update set $field$ = NULL 
+</update>
+
+<!-- 2 批量更新各个平台sku和本地sku对应关系-->
+<update id="updatePlatformSku2Location" parameterClass="java.util.Map" >
+	  <iterate   conjunction=";" close="" open=""  property="list">
+	  		update hx_stock_update set $platformField$ =  #list[].platformSku#
+	  		<isNotNull property="platformstatus" >
+	  		,$platformstatus$ = #list[].status#
+	  		</isNotNull>
+	  		<isNotNull property="xhsitem_id" >
+	  		,xhsitem_id = #list[].itemid#
+	  		</isNotNull>
+	  		<isNotNull property="product_id" >
+	  		,product_id = #list[].product_id#
+	  		</isNotNull>
+	  		where sku =#list[].ourSku# and type = #list[].type#
+	  </iterate>
+</update>
+
+
+
+
+
+ <!--  同步库存 -->
+ <!-- 查询需要同步库存的数据-->
+<select id="selectHistoryMaxId"  resultClass="java.lang.Long">
+	SELECT max_id_history FROM hx_stock_update_history
+</select>
+
+
+<select id="selectInsertHistoryMaxId"  resultClass="java.lang.Long">
+	SELECT idHistory FROM history ORDER BY idHistory DESC LIMIT 1
+</select>
+
+<update id="updateHistoryMaxId"  parameterClass="java.lang.Long">
+	update  hx_stock_update_history set max_id_history = $maxId$
+</update>
+
+<insert id="insertHistoryMaxId"  parameterClass="java.lang.Long">
+	insert  hx_stock_update_history values(null,$maxId$)
+</insert>
+
+
+
+<select id="selectHistoryByHistoryMaxid" parameterClass="java.lang.Long" resultMap="stockUpdateHistoryResultMap">
+SELECT history.*,
+(SELECT idlastLocation FROM lifecycle WHERE idproduct = history.idProduct AND idStatus != 7 LIMIT 1) idLastLocation,
+(SELECT sku FROM product WHERE idproduct = history.idProduct AND sku IS NOT NULL LIMIT 1) sku,
+(SELECT NAME FROM customer c WHERE c.idCustomer = history.idCustomer  LIMIT 1) customerName,
+(
+SELECT c.name
+FROM lifecycle l,customerorder co,customer c
+WHERE idproduct = history.idProduct
+AND l.idStatus !=7 
+AND l.idOrder = co.idOrder
+AND co.idCustomer = c.idCustomer LIMIT 1
+) customerName2
+FROM history
+WHERE idHistory > $maxId$
+ORDER BY idHistory
+</select>
+
+
+
+<select id="selectProductLastSteepStatus" parameterClass="java.util.Map" resultMap="stockUpdateHistoryResultMap">
+SELECT history.*,
+(SELECT idlastLocation FROM lifecycle WHERE idproduct = history.idProduct AND idStatus != 7) idLastLocation,
+(SELECT sku FROM product WHERE idproduct = history.idProduct AND sku IS NOT NULL LIMIT 1) sku,
+(SELECT NAME FROM customer c WHERE c.idCustomer = history.idCustomer ) customerName,
+(
+SELECT c.name
+FROM lifecycle l,customerorder co,customer c
+WHERE idproduct = history.idProduct
+AND l.idStatus !=7 
+AND l.idOrder = co.idOrder
+AND co.idCustomer = c.idCustomer LIMIT 1
+) customerName2
+FROM history
+WHERE idproduct = #idProduct#
+AND idHistory &lt; $idHistory$ 
+ORDER BY idHistory DESC LIMIT 1
+</select>
+
+
+
+
+
+<!-- 通过订单查询 是否存在 -->
+<select id="selectKaolaOrderByOrders" parameterClass="java.util.List"  resultMap="kaolaOrderResultMap">
+	select * from hx_stock_update_platform_order
+	where  1=1 and `order_id` in 
+	<iterate conjunction="," open="(" close=")" >
+           	#orderId[]#  
+     </iterate>
+</select>
+
+<insert id="insertKaoLaOrder" parameterClass="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord">
+	insert into hx_stock_update_platform_order (order_id,idPlartform,idStatus,create_time,order_time,status,type) values(#orderId#,#idPlartform#,#idStatus#,sysdate(),#orderTime#,#status#,#type#)
+</insert>
+
+<insert id="insertxhsOrder" parameterClass="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord">
+	insert into hx_stock_update_platform_order (order_id,idPlartform,idStatus,create_time,order_time,status,type) values(#orderId#,#idPlartform#,#idStatus#,sysdate(),#orderTime#,#status#,#type#)
+</insert>
+
+<update id="updateOrder" parameterClass="platFormOrderRecord">
+	update hx_stock_update_platform_order set idPlartform=#idPlartform#,idStatus=#idStatus#,order_time=#orderTime#,status=#status# where order_id = #orderId#
+	
+</update>
+
+<select id="stockUpdateResult" resultMap="stockUpdateResultMap" parameterClass="stockUpdate">
+	SELECT * FROM hx_stock_update
+	WHERE sku = #sku# 
+	AND type = #type#
+</select>
+
+<update id="updatestockOrder" parameterClass="java.util.Map">
+UPDATE hx_stock_update SET order_stock=order_stock+#num#,$ptype$ = $ptype$+#num#,update_time = sysdate()  WHERE sku = #sku# AND TYPE = #type#
+	
+</update>
+
+<insert id="insertStockReserve" parameterClass="com.huaixuan.network.biz.domain.platformstock.StockReserve">
+	insert into hx_stock_reserve (id,username,sku,type,ptype,num,status,inserttime) values(null,#username#,#sku#,#type#,#ptype#,#num#,#status#,sysdate())
+</insert>
+
+
+
+</sqlMap>
+
+

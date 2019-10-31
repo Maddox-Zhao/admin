@@ -1,0 +1,90 @@
+#set($layout = 'layout\default.vm')
+
+<body>
+	#set($title = "财务管理 - 账务冲正申请管理")
+<div class="main">
+  <form action="managerTransLogApp.html" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>账务冲正申请管理</span></h3>
+	<label>状态：</label>
+		<select name="status" id="status" theme="simple">
+						<option value="">-=请选择=-</option>
+						#foreach($s in $transAppStatusMap.entrySet())
+							<option value="$!{s.key}" #if($!{status} == ${s.key}) selected="true" #end>$!{s.value}</option>
+						#end
+                    </select>
+	<label>申请时间：从</label>
+			<input type="text" name="transDateStart" id="transDateStart" value="$!transDateStart" size="10" theme="simple" readonly="true" />
+	<label>到</label>
+			<input type="text" name="transDateEnd" id="transDateEnd" value="$!transDateEnd" size="10" theme="simple" readonly="true" />
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "transDateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "transDateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+
+    <input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/>
+    </div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox">
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>编号</th>
+		<th>备注</th>
+		<th>状态</th>
+		<th>申请时间</th>
+		<th>操作</th>
+      </tr>
+   #if($transLogAppList)
+      #foreach($transLogApp in $transLogAppList.items)
+		<tr  #if($velocityCount%2==0) class="bg" #end>
+            <td  align="center">$velocityCount</td>
+			<td  align="center">$!transLogApp.transMemo</td>
+    		<td  align="center">
+				$!transLogApp.statusName
+			</td>
+			<td  align="center">$date.format("yyyy-MM-dd HH:mm:ss",$!{transLogApp.gmtCreate})</td>
+    		<td  align="center">
+    			<a href="/counter/showTransLogAppInfo.html?transLogAppId=$!transLogApp.id">查看</a>
+    		</td>
+        </tr>
+	  #end
+   #end
+    </table>
+	  </form>
+ <!-- 分页 -->
+	#if($transLogAppList.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$transLogAppList).put('slider_target',"/counter/managerTransLogApp.html?status=$!status&transDateStart=$!transDateStart&transDateEnd=$!transDateEnd").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+	function formSubmit(){
+		var transDateStart = document.getElementById("transDateStart").value;
+	    var transDateEnd = document.getElementById("transDateEnd").value;
+	    var transDateStart = transDateStart.replace(/-/g, "/");
+	    var transDateEnd = transDateEnd.replace(/-/g, "/");
+		var b_date1=new Date(Date.parse(transDateStart));
+        var e_date1=new Date(Date.parse(transDateEnd));
+
+		if(e_date1 < b_date1){
+			alert("采购起始时间不能大于结束时间！");
+			return false;
+		}
+    	document.forms[0].submit();
+    }
+</script>
+
+</body>

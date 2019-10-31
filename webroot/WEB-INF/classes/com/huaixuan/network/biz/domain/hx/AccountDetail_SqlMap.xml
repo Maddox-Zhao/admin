@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="accountDetail" >
+<typeAlias alias="AccountDetail" type="com.huaixuan.network.biz.domain.hx.AccountDetail"/>
+	<resultMap id="AccountDetailResult" class="AccountDetail">
+		<result property="id" column="id"/>
+		<result property="accountId" column="account_id"/>
+		<result property="euroAccount" column="euro_account"/>
+		<result property="hkAccount" column="hk_account"/>
+		<result property="rmbAccount" column="rmb_account"/>
+		<result property="dollarAccount" column="dollar_account"/>
+		<result property="type" column="type"/>
+		<result property="operationType" column="operation_type"/>
+		<result property="operationId" column="operation_id"/>
+		<result property="hrefId" column="href_id"/>
+		<result property="note" column="note"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	<sql id="AccountDetailFields">
+			id,account_id,euro_account,hk_account,rmb_account,dollar_account,type,href_id,operation_type,operation_id,note,gmt_create,gmt_modify
+	</sql>
+	
+	<!-- 根据ID获取 -->
+	<select id="selectAccountDetailById" parameterClass="java.lang.Long" resultMap="AccountDetailResult">
+		select <include refid="AccountDetailFields"/>
+		  from hx_account_detail
+		 where id = #id#
+	</select>
+	
+	<!-- 根据现金表ID获得当前账户的详情信息 -->
+	<select id="getAccountDetailByAccountId" parameterClass="java.lang.Long" resultMap="AccountDetailResult">
+	select <include refid="AccountDetailFields"/>
+		  from hx_account_detail
+		 where account_id = #value#
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertAccountDetail" parameterClass="AccountDetail">
+		insert into hx_account_detail(
+ 			id,
+			account_id,
+			euro_account,
+			hk_account,
+			rmb_account,
+			dollar_account,
+			type,
+			href_id,
+			operation_type,
+			operation_id,
+			note,
+			gmt_create,
+			gmt_modify
+		) values (
+ 			null,
+			#accountId#,
+			#euroAccount#,
+			#hkAccount#,
+			#rmbAccount#,
+			#dollarAccount#,
+			#type#,
+			#hrefId#,
+			#operationType#,
+			#operationId#,
+			#note#,
+			sysdate(),
+			sysdate()
+		)
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="updateAccountDetailByNotNull" parameterClass="AccountDetail">
+		update hx_account_detail
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="accountId">
+				account_id=#accountId#
+			</isNotNull>
+			<isNotNull prepend="," property="euroAccount">
+				euro_account=#euroAccount#
+			</isNotNull>
+			<isNotNull prepend="," property="hkAccount">
+				hk_account=#hkAccount#
+			</isNotNull>
+			<isNotNull prepend="," property="rmbAccount">
+				rmb_account=#rmbAccount#
+			</isNotNull>
+			<isNotNull prepend="," property="dollarAccount">
+				dollar_account=#dollarAccount#
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				type=#type#
+			</isNotNull>
+			<isNotNull prepend="," property="operationType">
+				operation_type=#operationType#
+			</isNotNull>
+			<isNotNull prepend="," property="operationId">
+				operation_id=#operationId#
+			</isNotNull>
+			<isNotNull prepend="," property="note">
+				note=#note#
+			</isNotNull>
+			<isNotNull prepend="," property="modifyCreate">
+				modify_create=sysdate()
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	
+	
+	
+  <select id="getAccountDetailByConditionWithPage" resultMap="AccountDetailResult" parameterClass="java.util.Map">
+	   select
+	   <include refid="AccountDetailFields"/>
+	   from hx_account_detail c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[ c.gmt_create <= #dateEnd# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="operationId" prepend="and">
+				c.operation_id = #operationId#
+			</isNotEmpty>
+			<isNotEmpty property="accountId" prepend="and">
+				c.account_id = #accountId#
+			</isNotEmpty>
+		</dynamic>
+		order by gmt_create desc
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+
+	<select id="getAccountDetailByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(c.id) from hx_account_detail c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  c.gmt_create <= #dateEnd#]]>
+			</isNotEmpty>
+			<isNotEmpty property="operationId" prepend="and">
+				c.operation_id = #operationId#
+			</isNotEmpty>
+			<isNotEmpty property="accountId" prepend="and">
+				c.account_id = #accountId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>

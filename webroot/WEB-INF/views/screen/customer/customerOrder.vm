@@ -1,0 +1,256 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>订单数据</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+ 
+ 
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">订单号：</td>
+                    <td style="width:150px">
+                        <input name="idorder" class="mini-textbox" onenter="search()"/>
+                    </td>
+ 
+                    <td class="form-label" style="width:75px;">出售地点：</td>
+                    <td style="width:100px">
+                        <input name="idSite" onenter="search()"  class="mini-combobox"   textField="name" valueField="id" 
+                            url="/site/getSiteByType.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/>  
+                    </td>
+                    <td class="form-label" style="width:60px;">订单状态：</td>
+                    <td style="width:150px">
+                       <input  name="status" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+							data="statusdata"    allowInput="false" showNullItem="true" nullItemText="请选择..."/> 
+                    </td>
+					<td class="form-label" style="width:60px;"> </td>
+                    <td style="width:150px">
+                        
+                    </td>
+                    <td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+						<a class="mini-button" iconCls="icon-close" onclick="CloseWindow('cancle')">关闭</a>
+                    </td>
+                </tr>
+                <tr>
+                    
+					<input name="idCustomer" id="idCustomer" class="mini-textbox" style="display:none"  />
+ 
+                    <td class="form-label" style="width:60px;">订单总额：</td>
+                    <td style="width:150px">
+                        <input  id="subTotal" class="mini-textbox"  readonly="readonly"/>
+                    </td>
+                    <td class="form-label" style="width:40px;">现金总额：</td>
+                    <td style="width:100px">
+                        <input id="amountCash" class="mini-textbox"  readonly="readonly"/>
+                    </td>
+					<td class="form-label" style="width:60px;">起止时间：</td>
+                    <td   colspan="3">
+                        <input id="sellDateStart" name="sellDateStart" class="mini-datepicker"  format="yyyy-MM-dd" />
+                        ~
+                        <input id="sellDateEnd" name="sellDateEnd" class="mini-datepicker" format="yyyy-MM-dd"  />
+                    </td>
+                        
+                </tr>
+            </table>
+        </div>
+    </div>
+    </form>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:350px;" allowResize="true"   
+        url="/order1/getorderlist.html"  idField="idorder" multiSelect="false"  pageSize="100" allowAlternating="true" onRowdblclick="edit()"
+	 >
+        <div property="columns">
+			<div type="indexcolumn"></div>
+ 
+            <div field="idorder" width="40" headerAlign="center" align="center" allowSort="true">订单号</div>
+            <div field="date" width="80" headerAlign="center" align="center"  allowSort="true"   renderer="renderDate1" >日期</div>
+            <div field="subTotal" width="60" headerAlign="center" align="center"  allowSort="true">总价</div>
+            <div field="currencyname" width="40" headerAlign="center" align="center"  allowSort="true">币种</div>
+            <div field="paymentname" width="60" headerAlign="center" align="center"  allowSort="true">付款方式</div>
+            <div field="amountCash" width="60" headerAlign="center" align="center"  allowSort="true">现金</div>
+            <div field="customername" width="80" headerAlign="center" align="center"  allowSort="true">客户</div>
+			<div field="customerManager" width="80" headerAlign="center" align="center"  allowSort="true">客户经理</div>
+            <div field="sellchannelname" width="60" headerAlign="center" align="center"  allowSort="true">渠道</div>
+            <div field="sitename" width="60" headerAlign="center" align="center"  allowSort="true">出售地点</div>
+            <div field="employeename" width="60" headerAlign="center" align="center"  allowSort="true">最后经手人</div>
+            <div field="gmtpay" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderDates">付款时间</div>
+            <div field="deliverystatus" width="30" headerAlign="center" align="center"  allowSort="true">发货</div>
+            <div field="deliverydate" width="90" headerAlign="center"  align="center"  allowSort="true" renderer="renderDate">发货时间</div>
+			<div field="status" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">订单状态</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var deliverystatus = [{id:"YES",value:"Yes"},{id:"NO",value:"No"}]
+		var statusdata = [{id:0,value:"已付款"},{id:1,value:"未付款"},{id:2,value:"取消/部分取消订单"}]
+        mini.parse();
+        var grid = mini.get("datagrid1");
+		//mini.get("sellDateStart").setValue(new Date());
+		//mini.get("sellDateEnd").setValue(new Date());
+		
+     
+		function renderCurrency(row) {
+          if (row.value == '0') return "已付款";
+          if (row.value == '1') return "未付款";
+          if (row.value == '2') return "取消/部分取消";
+        }
+	 	function renderDate1(row) {
+        if (!row.value) return "";
+        var d = new Date(parseInt(row.value));
+        return formatDate(d, false);
+        }
+		function renderDate(row) {
+        if (!row.value) return "";
+        var d = new Date(parseInt(row.value));
+        return formatDate(d, true);
+        }
+		function renderDates(row) {
+        if (!row.value) return "";
+        var d = new Date(parseInt(row.value));
+        var da = formatDate(d, false);
+		return da;
+        }
+		 
+		
+        function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+             var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += " " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		function search()
+        {
+    		var form = new mini.Form("#form1");
+    		var data = form.getData();
+    		var date = mini.get("sellDateStart").getValue();
+            if (date instanceof Date) {
+                data.sellDateStart = formatDate(date);
+            }
+			var date = mini.get("sellDateEnd").getValue();
+            if (date instanceof Date) {
+                data.sellDateEnd = formatDate(date);
+            }
+			grid.load(data);
+
+    		//获取总金额
+    		jQuery.post("/order1/getorderlistTotlPrice.html",data,function(text)
+    		{
+    				var arr = text.split(",");
+					mini.get("subTotal").setValue(arr[0])
+					mini.get("amountCash").setValue(arr[1]);
+    		})
+		}
+
+	        function edit() {
+            var row = grid.getSelected();
+            if (row) {
+                mini.open({
+                    url: "orderinformation.html",
+                    title: "订单明细",
+                    width: 1100,
+                    height: 490,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+                            id: row.idorder,
+							idPayment:row.idPayment,
+							deliverystatus:row.deliverystatus
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                         //grid.reload();
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+		//统计
+		 function onDrawSummaryCell(e) {
+            var result = e.result;
+            var grid = e.sender;
+            var rows = e.data;
+            
+            if (e.field == "subTotal") {
+                var total = 0;
+				var totalCash = 0;
+                for (var i = 0, l = rows.length; i < l; i++) {
+                    var row = rows[i];
+                    var t = row.subTotal;
+                    if (isNaN(t)) continue;
+                    total += t;
+					
+					var t = row.amountCash;
+                    if (isNaN(t)) continue;
+					 totalCash += t;
+                }
+				mini.get("subTotal").setValue(total.toFixed(2))
+				mini.get("amountCash").setValue(totalCash.toFixed(2))
+            }
+        }
+
+	function  setData(data)
+	{
+		var idCustomer = data.idCustomer;
+		mini.get("idCustomer").setValue(idCustomer);
+		search();
+	}
+	
+	
+	
+	   function CloseWindow(action) {
+                if (action == "close" && form.isChanged()) {
+                    if (confirm("数据被修改了，是否先保存？")) {
+                        return false;
+                    }
+                }
+                if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+                else window.close();
+            }
+			
+			//跳转到详情页面
+	        function edit() {
+            var row = grid.getSelected();
+            if (row) {
+                mini.open({
+                    url: "/customer/adminOrderinformationOrder.html",
+                    title: "订单明细",
+                    width: 1100,
+                    height: 490,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+                            id: row.idorder,
+							idPayment:row.idPayment,
+							deliverystatus:row.deliverystatus
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                         grid.reload();
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+</script>
+</body>
+</html>

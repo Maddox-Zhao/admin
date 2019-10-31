@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ActivitySQL">
+<typeAlias alias="activity" type="com.huaixuan.network.biz.domain.shop.Activity"/>
+	<resultMap class="activity" id="activityResult">
+		<result column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="gmt_start" property="gmtStart"/>
+		<result column="gmt_end" property="gmtEnd"/>
+		<result column="img" property="img"/>
+		<result column="context" property="context"/>
+		<result column="status" property="status"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="img_small" property="img_small"/>
+		<result column="img_home_small" property="img_home_small"/>
+		<result column="activity_position" property="activityPosition"/>
+		<result column="activity_discount" property="activityDiscount"/>
+	</resultMap>
+<!-- create Activity object -->
+<insert id="addActivity" parameterClass="activity">
+<![CDATA[
+		insert into emall_activity
+		(id,title,gmt_start,gmt_end,img,context,status,gmt_create,gmt_modify,img_small,img_home_small,activity_position)values( null,
+		#title#,
+		#gmtStart#,
+		#gmtEnd#,
+		#img#,
+		#context#,
+		#status#,
+		#gmtCreate#,
+		#gmtModify#,
+		#img_small#,
+		#img_home_small#,
+		#activityPosition#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Activity object -->
+<update id="editActivity" parameterClass="activity">
+	update emall_activity set gmt_modify = sysdate()
+		<isNotEmpty property="title">
+				,title = #title#
+		</isNotEmpty>
+		<isNotEmpty property="gmtStart">
+			,gmt_start = #gmtStart#
+		</isNotEmpty>
+		<isNotEmpty property="gmtEnd">
+			,gmt_end = #gmtEnd#
+		</isNotEmpty>
+		<isNotEmpty property="img">
+			,img = #img#
+		</isNotEmpty>
+		<isNotEmpty property="imgSmall">
+			,img_small = #img_small#
+		</isNotEmpty>
+		<isNotEmpty property="context">
+			,context = #context#
+		</isNotEmpty>
+		<isNotEmpty property="status">
+			,status = #status#
+		</isNotEmpty>
+		<isNotEmpty property="img_home_small">
+			,img_home_small = #img_home_small#
+		</isNotEmpty>
+		<isNotEmpty property="activityPosition">
+			,activity_position = #activityPosition#
+		</isNotEmpty>
+		<isNotEmpty property="activityDiscount">
+			,activity_discount = #activityDiscount#
+		</isNotEmpty>
+		 where id = #id#
+</update>
+<!-- delete Activity object -->
+<delete id="removeActivity" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_activity where emall_activity.ID = #value#
+]]>
+</delete>
+<!-- search Activity object -->
+<select id="getActivity" parameterClass="java.lang.Long" resultMap="activityResult">
+<![CDATA[
+		select emall_activity.* from emall_activity where emall_activity.ID = #value#
+]]>
+</select>
+<!-- searchAll Activity List -->
+<select id="getActivitys" resultMap="activityResult">
+<![CDATA[
+		select emall_activity.* from emall_activity
+]]>
+</select>
+<!-- select count(*) from emall_activity a where sysdate() BETWEEN a.gmt_start and a.gmt_end-->
+<select id="getActivitysCount" resultClass="java.lang.Integer" parameterClass="java.lang.Long">
+<![CDATA[
+		select count(*) from emall_activity
+]]>
+</select>
+<!-- select * from emall_activity a where sysdate() BETWEEN a.gmt_start and a.gmt_end order by  a.GMT_MODIFY desc,a.id-->
+<select id="getActivitysPage" parameterClass="java.util.Map" resultMap="activityResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+	select * from emall_activity a
+	order by  a.GMT_MODIFY desc,a.id
+]]>
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="allActivityDisplay" resultMap="activityResult">
+		select a.* from emall_activity a
+		where a.status = '2'
+	      <isNotEmpty property="curTime" prepend="and">
+	        <![CDATA[	a.gmt_start <= #curTime# ]]>
+	      </isNotEmpty>
+	      <isNotEmpty property="curTime" prepend="and">
+	        <![CDATA[	a.gmt_end > #curTime# ]]>
+	      </isNotEmpty>
+		  order by  a.GMT_MODIFY desc,a.id
+</select>
+
+<select id="allActivityDisplay2" resultMap="activityResult">
+		select a.* from emall_activity a
+		where a.status = '2'
+		and a.img_home_small is not null
+	      <isNotEmpty property="curTime" prepend="and">
+	        <![CDATA[	a.gmt_start <= #curTime# ]]>
+	      </isNotEmpty>
+	      <isNotEmpty property="curTime" prepend="and">
+	        <![CDATA[	a.gmt_end > #curTime# ]]>
+	      </isNotEmpty>
+		  order by  a.GMT_MODIFY desc,a.id
+</select>
+
+<select id="getPublishedPosition" resultClass="java.lang.String" parameterClass="long">
+	select activity_position from emall_activity where id = #id#
+</select>
+
+<select id="getPublishedCount" resultClass="int" parameterClass="java.lang.String">
+	select count(*) from emall_activity where activity_position = #activityPosition# and status = '2'
+</select>
+
+<select id="getActivityGoodsCount" resultClass="int" parameterClass="long">
+	SELECT COUNT(*) FROM emall_activity e,emall_activity_goods ag WHERE e.id = #id# AND e.id = ag.activity_id
+</select>
+
+
+</sqlMap>

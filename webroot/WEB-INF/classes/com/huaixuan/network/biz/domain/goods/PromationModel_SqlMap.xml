@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PromationModelSQL">
+<typeAlias alias="promationModel" type="com.huaixuan.network.biz.domain.goods.PromationModel"/>
+	<resultMap class="promationModel" id="promationModelResult">
+		<result column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="code" property="code"/>
+		<result column="condition_expression" property="conditionExpression"/>
+		<result column="promation_expression" property="promationExpression"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create PromationModel object -->
+<insert id="addPromationModel" parameterClass="promationModel">
+<![CDATA[
+insert into emall_promation_model
+  (id,
+   name,
+   code,
+   condition_expression,
+   promation_expression,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #name#,
+   #code#,
+   #conditionExpression#,
+   #promationExpression#,
+   sysdate(),
+   sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update PromationModel object -->
+<update id="editPromationModel" parameterClass="promationModel">
+<![CDATA[
+		update emall_promation_model set name = #name#,
+		code = #code#,
+		condition_expression = #conditionExpression#,
+		promation_expression = #promationExpression#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete PromationModel object -->
+<delete id="removePromationModel" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_promation_model where emall_promation_model.ID = #value#
+]]>
+</delete>
+<!-- search PromationModel object -->
+<select id="getPromationModel" parameterClass="java.lang.Long" resultMap="promationModelResult">
+<![CDATA[
+		select emall_promation_model.* from emall_promation_model where emall_promation_model.ID = #value#
+]]>
+</select>
+<!-- searchAll PromationModel List -->
+<select id="getPromationModels" resultMap="promationModelResult">
+<![CDATA[
+		select emall_promation_model.* from emall_promation_model
+]]>
+</select>
+<select id="getPromationModelByCode" parameterClass="java.lang.String" resultMap="promationModelResult">
+<![CDATA[
+		select emall_promation_model.* from emall_promation_model where emall_promation_model.code = #value#
+]]>
+</select>
+</sqlMap>

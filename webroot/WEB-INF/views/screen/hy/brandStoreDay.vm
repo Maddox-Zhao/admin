@@ -1,0 +1,207 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<body>
+	<div class="main">
+    	 <h2>品牌库存查看</h2>
+		
+		 
+		 <form action="brandStoreView.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+		<tr>
+           <td>某一品牌时间段数据&nbsp;&nbsp;
+			品牌&nbsp;&nbsp;
+           <select name="idbrand" class="select">
+                <option value="">-=请选择=-</option>
+                #foreach($bp in $brandList)
+                <option value="$!bp.id" #if("$!bp.id"=="$!{idbrand}") selected #end>$!bp.brandName</option>
+                #end
+            </select>
+			开始日期&nbsp;&nbsp;
+            <input name="dateStart" id="dateStart" value="$!{dateStart}" style="width: 100px;" readonly="true"/>
+			结束日期&nbsp;&nbsp;
+            <input name="dateEnd" id="dateEnd" value="$!{dateEnd}" style="width: 100px;" readonly="true"/>
+           
+            <input name="submit" value="查询" class="button" type="submit"/>
+        </td>
+        </tr>
+	
+    <tr>
+     <td>
+			所有品牌某一天数据 &nbsp;&nbsp;日期
+        <input name="yearMonth1" id="yearMonth1" value="$!{yearMonth1}" style="width: 100px;" readonly="true"/>
+        
+        <input name="submit" value="查询" class="button" type="submit" />
+    	</td>
+    </tr>
+	</table>
+		</div>
+	</form>
+		 
+	<div class="tool">
+     #foreach($pvs in $productViewAllSumList )
+		<div align="right">
+			<font size='4'><strong><label>【 销售额: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${pvs.priceSum},'0.00') </label></strong></font>
+			<font size='4'><strong><label> $!pvs.priceCurrencySum 】</label></strong></font>
+		</div>
+	 #end
+	 #foreach($pvcost in $productViewCostSumList )
+		<div align="right">
+			<font size='4'><strong><label>【 成本: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${pvcost.costAll},'0.00') </label></strong></font>
+			<font size='4'><strong><label> $!pvcost.costCurrency 】</label></strong></font>
+		</div>
+     #end
+ </div>
+	
+		 
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>品牌时间段列表</span></h3>
+            <table >
+                <tr>
+                    <th >品牌</th>
+                    <th>日期</th>
+                    <th>可售库存</th>
+					<th>库存占比</th>
+					<th>总库存</th>
+					<th>预订量</th>
+					<th>日销售</th>
+					<th>日转化率</th>
+					<th>周销量</th>
+					<th>周转化率</th>
+					<th>半月销量</th>
+					<th>半月转率</th>
+					<th>月销量</th>
+					<th>月转化率</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($brandStoreDay in $query.items)
+					#set( $datestr = $!dateUtilHX.convertDateToString("yyyy-MM-dd",$!brandStoreDay.date))
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$brandMap.get("$!brandStoreDay.idBrand")</td>
+					<td style="text-align:center;">$!datestr</td>
+					<td style="text-align:center;"><a href="$appServer/productview/productHistoryList.html?idStatus=1&datestr=$!datestr&idBrand=$!{brandStoreDay.idBrand}" onClick="window.open(this.href,'','width=1200,height=800,left=100, top=10,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false;"  target="_blank">$!brandStoreDay.brandStore</a></td>
+					<td style="text-align:center;">$!brandStoreDay.brandStoreRate % </td>
+					<td style="text-align:center;">$!brandStoreDay.allStore</td>
+					<td style="text-align:center;"><a href="$appServer/productview/productHistoryList.html?idStatus=3&datestr=$!datestr&idBrand=$!{brandStoreDay.idBrand}" onClick="window.open(this.href,'','width=1200,height=800,left=100, top=10,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false;"  target="_blank">$!brandStoreDay.dayPreCost</a></td>
+					<td style="text-align:center;">$!brandStoreDay.daySaleCost</td>
+					<td style="text-align:center;">$!brandStoreDay.dayRate</td>
+					<td style="text-align:center;">$!brandStoreDay.weekSale</td>
+					<td style="text-align:center;">$!brandStoreDay.weekRate</td>
+					<td style="text-align:center;">$!brandStoreDay.halfMonthSale</td>
+					<td style="text-align:center;">$!brandStoreDay.halfMonthSaleRate</td>
+					<td style="text-align:center;">$!brandStoreDay.monthSale</td>
+					<td style="text-align:center;">$!brandStoreDay.monthSaleRate</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/productview/brandStoreView.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+		
+		<div class="tool">
+    
+		<div align="right">
+			<font size='4'><strong><label>【 $!{yearMonth1} 今日销售成本: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('18333.76','0.00') </label></strong></font>
+			<font size='4'><strong><label> EU ，总库存： </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('433803.8','0.00') </label></strong></font>
+			<font size='4'><strong><label> EU ，日周转率</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('4.23','0.00') </label></strong></font>
+			<font size='4'><strong><label> %， 日销售额</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('232673','0.00') </label></strong></font>
+			<font size='4'><strong><label> HKD， 日毛利率</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('17.38','0.00') </label></strong></font>
+			<font size='4'><strong><label> %  】</label></strong></font>
+		</div>
+ </div>
+        <div class="tool">
+    
+		<div align="right">
+			<font size='4'><strong><label>【 半月销售成本: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('147514.58','0.00') </label></strong></font>
+			<font size='4'><strong><label> EU ，半月平均库存： </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('435435.21','0.00') </label></strong></font>
+			<font size='4'><strong><label> EU ，半月周转率</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('33.88','0.00') </label></strong></font>
+			<font size='4'><strong><label> %， 半月销售额</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('1773650','0.00') </label></strong></font>
+			<font size='4'><strong><label> HKD， 半月毛利率</label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney('13.37','0.00') </label></strong></font>
+			<font size='4'><strong><label> %  （香港最近12个工作日，2个星期，算作半个月）】</label></strong></font>
+		</div>
+ </div>
+		
+		<!-- 列表模块 -->
+        <div class="listBox">
+		  <h3><span style="width:200px;">所有品牌 $!{yearMonth1}数据</span></h3>
+            <table >
+                <tr>
+                    <th>品牌</th>
+                    <th>日期</th>
+                    <th>可售库存</th>
+					<th>库存占比</th>
+					<th>总库存</th>
+					<th>预订量</th>
+					<th>日销售</th>
+					<th>日转化率</th>
+					<th>周销量</th>
+					<th>周转化率</th>
+					<th>半月销量</th>
+					<th>半月转率</th>
+					<th>月销量</th>
+					<th>月转化率</th>
+                </tr>
+				 #foreach($brandStoreDay in $brandStoreDayAllList)
+					#set( $datestr = $!dateUtilHX.convertDateToString("yyyy-MM-dd",$!brandStoreDay.date))
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$brandMap.get("$!brandStoreDay.idBrand")</td>
+					<td style="text-align:center;">$!datestr</td>
+					<td style="text-align:center;"><a href="$appServer/productview/productHistoryList.html?idStatus=1&datestr=$!datestr&idBrand=$!{brandStoreDay.idBrand}" onClick="window.open(this.href,'','width=1200,height=800,left=100, top=10,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false;"  target="_blank">$!brandStoreDay.brandStore</a></td>
+					<td style="text-align:center;">$!brandStoreDay.brandStoreRate % </td>
+					<td style="text-align:center;">$!brandStoreDay.allStore</td>
+					<td style="text-align:center;"><a href="$appServer/productview/productHistoryList.html?idStatus=3&datestr=$!datestr&idBrand=$!{brandStoreDay.idBrand}" onClick="window.open(this.href,'','width=1200,height=800,left=100, top=10,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false;"  target="_blank">$!brandStoreDay.dayPreCost</a></td>
+					<td style="text-align:center;">$!brandStoreDay.daySaleCost</td>
+					<td style="text-align:center;">$!brandStoreDay.dayRate</td>
+					<td style="text-align:center;">$!brandStoreDay.weekSale</td>
+					<td style="text-align:center;">$!brandStoreDay.weekRate</td>
+					<td style="text-align:center;">$!brandStoreDay.halfMonthSale</td>
+					<td style="text-align:center;">$!brandStoreDay.halfMonthSaleRate</td>
+					<td style="text-align:center;">$!brandStoreDay.monthSale</td>
+					<td style="text-align:center;">$!brandStoreDay.monthSaleRate</td>
+                 </tr>
+				 #end
+            </table>
+        </div> <!-- 列表模块 END -->
+
+    </div>
+	<script language="javascript" type="text/javascript">
+    	Calendar.setup({
+            inputField : "dateStart",
+            ifFormat   : "%Y-%m-%d",
+            align      : "T1" 
+        });
+        Calendar.setup({
+            inputField : "dateEnd",
+            ifFormat   : "%Y-%m-%d",
+            align      : "T1"
+        });
+        Calendar.setup({
+            inputField : "yearMonth1",
+            ifFormat   : "%Y-%m-%d",
+            align      : "T1"
+        });
+        
+</script>
+</body>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RoleAuthorityDao">
+	<typeAlias alias="RoleAuthority" type="com.huaixuan.network.biz.domain.admin.RoleAuthority"/>
+	<resultMap id="roleAuthorityResult" class="com.huaixuan.network.biz.domain.admin.RoleAuthority">
+	  <result column="role_id" property="roleId" />
+	  <result column="authority_id" property="authorityId" />
+	</resultMap>
+	
+	
+	<resultMap id="clientRoleAuthorityResult" class="com.huaixuan.network.biz.domain.admin.ClientRoleAuthority">
+	  <result column="client_role_id" property="roleId" />
+	  <result column="function_code" property="authorityId" />
+	</resultMap>
+
+	<sql id="RoleAuthorityDao.forSelectAll">
+		role_id, authority_id
+    </sql>
+
+	<select id="RoleAuthorityDao.getPermissionByRoleId" parameterClass="java.lang.Long" resultMap="roleAuthorityResult">
+		 select
+		 <include refid="RoleAuthorityDao.forSelectAll" />
+		 from emall_role_authority where role_id = #value#
+    </select>
+
+	<delete id="RoleAuthorityDao.removeRolePermission" parameterClass="java.lang.Long">
+		<![CDATA[
+			delete from emall_role_authority where role_id = #value#
+		]]>
+	</delete>
+
+	<insert id="RoleAuthorityDao.insertRolePermission" parameterClass="RoleAuthority">
+		<![CDATA[
+			insert into emall_role_authority(role_id,authority_id)
+			values(#roleId#,#authorityId#)
+		]]>
+	</insert>
+	
+	
+	
+	
+	<!-- C客户端 -->
+	<select id="RoleAuthorityDao.getClientPermissionByRoleId" parameterClass="java.lang.Long" resultMap="clientRoleAuthorityResult">
+		 select client_role_id,function_code
+		 from hx_client_rolefunc where client_role_id = #value#
+    </select>
+
+    <delete id="RoleAuthorityDao.removeClientRolePermission" parameterClass="java.lang.Long">
+		<![CDATA[
+			delete from hx_client_rolefunc where client_role_id = #value#
+		]]>
+	</delete>
+
+	<insert id="RoleAuthorityDao.insertClientRolePermission" parameterClass="com.huaixuan.network.biz.domain.admin.ClientRoleAuthority">
+		<![CDATA[
+			insert into hx_client_rolefunc(client_role_id,function_code)
+			values(#roleId#,#authorityId#)
+		]]>
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,155 @@
+#set($layout = 'layout\default.vm')
+<style type="text/css">
+.title { height: 1em; }
+</style>
+<script>
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+
+function check(){
+    if(!document.listForm.accountLogId.value.match(/^\d+$/) || document.listForm.accountLogId.value.length>=20){
+        alert("请输入合法帐户流水号！");
+        return false;
+    }
+    return true;
+}
+
+function formSubmit(){
+    if(check()){
+        document.listForm.action="getTransLogByAccountLogId.html";
+	document.listForm.target="";
+	document.forms.listForm.submit();
+    }
+}
+
+function doTransAjust(){
+    var memo = showModalDialog("showTransAjustMemo.html","transAjustMemo","dialogHeight:300px;scroll:no");
+    if(typeof(memo)!="undefined"){
+        document.getElementById("transMemo").value = memo;
+        //document.listForm.action="doAccountTransAjust.html";
+		document.listForm.action="doAccountTransAjustApp.html";
+        document.listForm.submit();
+    }
+}
+</script>
+#set($title = "财务管理 - 帐务冲正")
+<form name="listForm" action="getTransLogByAccountLogId.html" method="post" onsubmit="return check();">
+
+	<div class="searchBox">
+<h3><span>帐务冲正</span></h3>
+    #set($tmpAcountLogId=$!accountLogId)
+    #if("$!tmpAcountLogId"=="0")
+    	#set($tmpAcountLogId="")
+    #end
+    帐务流水号：<input type="text" name="accountLogId"  size="20" value="$!tmpAcountLogId"/> &nbsp;&nbsp;<font color="red">*</font>
+
+&nbsp;&nbsp;<input type="button" value="搜 索" class="btn"  onclick="formSubmit();"/>
+<br><br>
+
+#if($!transLogList.size()>0)
+		<h3><span>原事务流水账务信息 </span></h3>
+			<span style="color:red;">$!{message}</span>
+			<div class="tab-div">
+				#set($transLog=$!transLogList.get(0))
+				<table cellpadding="3" cellspacing="1" width="100%" align="center">
+					<tr>
+			            <td width="20%">流水号</td>
+			            <td width="80%">$!transLog.id</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">交易代码</td>
+			            <td width="80%">$!transLog.transCode</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">交易日期/记账日期</td>
+			            <td width="80%">$!date.format("yyyy-MM-dd HH:mm:ss",${transLog.transDt})</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">发生金额</td>
+			            #set($divAmountYuan=$!{moneyUtil.div("$!{transLog.transAmount}","100")})
+			            <td width="80%">￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">转出帐户</td>
+			            <td width="80%">$!transLog.transAccountOut</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">转入帐户</td>
+			            <td width="80%">$!transLog.transAccountIn</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">银行名称</td>
+			            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transLog.bankType")</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">发生机构</td>
+			            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transLog.transInstitution")</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">备注</td>
+			            <td width="80%">$!transLog.transMemo</td>
+			        </tr>
+				</table>
+
+			#if("$!transLog.flagCancel"=="")
+			    <br>
+			    <input type="button" value="冲销申请" class="btn"  onclick='doTransAjust();'/>
+			    <input type="hidden" name="transAjustLogId" id="transAjustLogId" value="$!transLog.id"/>
+			    <input type="hidden" name="transMemo" id="transMemo"/>
+		    #end
+
+		#if("$!transLog.flagCancel"!="")
+			#set($transLog="")
+			#set($transLog=$!transLogList.get(1))
+			<h3><span>冲销事务流水账务信息 </span></h3>
+			<div class="tab-div">
+				<table cellpadding="3" cellspacing="1" width="100%" align="center">
+					<tr>
+			            <td width="20%">流水号</td>
+			            <td width="80%">$!transLog.id</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">交易代码</td>
+			            <td width="80%">$!transLog.transCode</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">交易日期/记账日期</td>
+			            <td width="80%">$!date.format("yyyy-MM-dd HH:mm:ss",${transLog.transDt})</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">发生金额</td>
+			            #set($divAmountYuan=$!{moneyUtil.div("$!{transLog.transAmount}","100")})
+			            <td width="80%">￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00')</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">转出帐户</td>
+			            <td width="80%">$!transLog.transAccountOut</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">转入帐户</td>
+			            <td width="80%">$!transLog.transAccountIn</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">银行名称</td>
+			            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transLog.bankType")</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">发生机构</td>
+			            <td width="80%">$!accountUtil.getInstitutionNameByCode("$!transLog.transInstitution")</td>
+			        </tr>
+			        <tr>
+			            <td width="20%">备注</td>
+			            <td width="80%">$!transLog.transMemo</td>
+			        </tr>
+				</table>
+		#end
+ #else
+   没有结果！
+ #end
+    </div>
+   </div>
+  </div>
+
+</form>
+

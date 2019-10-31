@@ -1,0 +1,139 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 每日发货出库单查询")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 每日发货出库单查询</h2>
+
+	<div class="tool">
+		<span><a href="searchOutDepository.html" hidefocus="true" class="bt_par">出库单列表</a></span>
+	</div>
+
+	<form action="searchTodayList.html" name="searchForm" method="post">
+		#springBind("query.type")
+		<input type="hidden" name="${status.expression}" id="query.type" value="$!{status.value}"/>
+		<div class="searchBox">
+			<h3><span>搜索订单</span></h3>
+			<table>
+				<tr>
+					<th>修改时间：</th>
+					<td>
+						#springBind("query.optTimeStart")
+						<input type="text" id="query.optTimeStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.optTimeEnd")
+						<input type="text" id="query.optTimeEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.optTimeStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.optTimeEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+                    </td>
+					<th>状态：</th>
+					<td>
+						#springBind("query.status")
+						<select id="query.status" name="${status.expression}" class="select" style="width:auto;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $outDepositoryStatusMap.entrySet())
+								<option value="$!en.key" #if("$!en.key" == "${status.value}") selected="selected" #end >$!en.value</option>
+							#end
+						</select>
+					</td>
+    			</tr>
+    			<tr>
+					<td colspan="4">
+        				<button type="button" class="btn" onclick="formSubmit();">查询</button>
+        				<button type="button" class="btn" onclick="doExport();">Excel导出</button>
+					</td>
+    			</tr>
+            </table>
+        </div>
+	</form>
+
+	<!-- 入库单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+				<th>单据编号</th>
+				<th>单据类型</th>
+				<th>一级仓库</th>
+				<th>关联单据号</th>
+				<th>修改时间</th>
+				<th>制单人</th>
+				<th>仓管</th>
+				<th>状态</th>
+			</tr>
+			#foreach($outDepositoryDis in $page.items)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td align="left"><a href="showOutDetail.html?outDepId=$!outDepositoryDis.id">$!outDepositoryDis.billNum</a></td>
+					<td align="left">$!outDepositoryTypeMap.get("$outDepositoryDis.type")</td>
+					<td align="center">$!depositoryNameMap.get($!outDepositoryDis.depFirstId)</td>
+					<td align="center">
+						#if(!$outDepositoryDis.tradePackageList || $outDepositoryDis.tradePackageList.size() == 0)
+							#if($outDepositoryDis.type == "out_damaged")
+								<a target="_blank" href="$ctx/igc/ios/searchDamagedDetail.html?damagedCode=$!outDepositoryDis.relationNum">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_shopping")
+								<a target="_blank" href="$ctx/igc/ios/searchSRDetail.html?refNum=$!outDepositoryDis.relationNum&aType=view&cType=ct">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_check_damaged")
+								<a target="_blank" href="$ctx/igc/ios/storeCheckDetail.html?checkId=$!outDepositoryDis.relationNum">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_sales_change")
+								<a target="_blank" href="$ctx/igc/conRefund.html?refundId=$!outDepositoryDis.relationNum">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_storage_refund")
+								<a target="_blank" href="$ctx/igc/ios/searchKTDetail.html?refNum=$!outDepositoryDis.relationNum&aType=view&cType=kt">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_move_storage" || $outDepositoryDis.type == "out_borrow_storage" || $outDepositoryDis.type == "out_back_storage")
+								<a href="$ctx/igc/ios/moveLogReturn.html?moveCode=$!{outDepositoryDis.relationNum}" target="_blank">$!outDepositoryDis.relationNum</a>
+							#end
+						#else
+    						#foreach($tradePackage in $outDepositoryDis.tradePackageList)
+    							<a target="_blank" href="$!appServer.get("/trade/detail.html?tradeId=$tradePackage.tid")">$tradePackage.tid</a>
+    						#end
+						#end
+					</td>
+					<td align="center">$!dateUtil.convertDateToString("yyyy-MM-dd",$!outDepositoryDis.gmtModify)</td>
+					<td align="left">$!outDepositoryDis.creater</td>
+					<td align="left">$!outDepositoryDis.modifier</td>
+					<td align="center">$!outDepositoryStatusMap.get("$outDepositoryDis.status")</td>
+				</tr>
+			#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/storage/searchTodayList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	function formSubmit(){
+		var dateStart1=document.getElementById("query.optTimeStart").value.replace(/-/g, "/");
+    	var dateEnd1=document.getElementById("query.optTimeEnd").value.replace(/-/g, "/");
+		var b_date1=new Date(Date.parse(dateStart1));
+        var e_date1=new Date(Date.parse(dateEnd1));
+
+		if(e_date1 < b_date1){
+				   alert("操作起始时间不能大于结束时间！");
+			   return false;
+		}
+
+    	document.forms[0].submit();
+    }
+
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="exportTodaySalesList.html";
+		form1.submit();
+		form1.action="searchTodayList.html";
+	}
+</script>

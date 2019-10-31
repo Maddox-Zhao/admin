@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="clientProductUpdateLogDAO">
+	<typeAlias alias="productUpdateLog" type="com.huaixuan.network.biz.domain.product.ProductUpdateLog"/>
+	 
+	 
+	 <resultMap id="productUpdateLogMap" class="productUpdateLog">
+	 <result column="id" property="id"/>
+	 <result column="idProduct" property="idProduct"/>
+	 <result column="beforSku" property="beforSku"/>
+	 <result column="nowSku" property="nowSku"/>
+	 <result column="beforActivePrice" property="beforActivePrice"/>
+	 <result column="nowActivePrice" property="nowActivePrice"/>
+	 <result column="beforSmPrice" property="beforSmPrice"/>
+	 <result column="nowSmprice" property="nowSmprice" />
+	  <result column="beforType" property="beforType" />
+	 <result column="nowType" property="nowType" />
+	 <result column="beforMaterial" property="beforMaterial"/>
+	 <result column="nowMaterial" property="nowMaterial"/>
+	 <result column="beforColor" property="beforColor"/>
+	 <result column="nowColor" property="nowColor"/>
+	 <result column="beforSize" property="beforSize"/>
+	 <result column="nowSize" property="nowSize"/>
+	 <result column="updateUserId" property="updateUserId"/>
+	 <result column="updateUserName" property="updateUserName"/>
+	 <result column="updateTime" property="updateTime" />
+	 <result column="type" property="type" />
+	 </resultMap>
+	 
+	 
+
+	 
+	  <insert id="addProductUpdateLog" parameterClass="productUpdateLog">
+	  		insert into product_update_log(idProduct,beforSku,nowSku,beforActivePrice,nowActivePrice,beforSmPrice,nowSmprice,beforType,nowType,beforMaterial,nowMaterial,beforColor,nowColor,beforSize,nowSize,type,updateUserId,updateTime)
+	  	                                  value(#idProduct#,#beforSku#,#nowSku#,#beforActivePrice#,#nowActivePrice#,#beforSmPrice#,#nowSmprice#,#beforType#,#nowType#,#beforMaterial#,#nowMaterial#,#beforColor#,#nowColor#,#beforSize#,#nowSize#,#type#,#updateUserId#,sysdate())
+	  </insert>
+ 
+  
+	  <sql id="PRODUCT.UPDATELOG">
+	 	 <isNotEmpty property="idProduct">
+		    and  idProduct= #idProduct#
+		 </isNotEmpty>
+		 <isNotEmpty property="type">
+		    and  pl.type= #type#
+		 </isNotEmpty>
+	</sql>
+	  
+	
+	  <select id="selectProductUpdateLogList" parameterClass="java.util.Map" resultMap="productUpdateLogMap">
+		  	SELECT pl.*,ea.name updateUserName
+			FROM product_update_log pl,emall_admin ea
+			WHERE pl.updateUserId = ea.user_name
+			<include refid="PRODUCT.UPDATELOG"  />
+			ORDER BY updateTime desc
+			<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		     </isNotEmpty>
+		   
+	  </select>
+	  
+ 
+	
+	
+
+	  
+	
+</sqlMap>
+
+

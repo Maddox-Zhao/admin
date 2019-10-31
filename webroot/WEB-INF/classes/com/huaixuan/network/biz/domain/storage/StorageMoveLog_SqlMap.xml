@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="StorageMoveLogSQL">
+<typeAlias alias="storageMoveLog" type="com.huaixuan.network.biz.domain.storage.StorageMoveLog"/>
+	<resultMap class="storageMoveLog" id="storageMoveLogResult">
+		<result column="Id" property="id"/>
+		<result column="move_code" property="moveCode"/>
+		<result column="creater" property="creater"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="old_storage_id" property="oldStorageId"/>
+		<result column="new_storage_id" property="newStorageId"/>
+		<result column="new_dep_id" property="newDepId"/>
+		<result column="new_dep_name" property="depositoryName"/>
+		<result column="new_loc_id" property="newLocId"/>
+		<result column="old_loc_id" property="oldLocId"/>
+		<result column="new_dep_loc_name" property="depLocationName"/>
+		<result column="new_num" property="newNum"/>
+		<result column="move_num" property="moveNum"/>
+		<result column="type" property="type"/>
+		<result column="gmt_return" property="gmtReturn"/>
+		<result column="status" property="status"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="return_num" property="returnNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="memo" property="memo"/>
+	</resultMap>
+	<resultMap class="storageMoveLog" id="storageMoveLogSearch">
+		<result column="Id" property="id"/>
+		<result column="move_code" property="moveCode"/>
+		<result column="creater" property="creater"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="old_storage_id" property="oldStorageId"/>
+		<result column="new_storage_id" property="newStorageId"/>
+		<result column="new_dep_id" property="newDepId"/>
+		<result column="new_dep_name" property="depositoryName"/>
+		<result column="new_loc_id" property="newLocId"/>
+		<result column="new_dep_loc_name" property="depLocationName"/>
+		<result column="old_loc_id" property="oldLocId"/>
+		<result column="move_num" property="moveNum"/>
+		<result column="type" property="type"/>
+		<result column="gmt_return" property="gmtReturn"/>
+		<result column="status" property="status"/>
+		<result column="return_num" property="returnNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+
+		<resultMap class="storageMoveLog" id="storageMoveLogDetailResult">
+		<result column="Id" property="id"/>
+		<result column="move_code" property="moveCode"/>
+		<result column="creater" property="creater"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="old_storage_id" property="oldStorageId"/>
+		<result column="new_storage_id" property="newStorageId"/>
+		<result column="new_dep_id" property="newDepId"/>
+		<result column="new_dep_name" property="depositoryName"/>
+		<result column="new_loc_id" property="newLocId"/>
+		<result column="old_loc_id" property="oldLocId"/>
+		<result column="new_dep_loc_name" property="depLocationName"/>
+		<result column="new_num" property="newNum"/>
+		<result column="move_num" property="moveNum"/>
+		<result column="return_num" property="returnNum"/>
+		<result column="type" property="type"/>
+		<result column="gmt_return" property="gmtReturn"/>
+		<result column="status" property="status"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="attrs" property="attrs"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+
+	<resultMap class="storageMoveLog" id="sumNumResult">
+		<result column="sumMoveNum" property="sumMoveNum" nullValue="0"/>
+		<result column="sumReturnNum" property="sumReturnNum" nullValue="0"/>
+	</resultMap>
+
+<!-- create StorageMoveLog object -->
+<insert id="addStorageMoveLog" parameterClass="storageMoveLog">
+<![CDATA[
+		insert into ioss_storage_move_log
+		(Id,move_code,creater,gmt_create,gmt_modify,old_storage_id,new_storage_id,new_dep_id,new_loc_id,move_num,type,gmt_return,status,dep_first_id,memo )values( #id#,
+		#moveCode#,
+		#creater#,
+		sysdate(),
+		sysdate(),
+		#oldStorageId#,
+		#newStorageId#,
+		#newDepId#,
+		#newLocId#,
+		#moveNum#,
+		#type#,
+		#gmtReturn#,
+		#status#,
+		#depFirstId#,
+		#memo#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update StorageMoveLog object -->
+<update id="editStorageMoveLog" parameterClass="storageMoveLog">
+<![CDATA[
+		update ioss_storage_move_log set
+			creater = #creater#,
+			gmt_modify = sysdate(),
+			old_storage_id = #oldStorageId#,
+			new_storage_id = #newStorageId#,
+			new_dep_id = #newDepId#,
+			new_loc_id = #newLocId#,
+			move_num = #moveNum#,
+			type = #type#,
+			gmt_return = #gmtReturn#,
+			status = #status#,
+			move_code = #moveCode#,
+			return_num = #returnNum#,
+			dep_first_id = #depFirstId#
+		 where Id = #id#
+
+]]>
+</update>
+<!-- delete StorageMoveLog object -->
+<delete id="removeStorageMoveLog" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_storage_move_log where ioss_storage_move_log.ID = #value#
+]]>
+</delete>
+<!-- search StorageMoveLog object -->
+<select id="getStorageMoveLog" parameterClass="java.lang.Long" resultMap="storageMoveLogSearch">
+<![CDATA[
+		select a.*,
+			   (select dep.name from ioss_depository dep where dep.id=a.new_dep_id) as new_dep_name,
+       		   (select dl.loc_name from ioss_dep_location dl where dl.id=a.new_loc_id) as new_dep_loc_name,
+       		   (select loc_id from ioss_storage where id=a.old_storage_id) as old_loc_id
+		from ioss_storage_move_log a
+		where a.ID = #value#
+]]>
+</select>
+
+
+<!-- searchAll StorageMoveLog List -->
+<select id="getStorageMoveLogsByMap" parameterClass="java.util.Map" resultMap="storageMoveLogSearch">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+    select max(a.id) as Id,
+           move_code,
+           max(a.return_num) as return_num,
+           max(a.creater) as creater,
+           max(a.gmt_create) as gmt_create,
+           max(a.gmt_modify) as gmt_modify,
+           max(a.new_storage_id) as new_storage_id,
+           max(a.old_storage_id) as old_storage_id,
+           max(a.new_dep_id) as new_dep_id,
+           max(a.new_loc_id) as new_loc_id,
+           max(a.move_num) as move_num,
+           max(a.type) as type,
+           max(a.gmt_return) as gmt_return,
+           max(a.status) as status,
+           max(dep.name) as new_dep_name,
+           max(dl.loc_name) as new_dep_loc_name,
+           max(st.loc_id) as old_loc_id,
+           max(a.dep_first_id) as dep_first_id
+      from ioss_storage_move_log a,ioss_depository dep,ioss_dep_location dl,ioss_storage st
+     where dep.id = a.new_dep_id and dl.id = a.new_loc_id and st.id = a.old_storage_id
+]]>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			a.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			a.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="moveCode">
+			a.move_code like CONCAT('%',#moveCode#,'%')
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		    a.dep_first_id = #depfirstId#
+		</isNotEmpty>
+		group by a.move_code
+		order by Id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getStorageMoveLogsCountByMap"  parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from (select move_code
+		from ioss_storage_move_log a
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			a.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			a.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="moveCode">
+			a.move_code like CONCAT('%',#moveCode#,'%')
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		    a.dep_first_id = #depfirstId#
+		</isNotEmpty>
+		group by a.move_code)t
+</select>
+
+<select id="getBorrowedMoveLogsCountByMap"  parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1)
+		from ioss_storage_move_log
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="newStorageId">
+			new_storage_id = #newStorageId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="moveCode">
+			move_code like CONCAT('%',#moveCode#,'%')
+		</isNotEmpty>
+</select>
+
+<select id="getStorageMoveLogsByMoveCode" parameterClass="java.util.Map" resultMap="storageMoveLogResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select a.*,c.code,c.instance_name,c.attrs,c.goods_unit,b.storage_num as new_num,
+		       (select s.name from ioss_supplier s where s.id=b.supplier_id) as supplier_name,
+		       (select dep.name from ioss_depository dep where dep.id=a.new_dep_id) as new_dep_name,
+		       (select dl.loc_name from ioss_dep_location dl where dl.id=a.new_loc_id) as new_dep_loc_name,
+		       (select loc_id from ioss_storage where id=a.old_storage_id) as old_loc_id
+		from ioss_storage_move_log a,ioss_storage b,ioss_goods_instance c
+		where b.id=a.new_storage_id and b.goods_instance_id=c.id
+]]>
+		<isNotEmpty prepend="and" property="moveCode">
+			a.move_code = #moveCode#
+		</isNotEmpty>
+		order by a.status
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getStorageMoveLogsCountByMoveCode"  parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1)
+		from ioss_storage_move_log a,ioss_storage b,ioss_goods_instance c
+		where b.id=a.new_storage_id and b.goods_instance_id=c.id
+]]>
+		<isNotEmpty prepend="and" property="moveCode">
+			a.move_code = #moveCode#
+		</isNotEmpty>
+</select>
+
+<select id="sumMoveNumByMap"  parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select sum(move_num)
+		from ioss_storage_move_log
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="moveCode">
+			move_code = #moveCode#
+		</isNotEmpty>
+		group by move_code
+</select>
+
+
+<select id="getMoreDetailByMap" parameterClass="java.util.Map" resultMap="storageMoveLogResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select a.*,c.code,c.instance_name,c.attrs,c.goods_unit,b.storage_num as new_num,
+		       (select s.name from ioss_supplier s where s.id=b.supplier_id) as supplier_name,
+		       (select dep.name from ioss_depository dep where dep.id=a.new_dep_id) as new_dep_name,
+		       (select dl.loc_name from ioss_dep_location dl where dl.id=a.new_loc_id) as new_dep_loc_name,
+		       (select loc_id from ioss_storage where id=a.old_storage_id) as old_loc_id
+		from ioss_storage_move_log a,ioss_storage b,ioss_goods_instance c
+		where b.id=a.new_storage_id and b.goods_instance_id=c.id
+]]>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			a.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			a.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="moveCode">
+			a.move_code like CONCAT('%',#moveCode#,'%')
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId">
+		    a.dep_first_id = #depFirstId#
+		</isNotEmpty>
+		order by a.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+<select id="getMoveOrdersCountByMap"  parameterClass="java.util.Map" resultClass="java.lang.Integer">
+
+<![CDATA[
+		select count(1)
+		from ioss_storage_move_log sm,ioss_storage t,ioss_goods_instance gi
+		where 1=1 and sm.new_storage_id=t.id and t.goods_instance_id=gi.id
+]]>
+        <isNotEmpty prepend="and" property="code">
+			gi.code like CONCAT('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			gi.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="gmtCreateStart">
+          <![CDATA[ sm.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+         <![CDATA[ sm.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			sm.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			sm.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			sm.type = #type#
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			sm.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		    sm.dep_first_id = #depfirstId#
+		</isNotEmpty>
+</select>
+
+<select id="getMoveOrdersDetailByMap"  parameterClass="java.util.Map" resultMap="storageMoveLogDetailResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select sm.*,
+	       gi.code,
+	       gi.instance_name,
+	       gi.attrs,
+	       t.storage_num as new_num,
+	       (select dep.name
+	          from ioss_depository dep
+	         where dep.id = sm.new_dep_id) as new_dep_name,
+	       (select dl.loc_name
+	          from ioss_dep_location dl
+	         where dl.id = sm.new_loc_id) as new_dep_loc_name,
+	       (select dl.loc_name
+	          from ioss_dep_location dl
+	         where dl.id = sm.new_loc_id) as old_dep_loc_name,
+	       (select loc_id from ioss_storage where id = sm.old_storage_id) as old_loc_id
+	  from ioss_storage_move_log sm, ioss_storage t, ioss_goods_instance gi
+	 where 1 = 1
+	   and sm.new_storage_id = t.id
+	   and t.goods_instance_id = gi.id
+]]>
+        <isNotEmpty prepend="and" property="code">
+			gi.code like CONCAT('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			gi.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="gmtCreateStart">
+          <![CDATA[ sm.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+         <![CDATA[ sm.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			sm.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			sm.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			sm.type = #type#
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			sm.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		    sm.dep_first_id = #depfirstId#
+		</isNotEmpty>
+	    order by sm.gmt_create desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getSumNumByMap"  parameterClass="java.util.Map" resultMap="sumNumResult">
+<![CDATA[
+		select sum(sm.move_num) as sumMoveNum, sum(sm.return_num) as sumReturnNum
+		  from ioss_storage_move_log sm, ioss_storage t, ioss_goods_instance gi
+		 where 1 = 1
+		   and sm.new_storage_id = t.id
+		   and t.goods_instance_id = gi.id
+]]>
+      <isNotEmpty prepend="and" property="code">
+			gi.code like CONCAT('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			gi.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="gmtCreateStart">
+          <![CDATA[ sm.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+         <![CDATA[ sm.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			sm.new_dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			sm.new_loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			sm.type = #type#
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			sm.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		    sm.dep_first_id = #depfirstId#
+		</isNotEmpty>
+</select>
+
+</sqlMap>

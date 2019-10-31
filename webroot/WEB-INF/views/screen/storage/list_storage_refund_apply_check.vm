@@ -1,0 +1,93 @@
+#set($layout = "layout/default.vm")
+
+#if($!errorInfo && $!errorInfo == 'error')
+      <div class="warning">审核失败！</div>
+#end
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<form  name="form1" action="" method="post">
+	<div class="searchBox">
+		<h3><span>库存退货申请单审核 </span></h3>
+		<table>
+    		<tr>
+    		  <th>供应商：</th>
+    		  <td>$!{storageRefundApply.supplierName}</td>
+    		  <th>仓库名称：</th>
+    		  <td>$!{storageRefundApply.depositoryName}</td>
+    		  <th>库位：</th>
+    		  <td>$!{storageRefundApply.depLocationName}</td>
+    		</tr>
+
+    	</table>
+	</div>
+	<div class="listBox" id="listDiv">
+		<h3><span>库存退货产品列表</span></h3>
+		<table  id="listTable" name="listTable">
+			<tr>
+				<th>产品编码</th>
+		        <th>产品名称</th>
+		        <th>批次</th>
+		        <th>库存类型</th>
+				<th>库存数量</th>
+		        <th>退货数量</th>
+				<th>成本均价</th>
+				<th>应收金额</th>
+				<th>实收金额</th>
+				<th>退货原因</th>
+				<th>备注</th>
+			</tr>
+			#if($storageRefundApplyList)
+				#foreach($obj in $storageRefundApplyList)
+	    		<tr #if($velocityCount%2==0) class="bg" #end>
+					<td>&nbsp;$!{obj.code}
+						<input type="hidden" name="id" id="id_$velocityCount" value="$!obj.storageId"/>
+					</td>
+	      			<td>&nbsp;$!obj.instanceName
+						<input type="hidden" name="locId" id="locId_$velocityCount" value="$!obj.locId"/>
+					</td>
+	      			<td>&nbsp;$!obj.batchNum
+						<input type="hidden" name="batchNum" id="batchNum_$velocityCount" value="$!obj.batchNum"/>
+					</td>
+					<td align="center">&nbsp;$!storTypeMap.get($!obj.storType)</td>
+					<td>&nbsp;$!obj.storageNum
+						<input type="hidden" name="storageNum" id="storageNum_$velocityCount" value="${obj.storageNum}" />
+					</td>
+					<td>&nbsp;$!obj.refundNum</td>
+					<td>&nbsp;￥$!moneyUtil.getFormatMoney($!obj.refPrice,'0.00')</td>
+	      			<td>&nbsp;￥$!moneyUtil.getFormatMoney($!obj.dueFee,'0.00')</td>
+					<td>&nbsp;￥$!moneyUtil.getFormatMoney($!obj.factFee,'0.00')</td>
+					<td align="center">$!enumShoppingRefundReason.get("$obj.reason")</td>
+					<td>$!obj.memo</td>
+				</tr>
+		  		#end
+			#end
+	    </table>
+		#if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0)
+	  		没有记录！
+		#end
+ </div>
+
+<div align="center">
+	#if($storageRefundApplyList)
+    <input type="button" class="btn" name="finish" value="审核通过" #if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0) disabled="false" #else onclick="javascript:refundSuccess('$!relationNum');" #end/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="button" class="btn" name="close" value="修改申请单" #if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0) disabled="false" #else onclick="javascript:refundFail('$!relationNum');" #end/>
+	#end
+ </div>
+</form>
+<script language="javascript" type="text/javascript">
+function refundSuccess(relationNum){
+    if(confirm("确认审核通过？")){
+		document.forms[0].action = "refundApplySuccess.html?applyRelationNum="+relationNum;
+		document.forms[0].submit();
+	}
+}
+
+function refundFail(relationNum){
+    if(confirm("确认修改信息并返回？")){
+		document.forms[0].action = "detail_storage_refund_apply.html?flag=edit&applyRelationNum="+relationNum;
+		document.forms[0].submit();
+	}
+}
+</script>
+</div>

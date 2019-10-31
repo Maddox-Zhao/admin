@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="OutDepositorySQL">
+	<typeAlias alias="outDepository"
+		type="com.huaixuan.network.biz.domain.storage.OutDepository" />
+	<resultMap class="outDepository" id="outDepositoryResult">
+		<result column="id" property="id"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="type" property="type"/>
+		<result column="creater" property="creater"/>
+		<result column="modifier" property="modifier"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="status" property="status"/>
+		<result column="gmt_out_dep" property="gmtOutDep"/>
+		<result column="express_code" property="expressCode"/>
+		<result column="remark" property="remark"/>
+		<result column="finance_status" property="financeStatus"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+		<result column="handle_admin_id" property="handleAdminId"/>
+	</resultMap>
+	<resultMap class="outDepository" id="outDepositoryResultDetail">
+		<result column="good_code" property="goodCode" />
+		<result column="instance_name" property="instanceName" />
+		<result column="amount" property="amount" />
+		<result column="type" property="type" />
+		<result column="gmt_out_dep" property="gmtOutDep" />
+		<result column="attrs" property="attrs" />
+		<result column="bill_num" property="billNum" />
+		<result column="id" property="id" />
+		<result column="left_num" property="leftNum" nullValue="0" />
+		<result column="relation_num" property="relationNum" />
+		<result column="remark" property="remark" />
+		<result column="finance_status" property="financeStatus" />
+		<result column="dep_first_id" property="depFirstId" />
+		<result column="left_dep_num" property="leftDepNum" nullValue="0" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+	<resultMap id="outDepositoryResult2" class="outDepository"
+		extends="outDepositoryResult">
+		<result column="expressName" property="expressName" />
+		<result column="receiver" property="receiver" />
+	</resultMap>
+	<resultMap id="outDepositoryResult3" class="outDepository"
+		extends="outDepositoryResult">
+		<result column="is_out_depository_printed" property="isOutDepositoryPrinted" />
+		<result column="is_express_printed" property="isExpressPrinted" />
+	</resultMap>
+	<resultMap id="outDepositoryResult4" class="outDepository">
+		<result column="express_code" property="expressCode"/>
+		<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="type" property="type"/>
+		<result column="gmt_out_dep" property="gmtOutDep"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="express_id" property="expressId" />
+		<result column="actual_inventory" property="actualInventory" />
+		<result column="actual_weight" property="actualWeight" />
+		<result column="cast_weight" property="castWeight" />
+		<result column="goods_weight" property="goodsWeight" />
+	</resultMap>
+	<resultMap class="outDepository" id="outDepositoryTypesResult">
+		<result column="type" property="type" />
+	</resultMap>
+	<!-- create OutDepository object -->
+	<insert id="addOutDepository" parameterClass="outDepository">
+		insert into ioss_out_depository
+		(id,
+		bill_num,
+		type,
+		creater,
+		gmt_create,
+		gmt_modify,
+		relation_num,
+		status,
+		gmt_out_dep,
+		finance_status,
+		dep_first_id,
+		<isNotEmpty prepend="" property="isWholesale">
+			is_wholesale,
+	   </isNotEmpty>
+		tid)
+		values
+		(null,
+		#billNum#,
+		#type#,
+		#creater#,
+		sysdate(),
+		sysdate(),
+		#relationNum#,
+		#status#,
+		#gmtOutDep#,
+		'n',
+		#depFirstId#,
+		<isNotEmpty prepend="" property="isWholesale">
+			#isWholesale#,
+	   </isNotEmpty>
+		#tid#)
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update OutDepository object -->
+	<update id="editOutDepository" parameterClass="outDepository">
+<![CDATA[
+		update ioss_out_depository set bill_num = #billNum#,
+		type = #type#,
+		creater = #creater#,
+		modifier = #modifier#,
+		gmt_create = sysdate(),
+		relation_num = #relationNum#,
+		status = #status#,
+		remark = #remark#,
+		finance_status=#financeStatus#,
+		dep_first_id=#depFirstId#
+		 where id = #id#
+
+]]>
+	</update>
+	<!-- delete OutDepository object -->
+	<delete id="removeOutDepository" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_out_depository where ioss_out_depository.ID = #value#
+]]>
+	</delete>
+	<!-- search OutDepository object modifyied by chenhang 2011/01/18 strated -->
+	<select id="getOutDepository" parameterClass="java.lang.Long"
+		resultMap="outDepositoryResult2">
+<![CDATA[
+select o.*,
+       c.receiver as receiver,
+       (select e.express_name
+          from ioss_express e
+         where e.id = (select t.express_id
+                         from emall_trade t, emall_trade_package p
+                        where t.tid = p.tid
+                          and p.merge_tid = o.relation_num
+                          LIMIT 1)
+           LIMIT 1) expressName
+  from (ioss_out_depository o left
+        join(emall_trade c left join emall_refund d on c.tid = d.tid) on
+        o.relation_num = d.refund_id)
+  where o.ID = #value#
+]]>
+	</select>
+	<!--modifyied by chenhang 2011/01/18 ended -->
+	<!-- searchAll OutDepository List -->
+	<select id="getOutDepositorys" resultMap="outDepositoryResult">
+<![CDATA[
+		select ioss_out_depository.* from ioss_out_depository
+]]>
+	</select>
+
+	<select id="getOutDepositoryByParams" parameterClass="java.util.Map"
+		resultMap="outDepositoryResult">
+<![CDATA[
+		select ioss_out_depository.* from ioss_out_depository where 1=1
+]]>
+		<isNotEmpty prepend="and" property="relationNum">
+			relation_num in
+			(select tp.merge_tid from emall_trade_package tp
+			where
+			tp.tid=#relationNum#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+	</select>
+
+	<!-- modified by chenhang 2010/11/17 started -->
+	<select id="getOutDepositoryListsCount" resultClass="int">
+<![CDATA[
+select count(a.id)
+      from (ioss_out_depository a left join
+            (select p.merge_tid
+               from emall_trade b, emall_trade_package p
+              where b.tid = p.tid group by p.merge_tid) pp on a.relation_num = pp.merge_tid)
+      left join(emall_trade c
+      left join emall_refund d on c.tid = d.tid) on a.relation_num = d.refund_id
+     where 1 = 1
+     ]]>
+		<isNotEmpty prepend="and" property="expressId">
+			(pp.merge_tid in
+			(select k.merge_tid
+			from emall_trade t, emall_trade_package k
+			where
+			t.tid = k.tid
+			and
+			t.express_id = #expressId#
+			)
+			or c.express_id =
+			#expressId#
+			)</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			a.express_code like
+			CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isOutDepositoryPrinted">
+			a.is_out_depository_printed = #isOutDepositoryPrinted#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isExpressPrinted">
+			a.is_express_printed =
+			#isExpressPrinted#
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 started -->
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like
+			UPPER(CONCAT(#billNum#,'%'))
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 ended -->
+		<isNotEmpty prepend="and" property="types">
+			a.type in(
+			<iterate property="types" conjunction=",">#types[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			a.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			a.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			a.relation_num in (
+			select merge_tid from (select wmsys.wm_concat(merge_tid) as merge_tid
+			from
+			emall_trade_package where tid like CONCAT(#relationNum#,'%')
+			group by tid
+			union all
+			select #relationNum# as merge_tid from
+			dual)where 1=1 LIMIT 1)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#
+			</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			a.dep_first_id =
+			#depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="handleAdminId">
+			<isEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id is null
+			</isEqual>
+			<isNotEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id=#handleAdminId#
+			</isNotEqual>
+		</isNotEmpty>
+	</select>
+	<!-- modified by chenhang 2010/11/17 ended -->
+
+	<select id="getOutDepositoryLists" resultMap="outDepositoryResult3">
+		<include refid="pageSQLHead" />
+<![CDATA[
+ select a.id,a.bill_num,a.type,a.creater,a.modifier,a.gmt_create,a.gmt_modify,a.relation_num,
+ a.status,a.gmt_out_dep,a.express_code,a.remark,a.finance_status,a.dep_first_id,a.is_wholesale,a.is_out_depository_printed,a.is_express_printed,a.tid,a.handle_admin_id
+      from (ioss_out_depository a left join
+            (select p.merge_tid
+               from emall_trade b, emall_trade_package p
+              where b.tid = p.tid group by p.merge_tid) pp on a.relation_num = pp.merge_tid)
+      left join(emall_trade c
+      left join emall_refund d on c.tid = d.tid) on a.relation_num = d.refund_id
+     where 1 = 1
+     ]]>
+		<isNotEmpty prepend="and" property="expressId">
+			(pp.merge_tid in
+			(select k.merge_tid
+			from emall_trade t, emall_trade_package k
+			where
+			t.tid = k.tid
+			and
+			t.express_id = #expressId#
+			)
+			or c.express_id =
+			#expressId#
+			)</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			a.express_code like
+			CONCAT('%',#expressCode#,'%')
+			</isNotEmpty>
+		<isNotEmpty prepend="and" property="isOutDepositoryPrinted">
+			a.is_out_depository_printed = #isOutDepositoryPrinted#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isExpressPrinted">
+			a.is_express_printed =
+			#isExpressPrinted#
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 started -->
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like
+			UPPER(CONCAT(#billNum#,'%'))
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 ended -->
+		<isNotEmpty prepend="and" property="types">
+			a.type in(
+			<iterate property="types" conjunction=",">#types[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			a.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			a.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			a.relation_num in (
+			select merge_tid from (select wmsys.wm_concat(merge_tid) as merge_tid
+			from
+			emall_trade_package where tid like CONCAT(#relationNum#,'%')
+			group by tid
+			union all
+			select #relationNum# as merge_tid from
+			dual)where 1=1 LIMIT 1)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#
+			</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			a.dep_first_id =
+			#depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="handleAdminId">
+			<isEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id is null
+			</isEqual>
+			<isNotEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id=#handleAdminId#
+			</isNotEqual>
+		</isNotEmpty>
+		order by a.bill_num desc,a.id desc
+		<include refid="pageSQLFoot" />
+	</select>
+
+
+	<select id="getActualInventoryListsCount" resultClass="int">
+<![CDATA[
+select count(a.id)
+from ((ioss_out_depository a left join
+        (select p.merge_tid as tid,
+                  max(t.express_id) as express_id,
+                  max(t.actual_inventory) as actual_inventory
+             from emall_trade t, emall_trade_package p
+            where t.tid = p.tid
+            group by p.merge_tid) b on a.relation_num = b.tid)
+         left
+        join((emall_trade c left join emall_refund d on c.tid = d.tid) left join
+             (select e.tid as tid,
+                     sum(e.goods_number * e.good_weight) as weight
+                from emall_order e
+               group by e.tid) y on d.tid = y.tid) on
+        a.relation_num = d.refund_id)
+ where 1 = 1
+ ]]>
+		<isNotEmpty prepend="and" property="expressId">
+			(b.express_id =
+			#expressId# or c.express_id = #expressId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressCode">
+			a.express_code like
+			CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			(b.tid like
+			CONCAT('%',#tid#,'%') or c.tid like CONCAT('%',#tid#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isOutDepositoryPrinted">
+			a.is_out_depository_printed = #isOutDepositoryPrinted#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isExpressPrinted">
+			a.is_express_printed =
+			#isExpressPrinted#
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 started -->
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like
+			UPPER(CONCAT(#billNum#,'%'))
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 ended -->
+		<isNotEmpty prepend="and" property="types">
+			a.type in(
+			<iterate property="types" conjunction=",">#types[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			a.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			a.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			a.relation_num in
+			(select tp.merge_tid from emall_trade_package tp where tp.tid like
+			CONCAT(#relationNum#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#
+			</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			a.dep_first_id =
+			#depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="handleAdminId">
+			<isEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id is null
+			</isEqual>
+			<isNotEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id=#handleAdminId#
+			</isNotEqual>
+		</isNotEmpty>
+</select>
+<!-- modified by chenhang 2010/11/17 ended -->
+
+	<select id="getActualInventoryLists" resultMap="outDepositoryResult4">
+		<include refid="pageSQLHead" />
+<![CDATA[
+select a.gmt_out_dep,a.bill_num,a.type,a.relation_num,a.cast_weight,a.tid,a.actual_weight,a.id,a.express_code,
+       decode(c.express_id, '', b.express_id, c.express_id) as express_id,
+       decode(d.actual_inventory,
+              '',
+              b.actual_inventory,
+              d.actual_inventory) as actual_inventory,
+        y.weight as goods_weight
+  from ((ioss_out_depository a left join
+        (select p.merge_tid as tid,
+                  max(t.express_id) as express_id,
+                  max(t.actual_inventory) as actual_inventory
+             from emall_trade t, emall_trade_package p
+            where t.tid = p.tid
+            group by p.merge_tid) b on a.relation_num = b.tid)
+         left
+        join((emall_trade c left join emall_refund d on c.tid = d.tid) left join
+             (select e.tid as tid,
+                     sum(e.goods_number * e.good_weight) as weight
+                from emall_order e
+               group by e.tid) y on d.tid = y.tid) on
+        a.relation_num = d.refund_id)
+ where 1 = 1
+ ]]>
+		<isNotEmpty prepend="and" property="expressCode">
+			a.express_code like
+			CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			(b.tid like
+			CONCAT('%',#tid#,'%') or c.tid like CONCAT('%',#tid#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressId">
+			(b.express_id =
+			#expressId# or c.express_id = #expressId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isOutDepositoryPrinted">
+			a.is_out_depository_printed = #isOutDepositoryPrinted#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isExpressPrinted">
+			a.is_express_printed =
+			#isExpressPrinted#
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 started -->
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like
+			UPPER(CONCAT(#billNum#,'%'))
+		</isNotEmpty>
+		<!-- modified by chenhang 2011/01/04 ended -->
+		<isNotEmpty prepend="and" property="types">
+			a.type in(
+			<iterate property="types" conjunction=",">#types[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			a.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			a.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			a.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			a.relation_num in
+			(select tp.merge_tid from emall_trade_package tp where tp.tid like
+			CONCAT(#relationNum#,'%'))
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			a.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#
+			</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			a.dep_first_id =
+			#depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="handleAdminId">
+			<isEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id is null
+			</isEqual>
+			<isNotEqual property="handleAdminId" compareValue="-99">
+		  		handle_admin_id=#handleAdminId#
+			</isNotEqual>
+		</isNotEmpty>
+		order by a.bill_num desc,a.id desc
+		<include refid="pageSQLFoot" />
+	</select>
+
+	<update id="updateIsOutDepositoryPrintedById" parameterClass="java.util.Map">
+		update ioss_out_depository set is_out_depository_printed = 'y' where
+		<isNotEmpty property="ids">
+			id in(
+			<iterate property="ids" conjunction=",">
+				#ids[]#
+         </iterate>
+			)
+		</isNotEmpty>
+	</update>
+
+	<update id="updateIsExpressPrintedById" parameterClass="java.util.Map">
+		update ioss_out_depository set is_express_printed = 'y' where
+		<isNotEmpty property="ids">
+			id in(
+			<iterate property="ids" conjunction=",">
+				#ids[]#
+         </iterate>
+			)
+		</isNotEmpty>
+	</update>
+
+	<update id="updateOutDepositoryStatusById" parameterClass="java.util.Map">
+<![CDATA[
+		update ioss_out_depository set gmt_modify = sysdate(),
+
+		status = #status#,modifier = #modifier#,
+		gmt_out_dep = #gmtOutDep#
+		 where id = #id#
+]]>
+	</update>
+
+	<update id="updateByMap" parameterClass="java.util.Map">
+		update ioss_out_depository set gmt_modify = sysdate()
+		<isNotEmpty prepend="," property="actualWeight">
+			actual_weight =
+			#actualWeight#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="castWeight">
+			cast_weight = #castWeight#
+		</isNotEmpty>
+		where id = #id#
+	</update>
+
+	<select id="getOutDepositoryStatusByDetailId" parameterClass="java.lang.Long"
+		resultClass="java.lang.String">
+		select iodd.status
+		from ioss_out_depository iodd,
+		ioss_out_detail iod
+		where iodd.id = iod.out_depository_id and
+		iod.id=#outDetailId#
+</select>
+
+	<update id="updateExpressCodeById" parameterClass="java.util.Map">
+		update
+		ioss_out_depository set gmt_modify =
+		sysdate(),express_code=#expressCode# where id=#id#
+</update>
+
+	<select id="getOutDepositorysWithDetail" resultMap="outDepositoryResultDetail"
+		parameterClass="java.util.Map">
+ <![CDATA[
+   select gi.code as good_code,
+          gi.instance_name,
+          gi.attrs,
+          ode.out_num as amount,
+          ode.left_num,
+          od.type,
+          od.gmt_out_dep,
+          od.bill_num,
+          od.id,
+          od.relation_num,
+          od.remark,
+          od.finance_status,
+          od.dep_first_id,
+          ode.left_dep_num,
+          ode.gmt_modify
+     from ioss_out_depository od,
+          ioss_out_detail     ode,
+          ioss_goods_instance gi
+    where od.id = ode.out_depository_id
+      and gi.id = ode.goods_instance_id
+      and od.gmt_out_dep is not null
+      and od.status = 'out_finished'
+ ]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			gi.instance_name like
+			concat('%',#instanceName#,'%')
+    </isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			od.gmt_out_dep >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			od.gmt_out_dep < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type3">
+			od.type=#type3#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outs">
+			od.type in(
+			<iterate property="outs" conjunction=",">
+				#outs[]#
+         </iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="code">
+			gi.code like
+			concat('%',#code#,'%')
+	</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			od.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#
+			</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			od.dep_first_id =
+			#depfirstId#
+	</isNotEmpty>
+		order by od.gmt_out_dep
+	</select>
+
+	<select id="getOutDepositorysWithDetailCount" resultClass="java.lang.Integer">
+ <![CDATA[
+  select count(*) from ioss_out_depository od,ioss_out_detail ode,ioss_goods_instance gi
+  where od.id=ode.out_depository_id and gi.id=ode.goods_instance_id and od.gmt_out_dep is not null and od.status='out_finished'
+ ]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			gi.instance_name like
+			concat('%',#instanceName#,'%')
+    </isNotEmpty>
+		order by od.gmt_out_dep
+	</select>
+
+	<select id="getOutDepositoryByTid" resultMap="outDepositoryResult"
+		parameterClass="string">
+		select t.*
+		from ioss_out_depository t, emall_trade s,
+		emall_trade_package p
+		where t.relation_num = p.merge_tid
+		and s.tid =
+		p.tid
+		and s.tid = #value#
+</select>
+
+	<select id="getOutDepositoryByDetailId" parameterClass="java.lang.Long"
+		resultMap="outDepositoryResult">
+    <![CDATA[
+       select a.* from ioss_out_depository a,ioss_out_detail b where a.id = b.out_depository_id and b.id = #value#
+    ]]>
+	</select>
+
+	<select id="getOutDepositoryByExpressCode" resultMap="outDepositoryResult"
+		parameterClass="java.util.Map">
+ <![CDATA[
+   select ioss_out_depository.*
+     from ioss_out_depository od
+     where 1=1
+ ]]>
+		<isNotEmpty prepend="and" property="expressCode">
+      <![CDATA[ od.expressCode = #expressCode# ]]>
+	</isNotEmpty>
+</select>
+<update id="updateHandleAdminIdByUser" parameterClass="java.util.Map">
+	UPDATE ioss_out_depository
+	   SET handle_admin_id = #handleAdminId#, gmt_modify = sysdate()
+	 WHERE handle_admin_id is null
+	   AND id = #outDepositoryId#
+</update>
+</sqlMap>

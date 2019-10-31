@@ -1,0 +1,249 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 查看盘存商品明细")
+
+#if($!message)
+<div class="warning_min" id="massage">$!message</div>
+#end
+
+<div class="main">
+	<div id="print">
+		<h3><span>管理中心 - 查看盘存商品明细</span></h3>
+		<div class="searchBox">
+		<form action="/storage/detail_storage_check.html" name="searchForm" method="post">
+			#springBind("storageCheckQuery.goodsInstanceId")
+			<input  type="hidden" id="goodsInstanceId" name="${status.expression}" value="$!{status.value}" />
+            <input  type="hidden" name="checkId" value="$!checkId" />
+			<table>
+				<tr>
+                    <th>产品名称：</th>
+					<td>
+						#springBind("storageCheckQuery.goodsInstanceName")
+						<input type="text" id="goodsInstanceName" name="${status.expression}" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()" class="inp"/>
+                    </td>
+                	<th>产品编码：</th>
+					<td>
+						#springBind("storageCheckQuery.goodsInstanceCode")
+						<input type="text" id="goodsInstanceCode" name="${status.expression}" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()" class="inp"/>
+                    </td>
+                	<th>盘点类型：</th>
+					<td>
+						#springBind("storageCheckQuery.storType")
+						<select id="storType" name="${status.expression}" value="$!{status.value}" class="inp">
+                    		<option value="">-=请选择=-</option>
+                    		<option value="y" #if("y"==$!status.value)selected#end>盘点生溢</option>
+                    		<option value="k" #if("k"==$!status.value)selected#end>盘点亏损</option>
+                    	</select>
+                    </td>
+                	<th>状态：</th>
+					<td>
+						#springBind("storageCheckQuery.status")
+						<select id="status" name="${status.expression}" value="$!{status.value}">
+    						<option value="" #if($!status.value=="")selected#end>-=请选择=-</option>
+                    		<option value="s" #if($!status.value=="s")selected#end>未盘点</option>
+                    	</select>
+                    </td>
+					<th>
+						<input name="chaxun" value=" 查询 " class="btn" type="submit" />
+                    </th>
+					<td>
+						<input name="reset" value=" 重置 " class="btn"  type="button" onclick="clearSearch();" />
+                    </td>
+				</tr>
+			</table>
+		</form>
+		</div>
+<!-- 功能列表 -->
+	<div class="tool">
+		<span><a href="$appServer.get('/storage/list_storage_check.html')" hidefocus="true" class="bt_wu">库存盘点查询</a></span>
+        <span><a href="$appServer/storage/view_storage_check.html?checkId=$!checkId" hidefocus="true" class="bt_wu">盘点列表</a></span>
+		<span><a href="javascript:preview();" hidefocus="true" class="bt_wu">盘点明细打印</a></span>
+		#if("f"=="$!storageCheck.status")
+		<span><a href="javascript:moreResult();" hidefocus="true" class="bt_wu">盘盈单打印</a></span>
+		<span><a href="javascript:lessResult();" hidefocus="true" class="bt_wu">盘亏单打印</a></span>
+		#end
+    </div>
+<!-- 订单列表 -->
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable">
+      <tr>
+		<th>库位</th>
+		<th>产品编码</th>
+        <th>产品名称</th>
+		<th>属性</th>
+		<th>供应商</th>
+		<th>批次</th>
+		<th>库存类型</th>
+        <th>库存数量</th>
+        <th>盘点数量</th>
+		#if("f"=="$!storageCheck.status")
+			<th>盈亏</th>
+		#end
+        <th>备注</th>
+
+      </tr>
+	#if($query && $query.items.size()>0)
+	  #foreach($obj in $query.items)
+	  <tr>
+		 <td>$!obj.locName</td>
+		 <td>$!obj.code</td>
+		 <td>$!obj.goodsInstanceName</td>
+		 <td>$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attribute),20)</td>
+		 <td>$!obj.supplierName</td>
+		 <td>$!obj.batchNum</td>
+		 <td>&nbsp;$!storTypeMap.get($!obj.storType)</td>
+		 <td>$!obj.storNumber</td>
+		 #if("d"=="$!storageCheck.status")
+		 <td  >
+			<span id='store_check_detail_$!obj.id'>
+    			<input type="text" name="newCheckNum" value="$!obj.checkNum" id="newCheckNum_$!obj.id"  title="盘存数量" onclick="clearDisplayInfo($!obj.id);" onchange="editCheckNum('$!obj.id','$!obj.checkNum');" size="5" />
+    			<div class="success_min" id="modifySuccess_$!obj.id" style="display:none">修改成功</div>
+    	        <div class="warning_min" id="modifyError_$!obj.id" style="display:none">修改失败</div>
+			</span>
+		 </td>
+		 <td>
+			<span id='store_check_remark_$!obj.id'>
+				<textarea name="newCheckRemark" id="newCheckRemark_$!obj.id" onclick="clearDisplayInfo($!obj.id);" onchange="editCheckRemark('$!obj.id','$!obj.remark');">$!obj.remark</textarea>
+			</span>
+		 </td>
+		 #else
+			<td>$!obj.checkNum</td>
+			#if("f"=="$!storageCheck.status")
+			<td>#if("y"==$!obj.storType)盈
+				#elseif("k"==$!obj.storType)亏
+			    #end
+				$!obj.profitNum
+		    </td>
+			#end
+			<td style="word-break:break-all" width="150">&nbsp;$!obj.remark</td>
+		 #end
+	  </tr>
+	  #end
+	#end
+    </table>
+  </div>
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/detail_storage_check.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+	#if("d"=="$!storageCheck.status")
+	<div class="formBox">
+    <div class="content" align="center">
+     <form action="finishStoreCheck.html" name="finishForm" method="post">
+       <input  type="hidden" name="checkId"  value="$!storageCheck.id" />
+       <input name="finish" value="完成盘点" class="btn" type="button" onclick="javascript:finishCheck()"/>
+          <script language="javascript" type="text/javascript">
+        function finishCheck(){
+        		var answer = confirm("确定要完成盘点?")
+        		if (answer){
+        			document.finishForm.submit();
+        		}
+
+        		}
+		</script>
+	 </form>
+    </div>
+	</div>
+  #end
+  </div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+
+	function clearDisplayInfo(goodsId){
+		var msgDiv=document.getElementById('modifySuccess_' + goodsId);
+		var msgDiv2=document.getElementById('modifyError_' + goodsId);
+		msgDiv.style.display="none";
+		msgDiv2.style.display="none";
+	}
+	//DWR的方式更新盘存信息
+	function editCheckNum(goodsId,oldValue){
+
+		var newTradeAmount=document.getElementById('newCheckNum_' + goodsId);
+		var newTradeAmountValue=newTradeAmount.value;
+		var msgDiv=document.getElementById('modifySuccess_' + goodsId);
+		var msgDiv2=document.getElementById('modifyError_' + goodsId);
+		if(newTradeAmountValue==null||newTradeAmountValue.trim()==""){
+			alert("出错：您没有输入.");
+			newTradeAmount.value=oldValue;
+			newTradeAmount.select();
+            newTradeAmount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(!isNumber(newTradeAmountValue)){
+			alert("出错：请输入整数.");
+			newTradeAmount.value=oldValue;
+			newTradeAmount.select();
+            newTradeAmount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+
+		else{
+			jQuery.get('$appServer/storage/editDwrCheckNumDetail.html',{param1:goodsId,param2:newTradeAmountValue},function(message){callBackEditCode(message,newTradeAmount,goodsId);});
+		}
+	}
+
+		function editCheckRemark(goodsId,oldValue){
+
+		var newTradeAmount=document.getElementById('newCheckRemark_' + goodsId);
+		var newTradeAmountValue=newTradeAmount.value;
+		var msgDiv=document.getElementById('modifySuccess_' + goodsId);
+		var msgDiv2=document.getElementById('modifyError_' + goodsId);
+
+		jQuery.get('$appServer/storage/editDwrCheckRemarkDetail.html',{param1:goodsId,param2:newTradeAmountValue},function(message){callBackEditCode(message,newTradeAmount,goodsId);});
+	}
+	function callBackEditCode(msg,newTradeAmount,goodsId){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValue = msg.substring(msg.indexOf("\',\'") + 3, msg
+						.lastIndexOf("\']"));
+		var msgDiv=document.getElementById('modifySuccess_' + goodsId);
+		var msgDiv2=document.getElementById('modifyError_' + goodsId);
+		if (msgType == 'true') {
+			msgDiv2.style.display="none";
+			msgDiv.style.display="";
+		} else{
+			alert("修改失败!"+msgValue);
+			msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+	}
+
+	function clearSearch(){
+        document.getElementById('goodsInstanceId').value='';
+        document.getElementById('goodsInstanceName').value='';
+        document.getElementById('storType').value='';
+        document.getElementById('status').value='';
+        document.getElementById('goodsInstanceCode').value='';
+    }
+
+	function preview(){
+		window.showModalDialog("$appServer/storage/detail_storage_check.html?checkId=$!checkId&isPrint=true",null,"dialogWidth:1000px;help:no;status:no");
+	}
+		function moreResult(){
+		window.showModalDialog("$appServer/storage/detail_storage_check.html?checkId=$!checkId&storType=y&isPrint=true",null,"dialogWidth:1000px;help:no;status:no");
+	}
+			function lessResult(){
+		window.showModalDialog("$appServer/storage/detail_storage_check.html?checkId=$!checkId&storType=k&isPrint=true",null,"dialogWidth:1000px;help:no;status:no");
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^\d+$/;
+	  return reg.test(val);
+	}
+
+	function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00'
+              : ( (mnt*10 == Math.floor(mnt*10)) ?
+                       mnt + '0' : mnt);
+	}
+</script>
+</div>

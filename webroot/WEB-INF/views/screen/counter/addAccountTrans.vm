@@ -1,0 +1,222 @@
+#set($layout = 'layout\default.vm')
+#set($title = "财务管理 - 帐务补帐")
+<div class="main">
+
+<h2>帐务补帐</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>帐务补帐</span></h3>
+		   <form name="listForm" action="doTransApp.html" method="post">
+<script type="text/javascript">
+ String.prototype.trim = function() {
+   return this.replace(/(^\s*)|(\s*$)/g, "");
+ }
+
+
+function showTipMsg(msg,isError){
+	var msgDiv = document.getElementById("msgDiv");
+	msgArr = msg.split("$$");
+	if(msgDiv){
+		if(isError){
+			var showMsg = "<font color='red'>◆提醒：</font>";
+			for(var i=0;i<msgArr.length;i++){
+				showMsg += "<br><font color='red'>　"+msgArr[i]+"</font>"
+			}
+		}else{
+			var showMsg = "<font color='blue'>◆提醒：</font>";
+			for(var i=0;i<msgArr.length;i++){
+				showMsg += "<br><font color='blue'>　"+msgArr[i]+"</font>"
+			}
+		}
+		msgDiv.innerHTML=showMsg;
+	}
+}
+
+function showAddAccountTransCondition(){
+   if (request.readyState == 4) {
+       if (request.status == 200) {
+          var conditionDiv = document.getElementById("searchCondition");
+          if(conditionDiv){
+              conditionDiv.innerHTML = request.responseText;
+          }
+		  if(listForm.all("accTransReq.transDate")){
+		      Calendar.setup({
+			      inputField : "accTransReq.transDate",
+			      ifFormat   : "%Y-%m-%d",
+			      align      : "BR"
+			  });
+		  }
+		  if(listForm.all("accTransReq.outDate")){
+		      Calendar.setup({
+			      inputField : "accTransReq.outDate",
+			      ifFormat   : "%Y-%m-%d",
+			      align      : "BR"
+			  });
+		  }
+       }
+    }
+ }
+
+var request = false;
+function doListSubTransCode(type) {
+   try {
+      request = new XMLHttpRequest();
+   } catch (trymicrosoft) {
+      try {
+          request = new ActiveXObject("Msxml2.XMLHTTP");
+      } catch (othermicrosoft) {
+         try {
+            request = new ActiveXObject("Microsoft.XMLHTTP");
+         } catch (failed) {
+            request = false;
+         }
+         }
+    }
+   if (!request){
+        alert("打开连接失败，Error initializing XMLHttpRequest!");
+        return;
+   }
+   //获得当前时间
+   var URL = "listSubTransCodeByType.html?transType="+type;
+   request.open("POST", URL, false);
+   request.setRequestHeader("Content-Type","text/html;charset=UTF-8");
+   request.onreadystatechange = showAddAccountTransCondition;
+   request.send(null);
+   if(type=="transfer"){
+   	   var count = document.getElementById("accTransReq.outAccountNo");
+	   count.value="11185101000000009999";
+   }
+}
+function formSubmit(){
+    if(validateParams()){
+        if(confirm("确认补帐申请？")){
+            listForm.submit();
+        }
+    }
+}
+
+function validateParams(){
+        var msg = "";
+        if(document.getElementById("transType").value=="deposit"){
+            if(getObjValu("accountNo")==""){
+                msg += "转入帐户必填！$$"
+            }
+        }else if(document.getElementById("transType").value=="withdraw"){
+            if(getObjValu("accountNo")==""){
+                msg += "转出帐户必填！$$"
+            }
+        }
+        msg += commonValidate();
+        if(msg!=""){
+            showTipMsg(msg,true);
+            return false;
+        }
+        return true;
+    }
+
+    function commonValidate(){
+        var msg = "";
+        if(isObjExist("subTransCode") && getObjValu("subTransCode")==""){
+            msg += "补帐类型必填！$$"
+        }
+        if(isObjExist("inAccountNo") && getObjValu("inAccountNo")==""){
+            msg += "转入帐户必填！$$"
+        }
+        if(isObjExist("outAccountNo") && getObjValu("outAccountNo")==""){
+            msg += "转出帐户必填！$$"
+        }
+        if(isObjExist("amount") && getObjValu("amount")==""){
+            msg += "金额必填！$$"
+        }
+        if(isObjExist("amount") && getObjValu("amount")!=""){
+            var amountValue = getObjValu("amount");
+            if(!amountValue.match(/^\d+\.{0,1}\d{0,2}$/)){
+	            if(!amountValue.match(/^\.\d{1,2}$/)){
+	                msg += "非法金额格式！$$"
+	            }
+	        }
+        }
+        if(isObjExist("outBizNo") && getObjValu("outBizNo")==""){
+            msg += "外部流水号必填！$$"
+        }
+
+        if(isObjExist("outBizNo") && getObjValu("outBizNo")!=""){
+            if(listForm.all("accTransReq.outBizNo").value.length>32){
+                msg += "外部流水号过长！$$"
+            }
+        }
+
+        if(isObjExist("transDate") && getObjValu("transDate")==""){
+            msg += "内部时间必填！$$"
+        }
+
+       if(isObjExist("transDate") && getObjValu("transDate")!=""){
+          var r = getObjValu("transDate").match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+             msg += "内部时间格式不正确！$$"
+	  }
+        }
+
+        if(isObjExist("outDate") && getObjValu("outDate")==""){
+            msg += "外部时间必填！$$"
+        }
+
+       if(isObjExist("outDate") && getObjValu("outDate")!=""){
+          var r = getObjValu("outDate").match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+             msg += "外部时间格式不正确！$$"
+	  }
+        }
+
+        if(isObjExist("bankType") && getObjValu("bankType")==""){
+            msg += "银行名称必填！$$"
+        }
+        if(isObjExist("memo") && getObjValu("memo")==""){
+            msg += "备注必填！$$"
+        }
+        if(isObjExist("memo") && getObjValu("memo")!=""){
+            if(getObjValu("memo").length>86){
+                msg += "备注过长！$$"
+            }
+        }
+
+        return msg;
+    }
+
+    function getObjValu(name){
+        var fullName = "accTransReq."+name
+        return document.getElementById(fullName).value.trim();
+    }
+
+    function isObjExist(name){
+        var fullName = "accTransReq."+name
+        var obj = document.getElementById(fullName);
+        if(obj){
+            return true;
+        }
+        return false;
+    }
+
+</script>
+
+<div id="searchCondition"></div>
+&nbsp;&nbsp;
+  <input type="button" value="补帐申请" class="button"  onclick="formSubmit();"/>
+<div id="msgDiv">$!message </div>
+</form>
+
+<script>
+    #set($errorFlag=true)
+    #if("$!message"=="操作成功")
+    	#set($errorFlag=false)
+    #end
+    #if("$!message"!="")
+    	showTipMsg("$!message",$!errorFlag)
+    #end
+    window.onload=function (){
+        doListSubTransCode("deposit");
+    };
+</script>
+</div>

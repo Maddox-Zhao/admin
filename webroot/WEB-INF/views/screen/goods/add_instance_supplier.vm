@@ -1,0 +1,126 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>产品修改</h2>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>商品名称:</th>
+           <td>$!{goods.title}</td>
+		   <th>编码:</th>
+           <td>$!{goods.goodsSn}</td>
+		   <th>品牌:</th>
+           <td>$!{goods.brandName}</td>
+		   <th>单位:</th>
+           <td>$!{goods.goodsUnit}</td>
+           <th>类目:</th>
+           <td>$!{goods.catName}</td>
+        </tr>
+    </table>
+  </div>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>产品名称:</th>
+           <td>$!{instance.instanceName}</td>
+		   <th>产品编码:</th>
+           <td>$!{instance.code}</td>
+        </tr>
+    </table>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "editsuccess")
+		产品供应商修改成功！
+	#end
+</div>
+ #end
+
+        <div class="clear"></div>
+        <!-- 列表模块 -->
+        <div class="listBox">
+		 <form name="addsu" action="/instance/create_instance_supplier.html" method="post" onsubmit="return checksup();">
+			#springBind("goodsInstanceSupplier.goodsId")
+			<input type="hidden" name="${status.expression}" value="$!{goods.id}" />
+			#springBind("goodsInstanceSupplier.goodsInstanceId")
+			<input type="hidden" name="${status.expression}" value="$!{instance.id}" />
+			#springBind("goodsInstanceSupplier.supplierId")
+			<input type="hidden" name="${status.expression}" id="supplier_supplierId" value="$!{status.value}"/>
+            <table>
+                <tr>
+                   <th>供应商名称</th>
+                   <th>供应商产品编码</th>
+			       <th>供货价格</th>
+                </tr>
+                 <tr>
+                    <td align="center">
+					   #springBind("goodsInstanceSupplier.supplierName")
+        			   <input type="text" name="${status.expression}" id="supplier_name" value="$!{status.value}" readonly/>
+					   <input type="button" value="选择供应商" class="button" onclick="sesp()"/>
+					   <label class="red">${status.errorMessage}</label>
+					</td>
+                	<td align="center">
+						#springBind("goodsInstanceSupplier.supplierCode")
+					   <input type="text" name="${status.expression}" id="supplierCodeTmp" value="$!{status.value}"/>
+					   <label class="red">${status.errorMessage}</label>
+					</td>
+                    <td align="center">
+						#springBind("goodsInstanceSupplier.consultPrice")
+					   <input type="text" name="${status.expression}" id="consultPriceTmp" value="$!{status.value}"/>
+					   <label class="red">${status.errorMessage}</label>
+					</td>
+                 </tr>
+            </table>
+            <div class="form-but">
+                <button type="button" class="button-s4" onclick="upsp();">确定</button>
+          	</div>
+		 </form>
+      </div>
+</div>
+<script language="javascript" type="text/javascript">
+	function upsp(){
+		var supplierCode = document.getElementById("supplierCodeTmp").value;
+		supplierCode = jQuery.trim(supplierCode);
+		if(supplierCode.length > 30){
+			alert("供应商产品编码超长");
+			return;
+		}
+		var codePatrn=/^[A-Za-z0-9-]+$/;
+		if(!codePatrn.exec(supplierCode)){
+			alert("供应商产品编码格式不正确（限字母，'-'和数字）");
+			return;
+		}
+		var consultPrice = document.getElementById("consultPriceTmp").value;
+		consultPrice = jQuery.trim(consultPrice);
+		var patrn=/^\d{1,6}(\.\d{1,2})?$/;
+		if (!patrn.exec(consultPrice)) {
+			alert("供货价格格式不正确");
+			return;
+		}
+		var price = parseFloat(consultPrice);
+		if(isNaN(price)){
+			alert("供货价格不是数字");
+			return;
+		}
+		document.forms["addsu"].action = '/instance/create_instance_supplier.html';
+		document.forms["addsu"].submit();
+	}
+	
+        function sesp(){
+            var ret = window.showModalDialog("/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+            if(ret){
+                document.getElementById('supplier_supplierId').value=ret.id;
+                document.getElementById('supplier_name').value=ret.name;
+            }
+        }
+		function checksup(){
+			if(document.getElementById('supplier_supplierId').value == ""){
+				alert("请选择供应商");
+				return false;
+			}
+			return true;
+		}
+</script>

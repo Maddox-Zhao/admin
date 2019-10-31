@@ -1,0 +1,14 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+
+<div class="main">
+    	 <h2>图片</h2>
+<center>
+		 <img src="${upServer}$url"/><br/>
+		 <div class="form-but">
+			<button type="button" id="allcheckbutton" class="button-s4" onclick="history.go(-1)">返回</button>
+   		</div>
+		 
+</div>

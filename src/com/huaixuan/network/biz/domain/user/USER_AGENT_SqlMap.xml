@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserAgentSQL">
+    <typeAlias alias="agentInfo" type="com.huaixuan.network.biz.domain.user.AgentInfo" />
+    <resultMap class="agentInfo" id="agentInfoResult">
+    	<result property="id" column="id"/>
+    	<result property="gmtCreate" column="gmt_create"/>
+    	<result property="gmtModify" column="gmt_modify"/>
+    	<result property="userId" column="user_id"/>
+    	<result property="ticketLeft" column="ticket_left" nullValue="0"/>
+    	<result property="ticketUsed" column="ticket_used" nullValue="0"/>
+    	<result property="gmtApproved" column="gmt_approved"/>
+    	<result property="status" column="status"/>
+    	<result property="memo" column="memo"/>
+    	<result property="realName" column="real_name"/>
+    	<result property="sex" column="sex" nullValue="0"/>
+    	<result property="telNumber" column="tel_number" nullValue=""/>
+    	<result property="chatNumber" column="chat_number"/>
+    	<result property="chatType" column="chat_type"/>
+    	<result property="province" column="province"/>
+    	<result property="city" column="city"/>
+    	<result property="address" column="address"/>
+    	<result property="zip" column="zip"/>
+    	<result property="taobaoUser" column="taobao_user"/>
+    	<result property="taobaoShop" column="taobao_shop"/>
+    	<result property="taobaoPrestige" column="taobao_prestige"/>
+    	<result property="taobaoMainBusiness" column="taobao_main_business"/>
+    	<result property="paipaiUser" column="paipai_user"/>
+    	<result property="paipaiShop" column="paipai_shop"/>
+    	<result property="paipaiPrestige" column="paipai_prestige"/>
+    	<result property="paipaiMainBusiness" column="paipai_main_business"/>
+    	<result property="youaUser" column="youa_user"/>
+    	<result property="youaShop" column="youa_shop"/>
+    	<result property="youaPrestige" column="youa_prestige"/>
+    	<result property="youaMainBusiness" column="youa_main_business"/>
+    	<result property="ebayUser" column="ebay_user"/>
+    	<result property="ebayShop" column="ebay_shop"/>
+    	<result property="ebayPrestige" column="ebay_prestige"/>
+    	<result property="ebayMainBusiness" column="ebay_main_business"/>
+    	<result property="otherUser" column="other_user"/>
+    	<result property="otherShop" column="other_shop"/>
+    	<result property="otherMainBusiness" column="other_main_business"/>
+    	<result property="entityName" column="entity_name"/>
+    	<result property="entityAddress" column="entity_address"/>
+    	<result property="entityMainBusiness" column="entity_main_business"/>
+    	<result property="cashStatus" column="cash_status"/>
+    	<result property="gmtCashReceived" column="gmt_cash_received"/>
+    	<result property="cashMemoAgent" column="cash_memo_agent"/>
+    	<result property="cashMemoXilang" column="cash_memo_xilang"/>
+    	<result property="cashTicket" column="cash_ticket" nullValue="0"/>
+    	<result property="agent_manager_id" column="agent_manager_id"/>
+    	<result property="selfshopName" column="selfshop_name"/>
+    	<result property="selfshopAddress" column="selfshop_address"/>
+    	<result property="selfshopMainBusiness" column="selfshop_main_business"/>
+    	<result property="gmtDistribute" column="gmt_distribute"/>
+    	<result property="mainMemo" column="main_memo"/>
+    	<result property="channelMemo" column="channel_memo"/>
+    	<result property="connectMemo" column="connect_memo"/>
+    	<result property="isFulltime" column="is_fulltime"/>
+    </resultMap>
+
+    <select id="getUserAgentById" parameterClass="java.lang.Long" resultMap="agentInfoResult">
+    select * from emall_agent_info where user_id=#value#
+    </select>
+
+    <select id="getAgentInfoById" parameterClass="java.lang.Long" resultMap="agentInfoResult">
+     select * from emall_agent_info where user_id=#id#
+    </select>
+
+    <insert id="insertApply" parameterClass="agentInfo">
+     <![CDATA[
+     insert into emall_agent_info
+		  (id,
+		   gmt_create,
+		   gmt_modify,
+		   user_id,
+		   ticket_used,
+		   ticket_left,
+		   gmt_approved,
+		   status,
+		   memo,
+		   real_name,
+		   sex,
+		   tel_number,
+		   chat_type,
+		   chat_number,
+		   province,
+		   city,
+		   address,
+		   zip,
+		   taobao_user,
+		   taobao_shop,
+		   taobao_prestige,
+		   taobao_main_business,
+		   paipai_user,
+		   paipai_shop,
+		   paipai_prestige,
+		   paipai_main_business,
+		   youa_user,
+		   youa_shop,
+		   youa_prestige,
+		   youa_main_business,
+		   ebay_user,
+		   ebay_shop,
+		   ebay_prestige,
+		   ebay_main_business,
+		   other_user,
+		   other_shop,
+		   other_main_business,
+		   entity_name,
+		   entity_address,
+		   entity_main_business,
+		   agent_manager_id,
+		   selfshop_name,
+		   selfshop_address,
+		   selfshop_main_business)
+		values
+		  (null,
+		   sysdate(),
+		   sysdate(),
+		   #userId#,
+		   #ticketUsed#,
+		   #ticketLeft#,
+		   #gmtApproved#,
+		   #status#,
+		   #memo#,
+		   #realName#,
+		   #sex#,
+		   #telNumber#,
+		   #chatType#,
+		   #chatNumber#,
+		   #province#,
+		   #city#,
+		   #address#,
+		   #zip#,
+		   #taobaoUser#,
+		   #taobaoShop#,
+		   #taobaoPrestige#,
+		   #taobaoMainBusiness#,
+		   #paipaiUser#,
+		   #paipaiShop#,
+		   #paipaiPrestige#,
+		   #paipaiMainBusiness#,
+		   #youaUser#,
+		   #youaShop#,
+		   #youaPrestige#,
+		   #youaMainBusiness#,
+		   #ebayUser#,
+		   #ebayShop#,
+		   #ebayPrestige#,
+		   #ebayMainBusiness#,
+		   #otherUser#,
+		   #otherShop#,
+		   #otherMainBusiness#,
+		   #entityName#,
+		   #entityAddress#,
+		   #entityMainBusiness#,
+		   #agent_manager_id#,
+		   #selfshopName#,
+		   #selfshopAddress#,
+		   #selfshopMainBusiness#)
+
+      ]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+    </insert>
+
+    <update id="modifyApply" parameterClass="agentInfo">
+    <![CDATA[
+		update emall_agent_info
+		   set gmt_modify           = sysdate(),
+		       real_name            = #realName#,
+		       sex                  = #sex#,
+		       status               = #status#,
+		       tel_Number           = #telNumber#,
+		       chat_Type            = #chatType#,
+		       chat_number          = #chatNumber#,
+		       province             = #province#,
+		       city                 = #city#,
+		       address              = #address#,
+		       zip                  = #zip#,
+		       taobao_user          = #taobaoUser#,
+		       taobao_shop          = #taobaoShop#,
+		       taobao_prestige      = #taobaoPrestige#,
+		       taobao_main_business = #taobaoMainBusiness#,
+		       paipai_user          = #paipaiUser#,
+		       paipai_shop          = #paipaiShop#,
+		       paipai_prestige      = #paipaiPrestige#,
+		       paipai_main_business = #paipaiMainBusiness#,
+		       youa_user            = #youaUser#,
+		       youa_shop            = #youaShop#,
+		       youa_prestige        = #youaPrestige#,
+		       youa_main_business   = #youaMainBusiness#,
+		       ebay_user            = #ebayUser#,
+		       ebay_shop            = #ebayShop#,
+		       ebay_prestige        = #ebayPrestige#,
+		       ebay_main_business   = #ebayMainBusiness#,
+		       other_user           = #otherUser#,
+		       other_shop           = #otherShop#,
+		       other_main_business  = #otherMainBusiness#,
+		       entity_name          = #entityName#,
+		       entity_address       = #entityAddress#,
+		       entity_main_business = #entityMainBusiness#,
+		       selfshop_name        = #selfshopName#,
+		       selfshop_address     = #selfshopAddress#,
+		       selfshop_main_business = #selfshopMainBusiness#
+		 where user_id = #userId#
+      ]]>
+    </update>
+
+    <update id="updateAgentTickets" parameterClass="agentInfo">
+    <![CDATA[
+		update emall_agent_info
+		   set gmt_modify  = sysdate(),
+		       ticket_left = #ticketLeft#,
+		       ticket_used = #ticketUsed#
+		 where user_id = #userId#
+
+	 ]]>
+    </update>
+
+	<!-- modified by chenyan 2009/11/12 start增加了申请批准日期的赋值-->
+     <update id="isallowApply" parameterClass="agentInfo">
+     update emall_agent_info set gmt_modify=sysdate(),
+     <isNotEmpty property="status" prepend="">
+     	<isEqual property="status" compareValue="success">
+     		gmt_approved=sysdate(),
+     	</isEqual>
+     </isNotEmpty>
+     status=#status#,memo=#memo#,agent_manager_id=#agent_manager_id#
+     where id=#id#
+    </update>
+	<!-- modified by chenyan 2009/11/12 end -->
+
+    <update id="updateTicketLeft" parameterClass="java.util.Map">
+        update emall_agent_info set ticket_left=ticket_left + #ticketLeft#
+        where user_id=#userId#
+    </update>
+
+    <select id="getAgentInfoByUserId" parameterClass="java.lang.Long" resultMap="agentInfoResult">
+		select * from emall_agent_info where user_id=#userId#
+    </select>
+
+    <update id="editAgentInfoCash" parameterClass="java.util.Map">
+    	UPDATE emall_agent_info
+    	SET gmt_modify = sysdate(),
+    		cash_status = #cashStatus#
+    		<isNotEmpty property="cashTicket" prepend="">
+    			,ticket_used =  IFNULL(ticket_used, 0) + #cashTicket#,
+				ticket_left =  IFNULL(ticket_left, 0) - #cashTicket#
+			</isNotEmpty>
+			<isNull property="applyFail">
+				<isNotEmpty property="cashTicket" prepend="">
+					,cash_ticket = #cashTicket#
+				</isNotEmpty>
+			</isNull>
+			<isNotNull property="applyFail">
+				<isEqual compareProperty="applyFail" compareValue="fail">
+				,cash_ticket = 0
+				</isEqual>
+			</isNotNull>
+			<isNotEmpty property="gmtCashReceivedFlag" prepend="">
+				<isNotEmpty property="gmtCashReceived">
+					,gmt_cash_received = #gmtCashReceived#
+				</isNotEmpty>
+				<isEmpty property="gmtCashReceived">
+					,gmt_cash_received = null
+				</isEmpty>
+			</isNotEmpty>
+			<isNotNull property="cashMemoAgent" prepend="">
+				,cash_memo_agent = #cashMemoAgent#
+			</isNotNull>
+			<isNotNull property="cashMemoXilang" prepend="">
+				,cash_memo_xilang = #cashMemoXilang#
+			</isNotNull>
+		WHERE id = #id#
+    </update>
+
+	<!-- 分销地址更新 -->
+    <update id="updateAgentDistributAddr" parameterClass="java.util.Map">
+    	UPDATE emall_agent_info
+    	SET gmt_modify = sysdate()
+    		<isNotEmpty property="taobaoShop" prepend="">
+    			,taobao_User =  #taobaoUser#
+				,taobao_Shop =  #taobaoShop#
+				,taobao_Main_Business = #taobaoMainBusiness#
+				,taobao_Prestige = #taobaoPrestige#
+			</isNotEmpty>
+    		<isNotEmpty property="paipaiShop" prepend="">
+    			,paipai_User =  #paipaiUser#
+				,paipai_Shop =  #paipaiShop#
+				,paipai_Main_Business = #paipaiMainBusiness#
+				,paipai_Prestige = #paipaiPrestige#
+			</isNotEmpty>
+    		<isNotEmpty property="ebayShop" prepend="">
+    			,ebay_User =  #ebayUser#
+				,ebay_Shop =  #ebayShop#
+				,ebay_Main_Business = #ebayMainBusiness#
+				,ebay_Prestige = #ebayPrestige#
+			</isNotEmpty>
+    		<isNotEmpty property="youaShop" prepend="">
+    			,youa_User =  #youaUser#
+				,youa_Shop =  #youaShop#
+				,youa_Main_Business = #youaMainBusiness#
+				,youa_Prestige = #youaPrestige#
+			</isNotEmpty>
+    		<isNotEmpty property="otherShop" prepend="">
+    			,other_User =  #otherUser#
+				,other_Shop =  #otherShop#
+				,other_Main_Business = #otherMainBusiness#
+			</isNotEmpty>
+    		<isNotEmpty property="selfshopAddress" prepend="">
+    			,selfshop_Name =  #selfshopName#
+				,selfshop_Address =  #selfshopAddress#
+				,selfshop_Main_Business = #selfshopMainBusiness#
+			</isNotEmpty>
+    		<isNotEmpty property="entityAddress" prepend="">
+    			,entity_Name =  #entityName#
+				,entity_Address =  #entityAddress#
+				,entity_Main_Business = #entityMainBusiness#
+			</isNotEmpty>
+		WHERE id = #id#
+    </update>
+</sqlMap>

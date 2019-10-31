@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SearchKeywordSQL">
+	<typeAlias alias="searchKeyword" type="com.huaixuan.network.biz.domain.user.SearchKeyword"/>
+	<resultMap class="searchKeyword" id="searchKeywordResult">
+		<result column="id" property="id"/>
+		<result column="keyword" property="keyword"/>
+		<result column="keyword_pinying" property="keywordPinying"/>
+		<result column="result_count" property="resultCount"/>
+		<result column="search_count" property="searchCount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<update id="updateSearchKeyword" >
+			update emall_search_keyword set
+			search_count = search_count + 1,
+			gmt_modify = sysdate()
+			where keyword = #value#
+</update>
+<insert id="createSearchKeyword" parameterClass="java.lang.String">
+	insert into emall_search_keyword
+	  (id,
+	  keyword,
+	   keyword_pinying,
+	   result_count,
+	   search_count,
+	   gmt_create,
+	   gmt_modify)
+	values
+	  (null, #value#, #value#, 0, 1, sysdate(), sysdate())
+	  <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<select id="findSearchKeywordsByModify" resultMap="searchKeywordResult">
+<![CDATA[
+ select emall_search_keyword.*
+          from emall_search_keyword
+         where emall_search_keyword.gmt_modify >=#lastModify#
+         order by emall_search_keyword.gmt_modify asc  LIMIT 0,#end#
+		
+]]>
+</select>
+</sqlMap>

@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="clientProductDAO">
+	<typeAlias alias="clientProduct" type="com.huaixuan.network.biz.domain.product.Product"/>
+	<resultMap id="clinetProductResultsecurityTC" class="com.huaixuan.network.biz.domain.product.Product">
+	  <result column="exchangeRate" property="exchangeRate" />
+	  <result column="taxesReate" property="taxesReate" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="brandName" property="brandName" />
+	  <result column="seriesName" property="seriesName" />
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="type" property="type" />
+	  <result column="size" property="size" />
+	  <result column="dlPrice" property="dlPrice" />
+	  <result column="euPrice" property="euPrice" />
+	  <result column="dxPrice" property="dxPrice" />
+	  <result column="smPrice" property="smPrice" />
+	  <result column="ssPrice" property="ssPrice" />
+	  <result column="cost" property="cost" />
+	  <result column="idCostCurrency" property="idCostCurrency" />
+	  <result column="curSiteName" property="curSiteName" />
+	  <result column="curSiteId" property="curSiteId"/>
+	  <result column="status" property="status" />
+	  <result column="salePrice" property="salePrice" />
+	  <result column="salePriceCurrency" property="salePriceCurrency" />
+	  <result column="instock" property="instock" />
+	  <result column="sellDate" property="sellDate" />
+	  <result column="sellIdOrder" property="sellIdOrder" />
+	  <result column="sellChannel" property="sellChannel" />
+	  <result column="customerName" property="customerName" />
+	  <result column="sku" property="sku" />
+	  <result column="idSupply" property="idSupply" />
+	  <result column="customerId" property="customerId" />
+	  <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="years" property="years" />
+	  <result column="month" property="month" />
+	  <result column="activePrice" property="activePrice" />
+	  <result column="isFlaw" property="isFlaw" />
+	  <result column="picture" property="picture" />
+	  <result column="goods_id" property="goodsId" />
+	  <result column="customer_operate" property="managerUserName" />
+	  
+	  <result column="securityTC" property="securityTC"/>
+	  <result column="implementationS" property="implementationS"/>
+	  <result column="name" property="name"/>
+	  <result column="materialDes" property="materialdes"/>
+	  <result column="colorDes" property="colordes"/>
+	  <result column="origin" property="origin"/>
+	  
+	</resultMap>
+	
+	
+	
+	
+	<resultMap id="clinetProductResult" class="com.huaixuan.network.biz.domain.product.Product">
+	  <result column="exchangeRate" property="exchangeRate" />
+	  <result column="taxesReate" property="taxesReate" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="brandName" property="brandName" />
+	  <result column="seriesName" property="seriesName" />
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="type" property="type" />
+	  <result column="size" property="size" />
+	  <result column="dlPrice" property="dlPrice" />
+	  <result column="euPrice" property="euPrice" />
+	  <result column="dxPrice" property="dxPrice" />
+	  <result column="smPrice" property="smPrice" />
+	  <result column="ssPrice" property="ssPrice" />
+	  <result column="cost" property="cost" />
+	  <result column="idCostCurrency" property="idCostCurrency" />
+	  <result column="curSiteName" property="curSiteName" />
+	  <result column="curSiteId" property="curSiteId"/>
+	  <result column="status" property="status" />
+	  <result column="salePrice" property="salePrice" />
+	  <result column="salePriceCurrency" property="salePriceCurrency" />
+	  <result column="instock" property="instock" />
+	  <result column="sellDate" property="sellDate" />
+	  <result column="sellIdOrder" property="sellIdOrder" />
+	  <result column="sellChannel" property="sellChannel" />
+	  <result column="customerName" property="customerName" />
+	  <result column="sku" property="sku" />
+	  <result column="idSupply" property="idSupply" />
+	  <result column="customerId" property="customerId" />
+	  <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="years" property="years" />
+	  <result column="month" property="month" />
+	  <result column="activePrice" property="activePrice" />
+	  <result column="isFlaw" property="isFlaw" />
+	  <result column="picture" property="picture" />
+	  <result column="goods_id" property="goodsId" />
+	  <result column="customer_operate" property="managerUserName" />
+	</resultMap>
+     
+	
+	 <resultMap id="clinetProduct" class="com.huaixuan.network.biz.domain.product.Product">
+	 <result column="idProduct" property="idProduct"/>
+	 <result column="brandName" property="brandName"/>
+	 <result column="brandID" property="brandID"/>
+	 <result column="seriesName" property="seriesName"/>
+	 <result column="seriesId" property="seriesId"/>
+	 <result column="color" property="color"/>
+	 <result column="material" property="material"/>
+	 <result column="type" property="type"/>
+	 <result column="size" property="size" />
+	 <result column="targetCustomers" property="targetCustomers"/>
+	 <result column="name" property="name"/>
+	 <result column="materialdes" property="materialdes"/>
+	 <result column="colordes" property="colordes"/>
+	 <result column="sizedes" property="sizedes"/>
+	 <result column="uuid" property="uuid" javaType="java.lang.String"/>
+	 <result column="auuid" property="auuid"/>
+	 <result column="origin" property="origin"/>
+	 <result column="sku" property="sku"/>
+	 <result column="secondHand" property="secondHand"/>
+	 <result column="hasValidCard" property="hasValidCard"/>
+	 <result column="currencyName" property="currencyName"/>
+	 <result column="salePriceCurrency" property="salePriceCurrency"/>
+	 <result column="salePriceCurrencyName" property="salePriceCurrencyName"/>
+	 <result column="cost" property="cost"/>
+	 <result column="idCostCurrency" property="idCostCurrency" />
+	 <result column="curSiteName" property="curSiteName"/>
+	 <result column="status" property="status"/>
+	 <result column="idStatus" property="statusID"/>
+	 <result column="dlPrice" property="dlPrice" />
+	 <result column="euPrice" property="euPrice" />
+	 <result column="picture" property="picture" />
+	 <result column="dxPrice" property="dxPrice" />
+	 <result column="smPrice" property="smPrice" />
+	 <result column="ssPrice" property="ssPrice" />
+	  <result column="salePrice" property="salePrice" />
+	 
+	 <result column="remark" property="remark"/>
+	 <result column="curSiteId" property="curSiteId"/>
+	 <result column="idLastLocation" property="idLastLocation"/>
+	 <result column="customerName" property="customerName" />
+	 <result column="idSupply" property="idSupply" />
+	 <result column="idPurchase" property="idPurchase" />
+	 <result column="goodsId" property="goodsId" />
+	 <result column="idOrder" property="idOrder" />
+	 <result column="idLastOperator" property="idLastOperator" />
+	 <result column="idLifeCycle" property="idLifeCycle" />
+	 <result column="years" property="years" />
+	  <result column="month" property="month" />
+	  <result column="activePrice" property="activePrice" />
+	  <result column="isFlaw" property="isFlaw" />
+	 </resultMap>
+	 
+	 
+	 
+	 <resultMap id="productHistoryResultMap" class="com.huaixuan.network.biz.domain.product.ProductHistory">
+	 <result column="idProduct" property="idProduct"/>
+	 <result column="idOperation" property="idOperation"/>
+	 <result column="operation" property="operation"/>
+	 <result column="date" property="date"/>
+	 <result column="idOperator" property="idOperator"/>
+	 <result column="operatorName" property="operatorName"/>
+	 <result column="idCurStation" property="idCurStation"/>
+	 <result column="siteName" property="siteName"/>
+	 <result column="idStatus" property="idStatus" />
+	 <result column="status" property="status"/>
+	 <result column="idSupply" property="idSupply"/>
+	 <result column="supply" property="supply"/>
+	 <result column="idCustomer" property="idCustomer"/>
+	 <result column="customerName" property="customerName"/>
+	 </resultMap>
+	 
+	 
+	 
+	  <resultMap id="clinetProductResultCarStatus" class="com.huaixuan.network.biz.domain.product.Product">
+	 
+	 <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="brandName" property="brandName" />
+	  <result column="seriesName" property="seriesName" />
+	  
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="TYPE" property="type" />
+	  <result column="size" property="size" />
+	  
+	  <result column="dlPrice" property="dlPrice" />
+	  <result column="picture" property="picture" />
+	  <result column="euPrice" property="euPrice" />
+	  <result column="dxPrice" property="dxPrice" />
+	  
+	  <result column="smPrice" property="smPrice" />
+	  <result column="ssPrice" property="ssPrice" />
+	  <result column="cost" property="cost" />
+	  <result column="goods_id" property="goodsId" />
+	  
+	  <result column="idCostCurrency" property="idCostCurrency" />
+	  <result column="curSiteName" property="curSiteName" />
+	  <result column="curSiteId" property="curSiteId"/>
+ 	  <result column="status" property="status" />
+	  
+	  <result column="salePrice" property="salePrice" />
+	  <result column="salePriceCurrency" property="salePriceCurrency" />
+	  <result column="instock" property="instock" />
+	  <result column="activePrice" property="activePrice" />
+	  
+	   <result column="years" property="years" />
+	   <result column="month" property="month" />
+	   <result column="isFlaw" property="isFlaw" />
+	   <result column="sku" property="sku" />
+	    
+	    <result column="status" property="status" />
+	 
+	  
+	</resultMap>
+	 
+	 
+	
+	 
+ <resultMap  id="clientBySkuAndStatus" class="com.huaixuan.network.biz.domain.product.Product">
+	 <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="brandName" property="brandName" />
+	  <result column="seriesName" property="seriesName" />
+	  
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="TYPE" property="type" />
+	  <result column="size" property="size" />
+	  
+	  <result column="dlPrice" property="dlPrice" />
+	  <result column="picture" property="picture" />
+	  <result column="euPrice" property="euPrice" />
+	  <result column="dxPrice" property="dxPrice" />
+	  
+	  <result column="smPrice" property="smPrice" />
+	  
+	  <result column="cost" property="cost" />
+	  <result column="goods_id" property="goodsId" />
+	  
+	  <result column="idCostCurrency" property="idCostCurrency" />
+	  <result column="curSiteName" property="curSiteName" />
+	  <result column="curSiteId" property="curSiteId"/>
+ 	  <result column="status" property="status" />
+	  
+	  <result column="salePrice" property="salePrice" />
+	  <result column="salePriceCurrency" property="salePriceCurrency" />
+	  <result column="instock" property="instock" />
+	  <result column="activePrice" property="activePrice" />
+	  
+	   <result column="years" property="years" />
+	   <result column="month" property="month" />
+	   <result column="isFlaw" property="isFlaw" />
+	   <result column="sku" property="sku" />
+	    
+	    <result column="status" property="status" />
+	 
+	</resultMap>
+	
+	
+	<resultMap  id="productPropertyMap" class="com.huaixuan.network.biz.domain.product.Product">
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="type" property="type" />
+	  <result column="size" property="size" />
+	  <result column="idBrand" property="idBrand" />
+	  <result column="idSeries" property="idSeries" />
+	
+	</resultMap>
+
+	<!-- 为product表根据sku查询型号、材质、颜色做映射 -->
+	<resultMap id="slectProductinfo"  class="com.huaixuan.network.biz.domain.product.Product">
+			<result column="sku" property="sku" />
+		 	<result column="color" property="color" />
+		 	<result column="material" property="material" />
+		  	<result column="TYPE" property="type" />
+	</resultMap>
+
+	
+	 
+	 <sql id="PRODUCT.SEARCHPRODUCT">
+		<isNotEmpty property="idProduct">
+		     and l.idProduct = #idProduct#
+		</isNotEmpty>
+		<isNotEmpty property="sku">
+		     and p.sku = #sku#
+		</isNotEmpty>
+		<isNotEmpty property="type">
+		     and p.type = #type#
+		</isNotEmpty>
+		<isNotEmpty property="material">
+		     and p.material = #material#
+		</isNotEmpty>
+		<isNotEmpty property="color">
+		     and p.color = #color#
+		</isNotEmpty>
+		<isNotEmpty property="idOrder">
+		     and l.idOrder = #idOrder#
+		</isNotEmpty>
+		<isNotEmpty property="size">
+		     and p.size = #size#
+		</isNotEmpty>
+		<isNotEmpty property="brandID">
+		     and p.idBrand in ( $brandID$)
+		</isNotEmpty>
+		<isNotEmpty property="seriesId">
+		     and p.idSeries   in ( $seriesId$)
+		</isNotEmpty>
+		<isNotEmpty property="customerName">
+		     and customer.name like '%$customerName$%'
+		</isNotEmpty>
+		<isNotEmpty property="idCustomer">
+		     and  customer.idCustomer = $idCustomer$
+		</isNotEmpty>
+		<isNotEmpty property="managerUserName">
+		     and  customer.customer_operate = $managerUserName$
+		</isNotEmpty>
+		<isNotEmpty property="supplierId">
+		   and   pur.idSupply = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty property="idLocation">
+		   
+		   and  EXISTS (SELECT 1 FROM site WHERE site.idSite IN ($idLocation$) AND site.idSite = l.idLocation )
+		</isNotEmpty>
+		<isNotEmpty property="idLastLocation">
+		   and   l.idLastLocation  = #idLastLocation#
+		</isNotEmpty>
+		<isNotEmpty property="status">
+		   and   l.idStatus  = #status#
+		</isNotEmpty>
+		<isNotEmpty property="idSellChannel">
+		   and   sc.idSellChannel = #idSellChannel#
+		</isNotEmpty>
+		<isNotEmpty property="idLastOperator">
+		   and   l.idLastOperator  = #idLastOperator#
+		</isNotEmpty>
+		
+		<isNotEmpty property="inStockDateStart">
+				<![CDATA[ and p.gmt_create >= #inStockDateStart# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateEnd">
+				<![CDATA[  and p.gmt_create <= '$inStockDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty property="sellDateStart">
+				<![CDATA[ and co.date >= #sellDateStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="sellDateEnd">
+					<![CDATA[ and co.date <= '$sellDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty property="activePrice">
+			<isEqual property="activePrice" compareValue="TRUE">
+			 	and   p.active_price > 0
+			</isEqual>
+			<isEqual property="activePrice" compareValue="ON">
+			 	and   p.active_price > 0
+			</isEqual>
+		</isNotEmpty>
+			<isNotEmpty property="isFlaw">
+			<isEqual property="isFlaw" compareValue="TRUE">
+			 	and   l.isFlaw = 1
+			</isEqual>
+			<isEqual property="isFlaw" compareValue="ON">
+			 	and   l.isFlaw = 1
+			</isEqual>
+			<isEqual property="isFlaw" compareValue="FALSE">
+			 	and   l.isFlaw = 0
+			</isEqual>
+		</isNotEmpty>
+		
+	</sql>
+	
+    <select id="getProductList" resultMap="clinetProductResultsecurityTC" parameterClass="java.util.Map">
+       select * from (
+       
+       SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,
+       			  (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,
+		l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,
+		p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,
+		p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,
+		l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,
+		sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur
+		WHERE  
+		l.idproduct = p.idProduct 
+		AND l.idStatus != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		
+		<include refid="PRODUCT.SEARCHPRODUCT"  />
+		<isNotNull property="noStartRowAndEndRow">
+			ORDER BY b.name,p.idSeries,p.type DESC,p.material DESC,p.color DESC,p.size DESC
+		</isNotNull >
+		<isNull property="noStartRowAndEndRow">
+			ORDER BY l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.color DESC,p.size DESC
+		</isNull>
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       ) re   
+       <!-- 字段排序  -->
+        <isNotEmpty property="sortField" >
+			<isNotEmpty property="sortOrder" >
+				 order by $sortField$  $sortOrder$
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	
+	<select id="getProductListCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+       SELECT count(l.idproduct)
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur
+		WHERE   l.idproduct = p.idProduct 
+		AND l.idStatus != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		<include refid="PRODUCT.SEARCHPRODUCT" />
+	</select>
+	<select id="getGoodsSaleInfoListCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+       	SELECT count(l.idproduct)
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur,emall_goods eg
+		WHERE   l.idproduct = p.idProduct 
+		AND l.idStatus != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND p.goods_id=eg.id
+		<isNotEmpty property="id">
+		   AND   eg.id  = #id#
+		</isNotEmpty>
+		
+		<include refid="PRODUCT.SEARCHPRODUCT" />
+	</select>
+    <select id="getGoodsSaleInfoList" resultMap="clinetProductResultsecurityTC" parameterClass="java.util.Map">
+		select * from ( 
+  		SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,
+       	 (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,
+		l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,
+		p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,
+		p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,
+		l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,
+		sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate
+		
+		FROM  
+		product p, lifecycle l, brand b,
+		series s, site,status sta,
+		customerorder co, sellchannel sc,customer,
+		purchase pur,emall_goods eg
+		WHERE  
+		l.idproduct = p.idProduct 
+		AND l.idStatus != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND p.goods_id=eg.id
+		<isNotEmpty property="id">
+		   AND   eg.id  = #id#
+		</isNotEmpty>
+		<include refid="PRODUCT.SEARCHPRODUCT" />
+		
+		<isNotNull property="noStartRowAndEndRow">
+			ORDER BY co.date DESC, b.name,p.idSeries,p.type DESC,p.material DESC,p.size DESC
+		</isNotNull >
+		<isNull property="noStartRowAndEndRow">
+			ORDER BY co.date DESC, l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.size DESC
+		</isNull>
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       ) re   
+       <!-- 字段排序  -->
+        <isNotEmpty property="sortField" >
+			<isNotEmpty property="sortOrder" >
+				 order by $sortField$  $sortOrder$
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>	
+	<select id="getProductbyidProduct" parameterClass="java.lang.String"
+		resultMap="clinetProduct">
+		SELECT p.idProduct idProduct,l.idLifeCycle,
+		b.name brandName,
+		s.name seriesName,
+		size,
+		p.idBrand brandID,
+		p.idSeries seriesId,
+		p.Type Type,
+		p.Picture Picture,
+		p.Material Material,
+		p.color color,
+		p.targetCustomers targetCustomers,
+		p.name name,
+		p.material_des materialdes,
+		p.color_des colordes,
+		p.size_des sizedes,
+		p.UUID UUID,
+		p.aUUID aUUID,
+		p.Origin origin,
+		p.sku sku,
+		pur.secondHand secondHand,
+		pur.idSupply,
+		pur.idPurchase,
+		l.hasValidCard hasValidCard,
+		l.isFlaw,
+		c.name currencyName,
+		(SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,
+		(SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,
+		l.cost cost,
+		l.idCostCurrency,
+		site.name curSiteName,
+		l.idLocation curSiteId,
+		l.idLastLocation,
+		sta.status,
+		sta.idStatus,
+		l.price salePrice,
+		p.CNPrice dlPrice,
+		p.EUPrice euPrice,
+		p.HKPrice dxPrice,
+		l.HKHXPrice smPrice,
+		l.HXPrice ssPrice,
+		l.remark remark,
+		customer.name customerName,
+		p.goods_id goodsId,
+		l.idOrder,
+		p.active_price activePrice,p.years,p.month,
+		(SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator
+		FROM product p,
+		lifecycle l,
+		brand b,
+		series s,
+		site,
+		currency c,
+		status sta,
+		customerorder co,
+		sellchannel sc,
+		customer,
+		purchase pur
+		WHERE p.idProduct = #vaule#
+		AND l.idproduct = p.idproduct
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND c.idCurrency=l.idCostCurrency
+		and l.idStatus != 7
+		limit 1
+	</select>
+		<update id="updateproduct" parameterClass="clientProduct">
+		UPDATE product SET 
+			idBrand = #brandID#,
+			idSeries = #seriesId#,
+			type = #type#,
+			Material = #material#,
+			Color = #color#,
+			Size = #size#,
+			targetCustomers = #targetCustomers#,
+			NAME =#name#,
+			material_des = #materialdes#,
+			color_des = #colordes#,
+			size_des = #sizedes#,
+			UUID = #uuid#,
+			aUUID = #auuid#,
+			Origin = #origin#,
+			sku = #sku#
+		WHERE idProduct = #idProduct#
+		</update>
+
+
+
+<select id="selectProductsByIdList" resultMap="clinetProductResult" parameterClass="java.util.List">
+        SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,
+        		   (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,
+		 l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type TYPE,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,
+		p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HKHXPrice ssPrice,l.cost,p.goods_id,
+		l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,
+		sc.name sellChannel,customer.name customerName,p.sku,customer.idCustomer customerId ,customer.customer_operate
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur
+		WHERE  
+		l.idproduct = p.idProduct 
+		AND l.idStatus  = 1 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND l.idProduct  in 
+		<iterate open="(" close=")" conjunction="," >  
+                #idProduct[]#  
+        </iterate>
+		order by p.type
+	</select>
+	<!-- 批量修改商品 -->
+	<update id="updateProductsByIdList" parameterClass="com.huaixuan.network.biz.domain.product.Product">
+		UPDATE product SET
+		   
+		     type = #type#,
+		
+		     material = #material#,
+		    
+		     color = #color#,
+		    
+		     size = #size#
+		     
+		     WHERE idProduct = #idProduct#
+		</update>
+	
+	<select id="selectShoppingCar" resultMap="clinetProductResult" parameterClass="java.lang.String">
+       SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,
+        (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase) taxesReate,
+		 l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type TYPE,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,
+		p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,sp.sale_price ssPrice,l.cost,p.goods_id,
+		l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,
+		sc.name sellChannel,customer.name customerName,p.sku,customer.idCustomer customerId ,customer.customer_operate
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur,hx_shopping_car sp
+		WHERE  
+		l.idproduct = p.idProduct 
+	    AND l.idStatus  != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND sp.idProduct = p.idProduct
+		AND sp.user_name = #userName#
+		order by p.idProduct,p.type,p.material,p.color,p.size
+
+	</select>
+	
+	
+	
+	<select id="selectShoppingCarMap" resultMap="clinetProductResult" parameterClass="java.util.Map">
+      select * from (SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,
+        (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase) taxesReate,
+		 l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type TYPE,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,
+		p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,sp.sale_price ssPrice,l.cost,p.goods_id,
+		l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,
+		sc.name sellChannel,customer.name customerName,p.sku,customer.idCustomer customerId ,customer.customer_operate
+		FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,
+		purchase pur,hx_shopping_car sp
+		WHERE  
+		l.idproduct = p.idProduct 
+	    AND l.idStatus  != 7 
+		AND p.idBrand = b.idBrand
+		AND p.idSeries = s.idSeries
+		AND l.idLocation = site.idSite
+		AND sta.idStatus = l.idStatus
+		AND l.idOrder = co.idOrder
+		AND co.idChannel = sc.idSellChannel
+		AND co.idCustomer = customer.idCustomer
+		AND pur.idPurchase = l.idPurchase
+		AND sp.idProduct = p.idProduct
+		AND sp.user_name = #userName#
+		order by p.idProduct DESC,p.type DESC,p.material DESC,p.color DESC,p.size DESC
+		) re
+		 <!-- 字段排序 --> 
+          <isNotEmpty property="sortField" >
+			 <isNotEmpty property="sortOrder" >
+				 order by $sortField$  $sortOrder$
+	          </isNotEmpty>
+         </isNotEmpty>
+	</select>
+	
+	
+	
+	
+	<!-- 用sku添加到购物车，获取购物车 -->
+	<select id="selectShoppingCarStatus" resultMap="clinetProductResultCarStatus" parameterClass="java.lang.String">
+	SELECT  l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type TYPE,p.Material material,p.color color,size
+           ,p.CNPrice dlPrice,p.picture,p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,sp.sale_price ssPrice,l.cost,p.goods_id,
+           l.idCostCurrency,st.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		   p.gmt_create instock,p.active_price activePrice,p.years,p.month,l.isFlaw,p.sku,sta.status
+		   FROM  product p,lifecycle l,brand b,series s,STATUS sta,hx_shopping_car sp,site st
+             WHERE p.idProduct=l.idProduct 
+                              AND l.idStatus=sta.idStatus 
+                              AND p.idBrand=b.idBrand 
+                              AND p.idSeries = s.idSeries
+                              AND l.idLocation = st.idSite
+                              AND sp.idProduct = p.idProduct
+                              AND sp.user_name=#userName#
+                ORDER BY p.idProduct,p.type,p.material,p.color,p.size
+	</select>
+
+
+
+
+
+<resultMap  id="clientBySkuAndStatus" class="com.huaixuan.network.biz.domain.product.Product">
+	 <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="brandName" property="brandName" />
+	  <result column="seriesName" property="seriesName" />
+	  
+	   <result column="TYPE" property="type" />
+	  <result column="material" property="material" />
+	  <result column="color" property="color" />
+	  <result column="size" property="size" />
+	  
+	  <result column="dlPrice" property="dlPrice" />
+	  <result column="picture" property="picture" />
+	  <result column="euPrice" property="euPrice" />
+	  <result column="dxPrice" property="dxPrice" />
+	  
+	  <result column="smPrice" property="smPrice" />
+	  <result column="cost" property="cost" />
+	  <result column="goods_id" property="goodsId" />
+	  
+	  <result column="idCostCurrency" property="idCostCurrency" />
+	  <result column="curSiteName" property="curSiteName" />
+	  <result column="curSiteId" property="curSiteId"/>
+ 	  <result column="status" property="status" />
+	  
+	  <result column="salePrice" property="salePrice" />
+	  <result column="salePriceCurrency" property="salePriceCurrency" />
+	  <result column="instock" property="instock" />
+	  <result column="activePrice" property="activePrice" />
+	  
+	   <result column="years" property="years" />
+	   <result column="month" property="month" />
+	   <result column="isFlaw" property="isFlaw" />
+	   <result column="sku" property="sku" />
+	    
+	    <result column="status" property="status" />
+	 
+	</resultMap>
+	<!-- 用sku和status，获取商品 -->
+	<select id="selectProductBySkuAndStatus" parameterClass="java.util.Map" resultMap="clientBySkuAndStatus">
+	 SELECT  l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type TYPE,p.Material material,p.color color,size
+           ,p.CNPrice dlPrice,p.picture,p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.cost,p.goods_id,
+           l.idCostCurrency,st.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,
+		   p.gmt_create instock,p.active_price activePrice,p.years,p.month,l.isFlaw,p.sku,sta.status
+		   FROM  product p,lifecycle l,brand b,series s,STATUS sta,site st
+             WHERE p.idProduct=l.idProduct 
+                              AND l.idStatus=sta.idStatus 
+                              AND p.idBrand=b.idBrand 
+                              AND p.idSeries = s.idSeries
+                              AND l.idLocation = st.idSite
+                           <isNotEmpty property="sku">
+		                     and p.sku = #sku#
+		                   </isNotEmpty>
+		                  <isNotEmpty property="status">
+		                  and sta.status=#status#
+		                  </isNotEmpty>
+	</select>
+	<!-- 开单后更新lifecyle状态和售价 -->
+	<update id="updateLifeCyle" parameterClass="java.util.Map" >
+			UPDATE lifecycle SET isFlaw = isFlaw
+			<isNotEmpty property="idStatus" prepend=",">
+			   idStatus = $idStatus$
+			</isNotEmpty>
+			
+			<isNotEmpty property="idOrder" prepend=",">
+			   idOrder = $idOrder$
+			</isNotEmpty>
+			<isNotEmpty property="idOrder2" prepend=",">
+			   idOrder2 = $idOrder2$
+			</isNotEmpty>
+			
+			<isNotEmpty property="price" prepend=",">
+			   price = $price$
+			</isNotEmpty>
+			
+			<isNotEmpty property="idPriceCurrency" prepend=",">
+			   idPriceCurrency = $idPriceCurrency$
+			</isNotEmpty>
+
+			<isNotEmpty property="idLastLocation" prepend=",">
+			   idLastLocation = $idLastLocation$
+			</isNotEmpty>
+			
+			
+			<isNotEmpty property="idLastOperator" prepend=",">
+			   idLastOperator = $idLastOperator$
+			</isNotEmpty>
+			
+		WHERE   idLifeCycle = #idLifeCycle#
+	</update>
+	
+	
+	<insert id="copyLifeCyleByIdLiceCyle" parameterClass="java.lang.Long">
+		INSERT INTO lifecycle(idProduct,cost,idCostCurrency,idPurchase,HXPrice,HKHXPrice,idLocation,idLastLocation,idStatus,idPriceCurrency,idOrder,idLastOperator,hasValidCard,remark,isFlaw) 
+		SELECT                idProduct,cost,idCostCurrency,idPurchase,HXPrice,HKHXPrice,idLocation,idLastLocation,1 idStatus,0 idPriceCurrency,-1 idOrder,idLastOperator,hasValidCard,remark,isFlaw
+		FROM lifecycle WHERE idLifeCycle =  #idLifeCycle#
+	</insert>
+	
+	 <!-- 插入历史记录 -->
+	<insert id="insertIntoHistory" parameterClass="java.util.Map">
+		insert into history values(null,$idOperation$,$idProduct$,
+		<isNotEmpty property="date">
+			$date$
+		</isNotEmpty>
+		<isEmpty property="date">
+			sysdate()
+		</isEmpty>
+		,$idOperator$,$idCurStation$,$idStatus$,$idSupply$,$idCustomer$)
+	</insert>
+	
+	
+	
+
+	
+	<!-- 更新产品信息 -->
+	<update id="updateProductByNotNull" parameterClass="com.huaixuan.network.biz.domain.product.Product">
+		update product set gmt_modify = gmt_modify 
+		<isNotNull prepend="," property="brandID">
+			idBrand=#brandID#
+		</isNotNull>
+		<isNotNull prepend="," property="seriesId">
+			idSeries=#seriesId#
+		</isNotNull>
+		<isNotNull prepend="," property="type">
+			Type=#type#
+		</isNotNull>
+		<isNotNull prepend="," property="material">
+			Material=#material#
+		</isNotNull>
+		<isNotNull prepend="," property="color">
+			Color=#color#
+		</isNotNull>
+		<isNotNull prepend="," property="uuid">
+			UUID=#uuid#
+		</isNotNull>
+		<isNotNull prepend="," property="auuid">
+			aUUID=#auuid#
+		</isNotNull>
+		<isNotNull prepend="," property="picture">
+			Picture=#picture#
+		</isNotNull>
+		<isNotNull prepend="," property="dlPrice">
+			CNPrice=#dlPrice#
+		</isNotNull>
+		<isNotNull prepend="," property="euPrice">
+			EUPrice=#euPrice#
+		</isNotNull>
+		<isNotNull prepend="," property="dxPrice">
+			HKPrice=#dxPrice#
+		</isNotNull>
+		<isNotNull prepend="," property="size">
+			Size=#size#
+		</isNotNull>
+		<isNotNull prepend="," property="targetCustomers">
+			targetCustomers=#targetCustomers#
+		</isNotNull>
+		<isNotNull prepend="," property="isDisplay">
+			is_display=#isDisplay#
+		</isNotNull>
+		<isNotNull prepend="," property="origin">
+			Origin=#origin#
+		</isNotNull>
+		<isNotNull prepend="," property="sizedes">
+			size_des=#sizedes#
+		</isNotNull>
+		<isNotNull prepend="," property="name">
+			name=#name#
+		</isNotNull>
+		<isNotNull prepend="," property="materialdes">
+			material_des=#materialdes#
+		</isNotNull>
+		
+		<isNotNull prepend="," property="colordes">
+			color_des=#colordes#
+		</isNotNull>
+		<isNotNull prepend="," property="sku">
+			sku=#sku#
+		</isNotNull>
+		<isNotEmpty prepend="," property="activePrice">
+				active_price=#activePrice#
+		</isNotEmpty>
+		 where idProduct = #idProduct#
+ 
+	</update>
+	
+
+	<!-- 更新产品信息  -->
+	<update id="updateLifecycleByNotNull" parameterClass="com.huaixuan.network.biz.domain.product.Product">
+		update lifecycle set idProduct = idProduct
+			<isNotNull prepend="," property="cost">
+				cost=#cost#
+			</isNotNull>
+			<isNotEmpty prepend="," property="idCostCurrency">
+				idCostCurrency=#idCostCurrency#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idPurchase">
+				idPurchase=#idPurchase#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="ssPrice">
+				HXPrice=#ssPrice#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="smPrice">
+				HKHXPrice=#smPrice#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idLocation">
+				idLocation=#idLocation#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idLastLocation">
+				idLastLocation=#idLastLocation#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				idStatus=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="salePrice">
+				price=#salePrice#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="salePriceCurrency">
+				idPriceCurrency=#salePriceCurrency#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idOrder">
+				idOrder=#idOrder#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idOrder2">
+				idOrder2=#idOrder2#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="idLastOperator">
+				idLastOperator=#idLastOperator#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="remark">
+				remark=#remark#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="isFlaw">
+				isFlaw=#isFlaw#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="hasValidCard">
+				hasValidCard=#hasValidCard#
+			</isNotEmpty>
+			
+		where idProduct = #idProduct#
+		<isNull prepend="and" property="back">
+			idStatus != 7
+		</isNull>
+		<isNotNull prepend="and" property="back">
+			idStatus = 7
+		</isNotNull>
+	</update>
+	
+	
+	<!--  修改型号 后更新平台SKU为空 -->
+	<update id="updateProductSku2Null" parameterClass="java.lang.String">
+		update product set goods_id = null,instance_id = null,sku_shangpin_sh=null,sku_shangpin_hk=null,sku_zouxiu_hk=null,sku_wangdiantong_sh=null,sku_kaola_hk=null,sku_kaola_sh=null
+		where idProduct = #idProduct#
+	</update>
+	
+	 
+	 
+	 
+	 
+	 
+	 <!--  查询产品历史信息 -->
+	<select id="selectProductHistoryByIdProduct" parameterClass="java.lang.String" resultMap="productHistoryResultMap">
+		SELECT h.idProduct,h.idOperation,o.name operation,h.Date,h.idOperator,ea.name operatorName,h.idCurStation,site.name siteName ,h.idStatus,s.status,h.idSupply,supply.name supply,h.idCustomer,customer.name customerName
+		FROM history h,`status` s,operation o,site,supply,customer,emall_admin ea
+		WHERE h.idOperation = o.idOperation
+		AND h.idStatus = s.idStatus
+		AND h.idCurStation = site.idSite
+		AND h.idSupply = supply.idSupply
+		AND h.idCustomer = customer.idCustomer
+		AND h.idOperator = ea.user_name
+		AND h.idProduct =#idProduct#
+		ORDER BY DATE 
+	</select>
+	
+	<insert id="addProduct" parameterClass="clientProduct" >
+	insert into product(idProduct,idBrand,idSeries,Type,Material,Color,Size,Picture,CNPrice,EUPrice,HKPrice,gmt_create,gmt_modify,`targetCustomers`,uuid,origin,years,month)
+	value(#idProduct#,#brandID#,#seriesId#,#type#,#material#,#color#,#size#,#picture#,#dlPrice#,#euPrice#,#dxPrice#,sysdate(),sysdate(),0,'',#origin#,#years#,#month#)
+ 
+	</insert>
+	
+	<insert id="addProductLifeCyle" parameterClass="clientProduct" >
+ 		insert into lifecycle(idLifeCycle,idProduct,cost,idCostCurrency,idPurchase,HXPrice,HKHXPrice,idLocation,idLastLocation,idStatus,idOrder,idLastOperator,hasValidCard)
+ 		value(null,#idProduct#,#cost#,#idCostCurrency#,#idPurchase#,#ssPrice#,#smPrice#,#idLocation#,#idLastLocation#,#statusID#,#idOrder#,#idLastOperator#,0)
+ 		<selectKey resultClass="java.lang.Long" keyProperty="idLifeCycle" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	
+	  <update id="updateProductId" parameterClass="clientProduct">
+	     update product set idProduct=idProduct
+	     <isNotNull prepend="," property="brandID">
+	     idBrand=#brandID#
+	     </isNotNull>
+	     <isNotNull prepend="," property="seriesId">
+	     idSeries=#seriesId#
+	     </isNotNull>
+	      where idProduct=#idProduct#
+	  </update>
+
+	<!-- 查询product表中的型号，材质，颜色根据sku集合（去重复） -->
+	<select id="selectSkuinformation"   resultMap="slectProductinfo" parameterClass="java.util.List">
+		SELECT DISTINCT
+			p.sku sku,
+			p.Color Color,
+			p.Material Material,
+			p.Type Type
+		FROM 
+			product p
+		WHERE p.sku in 
+		<iterate open="(" close=")" conjunction="," >  
+                #sku[]#  
+        </iterate>
+		
+	</select>
+	
+	
+	<!--  sku  SecurityTC  ImplementationS  NAME material_des  color_des Origin-->
+	<update id="updateProductsetSecurityTC" parameterClass="clientProduct">
+	     update product set 
+	     
+	     <isNotNull  property="securityTC">
+	     SecurityTC=#securityTC#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="implementationS">
+	     ImplementationS=#implementationS#
+	     </isNotNull>
+	     
+	      <isNotNull prepend="," property="name">
+	        name=#name#
+	      </isNotNull>
+	     
+	     <isNotNull prepend="," property="materialdes">
+	       material_des=#materialdes#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="colordes">
+	       color_des=#colordes#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="origin">
+	       Origin=#origin#
+	     </isNotNull>
+	     
+	      where sku=#sku#
+	  </update>
+	  
+	  <update id="updateProductPutNull" parameterClass="clientProduct">
+	     update product set goods_id=null , instance_id=null , gmt_export=null
+	     where idProduct=#idProduct#
+	     
+	  </update>
+	  
+	  <select id="getProductbysku" parameterClass="java.lang.String" resultMap="productPropertyMap">
+	  
+	    SELECT * FROM product WHERE sku=#sku# LIMIT 1
+	  
+	  
+	  </select>
+	  
+</sqlMap>
+
+

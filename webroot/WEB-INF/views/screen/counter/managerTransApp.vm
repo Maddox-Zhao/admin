@@ -1,0 +1,125 @@
+#set($layout = 'layout\default.vm')
+#set($title = "财务管理 - 账务补帐申请管理")
+<div class="main">
+
+<h2>账务补帐申请单列表</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>账务补帐申请管理</span></h3>
+      <form action="managerTransApp.html" name="searchForm" method="post">
+    <table>
+      <tr>
+    <th>内部流水号：</th>
+		<td><input type="text" name="parMap.innerBizNo" id="parMap.innerBizNo" value="$!parMap.innerBizNo" maxLength="32"/>		</td>
+	<th>补帐类型：</th>
+			<td><select id="parMap.subTransCode" name="parMap.subTransCode">
+        <option value="">-=请选择=-</option>
+		<option value="400301" #if($!parMap.subTransCode == "400301")selected #end>在线充值</option>
+		<option value="500301" #if($!parMap.subTransCode == "500301")selected #end>提现成功</option>
+		<option value="500401" #if($!parMap.subTransCode == "500401")selected #end>批量提现成功</option>
+		<option value="301101" #if($!parMap.subTransCode == "301101")selected #end>退货退款</option>
+	</select>		<td>
+	<th>状态：</th>		<td>
+	<select id="parMap.status" name="parMap.status">
+        <option value="">-=请选择=-</option>
+		<option value="new" #if($!parMap.status == "new")selected #end>新建</option>
+		<option value="success" #if($!parMap.status == "success")selected #end>申请成功</option>
+		<option value="fail" #if($!parMap.status == "fail")selected #end>申请退回</option>
+	</select>
+	</td></tr>
+			<tr>
+	<th>内部时间：</th> 		<td>从&nbsp;
+	<input type="text" name="parMap.transDateStart" id="parMap.transDateStart" maxlength="10" value="$!parMap.transDateStart" size="8" "readonly=false" />
+&nbsp;到&nbsp;
+		<input type="text" name="parMap.transDateEnd" id="parMap.transDateEnd" maxlength="10" value="$!parMap.transDateEnd" size="8" "readonly=false" />
+		</td>
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "parMap.transDateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "parMap.transDateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+<th>&nbsp;</th>
+		</td>		&nbsp;</td><th><input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/></th>
+  		<td>&nbsp;  </td>
+</table>
+    </form>
+  </div>
+<div class="clear"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+
+<!-- 订单列表 -->
+<div class="listBox">
+          <h3><span>账务补帐申请单列表</span></h3>
+    <table>
+      <tr>
+        <th>编号</th>
+		<th>内部流水号</th>
+		<th>金额</th>
+        <th>补帐类型</th>
+		<th>内部时间</th>
+		<th>状态</th>
+		<th>操作</th>
+      </tr>
+
+      #foreach($transApp in $query.items)
+		<tr  #if($velocityCount%2==0) class="bg" #end>
+            <td  align="center">$velocityCount</td>
+			<td  align="center">$!transApp.innerBizNo</td>
+			<td  align="center">$!transApp.amount</td>
+    		<td  align="center">
+				$!transApp.subTransCodeName
+			</td>
+			<td  align="center">$!transApp.transDate</td>
+    		<td  align="center">
+				$!transApp.statusName
+			</td>
+    		<td  align="center">
+    			<a href="showTransAppInfo.html?parMap.transAppId=$transApp.id">查看</a>
+    		</td>
+        </tr>
+	  #end
+
+    </table>
+    <div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/counter/managerTransApp.html?parMap.transDateStart=$!{parMap.transDateStart}&parMap.transDateEnd=$!{parMap.transDateEnd}&parMap.innerBizNo=$!{parMap.innerBizNo}&parMap.subTransCode=$!{parMap.subTransCode}&parMap.status=$!{parMap.status}").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+
+  </div>
+
+</div>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var transDateStart = document.getElementById("parMap.transDateStart").value;
+		    var transDateEnd = document.getElementById("parMap.transDateEnd").value;
+		    var transDateStart = transDateStart.replace(/-/g, "/");
+		    var transDateEnd = transDateEnd.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(transDateStart));
+            var e_date1=new Date(Date.parse(transDateEnd));
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+			document.getElementById("parMap.innerBizNo").value=document.getElementById("parMap.innerBizNo").value.trim();
+        	document.forms[0].submit();
+	    }
+</script>
+
+</body>

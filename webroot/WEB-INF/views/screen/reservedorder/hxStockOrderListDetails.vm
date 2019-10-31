@@ -1,0 +1,157 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>订单产品</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+   </head>
+#set($isAdmin = false)
+#if($dutyids.contains("52"))
+		#set($isAdmin = true)
+#end
+<body>
+	 <form id="excelForm"  action="/product/exportSuoKuProduct.html" method="post" target="excelIFrame">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td>
+						<input id="sedid" name="orderId" class="mini-textbox"  value="$!{orderId}" style="display:none"/>
+                    </td> 
+					
+                    ##<td rowspan="4">
+                      ##  <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+                    ##</td>
+					<td >
+						<a class="mini-button" iconCls="icon-download" onclick="exportStockOrderOne()">导出</a>
+                    </td>
+
+                </tr>
+              
+               
+            </table>
+        </div>
+    </div>
+	</form>
+
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:480px;" allowResize="true" multiSelect="true" 
+        url="HxSearchDetalisOrder.html"  idField="idProduct"  pageSize="50" pageIndex="1"  onselectionchanged="canAdd2ShoppingCar()" >
+        <div property="columns">
+			<div field="idorder" width="170" headerAlign="center" align="center" allowSort="true">销售订单号（魅力惠）</div>
+            <div field="idPlartform" width="90" headerAlign="center" align="center"  allowSort="true" renderer="rendererCode">平台名称</div>
+			
+			<div field="tmall" width="160" headerAlign="center" align="center"  allowSort="true" renderer="rendererTmall">是否是天猫订单（魅力惠）</div>
+			<div field="idStatus" width="90" headerAlign="center" align="center"  allowSort="true" renderer="rendererStatus">状态</div>
+            <div field="createDate" width="160" headerAlign="center" align="center"  allowSort="true">接收订单时间</div>
+			<div field="palcedTime" width="160" headerAlign="center" align="center"  allowSort="true">平台下单时间（魅力惠）</div>
+			
+			
+            <div field="name" width="80" headerAlign="center" align="center" allowSort="true">收件人姓名</div>
+			<div field="realName" width="100" headerAlign="center" align="center" allowSort="true">报关人姓名（魅力惠）</div>
+			<div field="identityNumber" width="80" headerAlign="center" align="center" allowSort="true">报关人身份证号（魅力惠）</div>
+			<div field="mobile" width="90" headerAlign="center" align="center" allowSort="true">收件人电话</div>
+			
+            <div field="country" width="60" headerAlign="center" align="center"  allowSort="true">国家</div>
+			<div field="province" width="60" headerAlign="center" align="center"  allowSort="true">省份</div>
+            <div field="city" width="60" headerAlign="center" align="center"  allowSort="true">城市</div>
+            <div field="district" width="60" headerAlign="center" align="center" allowSort="true">地区</div>
+			
+			<div field="streetAddress" width="120" headerAlign="center" align="center" allowSort="true">街道地址</div>
+            <div field="zipCode" width="100" headerAlign="center" align="center"  allowSort="true">邮政编码</div>
+			<div field="totalPrice" width="60" headerAlign="center" align="center"  allowSort="true">订单总价</div>
+            <div field="discountPrice" width="60" headerAlign="center" align="center"  allowSort="true">优惠总价</div>
+            
+			<div field="freight" width="60" headerAlign="center" align="center"  allowSort="true">运费</div>
+            <div field="skuId" width="60" headerAlign="center" align="center"  allowSort="true">魅力惠sku</div>
+            <div field="merchantSkuId" width="80" headerAlign="center" align="center"  allowSort="true">我们的SKU</div>
+            <div field="quantity" width="60" headerAlign="center" align="center"  allowSort="true">商品数量</div>
+			
+            <div field="productname" width="100" headerAlign="center" align="center"  allowSort="true">商品名称</div>
+            <div field="size" width="100" headerAlign="center" align="center"  allowSort="true">商品尺寸</div>
+			<div field="currency" width="100" headerAlign="center" align="center"  allowSort="true">币种</div>
+			<div field="supplyprice" width="100" headerAlign="center" align="center"  allowSort="true">供货价</div>
+		</div>
+	</div>
+    <script type="text/javascript">
+	
+		 var userSite = "$!{site}"; //site
+		var statusData = [{id:1,value:"考拉"},{ id:2, value:"寺库"},{ id:3, value:"珍品"},{ id:4, value:"1号店"},{ id:5, value:"天猫"},{ id:6, value:"higo"},{id:7, value:"分期乐"},{id:8,value:"拼多多"},{id:9, value:"魅力惠"},{id:10,value:"小红书"}];
+	    var status=[{id:1,value:"已售"},{ id:2, value:"取消"},{ id:3, value:"未确定"}]
+		//将html标签解析为miniui控件
+		mini.parse();
+		//根据id获取控件对象
+		var grid = mini.get("datagrid1");
+		search();
+		function rendererCode(row){
+		  if(row.value=='1') return "考拉";
+		     else if(row.value=='2') return "寺库";
+			 else if(row.value=='3') return "珍品";
+			 else if(row.value=='4') return "1号店";
+			 else if(row.value=='5') return "天猫";
+			 else if(row.value=='6') return "higo";
+			 else if(row.value=='7') return "分期乐";
+			 else if(row.value=='8') return "拼多多";
+			 else if(row.value=='9') return "魅力惠";
+			 else if(row.value=='10') return "小红书";
+			 else return "";
+		}
+		
+		function rendererStatus(row){
+		   if (row.value=='1') return "已售";
+		   else if (row.value=='2') return "取消";
+		   else return "";
+		}
+		
+		function rendererTmall(row){
+		   if (row.value=='false') return "否";
+		   else if (row.value=='true') return "是";
+		   else return "";
+		}
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据 
+			if(!data.idorder)
+				delete data.idorder;
+            grid.load(data);
+        }
+		
+		 //导出
+        function exportStockOrder() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据  
+			if(!data.idorder)
+				delete data.idorder;
+				
+			if(!data.idPlartform)
+				delete data.idPlartform;
+				
+			if(!data.merchantSkuId)
+				delete data.merchantSkuId;
+			var excelForm = document.getElementById("excelForm");
+	  		excelForm.submit();
+        }
+		
+	 //导出
+        function exportStockOrderOne() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据  
+			if(!data.idorder)
+				delete data.idorder;
+				
+			if(!data.idPlartform)
+				delete data.idPlartform;
+				
+			if(!data.merchantSkuId)
+				delete data.merchantSkuId;
+			var excelForm = document.getElementById("excelForm");
+			excelForm.action = "/HxStockOrder/exportStockOrderOne.html"
+	  		excelForm.submit();
+        }	
+</script>
+</body>
+</html>

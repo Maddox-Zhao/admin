@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="StorageCheckDetailSQL">
+	<typeAlias alias="storageCheckDetail"
+		type="com.huaixuan.network.biz.domain.storage.StorageCheckDetail" />
+	<typeAlias alias="storageAgeDetail"
+	    type="com.huaixuan.network.biz.domain.storage.StockAge" />
+	<resultMap class="storageCheckDetail"
+		id="storageCheckDetailResult">
+		<result column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="goods_instance_id" property="goodsInstanceId" />
+		<result column="stor_id" property="storId" />
+		<result column="loc_id" property="locId" />
+		<result column="check_id" property="checkId" />
+		<result column="stor_number" property="storNumber" />
+		<result column="stor_type" property="storType" />
+		<result column="check_num" property="checkNum" />
+		<result column="profit_num" property="profitNum" />
+		<result column="supplier_id" property="supplierId" />
+		<result column="remark" property="remark" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+	<resultMap class="storageCheckDetail"
+		id="storageCheckDetailFullResult">
+		<result column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="goods_instance_id" property="goodsInstanceId" />
+		<result column="code" property="code" />
+		<result column="attrs" property="attribute" />
+		<result column="stor_id" property="storId" />
+		<result column="loc_id" property="locId" />
+		<result column="loc_name" property="locName" />
+		<result column="check_id" property="checkId" />
+		<result column="stor_number" property="storNumber" />
+		<result column="stor_type" property="storType" />
+		<result column="check_num" property="checkNum" />
+		<result column="profit_num" property="profitNum" />
+		<result column="supplier_id" property="supplierId" />
+		<result column="remark" property="remark" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="goodsInstanceName" property="goodsInstanceName" />
+		<result column="supplierName" property="supplierName" />
+	</resultMap>
+
+	<resultMap class="storageCheckDetail"
+		id="countStorageCheckDetail">
+		<result column="goods_instance_id" property="goodsInstanceId" />
+		<result column="profit_num" property="profitNum" />
+		<result column="stor_id" property="storId" />
+	</resultMap>
+
+	<resultMap class="storageAgeDetail" id="stockAgeExportResult">
+		<result column="code" property="code" />
+		<result column="instance_name" property="instanceName" />
+		<result column="cat_code" property="catCode" />
+		<result column="attrs" property="attrs" />
+		<result column="goods_unit" property="goodsUnit" />
+		<result column="depositoryName" property="depositoryName" />
+		<result column="loc_name" property="locName" />
+		<result column="supplierName" property="supplierName" />
+		<result column="storage_num" property="storageNum" />
+		<result column="storage_price" property="storagePrice" />
+		<result column="half_month" property="halfMonth" />
+		<result column="one_month" property="oneMonth" />
+		<result column="onehalf_month" property="oneHalfMonth" />
+		<result column="two_month" property="twoMonth" />
+		<result column="three_month" property="threeMonth" />
+		<result column="above_month" property="aboveMonth" />
+		<result column="after_onemonth" property="afterOnemonth" />
+		<result column="onemonth_threemonty" property="onemonthThreemonty" />
+		<result column="threemonty_sixmonty" property="threemontySixmonty" />
+		<result column="sixmonty_twelvemonth" property="sixmontyTwelvemonth" />
+		<result column="above_twelvemonth" property="aboveTwelvemonth" />
+		<result column="stor_type" property="storType" />
+	</resultMap>
+
+	<!-- create StorageCheckDetail object -->
+	<insert id="addStorageCheckDetail"
+		parameterClass="storageCheckDetail">
+		<![CDATA[
+		insert into ioss_storage_check_detail
+		(id,goods_id,goods_instance_id,stor_id,loc_id,check_id,stor_number,stor_type,check_num,profit_num,supplier_id,remark,gmt_create,gmt_modify )values( null,
+		#goodsId#,
+		#goodsInstanceId#,
+		#storId#,
+	    #locId#,
+		#checkId#,
+		#storNumber#,
+		#storType#,
+		#checkNum#,
+		#profitNum#,
+		#supplierId#,
+		#remark#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update StorageCheckDetail object -->
+	<update id="editStorageCheckDetail"
+		parameterClass="storageCheckDetail">
+		<![CDATA[
+		update ioss_storage_check_detail set goods_id = #goodsId#,
+		goods_instance_id = #goodsInstanceId#,
+		stor_id = #storId#,
+	    loc_id=#locId#,
+		check_id = #checkId#,
+		stor_number = #storNumber#,
+		stor_type = #storType#,
+		check_num = #checkNum#,
+		profit_num = #profitNum#,
+		supplier_id = #supplierId#,
+		remark = #remark#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+	</update>
+	<!-- delete StorageCheckDetail object -->
+	<delete id="removeStorageCheckDetail"
+		parameterClass="java.lang.Long">
+		<![CDATA[
+		delete from ioss_storage_check_detail where ioss_storage_check_detail.ID = #value#
+]]>
+	</delete>
+	<!-- search StorageCheckDetail object -->
+	<select id="getStorageCheckDetail" parameterClass="java.lang.Long"
+		resultMap="storageCheckDetailResult">
+		<![CDATA[
+		select ioss_storage_check_detail.* from ioss_storage_check_detail where ioss_storage_check_detail.ID = #value#
+]]>
+	</select>
+	<!-- searchAll StorageCheckDetail List -->
+	<select id="getStorageCheckDetails"
+		resultMap="storageCheckDetailResult">
+		<![CDATA[
+		select ioss_storage_check_detail.* from ioss_storage_check_detail
+]]>
+	</select>
+
+
+	<select id="getStorageCheckDetailsByParameterMap"
+		resultMap="storageCheckDetailFullResult">
+		<include refid="pageSQLHead" />
+		<![CDATA[
+	select ioss_storage_check_detail.*,
+	       ioss_supplier.name as supplierName,
+	       ioss_goods_instance.instance_name as goodsInstanceName,
+	       ioss_goods_instance.code,
+	       ioss_goods_instance.attrs,
+	       ioss_dep_location.loc_name
+	  from ioss_storage_check_detail,
+	       ioss_supplier,
+	       ioss_goods_instance,
+	       ioss_dep_location
+	 where ioss_storage_check_detail.supplier_id = ioss_supplier.id
+	   and ioss_storage_check_detail.goods_instance_id = ioss_goods_instance.id
+	   and ioss_dep_location.id = ioss_storage_check_detail.loc_id
+
+       ]]>
+		<isNotEmpty prepend="and" property="checkId">
+			ioss_storage_check_detail.check_id = #checkId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storId">
+			ioss_storage_check_detail.stor_id = #storId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			ioss_storage_check_detail.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			ioss_storage_check_detail.stor_type = #storType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_storage_check_detail.goods_instance_id =
+			#goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			ioss_storage_check_detail.check_num is null
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceCode">
+			ioss_goods_instance.code like
+			CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceName">
+			ioss_goods_instance.instance_name like
+			CONCAT('%',#goodsInstanceName#,'%')
+		</isNotEmpty>
+		order by ioss_storage_check_detail.loc_id
+		asc,ioss_goods_instance.code asc
+		<include refid="pageSQLFoot" />
+	</select>
+
+	<select id="getStorageCheckDetailsCountByParameterMap"
+		resultClass="java.lang.Integer">
+		<![CDATA[
+		select count(ioss_storage_check_detail.id) from ioss_storage_check_detail where 1=1
+      ]]>
+
+		<isNotEmpty prepend="and" property="checkId">
+			ioss_storage_check_detail.check_id = #checkId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storId">
+			ioss_storage_check_detail.stor_id = #storId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			ioss_storage_check_detail.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			ioss_storage_check_detail.stor_type = #storType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_storage_check_detail.goods_instance_id =
+			#goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			ioss_storage_check_detail.check_num is null
+		</isNotEmpty>
+	</select>
+
+	<select id="sumStorageCheckDetailByParameterMap"
+		resultClass="java.lang.Integer">
+		<![CDATA[
+		select sum(ioss_storage_check_detail.check_num) from ioss_storage_check_detail where 1=1
+      ]]>
+
+		<isNotEmpty prepend="and" property="checkId">
+			check_id = #checkId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storId">
+			stor_id = #storId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+	</select>
+
+
+	<select id="getCheckDetailCountByMap"
+		resultMap="countStorageCheckDetail">
+		<![CDATA[
+		select goods_instance_id,stor_id, sum(check_num) as profit_num
+		  from ioss_storage_check_detail
+		 where 1 = 1
+      ]]>
+
+		<isNotEmpty prepend="and" property="checkId">
+			check_id = #checkId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			stor_type = #storType#
+		</isNotEmpty>
+		group by goods_instance_id,stor_id
+	</select>
+
+	<select id="getStockAgeAnalysisDataListsByParameterMap"
+		parameterClass="java.util.Map" resultMap="stockAgeExportResult">
+		<![CDATA[
+      select b.code,b.instance_name,b.cat_code,b.attrs,b.goods_unit,e.name as depositoryName,d.loc_name,c.name as supplierName,a.storage_num,a.storage_price,a.half_month,a.one_month,
+            a.onehalf_month,a.two_month,a.three_month,a.above_month,a.after_onemonth,a.onemonth_threemonty,a.threemonty_sixmonty,a.sixmonty_twelvemonth,a.above_twelvemonth, a.stor_type
+      from ioss_stock_age a,ioss_goods_instance b,ioss_supplier c,ioss_dep_location d,ioss_depository e
+      where b.id=a.goods_instance_id and a.supplier_id=c.id and a.loc_id=d.id and d.dep_id=e.id
+                ]]>
+		<isNotEmpty prepend="and" property="queryDate">
+			a.countdate = #queryDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="code">
+			b.code like
+			CONCAT('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="queryDate">
+			c.name like
+			CONCAT('%',#supplierName#,'%')
+		</isNotEmpty>
+
+		order by e.name,c.name
+	</select>
+
+
+</sqlMap>

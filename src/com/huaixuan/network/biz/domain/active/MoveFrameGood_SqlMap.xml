@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<!-- 表名:hx_moveframe_product -->
+<sqlMap namespace="moveframeProductDao">
+<!-- 
+	<typeAlias alias="MoveFrameProduct" type="com.huaixuan.network.biz.domain.active.MoveframeP"/>
+	
+	<resultMap id="MoveFrameProductResult" class="MoveFrameProduct">
+		<result property="id" column="id"/>
+		<result property="moveframeId" column="moveframe_id"/>
+		<result property="productId" column="product_id"/>
+		<result property="goodsId" column="goods_id"/>
+		<result property="instanceId" column="instance_id"/>
+		<result property="note" column="note"/>
+		<result property="discountPrice" column="discount_price"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+		<result property="area" column="area"/>
+	</resultMap>
+	
+	
+	<sql id="MoveframeFields">
+			id,moveframe_id,product_id,goods_id,instance_id,note,discount_price,gmt_create,gmt_modify
+	</sql>
+	
+	 -->
+	<!-- 根据活动框ID获取该客户所对应的活动产品 
+	<select id="getMoveFrameGoodsInfoByMoveFrameId" parameterClass="java.lang.Long" resultMap="MoveFrameProductResult">
+		SELECT id,moveframe_id,product_id,goods_id,instance_id,note,discount_price,gmt_create,gmt_modify,(SELECT `area` FROM hx_moveframe m WHERE m.id=g.moveframe_id) `area`
+		FROM 
+		hx_moveframe_product g
+		WHERE g.moveframe_id = #moveframeId#
+	</select>
+	-->
+	<!-- 根据客户ID得到他所对用的活动框ID 
+	<select id="getMoveFrameIdsByCustomerId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		SELECT q.moveframe_id FROM hx_moveframe_user q,hx_moveframe m 
+		WHERE q.customer_id= #customerId# AND m.id = q.moveframe_id
+		AND m.status = 'open'
+	</select>
+	-->
+	<!-- 得到活动框的名字 
+	<select id="selectMoveframeNameById" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	SELECT mf.name
+	FROM 
+	hx_moveframe mf
+	WHERE mf.id =#moveframeId#
+	</select>
+	
+	<select id="getHeaderEmail" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	SELECT email
+	FROM emall_admin a
+	WHERE a.user_name=(SELECT head_adminId FROM hx_moveframe m WHERE m.id = #moframeId#) LIMIT 1
+	</select>
+	
+	-->
+</sqlMap>
+
+

@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserSQL">
+	<typeAlias alias="user" type="com.huaixuan.network.biz.domain.user.User" />
+	<typeAlias alias="tradeSales" type="com.huaixuan.network.biz.domain.trade.TradeSalesCount" />
+	<resultMap id="userResult" class="user">
+		<result property="id" column="id" />
+		<result column="account" property="account" />
+		<result property="password" column="password" />
+		<result property="payPassword" column="paypassword" />
+		<result column="nickname" property="nickname" />
+		<result column="email" property="email" />
+		<result column="sex" property="sex" />
+		<result column="visit_count" property="visitCount" />
+		<result column="user_rank" property="userRank" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_last" property="gmtLast" />
+		<result column="ip_last" property="ipLast" />
+		<result column="stauts" property="stauts" />
+		<result column="is_validated" property="isValidated" />
+		<result column="reference_id" property="referenceId" />
+		<result column="type" property="type"/>
+		<result column="agent_count" property="agentCount"/>
+		<result column="sales_count" property="salesCount"/>
+		<result column="vip_remark" property="vipRemark"/>
+		<result column="is_period_pay" property="isPeriodPay"/>
+		<result column="gmt_period_pay_start" property="gmtPeriodPayStart"/>
+		<result column="gmt_period_pay_end" property="gmtPeriodPayEnd"/>
+		<result column="period" property="period"/>
+		<result column="ycperiod" property="ycperiod" nullValue="0"/>
+		<result column="period_amount_max" property="periodAmountMax" nullValue="0"/>
+		<result column="period_amount_now" property="periodAmountNow" nullValue="0"/>
+		<result column="is_scrap" property="isScrap"/>
+	</resultMap>
+	<resultMap id="userResultExtented" class="user"  extends="userResult" >
+		<result column="invoice" property="invoice" />
+		<!-- 
+		<result column="dep_code" property="depCode"/>
+		 -->
+	</resultMap>
+
+	<resultMap id="newuserResult" class="user">
+		<result property="id" column="id" />
+		<result column="account" property="account" />
+		<result property="password" column="password" />
+		<result column="nickname" property="nickname" />
+		<result column="real_name" property="realName" />
+		<result column="email" property="email" />
+		<result column="sex" property="sex" />
+		<result column="visitCount" property="visitCount" />
+		<result column="userRank" property="userRank" />
+		<result column="gmtCreate" property="gmtCreate" />
+		<result column="gmtLast" property="gmtLast" />
+		<result column="ipLast" property="ipLast" />
+		<result column="stauts" property="stauts" />
+		<result column="isValidated" property="isValidated" />
+		<result column="referenceId" property="referenceId" />
+		<result column="type" property="type"/>
+		<result column="agentManagerName" property="agentManagerName"/>
+		<result column="is_scrap" property="isScrap"/>
+		<result column="taobao_Main_Business" property="taobaoMainBusiness"/>
+		<result column="paipai_Main_Business" property="paipaiMainBusiness"/>
+		<result column="youa_Main_Business" property="youaMainBusiness"/>
+		<result column="ebay_Main_Business" property="ebayMainBusiness"/>
+		<result column="other_Main_Business" property="otherMainBusiness"/>
+		<result column="entity_Main_Business" property="entityMainBusiness"/>
+		<result column="selfshop_Main_Business" property="selfshopMainBusiness"/>
+	</resultMap>
+	
+	<resultMap class="user" id="serchuser">
+		<result property="id" column="id" />
+		<result column="account" property="account" />
+		<result column="name" property="name" />
+		<result column="sex" property="sex" />
+		<result column="type" property="type"/>
+		<result column="phone" property="phone"/>
+		<result column="address" property="useraddress"/>
+		<result column="integral" property="integral"/>
+		<result column="user_rank" property="userRank"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="stauts" property="stauts"/>
+		<result column="email" property="email"/>
+	</resultMap>
+	
+	
+	
+
+
+	<insert id="addUser" parameterClass="user">
+        <![CDATA[
+        insert into emall_users
+        (id,account,password,paypassword,nickname,email,sex,visit_count,user_rank,gmt_create,gmt_last,ip_last,stauts,is_validated,reference_id,type,customer_id)values(
+        null,
+        #account#,
+        #password#,
+        #payPassword#,
+        #nickname#,
+        #email#,
+        #sex#,
+        #visitCount#,
+        #userRank#,
+        sysdate(),
+        sysdate(),
+        #ipLast#,
+        #stauts#,
+        #isValidated#,
+        #referenceId#,
+        #type#,
+        #idCustomer#
+         )
+    ]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+	<insert id="addUserRole" parameterClass="map">
+        <![CDATA[
+        insert into adm_user_role (user_id, role_id) values (#userId#, #roleId#)
+    ]]>
+	</insert>
+
+<update id="updateUser" parameterClass="user">
+<![CDATA[
+update emall_users
+   set nickname = #nickname#,
+       email    = #email#,
+       sex      = #sex#,
+       stauts   = #stauts#
+ where id = #id#
+
+]]>
+</update>
+
+<update id="updateUserGrade" parameterClass="map">
+<![CDATA[
+update emall_users u
+   set u.user_rank = #userRank#
+ where u.id in (select aa.buy_id
+                  from (select t.buy_id, sum(t.goods_amount) as sum_amount
+                          from emall_trade t
+                         where t.status = 'trade_finish'
+                         group by t.buy_id) aa
+                 where aa.sum_amount > #samllNum#
+                   and aa.sum_amount <= #bigNum#)
+
+]]>
+</update>
+
+    <update id="updateUserScrap" parameterClass="user">
+        <![CDATA[
+            update emall_users
+            set is_scrap   = #isScrap#
+            where id =#id#
+    ]]>
+    </update>
+
+    <update id="updateGrade" parameterClass="map">
+        <![CDATA[
+            update emall_users u
+            set u.user_rank = #userRank#
+            where u.id =#id#
+    ]]>
+    </update>
+
+	<update id="editPassword" parameterClass="user">
+        <![CDATA[
+            update emall_users set password = #password#
+         where id = #id#
+    ]]>
+	</update>
+
+	<update id="editPayPassword" parameterClass="user">
+        <![CDATA[
+            update emall_users set paypassword = #payPassword#
+         where id = #id#
+    ]]>
+	</update>
+
+	<update id="editGmtPeriodPay">
+        <![CDATA[
+           update emall_users t set
+			 t.gmt_period_pay_start = t.gmt_period_pay_end,
+			 t.gmt_period_pay_end = t.gmt_period_pay_end + t.period
+			where t.is_period_pay = 'y'
+			   and IFNULL(t.period_amount_now, 0) <= 0
+			   and t.gmt_period_pay_end < sysdate()
+    ]]>
+	</update>
+
+	<select id="getUser" resultMap="userResult">
+        <![CDATA[
+        select * from emall_users where id=#id#
+    ]]>
+	</select>
+
+	<select id="user" resultMap="userResult">
+        <![CDATA[
+        select * from emall_users where id=#id#
+    ]]>
+	</select>
+
+	<select id="getUserByAccount" resultMap="userResult">
+        <![CDATA[
+        select * from emall_users where account=#account#
+    ]]>
+	</select>
+
+	<select id="getUserByUsername" resultMap="userResult">
+        <![CDATA[
+        select * from emall_users where account=#value# and stauts=1
+    ]]>
+	</select>
+
+	<select id="getUserCount" resultClass="int">
+        <![CDATA[
+        select count(*) from emall_users
+    ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="account">
+				(account like #account#)
+            </isNotEmpty>
+
+		</dynamic>
+	</select>
+
+	<select id="getUsers" resultMap="userResult">
+	
+        <![CDATA[
+        select * from emall_users
+    ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="account">
+				(account like #account#)
+            </isNotEmpty>
+		</dynamic>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+	</select>
+
+	<select id="checkPassword" resultClass="java.lang.String"
+		parameterClass="user">
+    <![CDATA[
+        select account from emall_users
+        where id=#id# and password=#currentlypwd#
+    ]]>
+	</select>
+
+	<select id="checkPayPassword" resultClass="java.lang.String"
+		parameterClass="user">
+    <![CDATA[
+        select account from emall_users
+        where id=#id# and paypassword=#currentlypwd#
+    ]]>
+	</select>
+
+
+	<select id="checkAccount" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+    <![CDATA[
+        select account from emall_users
+        where account=#value#
+    ]]>
+	</select>
+
+	<select id="checkEmail" resultClass="java.lang.String"
+		parameterClass="java.lang.String">
+    <![CDATA[
+        select email from emall_users
+        where email=#value#
+    ]]>
+	</select>
+
+	<delete id="deleteUser" parameterClass="java.lang.Long">
+        <![CDATA[
+        delete from emall_users where id = #id#
+    ]]>
+	</delete>
+
+	<delete id="deleteUserRoles" parameterClass="java.lang.Long">
+        <![CDATA[
+        delete from adm_user_role where user_id = #id#
+    ]]>
+	</delete>
+
+	<select id="getUserPassword" resultClass="java.lang.String">
+        <![CDATA[
+        select password from emall_users where account=#account#
+    ]]>
+	</select>
+
+	<update id="updateLastLogin" parameterClass="user">
+        <![CDATA[
+            update emall_users set gmt_last=sysdate(), ip_last=#ipLast# ,visit_count=visit_count+1 where id=#id#
+         ]]>
+	</update>
+
+	<select id="getUsersByCondition"  resultMap="newuserResult">
+	
+        select eu.is_scrap,eu.id id,eu.account account,eu.password password,eu.nickname nickname,eu.email email,eu.sex sex,'' as real_name,
+        '' as taobao_Main_Business,'' as paipai_Main_Business,'' as youa_Main_Business,'' as ebay_Main_Business,'' as other_Main_Business,
+        '' as entity_Main_Business,'' as selfshop_Main_Business,
+        eu.visit_count visitCount,eu.user_rank userRank,eu.gmt_create gmtCreate, eu.gmt_last gmtLast,eu.ip_last ipLast,eu.stauts stauts,
+        eu.is_validated isValidated,eu.reference_id referenceId,eu.type type
+        <isNotEmpty prepend="" property="agentManagerId">
+            ,admin.user_name as agentManagerName
+        </isNotEmpty>
+        <isEmpty property="agentManagerId">
+        	,'' agentManagerName
+        </isEmpty>
+			from emall_users eu
+        <isNotEmpty prepend="" property="agentManagerId">
+			, emall_agent_info agent,emall_admin admin
+		</isNotEmpty>
+			where 1=1
+		<isNotEmpty prepend="and" property="agentManagerId">
+			eu.id=agent.user_id and agent.agent_manager_id=admin.id
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+		   eu.id=#id#
+		</isNotEmpty>
+		<isNotEmpty property="account" prepend="and">
+			eu.account like concat('%',#account#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="email" prepend="and">
+            eu.email like concat('%',#email#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="nickname" prepend="and">
+            eu.nickname=#nickname#
+        </isNotEmpty>
+        <isNotEmpty property="stauts" prepend="and">
+            eu.stauts=#stauts#
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+            eu.type=#type#
+        </isNotEmpty>
+        order by eu.id desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+    </select>
+    
+	<select id="getUsersByCondition_addagent"  resultMap="newuserResult">
+	
+			<![CDATA[
+            select eu.is_scrap,eu.id id,eu.account account,eu.password password,eu.nickname nickname,eu.email email,
+            eu.sex sex,eu.visit_count visitCount,eu.user_rank userRank,eu.gmt_create gmtCreate, eu.gmt_last gmtLast,
+            eu.ip_last ipLast,eu.stauts stauts,
+            '' as real_name,
+	        '' as taobao_Main_Business,'' as paipai_Main_Business,'' as youa_Main_Business,'' as ebay_Main_Business,'' as other_Main_Business,
+	        '' as entity_Main_Business,'' as selfshop_Main_Business,
+            eu.is_validated isValidated,eu.reference_id referenceId,eu.type type
+            ,'' as agentManagerName
+			from emall_users eu
+			where 1=1
+        ]]>
+	        
+	        <isNotEmpty property="id" prepend="and">eu.id=#id#</isNotEmpty>
+	        <isNotEmpty property="account" prepend="and">
+	            eu.account like concat('%',#account#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="email" prepend="and">
+	            eu.email like concat('%',#email#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="nickname" prepend="and">
+	            eu.nickname=#nickname#
+	        </isNotEmpty>
+	        <isNotEmpty property="stauts" prepend="and">
+	            eu.stauts=#stauts#
+	        </isNotEmpty>
+	        <isNotEmpty property="type" prepend="and">
+	            eu.type=#type#
+	        </isNotEmpty>
+	        <isNotEmpty property="isScrap" prepend="and">
+	            eu.IS_SCRAP=#isScrap#
+	        </isNotEmpty>
+	        <isNotEmpty property="userRank" prepend="and">
+	            eu.user_rank=#userRank#
+	        </isNotEmpty>
+	        
+	        order by eu.id desc
+		<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+    </select>
+
+	<select id="getUsersByConditionCount" resultClass="java.lang.Integer">
+        <![CDATA[
+            select count(1) from emall_users eu where 1=1
+        ]]>
+        <isNotEmpty property="id" prepend="and">eu.id=#id#</isNotEmpty>
+        <isNotEmpty property="account" prepend="and">
+            eu.account like concat('%',#account#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="email" prepend="and">
+            eu.email like concat('%',#email#,'%')
+        </isNotEmpty>
+        <isNotEmpty property="nickname" prepend="and">
+            eu.nickname=#nickname#
+        </isNotEmpty>
+        <isNotEmpty property="stauts" prepend="and">
+            eu.stauts=#stauts#
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+            eu.type=#type#
+        </isNotEmpty>
+    </select>
+
+	<select id="getUsersByConditionCount_addagent"  resultClass="java.lang.Integer">
+	        select count(1)
+	        from emall_users eu
+			where 1=1
+	        
+	        <isNotEmpty property="id" prepend="and">eu.id=#id#</isNotEmpty>
+	        <isNotEmpty property="account" prepend="and">
+	            eu.account like concat('%',#account#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="email" prepend="and">
+	            eu.email like concat('%',#email#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="nickname" prepend="and">
+	            eu.nickname=#nickname#
+	        </isNotEmpty>
+	        <isNotEmpty property="stauts" prepend="and">
+	            eu.stauts=#stauts#
+	        </isNotEmpty>
+	        <isNotEmpty property="type" prepend="and">
+	            eu.type=#type#
+	        </isNotEmpty>
+	        <isNotEmpty property="isScrap" prepend="and">
+	            eu.IS_SCRAP=#isScrap#
+	        </isNotEmpty>
+	        <!--
+	        <isNotEmpty property="isAdmin" prepend="and">
+	            eu.is_admin=#isAdmin#
+	        </isNotEmpty>
+	         -->
+    </select>
+
+    <select id="getUserById" parameterClass="java.lang.Long" resultMap="userResultExtented">
+    <![CDATA[
+            select emall_users.* from emall_users where emall_users.id = #value#
+    ]]>
+    </select>
+
+    <insert id="addUserRoleRegister" parameterClass="java.util.Map">
+        <![CDATA[
+        insert into adm_user_role (user_id, role_id) values (#userId#, #roleId#)
+    ]]>
+    </insert>
+
+    <select id="getUserByEmail" resultMap="userResult" parameterClass="java.lang.String">
+        <![CDATA[
+            select * from emall_users
+            where email=#value#
+        ]]>
+    </select>
+
+    <select id="getAgentUsers"  resultMap="userResult" parameterClass="long">
+    <![CDATA[
+       select users.*
+			  from emall_users users, emall_agent_goods agent
+			  where users.id = agent.user_id
+			  and agent.goods_id = #id#
+
+    ]]>
+    </select>
+
+    <select id="getUserByUser" resultMap="userResult" parameterClass="user">
+        <![CDATA[
+            select * from emall_users
+            where account=#account# and password = #password# and stauts = 1
+        ]]>
+    </select>
+    <update id="updateUserType" parameterClass="java.util.Map">
+    	 <![CDATA[
+           update emall_users set type=#type# where id=#id#
+        ]]>
+    </update>
+
+    <update id="updateAgentCount" parameterClass="java.util.Map">
+    	update emall_users set agent_count = #agentCountNumber# where id = #userId#
+    </update>
+
+	<update id="updateAgentInvoice" parameterClass="java.util.Map">
+    	update emall_users set invoice = #invoice# where id = #userId#
+    </update>
+
+    <update id="updateUserByParMap" parameterClass="java.util.Map">
+    	 <![CDATA[
+           update emall_users set is_validated=1,type=#type# , vip_remark = #vipRemark# where id=#id#
+        ]]>
+    </update>
+
+    <update id="updateUserSalesCount" parameterClass="tradeSales">
+    	update emall_users set sales_count=#salesCount# where id = #userId#
+    </update>
+
+    <select id="getUserWithTypes" resultMap="userResult" parameterClass="java.util.Map">
+       <![CDATA[
+           select emall_users.* from emall_users where emall_users.stauts=1
+       ]]>
+ 		<isNotEmpty prepend="and" property="userTypes">
+			emall_users.type in(
+			<iterate property="userTypes" conjunction=",">#userTypes[]#</iterate>
+			)
+		</isNotEmpty>
+    </select>
+        <update id="updateUserPeriod" parameterClass="user">
+    	update emall_users
+    	set
+    		is_period_pay=#isPeriodPay#,
+    	 	gmt_period_pay_start=#gmtPeriodPayStart#,
+    	 	gmt_period_pay_end=#gmtPeriodPayEnd#,
+    	 	period=#period#,
+			ycperiod=#ycperiod#,
+    	 	period_amount_max=#periodAmountMax#
+    	where id = #id#
+    </update>
+
+    <update id="updateUserPeriodAmount" parameterClass="user">
+    	update emall_users
+    	set period_amount_now=#periodAmountNow#
+    	where id = #id#
+    </update>
+    <update id="updateChannelMemoByUserId" parameterClass="java.util.Map">
+    	update emall_agent_info
+    	set channel_memo=#channelMemo#
+    	where user_id=#userId#
+    </update>
+    <update id="updateMainMemoByUserId" parameterClass="java.util.Map">
+    	update emall_agent_info
+    	set main_memo=#mainMemo#
+    	where user_id=#userId#
+    </update>
+    <update id="updateConnectMemoByUserId" parameterClass="java.util.Map">
+    	update emall_agent_info
+    	set connect_memo=#connectMemo#
+    	where user_id=#userId#
+    </update>
+    <update id="updateIsFulltimeByUserId" parameterClass="java.util.Map">
+    	update emall_agent_info
+    	set is_fulltime=#isFulltime#
+    	where user_id=#userId#
+    </update>
+    
+    
+    <!-- 更新emall_users 用户主表 -->
+	<update id="updateUsersByNotNull" parameterClass="user">
+		update emall_users
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="sex">
+				sex=#sex#
+			</isNotNull>
+			<isNotNull prepend="," property="userRank">
+				user_rank=#userRank#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtLast">
+				gmt_last=sysdate()
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				type=#type#
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+    
+    <select id="selectCustomerIdById" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+    	SELECT u.customer_id
+		FROM emall_users u
+		WHERE u.id = #userId#
+    </select>
+    
+    <select id="serchUserListByConditionWithPageCount" resultClass="java.lang.Integer">
+    SELECT  COUNT(*)FROM (
+	SELECT 
+	eu.account,
+	cu.name,
+	eu.sex,
+	eu.type,
+	cu.phone,
+	cu.address,
+	cu.integral,
+	eu.user_rank,
+	eu.gmt_create,
+	eu.stauts,
+	eu.email
+	FROM customer cu,emall_users eu
+	WHERE 
+	eu.customer_id = cu.idCustomer
+			<isNotEmpty property="id" prepend="and">
+				eu.id=#id#
+			</isNotEmpty>
+	        <isNotEmpty property="account" prepend="and">
+	            eu.account like concat('%',#account#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="email" prepend="and">
+	            eu.email like concat('%',#email#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="nickname" prepend="and">
+	            eu.nickname=#nickname#
+	        </isNotEmpty>
+	        <isNotEmpty property="stauts" prepend="and">
+	            eu.stauts=#stauts#
+	        </isNotEmpty>
+	        <isNotEmpty property="type" prepend="and">
+	            eu.type=#type#
+	        </isNotEmpty>
+	        <isNotEmpty property="isScrap" prepend="and">
+	            eu.IS_SCRAP=#isScrap#
+	        </isNotEmpty>
+	)s
+    </select>
+    
+    <select id="serchUserListByConditionWith" resultMap="serchuser">
+    <![CDATA[
+      SELECT eu.id,eu.account,cu.name,eu.sex,eu.type,cu.phone,cu.address,cu.integral,eu.user_rank,eu.gmt_create,eu.stauts,
+	eu.email
+	FROM customer cu,emall_users eu
+	WHERE 
+	eu.customer_id = cu.idCustomer
+        ]]>
+        	<isNotEmpty property="account" prepend="and">
+	            eu.id = #id#
+	        </isNotEmpty>
+        	<isNotEmpty property="account" prepend="and">
+	            eu.account like concat('%',#account#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="email" prepend="and">
+	            eu.email like concat('%',#email#,'%')
+	        </isNotEmpty>
+	        <isNotEmpty property="nickname" prepend="and">
+	            eu.nickname=#nickname#
+	        </isNotEmpty>
+	        <isNotEmpty property="stauts" prepend="and">
+	            eu.stauts=#stauts#
+	        </isNotEmpty>
+	        <isNotEmpty property="type" prepend="and">
+	            eu.type=#type#
+	        </isNotEmpty>
+	        <isNotEmpty property="isScrap" prepend="and">
+	            eu.IS_SCRAP=#isScrap#
+	        </isNotEmpty>
+	        <isNotEmpty property="userRank" prepend="and">
+	            eu.user_rank=#userRank#
+	        </isNotEmpty>
+	        
+	        order by eu.id desc
+		<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+    </select>
+    
+    
+</sqlMap>

@@ -1,0 +1,179 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 退货/退款申请列表")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 退货/退款申请列表</h2>
+
+	#if($success)
+		<div class="mag-t2">$success</div>
+	#end
+	#if($error)
+		<div class="mag-t1">$error</div>
+	#end
+
+	<form action="$!appServer.get("/trade/refundList.html")" name="searchForm" method="post">
+		<input type="hidden" name="refundId" id="refundId" value=""/>
+		<input type="hidden" name="currPage" id="currPage" value="$page.currentPage"/>
+		<div class="searchBox">
+			<h3><span>搜索订单</span></h3>
+			<table>
+				<tr>
+					<th>订单编号：</th>
+					<td>
+						#springBind("query.tid")
+						<input type="text" name="${status.expression}" id="tid" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()" class="inp inp-w160"/>
+					</td>
+					<th>买家昵称：</th>
+					<td>
+						#springBind("query.buyNick")
+						<input type="text" name="${status.expression}" id="buyNick" value="$!{status.value}" onblur="javascript:this.value=this.value.trim()" class="inp inp-w160"/>
+					</td>
+					<th>状态：</th>
+					<td>
+						#springBind("query.status")
+						<select name="${status.expression}" id="status_id" class="select">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $enumRefundStatusMap.entrySet())
+								<option value="$!en.key" #if("$!{status.value}" == "$en.key") selected="selected" #end>$!en.value</option>
+							#end
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>申请时间：</th>
+					<td>
+						#springBind("query.gmtCreateStart")
+						<input type="text" id="gmtCreateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.gmtCreateEnd")
+						<input type="text" id="gmtCreateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "gmtCreateStart",
+								ifFormat  : "%Y-%m-%d",
+								align   : "BR"
+							});
+							Calendar.setup({
+								inputField : "gmtCreateEnd",
+								ifFormat  : "%Y-%m-%d",
+								align   : "BR"
+							});
+						</script>
+					</td>
+					<th>类型：</th>
+					<td>
+						#springBind("query.type")
+						<select name="${status.expression}" id="type_id" class="select">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $enumRefundTypeMap.entrySet())
+								<option value="$!en.key" #if("$!{status.value}" == "$en.key") selected="selected" #end>$!en.value</option>
+							#end
+						</select>
+					</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="6">
+    					<button type="button" class="btn" onclick="formSubmit();">查询</button>
+    					<button type="button" class="btn" onclick="clean();">重置</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>列表</span></h3>
+		<table>
+			<tr>
+				<th>用户名</th>
+				<th>申请编号</th>
+				<th>订单编号</th>
+				<th>状态</th>
+				<th>类型</th>
+				<th>仓库名称</th>
+				<th>申请时间</th>
+				<th>操作</th>
+			</tr>
+			#if($page && $page.items && $page.items.size() > 0)
+    			#foreach($refund in $page.items)
+    				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+    					<td>$!{refund.buyNick}</td>
+    					<td>$!{refund.refundId}</td>
+    					<td><a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", ${refund.tid})">$!{refund.tid}</a></td>
+    					<td>$!enumRefundStatusMap.get($refund.status)</td>
+    					<td>$!enumRefundTypeMap.get($refund.type)</td>
+    					<td>$!depositoryNameMap.get($!refund.depFirstId)</td>
+    					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $refund.gmtCreate)</td>
+    					<td>
+    						<a href="confirmRefund.html?id=$!refund.id&detail=yes">查看</a>
+    						#if("$!refund.status" == "wait_seller_agree")
+    							<a href="confirmRefund.html?id=$!refund.id">处理申请</a>
+    						#end
+    						#if($adminAccess.has("A_REF_FINANCE_USER"))
+								#if((("$!refund.status"=="financer_refund")||("$!refund.status"=="goods_in_depository"))&&("$!refund.type"!="c")&&($adminAccess.has("A_FINANCE_MANAGE_USER")))
+    								<a href="#" onclick="congoo($!refund.id)">确认退款</a>
+    							#end
+    						#end
+    					</td>
+    				</tr>
+				#end
+			#end
+		</table>
+		<!-- 分页 -->
+		#if($page && $page.items && $page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/trade/refundList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function formSubmit(){
+		if(!checkDate('gmtCreateStart','gmtCreateEnd'))
+			return false;
+		else
+			document.searchForm.submit();
+	}
+
+		function congoo(refundId){
+			if(confirm("确认退款后，退款将转入买家账户，确认继续?")){
+				document.getElementById("refundId").value=refundId;
+				document.searchForm.action='$!appServer.get("/trade/congoo.html")';
+				document.searchForm.submit();
+				document.searchForm.action='$!appServer.get("/trade/refList.html")';
+			}
+		}
+
+	function checkDate(begin,end){
+		var dateStart=document.getElementById(begin).value.replace(/-/g, "/");
+		var dateEnd=document.getElementById(end).value.replace(/-/g, "/");
+		var b_date=new Date(Date.parse(dateStart));
+    var e_date=new Date(Date.parse(dateEnd));
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		return true;
+	}
+
+	function clean(){
+	document.getElementById('tid').value='';
+		document.getElementById('buyNick').value='';
+			document.getElementById('status_id').value='';
+				document.getElementById('gmtCreateStart').value='';
+								document.getElementById('gmtCreateEnd').value='';
+	}
+</script>

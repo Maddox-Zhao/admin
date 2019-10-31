@@ -1,0 +1,1684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TradeSQL">
+<typeAlias alias="trade" type="com.huaixuan.network.biz.domain.trade.Trade"/>
+<typeAlias alias="tradeSalesCount" type="com.huaixuan.network.biz.domain.trade.TradeSalesCount"/>
+	<resultMap class="trade" id="tradeResult">
+		<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="status" property="status"/>
+		<result column="buy_id" property="buyId"/>
+		<result column="buy_nick" property="buyNick"/>
+		<result column="seller_id" property="sellerId"/>
+		<result column="seller_nick" property="sellerNick"/>
+		<result column="pay_status" property="payStatus"/>
+		<result column="goods_amount" property="goodsAmount"/>
+		<result column="express_id" property="expressId"/>
+		<result column="express_payment" property="expressPayment"/>
+		<result column="shipping_amount" property="shippingAmount" nullValue="0"/>
+		<result column="amount" property="amount"/>
+		<result column="type" property="type"/>
+		<result column="buyer_note" property="buyerNote"/>
+		<result column="pay_time" property="payTime"/>
+		<result column="finish_time" property="finishTime"/>
+		<result column="receiver" property="receiver"/>
+		<result column="country" property="country"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		<result column="district" property="district"/>
+		<result column="address" property="address"/>
+		<result column="zipcode" property="zipcode"/>
+		<result column="mobile" property="mobile"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="user_point" property="userPoint"/>
+		<result column="send_point" property="sendPoint"/>
+		<result column="payment" property="payment"/>
+		<result column="is_point" property="isPoint"/>
+		<result column="ticket_amount" property="ticketAmount" nullValue="0"/>
+		<result column="note" property="seviceNote" />
+		<result column="agent_sell_amount" property="agentSellAmount" />
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="trade_type" property="tradeType"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="wholesale_status" property="wholesaleStatus"/>
+		<result column="gmt_period_pay_end" property="gmtPeriodPayEnd"/>
+		<result column="purchase_id" property="purchaseId"/>
+		<result column="trade_type" property="tradeType" nullValue="0"/>
+		<result column="memo" property="memo"/>
+		<result column="stockout_status" property="stockoutStatus"/>
+		<result column="invoice" property="invoice"/>
+		<result column="interface_express_code" property="interfaceExpressCode"/>
+		<result column="customerorder_idOrder" property="customerorderIdOrder" nullValue="0"/>
+	</resultMap>
+	<resultMap id="tradeCountWithStatusResult" class="trade">
+		<result column="status" property="status"/>
+		<result column="countWithStatus" property="countWithStatus"/>
+	</resultMap>
+	<resultMap  id="tradeDetailResult"  class="trade"  extends="tradeResult" >
+		<result column="note" property="seviceNote" />
+		<result column="invoice_name" property="invoiceName" />
+	</resultMap>
+	<resultMap class="trade" id="tradeResultNoExpressCode">
+		<result column="id" property="id"/>
+		<result column="tid" property="tid"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="status" property="status"/>
+		<result column="buy_id" property="buyId"/>
+		<result column="buy_nick" property="buyNick"/>
+		<result column="seller_id" property="sellerId"/>
+		<result column="seller_nick" property="sellerNick"/>
+		<result column="pay_status" property="payStatus"/>
+		<result column="goods_amount" property="goodsAmount"/>
+		<result column="express_id" property="expressId"/>
+		<result column="express_payment" property="expressPayment"/>
+		<result column="shipping_amount" property="shippingAmount" nullValue="0"/>
+		<result column="amount" property="amount"/>
+		<result column="type" property="type"/>
+		<result column="trade_type" property="tradeType"/>
+		<result column="buyer_note" property="buyerNote"/>
+		<result column="pay_time" property="payTime"/>
+		<result column="finish_time" property="finishTime"/>
+		<result column="receiver" property="receiver"/>
+		<result column="country" property="country"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		<result column="district" property="district"/>
+		<result column="address" property="address"/>
+		<result column="zipcode" property="zipcode"/>
+		<result column="mobile" property="mobile"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="user_point" property="userPoint"/>
+		<result column="send_point" property="sendPoint"/>
+		<result column="payment" property="payment"/>
+		<result column="is_point" property="isPoint"/>
+		<result column="ticket_amount" property="ticketAmount" nullValue="0"/>
+		<result column="note" property="seviceNote" />
+		<result column="agent_sell_amount" property="agentSellAmount" />
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="trade_type" property="tradeType"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="wholesale_status" property="wholesaleStatus"/>
+		<result column="gmt_period_pay_end" property="gmtPeriodPayEnd"/>
+		<result column="trade_type" property="tradeType" nullValue="0"/>
+		<result column="stockout_status" property="stockoutStatus"/>
+		<result column="invoice" property="invoice"/>
+		<result column="invoice_name" property="invoiceName"/>
+		<result column="is_purchased" property="isPurchased"/>
+	</resultMap>
+	<resultMap id="tradeResultWithExpressCode" class="trade"  extends="tradeResultNoExpressCode">
+		<result column="express_code" property="expressCode" nullValue=""/>
+	</resultMap>
+   <resultMap class="trade" id="tradePartResult">
+        <result column="id" property="id"/>
+   </resultMap>
+
+	<resultMap class="trade" id="tradeGoodsAmountSumResult">
+	    <result column="goods_amount_sum" property="goodsAmountSum"/>
+	    <result column="id" property="id"/>
+	</resultMap>
+
+    <resultMap class="tradeSalesCount" id="resUsersSalesCount">
+      <result column="userId" property="userId"/>
+      <result column="tradeSum" property="tradeSum"/>
+      <result column="refundSum" property="refundSum"/>
+      <result column="salesCount" property="salesCount"/>
+    </resultMap>
+    
+    <resultMap id="customerOrderMap" class="com.huaixuan.network.biz.domain.hy.CustomerOrder">
+		<result column="idOrder" property="idOrder" />
+		<result column="date" property="date" />
+		<result column="idCustomer" property="idCustomer" />
+		<result column="idChannel" property="idChannel" />
+		<result column="subTotal" property="subTotal" />
+		<result column="idCurrency" property="idCurrency" />
+		<result column="operator" property="operator" />
+		<result column="operator2" property="operator2" />
+		<result column="idPayment" property="idPayment" />
+		<result column="amountCard" property="amountCard" />
+		<result column="amountCash" property="amountCash" />
+		<result column="status" property="status" />
+		<result column="remark" property="remark" />
+		<result column="idSite" property="idSite" />
+	</resultMap>
+<!-- create Trade object -->
+
+
+
+<!-- begin modify by  Nov 4, 2010 add can_resume-->
+<insert id="addTrade" parameterClass="trade">
+<![CDATA[
+insert into emall_trade
+  (id,
+   tid,
+   shop_id,
+   status,
+   buy_id,
+   buy_nick,
+   seller_id,
+   seller_nick,
+   pay_status,
+   goods_amount,
+   express_id,
+   express_payment,
+   shipping_amount,
+   amount,
+   type,
+   buyer_note,
+   pay_time,
+   finish_time,
+   receiver,
+   country,
+   province,
+   city,
+   district,
+   address,
+   zipcode,
+   mobile,
+   gmt_create,
+   gmt_modify,
+   user_point,
+   send_point,
+   ticket_amount,
+   payment,
+   is_point,
+   note,
+   agent_sell_amount,
+   dep_first_id,
+   trade_type,
+   is_wholesale,
+   wholesale_status,
+   gmt_period_pay_end,
+   memo,
+   stockout_status,
+   purchase_id,
+   invoice,
+   invoice_name,
+   INTERFACE_EXPRESS_CODE)
+values
+  (null,
+   #tid#,
+   #shopId#,
+   #status#,
+   #buyId#,
+   #buyNick#,
+   #sellerId#,
+   #sellerNick#,
+   #payStatus#,
+   #goodsAmount#,
+   #expressId#,
+   #expressPayment#,
+   #shippingAmount#,
+   #amount#,
+   #type#,
+   SUBSTRING(#buyerNote#,1,1024),
+   #payTime#,
+   #finishTime#,
+   #receiver#,
+   #country#,
+   #province#,
+   #city#,
+   #district#,
+   #address#,
+   #zipcode#,
+   #mobile#,
+   sysdate(),
+   sysdate(),
+   #userPoint#,
+   #sendPoint#,
+   #ticketAmount#,
+   'normal',
+   'n',
+   #seviceNote#,
+   #agentSellAmount#,
+   #depFirstId#,
+   #tradeType#,
+   #isWholesale#,
+   #wholesaleStatus#,
+   #gmtPeriodPayEnd#,
+   #memo#,
+   #stockoutStatus#,
+   #purchaseId#,
+   IFNULL(#invoice#,'n'),
+   #invoiceName#,
+   #interfaceExpressCode#)
+
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- end by shenzh Nov 4, 2010-->
+<!-- update Trade object -->
+<update id="editTrade" parameterClass="trade">
+
+update emall_trade
+   set tid             = #tid#,
+       shop_id         = #shopId#,
+       status          = #status#,
+       buy_id          = #buyId#,
+       buy_nick        = #buyNick#,
+       seller_id       = #sellerId#,
+       seller_nick     = #sellerNick#,
+       pay_status      = #payStatus#,
+       goods_amount    = #goodsAmount#,
+       shipping_amount = #shippingAmount#,
+       amount          = #amount#,
+       type            = #type#,
+       buyer_note      = SUBSTRING(#buyerNote#,1,1024),
+       pay_time        = #payTime#,
+       finish_time     = #finishTime#,
+       receiver        = #receiver#,
+       country         = #country#,
+       province        = #province#,
+       city            = #city#,
+       district        = #district#,
+       address         = #address#,
+       zipcode         = #zipcode#,
+       mobile          = #mobile#,
+       user_point      = #userPoint#,
+       send_point      = #sendPoint#,
+       ticket_amount   = #ticketAmount#,
+       payment         = #payment#,
+       is_point        = #isPoint#,
+       agent_sell_amount=#agentSellAmount#,
+       dep_first_id    =#depFirstId#,
+       gmt_modify      = sysdate(),
+       gmt_period_pay_end = #gmtPeriodPayEnd#,
+       memo            = #memo#
+       <isNotEmpty property="seviceNote">
+       	,note = #seviceNote#
+       </isNotEmpty>
+       <isNotEmpty property="expressId">
+       	,express_id = #expressId#
+       </isNotEmpty>
+		<!-- begin add by shenzh Nov 23, 2010 -->
+ 		<isNotEmpty property="stockoutStatus">
+       	,stockout_status = #stockoutStatus#
+       </isNotEmpty>
+		<!-- end by shenzh Nov 23, 2010-->
+ where id = #id#
+</update>
+
+<!-- added by chenhang started 2010/11/18 -->
+<update id="updateActualInventoryById" parameterClass="java.util.Map">
+	update emall_trade b set gmt_modify = sysdate(),actual_inventory=#actualInventory#
+	where b.tid = #relationNum#
+</update>
+<update id="updateActualInventoryByIdRe" parameterClass="java.util.Map">
+	update emall_refund b set gmt_modify = sysdate(),actual_inventory=#actualInventory#
+	where b.refund_id = #relationNum#
+</update>
+<!-- added by chenhang ended 2010/11/18 -->
+
+<update id="updateTradeExpressInfo" parameterClass="trade">
+<![CDATA[
+update emall_trade
+   set express_id      = #expressId#,
+   	   express_payment = #expressPayment#,
+       shipping_amount = #shippingAmount#,
+       amount          = #amount#,
+       gmt_modify      = sysdate()
+ where id = #id#
+]]>
+</update>
+
+<update id="updatePeriodTradeExpressInfo" parameterClass="trade">
+<![CDATA[
+update emall_trade
+   set express_id      = #expressId#,
+   	   express_payment = #expressPayment#,
+       shipping_amount = #shippingAmount#,
+       amount          = #amount#,
+       status          = #status#,
+       gmt_period_pay_end = #gmtPeriodPayEnd#,
+       gmt_modify      = sysdate()
+ where id = #id#
+]]>
+</update>
+<!-- added by chenhang 2010/01/07 started-->
+<update id="updateTradeBuyerNote" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_trade set gmt_modify = sysdate(),
+		buyer_note = #buyerNote#
+		 where tid = #tid#
+]]>
+</update>
+<!-- added by chenhang 2010/01/07 ended-->
+<!-- added by chenhang 2010/01/10 started-->
+<update id="updateTradeExpressId" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_trade set gmt_modify = sysdate(),
+		express_id = #expressId#
+		 where tid = #tid#
+]]>
+</update>
+<!-- added by chenhang 2010/01/10 ended-->
+<!-- added by chenhang 2010/05/05 started-->
+<update id="updateInterfaceExpressCode" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_trade set gmt_modify = sysdate(),
+		interface_express_code = #interfaceExpressCode#
+		 where tid = #tid#
+]]>
+</update>
+<!-- added by chenhang 2010/05/05 ended-->
+<!-- delete Trade object -->
+<delete id="removeTrade" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_trade where emall_trade.ID = #value#
+]]>
+</delete>
+<!-- search Trade object -->
+<select id="getTrade" parameterClass="java.lang.Long" resultMap="tradeDetailResult">
+<![CDATA[
+	select t.*
+	  from emall_trade t
+	 where t.id = #value#
+]]>
+</select>
+<!-- search Trade object By tid -->
+<!-- modifed by chenhang 2010/12/02 started-->
+<select id="getTradeByTid"  resultMap="tradeDetailResult">
+<![CDATA[
+		select t.*
+		from emall_trade t where t.tid = #value# LIMIT 1
+		]]>
+</select>
+<!-- modifed by chenhang 2010/12/02 ended-->
+<!-- search Wholesale Trade object By getTradeByMap -->
+<select id="getTradeByMap"  resultMap="tradeResult">
+<![CDATA[
+		select t.* from emall_trade t where 1=1
+]]>
+		<isNotEmpty prepend="and" property="tid">
+		    t.tid = #tid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+		    t.is_wholesale = #isWholesale#
+		</isNotEmpty>
+</select>
+
+<!-- searchAll Trade List -->
+<select id="getTrades" resultMap="tradeResult">
+	
+<![CDATA[
+		select emall_trade.* from emall_trade
+]]>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getTradesByParameterMap" resultMap="tradeResultNoExpressCode">
+	
+		select o.* from
+		(
+		select t.*
+		from emall_trade t
+		where 1=1
+		<isNotEmpty prepend="and" property="id">
+			t.id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    t.tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			t.buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			t.buy_nick = #buyNick#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/08 start -->
+		<isNotEmpty prepend="and" property="invoice">
+			t.invoice = #invoice#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/08 end -->
+
+		<isNotEmpty prepend="and" property="status">
+		<isEqual property="status" compareValue="wait_confirm">
+		  wholesale_status = #status#
+		</isEqual>
+		<isNotEqual property="status" compareValue="wait_confirm">
+			t.status = #status#
+		</isNotEqual>
+		</isNotEmpty>
+		<!-- lilei 2010/06/08 end -->
+		<isNotEmpty prepend="and" property="payStatus">
+			t.pay_status = #payStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressPayment">
+			t.express_payment = #expressPayment#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="finishTime">
+			t.finish_time = #finishTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			t.gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			t.gmt_create = #gmtCreate#
+		</isNotEmpty>
+        <!-- lilie 2010/060/08 start -->
+		<isNotEmpty property="isWholesale">
+			<isNotEqual prepend="and" property="isWholesale" compareValue="n">
+				t.is_wholesale = #isWholesale#
+            </isNotEqual>
+			<isEqual prepend="and" property="isWholesale" compareValue="n">
+				(t.is_wholesale = #isWholesale# OR t.is_wholesale IS NULL )
+			</isEqual>
+		</isNotEmpty>
+		<!-- lilie 2010/060/08 end -->
+		<isNotEmpty prepend="and" property="wholesaleStatus">
+			t.wholesale_status=#wholesaleStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStartTime">
+<![CDATA[			t.pay_time >= STR_TO_DATE(#payStartTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payEndTime">
+<![CDATA[			t.pay_time < DATE_ADD(STR_TO_DATE(#payEndTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			t.receiver like CONCAT('%',#receiver#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="country">
+			t.country = #country#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="province">
+			t.province = #province#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="city">
+			t.city = #city#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="district">
+			t.district = #district#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="address">
+			t.address = #address#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="zipcode">
+			t.zipcode = #zipcode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="mobile">
+			t.mobile = #mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPoint">
+			t.user_point = #userPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sendPoint">
+			t.send_point = #sendPoint#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId">
+            t.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            (t.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) or t.dep_first_id is null)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="opp">
+            t.status != #opp#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="isReminders">
+			<![CDATA[  t.gmt_period_pay_end < sysdate() ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 start   -->
+		<isNotEmpty prepend="and" property="tradeType">
+			<![CDATA[  t.trade_type = #tradeType# ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 end -->
+		<!-- begin add by shenzh Nov 4, 2010  modify 2010-11-23-->
+ 		<isNotEmpty prepend="and" property="stockoutStatus">
+			<![CDATA[  IFNULL(t.stockout_status,'n') = #stockoutStatus# ]]>
+			<isNotEmpty prepend="and" property="status">
+				<![CDATA[  t.status = #status# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+		<!-- end by shenzh Nov 4, 2010-->
+		)o
+		order by o.gmt_create desc,o.tid desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getTradesCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from emall_trade t
+]]>
+			where 1=1
+		
+		<isNotEmpty prepend="and" property="id">
+			t.id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+			t.tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			t.buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			t.buy_nick = #buyNick#
+		</isNotEmpty>
+		<!-- chenhang 2010/06/12 start -->
+		<isNotEmpty prepend="and" property="wholesaleStatus">
+			t.wholesale_status = #wholesaleStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+			t.is_wholesale = #isWholesale#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="invoice">
+			t.invoice = #invoice#
+        </isNotEmpty>
+		<!-- chenhang 2010/06/12 end -->
+        <!-- lilei 2010/06/08 modify  wholesale_status -->
+		<isNotEmpty prepend="and" property="status">
+		<isEqual property="status" compareValue="wait_confirm">
+		    t.wholesale_status = #status#
+		</isEqual>
+		<isNotEqual property="status" compareValue="wait_confirm">
+			t.status = #status#
+		</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStatus">
+			t.pay_status = #payStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressPayment">
+			t.express_payment = #expressPayment#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="finishTime">
+			t.finish_time = #finishTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			t.gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			t.gmt_create = #gmtCreate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStartTime">
+<![CDATA[			t.pay_time >= STR_TO_DATE(#payStartTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payEndTime">
+<![CDATA[			t.pay_time < DATE_ADD(STR_TO_DATE(#payEndTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			t.receiver like CONCAT('%',#receiver#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="country">
+			t.country = #country#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="province">
+			t.province = #province#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="city">
+			t.city = #city#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="district">
+			t.district = #district#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="address">
+			t.address = #address#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="zipcode">
+			t.zipcode = #zipcode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="mobile">
+			t.mobile = #mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPoint">
+			t.user_point = #userPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sendPoint">
+			t.send_point = #sendPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="notStatus">
+			t.status != #notStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            (t.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) or t.dep_first_id is null)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId">
+            t.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <!-- lilei 2010/06/08 start -->
+        <isNotEmpty property="isWholesale">
+		<isNotEqual prepend="and" property="isWholesale" compareValue="n">
+				t.is_wholesale = #isWholesale#
+        </isNotEqual>
+		<isEqual prepend="and" property="isWholesale" compareValue="n">
+				(t.is_wholesale = #isWholesale# OR t.is_wholesale IS NULL )
+		</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="opp">
+			t.status != #opp#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isReminders">
+			<![CDATA[  t.gmt_period_pay_end < sysdate() ]]>
+		</isNotEmpty>
+		<!-- lilei 2010/06/08 end -->
+		<!-- modify by wangkun 2010/09/28 start  -->
+		<isNotEmpty prepend="and" property="tradeType">
+			<![CDATA[  t.trade_type = #tradeType# ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 end -->
+		<!-- begin add by shenzh Nov 4, 2010   modify 2010-11-23-->
+ 		<isNotEmpty prepend="and" property="stockoutStatus">
+			<![CDATA[  IFNULL(t.stockout_status,'n') = #stockoutStatus# ]]>
+			<isNotEmpty prepend="and" property="status">
+				<![CDATA[  t.status = #status# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+		<!-- end by shenzh Nov 4, 2010-->
+</select>
+
+<sql id="getTradesByParameterMapWhitNoteBody">
+	select o.*,od.express_code from
+		(select etp.tid,iod.express_code from emall_trade_package etp,ioss_out_depository iod
+		where iod.relation_num = etp.merge_tid(+))od,(
+		select t.*
+		from emall_trade t
+		
+		where 1=1
+		
+		<isNotEmpty prepend="and" property="id">
+			t.id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    t.tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			t.buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			t.buy_nick = #buyNick#
+		</isNotEmpty>
+		
+		<!-- added by chenhang 2010/11/08 start -->
+		<isNotEmpty prepend="and" property="invoice">
+			t.invoice = #invoice#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/08 end -->
+        <!-- lilei 2010/06/08 modify  wholesale_status -->
+		<isNotEmpty prepend="and" property="status">
+		<isEqual property="status" compareValue="wait_confirm">
+		  wholesale_status = #status#
+		</isEqual>
+		<isNotEqual property="status" compareValue="wait_confirm">
+			t.status = #status#
+		</isNotEqual>
+		</isNotEmpty>
+		<!-- lilei 2010/06/08 end -->
+		<isNotEmpty prepend="and" property="payStatus">
+			t.pay_status = #payStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressPayment">
+			t.express_payment = #expressPayment#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="finishTime">
+			t.finish_time = #finishTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			t.gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			t.gmt_create = #gmtCreate#
+		</isNotEmpty>
+        <!-- lilie 2010/060/08 start -->
+		<isNotEmpty property="isWholesale">
+			<isNotEqual prepend="and" property="isWholesale" compareValue="n">
+				t.is_wholesale = #isWholesale#
+            </isNotEqual>
+			<isEqual prepend="and" property="isWholesale" compareValue="n">
+				(t.is_wholesale = #isWholesale# OR t.is_wholesale IS NULL )
+			</isEqual>
+		</isNotEmpty>
+		<!-- lilie 2010/060/08 end -->
+		<isNotEmpty prepend="and" property="wholesaleStatus">
+			t.wholesale_status=#wholesaleStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStartTime">
+<![CDATA[			t.pay_time > STR_TO_DATE(#payStartTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payEndTime">
+<![CDATA[			t.pay_time < DATE_ADD(STR_TO_DATE(#payEndTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			t.receiver = #receiver#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="country">
+			t.country = #country#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="province">
+			t.province = #province#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="city">
+			t.city = #city#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="district">
+			t.district = #district#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="address">
+			t.address = #address#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="zipcode">
+			t.zipcode = #zipcode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="mobile">
+			t.mobile = #mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPoint">
+			t.user_point = #userPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sendPoint">
+			t.send_point = #sendPoint#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId">
+            t.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            (t.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) or t.dep_first_id is null)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="opp">
+            t.status != #opp#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="isReminders">
+			<![CDATA[  t.gmt_period_pay_end < sysdate() ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 start   -->
+		<isNotEmpty prepend="and" property="tradeType">
+			<![CDATA[  t.trade_type = #tradeType# ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 end -->
+		<!-- begin add by shenzh Nov 4, 2010   modify 2010-11-23 -->
+ 		<isNotEmpty prepend="and" property="stockoutStatus">
+			<![CDATA[  IFNULL(t.stockout_status,'n') = #stockoutStatus# ]]>
+			<isNotEmpty prepend="and" property="status">
+				<![CDATA[  t.status = #status# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+		<!-- end by shenzh Nov 4, 2010 -->
+		<!-- fangqing 20101215 started -->
+		and t.status != 'wait_buyer_pay'
+		and t.status != 'trade_close'
+		)o where o.tid = od.tid(+)
+		<isNotEmpty prepend="and" property="expressCode">
+			od.express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		<!-- fangqing 20101216 ended -->
+		order by o.gmt_create desc,o.tid desc
+</sql>
+		
+
+<select id="getTradesByParameterMapWhitNoteCount" resultClass="int">
+	select count(*) from (<include refid="getTradesByParameterMapWhitNoteBody"/>)
+</select>
+
+<select id="getTradesByParameterMapWhitNote" resultMap="tradeResultWithExpressCode">
+	
+	<include refid="getTradesByParameterMapWhitNoteBody"/>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+
+
+<select id="getTradesWithNoteCount" resultClass="int">
+	select count(*) from emall_trade t where 1=1
+	    <isNotEmpty prepend="and" property="status">
+			t.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeTypes" >
+            t.trade_type in (
+            <iterate property="tradeTypes" conjunction=",">#tradeTypes[]#</iterate>
+            )
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+				t.is_wholesale = #isWholesale#
+        </isNotEmpty>
+</select>
+
+
+<select id="getTradesWithNote" resultMap="tradeResult">
+	
+	select t.* from emall_trade t where 1=1
+	<isNotEmpty prepend="and" property="status">
+			t.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeTypes" >
+            t.trade_type in(
+            <iterate property="tradeTypes" conjunction=",">#tradeTypes[]#</iterate>
+            )
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+				t.is_wholesale = #isWholesale#
+        </isNotEmpty>
+		order by t.gmt_create desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+
+<select id="getTradesGoodsAmountSum" resultMap="tradeGoodsAmountSumResult" parameterClass="com.huaixuan.network.biz.query.TradeListQuery" >
+
+<![CDATA[
+select count(a.id) as id,
+       coalesce(sum(a.goods_amount + a.SHIPPING_AMOUNT), 0) as goods_amount_sum
+  from emall_trade a 
+  ]]>
+   
+ where 1=1
+		
+		<isNotEmpty prepend="and" property="id">
+			a.id = #id#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/25 start -->
+		<isNotEmpty prepend="and" property="invoice">
+			a.invoice = #invoice#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/08 end -->
+		<isNotEmpty prepend="and" property="tid">
+			a.tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			a.buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			a.buy_nick = #buyNick#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStatus">
+			a.pay_status = #payStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+			a.is_wholesale = #isWholesale#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="wholesaleStatus">
+			a.wholesale_status = #wholesaleStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressPayment">
+			a.express_payment = #expressPayment#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			a.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			a.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="finishTime">
+			a.finish_time = #finishTime#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="gmtModify">
+			a.gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			a.gmt_create = #gmtCreate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			a.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			a.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStartTime">
+<![CDATA[			a.pay_time > STR_TO_DATE(#payStartTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payEndTime">
+<![CDATA[			a.pay_time < DATE_ADD(STR_TO_DATE(#payEndTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			a.receiver = #receiver#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="country">
+			a.country = #country#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="province">
+			a.province = #province#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="city">
+			a.city = #city#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="district">
+			a.district = #district#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="address">
+			a.address = #address#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="zipcode">
+			a.zipcode = #zipcode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="mobile">
+			a.mobile = #mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPoint">
+			a.user_point = #userPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sendPoint">
+			a.send_point = #sendPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="notStatus">
+			a.status != #notStatus#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="depfirstIds" >
+            (a.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) or a.dep_first_id is null)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId">
+            a.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="isWholesale">
+            a.is_wholesale = #isWholesale#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="opp">
+            a.status != #opp#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="isReminders">
+			<![CDATA[ a.gmt_period_pay_end < sysdate() ]]>
+		</isNotEmpty>
+		<!-- begin add by shenzh Nov 4, 2010  -->
+		<isNotEmpty prepend="and" property="tradeType">
+			<![CDATA[  a.trade_type = #tradeType# ]]>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="stockoutStatus">
+			<![CDATA[  IFNULL(a.stockout_status,'n') = #stockoutStatus# ]]>
+		</isNotEmpty>
+		<!-- end by shenzh Nov 4, 2010 -->
+</select>
+
+<select id="getTradesPartByTimetask" resultMap="tradeResult">
+
+	  select emall_trade.* from emall_trade emall_trade
+      <dynamic prepend="where">
+            <isNotEmpty prepend="and" property="status">
+			   status = #status#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="and" property="day">
+		    <![CDATA[	( sysdate() - gmt_modify)>#day#]]>
+		    </isNotEmpty>
+		    <isNotEmpty prepend="and" property="isPoint">
+                is_point = #isPoint#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="buyUserId">
+                buy_id = #buyUserId#
+            </isNotEmpty>
+      </dynamic>
+</select>
+
+
+
+<select id="countAllTradeAmount" resultClass="java.lang.Double">
+<![CDATA[
+		select coalesce(sum(emall_trade.goods_amount+emall_trade.shipping_amount),0) from emall_trade
+		where status!='trade_close'
+]]>
+</select>
+
+<select id="countAllFinishedTradeAmount" resultClass="java.lang.Double">
+<![CDATA[
+		select coalesce(sum(emall_trade.amount),0) from emall_trade
+		where status='trade_finish'
+]]>
+			<!-- and pay_status='paid' -->
+</select>
+
+<update id="updateTradeStatusByTid">
+<![CDATA[
+update emall_trade
+   set status = #status#, gmt_modify = sysdate()
+ where tid = #tid#
+
+]]>
+</update>
+
+<update id="updateTradeByRefund">
+<![CDATA[
+update emall_trade
+   set status = #status#, gmt_modify = sysdate()
+ where 1=1
+]]>
+	<isNotEmpty prepend="and" property="tid">
+			tid = #tid#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="relationNumList" >
+         tid in(
+            <iterate property="relationNumList" conjunction=",">#relationNumList[]#</iterate>
+            )
+    </isNotEmpty>
+</update>
+
+<select id="getTradeStatusByTid" resultMap="tradeResult">
+<![CDATA[
+		select emall_trade.* from emall_trade
+		where tid = #tid#
+]]>
+			<!-- and pay_status='paid' -->
+</select>
+
+<select id="getTradesAlreadyPaid" resultMap="tradeResult">
+	
+<![CDATA[
+		select emall_trade.* from emall_trade where 1=1
+]]>
+		<isNotEmpty prepend="and" property="buyUserId">
+			buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStatus">
+			pay_status = #payStatus#
+		</isNotEmpty>
+		order by pay_time desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<update id="updateTradeStatusByRefundId" parameterClass="java.util.Map">
+update emall_trade
+   set status = #status#, gmt_modify = sysdate()
+ where tid =
+       (select tid from emall_refund erd where erd.refund_id = #refundId#)
+
+</update>
+
+<select id="getTradeByRefundId" parameterClass="java.lang.String" resultMap="tradeResult">
+SELECT a.*
+  FROM emall_trade a, emall_refund b
+ WHERE a.tid = b.tid
+   AND b.refund_id = #refundId#
+
+</select>
+<update id="updatePayTimeByTid" parameterClass="java.util.Map">
+update emall_trade
+   set gmt_modify = #gmtNow#, pay_time = #gmtNow#, pay_status = 'paid'
+ where tid = #tid#
+
+</update>
+<update id="updateShippingAmountById" parameterClass="java.util.Map">
+update emall_trade
+   set gmt_modify      = #gmtNow#,
+       shipping_amount = #shippingAmount#,
+       amount          = #amount#,
+       memo            = #memo#
+      <!-- lilei 2010/06/10 add  -->
+       <isNotEmpty prepend="," property="depFirstId">
+       dep_first_id = #depFirstId#
+       </isNotEmpty>
+       <isNotEmpty prepend="," property="wholesaleStatus">
+       wholesale_status = #wholesaleStatus#
+       </isNotEmpty>
+ where id = #id#
+
+</update>
+<select id="getTradeByOrderId" parameterClass="java.lang.Long" resultMap="tradeResult">
+select *
+  from emall_trade
+ where tid = (select tid from emall_order where id = #id#)
+
+</select>
+
+<update id="updateAmountByGoodsPrice" parameterClass="java.util.Map">
+update emall_trade
+   set gmt_modify   = sysdate(),
+       goods_amount = #goodsAmount#,
+       amount       = #amount#,
+       memo         = #memo#
+ where tid = (select tid from emall_order where id = #orderId#)
+
+</update>
+
+<update id="updateTradeOrderPrice" parameterClass="java.util.Map">
+update emall_trade
+   set gmt_modify   = sysdate(),
+       goods_amount = #goodsAmount#,
+       amount       = #amount#
+ where tid = #tid#
+
+</update>
+
+<update id="updateMessageByTradeId" parameterClass="java.util.Map">
+	update emall_trade set
+	gmt_modify   = sysdate(),
+	note = #message# where emall_trade.tid=#tradeID#
+</update>
+
+<update id="updateInvoiceByTradeId" parameterClass="java.util.Map">
+	update emall_trade set
+	gmt_modify   = sysdate(),
+	invoice = #invoice# where emall_trade.tid=#tradeID#
+</update>
+
+<update id="updateIspurchasedByTradeId" parameterClass="java.util.Map">
+	update emall_trade set
+	gmt_modify   = sysdate(),
+	is_purchased='y' where emall_trade.id=#tradeID#
+</update>
+
+<select id="countAllGoodsAmount" resultClass="java.lang.Double" parameterClass="java.util.Map">
+<![CDATA[
+		select coalesce(sum(emall_trade.goods_amount),0) from emall_trade
+		where status!='trade_close'
+]]>
+<isNotEmpty property="dateStart">
+     <![CDATA[ and emall_trade.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+</isNotEmpty>
+<isNotEmpty property="dateEnd">
+     <![CDATA[ and emall_trade.gmt_create <= DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+</isNotEmpty>
+</select>
+
+<select id="countAllShipAmount" resultClass="java.lang.Double" parameterClass="java.util.Map">
+<![CDATA[
+		select coalesce(sum(emall_trade.shipping_amount),0) from emall_trade
+		where status!='trade_close'
+]]>
+<isNotEmpty property="dateStart">
+     <![CDATA[ and emall_trade.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+</isNotEmpty>
+<isNotEmpty property="dateEnd">
+     <![CDATA[ and emall_trade.gmt_create <= DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+</isNotEmpty>
+</select>
+
+<select id="listUsersSalesCount" resultMap="resUsersSalesCount">
+SELECT trade.buy_id as userId,
+       tradeSum,
+       refundSum,
+       (CASE
+         WHEN refund.refundSum IS NULL THEN
+          trade.tradeSum
+         ELSE
+          trade.tradeSum - refund.refundSum
+       END) AS salesCount
+  FROM (SELECT sum(t.goods_amount) AS tradeSum, t.buy_id
+          FROM emall_trade t
+         WHERE t.status ='trade_finish'
+           and t.is_wholesale ='n'
+           AND t.buy_id in
+               (SELECT u.id FROM emall_users u WHERE u.type IN ('d', 'w'))
+         GROUP BY t.buy_id) trade,
+       (SELECT r.buy_id, sum(r.refund_amount) AS refundSum
+          FROM emall_refund r, emall_trade t
+         WHERE r.buy_id in
+               (SELECT u.id FROM emall_users u WHERE u.type IN ('d', 'w'))
+           AND t.tid = r.tid
+           AND t.status &lt;&gt;'trade_close'
+           AND r.status ='success'
+           And t.is_wholesale ='n'
+         GROUP BY r.buy_id) refund
+ WHERE trade.buy_id = refund.buy_id(+)
+</select>
+
+<!-- search Trade List -->
+<select id="getSumAmountGroupByUserId" resultMap="tradeGoodsAmountSumResult">
+<![CDATA[
+		select aa.id, coalesce(g.goods_amount_sum, 0) goods_amount_sum
+		  from (select u.id from emall_users u where u.is_period_pay = 'y') aa
+		  left join (select t.buy_id buy_id,
+		                    coalesce(sum(t.amount), 0) goods_amount_sum
+		               from emall_trade t, emall_users us
+		              where t.buy_id = us.id
+		                and t.pay_status = 'no_pay'
+		                and t.express_payment = 'period_pay'
+		                and t.status <> 'trade_close'
+		                and t.gmt_create >= us.gmt_period_pay_start
+		                and t.gmt_create < us.gmt_period_pay_end
+		              group by t.buy_id) g on (g.buy_id = aa.id)
+]]>
+</select>
+
+<select id="getTodayPeriodMoney" resultClass="java.lang.Double" parameterClass="java.util.Map">
+<![CDATA[
+  select coalesce(sum(emall_trade.amount), 0)
+       from emall_trade
+  where emall_trade.express_payment = 'period_pay'
+    and emall_trade.status <> 'trade_close'
+    and emall_trade.pay_status = 'no_pay'
+]]>
+<isNotEmpty prepend="and" property="userId">
+    emall_trade.buy_id = #userId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="gmtCreateStart">
+    <![CDATA[ emall_trade.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+</isNotEmpty>
+<isNotEmpty prepend="and" property="gmtCreateEnd">
+    <![CDATA[ emall_trade.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+</isNotEmpty>
+</select>
+
+<select id="getTradeByPurchaseId" resultMap="tradeResult">
+	<![CDATA[
+		select t.* from emall_trade t where t.purchase_id = #value# and t.trade_type=4
+	]]>
+</select>
+
+<!-- begin add by shenzh Nov 3, 2010   For Taobao -->
+<select id="getRemoteTradeIdByTid"  resultClass="String">
+<![CDATA[
+		select t.paipai_trade_id from interface_user_trade t where t.trade_id=#value# LIMIT 1
+]]>
+</select>
+<!-- end by shenzh Nov 3, 2010-->
+
+<update id="editTradeWithDepFirstId" parameterClass="trade">
+<![CDATA[
+update emall_trade
+   set dep_first_id = #depFirstId#,
+       gmt_modify   = sysdate()
+ where id = #id#
+]]>
+</update>
+
+<select id="getTradeCountWithStatus" resultMap="tradeCountWithStatusResult">
+	select status,count(1) as countWithStatus from emall_trade group by status
+</select>
+<select id="getTradesExcelByParameterMap" resultMap="tradeResultWithExpressCode">
+
+		select o.*,od.express_code from
+		(select etp.tid,iod.express_code from emall_trade_package etp,ioss_out_depository iod
+		where iod.relation_num = etp.merge_tid(+))od,(
+		select t.*,(select e.express_name from ioss_express e where t.express_id=e.id and status='enabled') express_name
+		<isNotEmpty prepend="" property="interTid">
+			,i.paipai_trade_id as interTid
+		</isNotEmpty>
+		<isEmpty prepend="" property="interTid">
+			,(select i.paipai_trade_id from interface_user_trade i where t.tid = i.trade_id LIMIT 1) as interTid
+		</isEmpty>
+		from emall_trade t
+		<isNotEmpty prepend="" property="interTid">
+			,interface_user_trade i
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="isPurchased">
+			,ioss_depository_first idf
+        </isNotEmpty>
+		<isNotEmpty prepend="" property="agentManagerId">
+			,emall_agent_info u
+		</isNotEmpty>
+		where 1=1
+		<isNotEmpty prepend="and" property="agentManagerId">
+			t.buy_id = u.user_id(+) and u.agent_manager_id = #agentManagerId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="interTid">
+			t.tid = i.trade_id and i.paipai_trade_id like CONCAT('%',#interTid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="id">
+			t.id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tid">
+		    t.tid like CONCAT('%',#tid#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyUserId">
+			t.buy_id = #buyUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="buyNick">
+			t.buy_nick = #buyNick#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="isPurchased">
+			t.is_purchased = #isPurchased#
+			and idf.id = t.dep_first_id
+			and idf.is_stocked='n'
+        </isNotEmpty>
+		<!-- added by chenhang 2010/11/08 start -->
+		<isNotEmpty prepend="and" property="invoice">
+			t.invoice = #invoice#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/11/08 end -->
+
+		<isNotEmpty prepend="and" property="status">
+		<isEqual property="status" compareValue="wait_confirm">
+		  wholesale_status = #status#
+		</isEqual>
+		<isNotEqual property="status" compareValue="wait_confirm">
+			t.status = #status#
+		</isNotEqual>
+		</isNotEmpty>
+		<!-- lilei 2010/06/08 end -->
+		<isNotEmpty prepend="and" property="payStatus">
+			t.pay_status = #payStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressPayment">
+			t.express_payment = #expressPayment#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			t.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeType">
+			t.trade_type = #tradeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="finishTime">
+			t.finish_time = #finishTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModify">
+			t.gmt_modify = #gmtModify#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			t.gmt_create = #gmtCreate#
+		</isNotEmpty>
+        <!-- lilie 2010/060/08 start -->
+		<isNotEmpty property="isWholesale">
+			<isNotEqual prepend="and" property="isWholesale" compareValue="n">
+				t.is_wholesale = #isWholesale#
+            </isNotEqual>
+			<isEqual prepend="and" property="isWholesale" compareValue="n">
+				(t.is_wholesale = #isWholesale# OR t.is_wholesale IS NULL )
+			</isEqual>
+		</isNotEmpty>
+		<!-- lilie 2010/060/08 end -->
+		<isNotEmpty prepend="and" property="wholesaleStatus">
+			t.wholesale_status=#wholesaleStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			t.gmt_create > STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			t.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payStartTime">
+<![CDATA[			t.pay_time > STR_TO_DATE(#payStartTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="payEndTime">
+<![CDATA[			t.pay_time < DATE_ADD(STR_TO_DATE(#payEndTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="receiver">
+			t.receiver like CONCAT('%',#receiver#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="country">
+			t.country = #country#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="province">
+			t.province = #province#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="city">
+			t.city = #city#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="district">
+			t.district = #district#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="address">
+			t.address = #address#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="zipcode">
+			t.zipcode = #zipcode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="mobile">
+			t.mobile = #mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userPoint">
+			t.user_point = #userPoint#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sendPoint">
+			t.send_point = #sendPoint#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId">
+            t.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            (t.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) or t.dep_first_id is null)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="opp">
+            t.status != #opp#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="isReminders">
+			<![CDATA[  t.gmt_period_pay_end < sysdate() ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 start   -->
+		<isNotEmpty prepend="and" property="tradeType">
+			<![CDATA[  t.trade_type = #tradeType# ]]>
+		</isNotEmpty>
+		<!-- modify by wangkun 2010/09/28 end -->
+		<!-- begin add by shenzh Nov 4, 2010  modify 2010-11-23-->
+ 		<isNotEmpty prepend="and" property="stockoutStatus">
+			<![CDATA[  IFNULL(t.stockout_status,'n') = #stockoutStatus# ]]>
+			<isNotEmpty prepend="and" property="status">
+				<![CDATA[  t.status = #status# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+		<!-- end by shenzh Nov 4, 2010-->
+		)o where o.tid = od.tid(+)
+		<isNotEmpty prepend="and" property="expressCode">
+			od.express_code like CONCAT('%',#expressCode#,'%')
+		</isNotEmpty>
+		order by o.gmt_create desc,o.tid desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+	</select>
+	
+	<select id="getTradeGoodsBill" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		select a.tid as TID, ir.id as BILLID
+		  from (select o.tid, min(r.resource_order) rorder
+		          from emall_order o, emall_goods g, ioss_resources r
+		         where o.goods_id = g.id
+		           and g.bill_id = r.id
+		           <dynamic>
+		               <isNotNull property="tids">
+				           <iterate property="tids" prepend="and o.tid in" open="(" close=")" conjunction=",">
+				               #tids[]:VARCHAR#
+				           </iterate>
+			           </isNotNull>
+			           <isNotNull property="rorder">
+			               having min(r.resource_order) = #rorder:NUMERIC#
+			           </isNotNull>
+		           </dynamic>
+		         group by o.tid) a,
+		       ioss_resources ir
+		 where ir.type = 'goodsbill'
+		   and ir.resource_order = a.rorder
+	</select>
+	
+	<insert id="addCustomerOrderGetId" parameterClass="com.huaixuan.network.biz.domain.hy.CustomerOrder">
+		<![CDATA[
+		insert into CustomerOrder
+		  (idOrder,
+		   date,
+		   idCustomer,
+		   idChannel,
+		   subTotal,
+		   idCurrency,
+		   operator,
+		   operator2,
+		   idPayment,
+		   amountCard,
+		   amountCash,
+		   status,
+		   remark,
+		   idSite
+		   )
+		values
+		  (null,
+		   sysdate(),
+		   #idCustomer#,
+		   #idChannel#,
+		   #subTotal#,
+		   #idCurrency#,
+		   #operator#,
+		   #operator2#,
+		   #idPayment#,
+		   #amountCard#,
+		   #amountCash#,
+		   #status#,
+		   #remark#,
+		   #idSite#
+		   )
+		
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="idOrder" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	<update id="updateCustomerOrderStatus" parameterClass="java.util.Map">
+		update CustomerOrder  
+		set idPayment = #idPayment#,
+			status = #status#
+		<isNotNull property="cash" prepend=",">
+			amountCash = #cash#
+		</isNotNull>
+		
+		 where 
+		   	idOrder = #idOrder#
+		   and status = 1
+	</update>
+	
+	<update id="updateLifecycleByProductId" parameterClass="java.util.Map">
+		update LifeCycle 
+		set 
+		<isNotEmpty  property="remark">
+		remark=#remark#,
+		</isNotEmpty>
+		<isNotEmpty  property="price">
+		price=#price#,
+		</isNotEmpty>
+		<isNotEmpty  property="idPriceCurrency">
+		idPriceCurrency=#idPriceCurrency#,
+		</isNotEmpty>
+		<isNotEmpty  property="idOrder">
+		idOrder=#idOrder#,
+		</isNotEmpty>
+		<isNotEmpty  property="idLastOperator">
+		idLastOperator=#idLastOperator#,
+		</isNotEmpty>
+		
+		idStatus = #idStatus#
+		
+		where idProduct = #idProduct#
+		and idStatus != 7
+	</update>
+	
+	<insert id="addHistoryGetId" parameterClass="com.huaixuan.network.biz.domain.hy.HistoryView">
+		<![CDATA[
+		insert into History
+		  (idHistory,
+		   idOperation,
+		   idProduct,
+		   Date,
+		   idOperator,
+		   idCurStation,
+		   idStatus,
+		   idSupply,
+		   idCustomer
+		   )
+		values
+		  (null,
+		   #idOperation#,
+		   #idproduct#,
+		   DATE_FORMAT(SYSDATE(), '%Y-%m-%d'),
+		   #idOperator#,
+		   #idCurStation#,
+		   #idStatus#,
+		   (SELECT t.idSupply FROM Purchase t,LifeCycle l WHERE l.idProduct = #idproduct#  AND t.idPurchase=l.idPurchase AND l.idStatus!=7),
+		   #idCustomer#
+		   )
+		
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="idHistory" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	<update id="updateTradeCustomerOrderIdOrder" parameterClass="java.util.Map">
+		update emall_trade 
+		set 
+		customerorder_idOrder = #customerorder_idOrder#,
+		gmt_modify   = sysdate()
+		where tid = #tid#
+	</update>
+	
+	<select id="getCustomerOrderById"  resultMap="customerOrderMap">
+	<![CDATA[
+			select t.* from CustomerOrder t where t.idOrder=#value#
+	]]>
+	</select>
+	
+	
+</sqlMap>

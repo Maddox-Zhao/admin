@@ -1,0 +1,478 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript" src="${ctx}/scripts/jquery.js"></script>
+<script type="text/javascript">
+
+var fieldCurrentPage="a";
+
+	function checkValue(oldValue){
+	       var f=document.getElementById("sortstr");
+			var content=jQuery.trim(document.getElementById("sortstr").value);
+		if(content!=null && content!=""){
+			if(isNaN(content)||content<0){
+			alert("出错：请输入数字.");
+			f.value=oldValue;
+			f.select();
+            f.focus();
+		}else{
+			var re="^\\d*[1-9]\\d*$";
+		if(!re.test(content)){
+		alert("次序必须为正整数！");
+			f.value=oldValue;
+			f.select();
+            f.focus();
+		}
+		}
+		}else if(content==null||content==""){
+			alert("次序不能为空");
+			f.value=oldValue;
+			f.select();
+            f.focus();
+		}
+
+	}
+
+
+function updateCabinet()
+{
+
+	var cnn = document.getElementById("cabinetName");
+	var ckk = document.getElementById("cabinetKeyword");
+	var cn=jQuery.trim(document.getElementById("cabinetName").value);
+	var ck=jQuery.trim(document.getElementById("cabinetKeyword").value);
+	if(cn.length>20){
+		alert("标题不能超过20个字符");
+		return false;
+	}else if(ck.length>=40){
+	alert("关键字不能超过40个字符")
+		return false;
+	}else if(cn==""){
+	alert("标题不能为空")
+		return false;
+	}else if(ck==""){
+	alert("关键字不能不能为空")
+		return false;
+	}
+
+	//验证图片
+	var obj = document.getElementById("images");
+	var sUrl = getFullPath(obj);
+    var myImage = new Image();
+    myImage.src = sUrl;
+	if(myImage.file>0){
+    	if(myImage.fileSize>200*1024){
+    	    alert("图片不能大于200KB");
+            return false;
+    	}
+	}
+
+	document.form1.submit();
+}
+
+//获取图片全路径（不同的浏览器
+function getFullPath(obj) {
+    if(obj){
+        //ie
+        if (window.navigator.userAgent.indexOf("MSIE")>=1)
+        {
+            obj.select();
+            return document.selection.createRange().text;
+        }
+        //firefox
+        else if(window.navigator.userAgent.indexOf("Firefox")>=1)
+        {
+            if(obj.files)
+            {
+                return obj.files.item(0).getAsDataURL();
+            }
+            return obj.value;
+        }
+        return obj.value;
+    }
+}
+
+function deleteGoods(id){
+	var obj = document.getElementById("showcaseId");
+	obj.value = id;
+	var obj2 = document.getElementById("deleteGoodsTag");
+	obj2.value = 'yes';
+	var	mymes=confirm("确定从橱窗里删除这个商品？");
+	 if(true==mymes){
+		document.formgoods.action="/shop/scg.html";
+		document.formgoods.submit();
+  	}else {
+  	}
+}
+
+function showcaseUp(id){
+	var obj = document.getElementById("showcaseId");
+	obj.value = id;
+	var obj2 = document.getElementById("upTag");
+	obj2.value = 'yes';
+	var	mymes=confirm("确定上升这个商品？");
+	 if(true==mymes){
+		document.formgoods.action="/shop/scg.html";
+		document.formgoods.submit();
+  	}else {
+  	}
+
+}
+
+function showcaseDown(id){
+	var obj = document.getElementById("showcaseId");
+	obj.value = id;
+	var obj2 = document.getElementById("downTag");
+	obj2.value = 'yes';
+	var	mymes=confirm("确定下降这个商品？");
+	 if(true==mymes){
+		document.formgoods.action="scg.html";
+		document.formgoods.submit();
+  	}else {
+  	}
+
+}
+
+function addGoodsToCabinet(){
+	if(!checkIds()) return;
+	var obj = document.getElementById("addTag");
+	obj.value = 'yes';
+	var arr = [];
+	jQuery('input[name="ids"]:checked').each(function() {
+		arr.push(this.value);
+	});
+
+	document.formgoods.action="/shop/scg.html?addTag=yes&objs="+arr;
+	document.formgoods.submit();
+
+}
+
+
+function searchGoods(){
+if (document.getElementById('isCutpriceSearch').checked) {
+		document.getElementById('isCutprice').value = document.getElementById('isCutpriceSearch').value;
+		} else {
+		document.getElementById('isCutprice').value = "";
+		}
+		if(document.getElementById('newArrival').checked){
+		document.getElementById('newArrival').value = "";
+		}
+		var a=document.getElementById('isCutprice').value;
+		var b=document.getElementById('selectSort').value;
+		var c=document.getElementById('catCode').value;
+		var d=document.getElementById('goodsName').value;
+		var e=document.getElementById('goodsSn').value;
+		var f=document.getElementById('priceLowstr').value;
+		var g=document.getElementById('priceHighstr').value;
+		var h=document.getElementById('goodsNumber').value;
+		if(f>g){
+		alert("价格区间起始价格必须小于截止价格！");
+		return false;
+		}
+	document.formgoods.action="/shop/scg.html?isCutprice"+a+"&selectSort="+b+"&catCode="+c
+	+"&goodsName="+d+"&goodsSn="+e+"&priceLowstr="+f+"&priceHighstr="+g+"&goodsNumber="+h;
+	document.formgoods.submit();
+}
+
+function doModify(id,num){
+	var numValue=jQuery.trim(document.getElementById(num).value);
+ if(document.getElementById(num).value.length>18){
+ 	alert("长度必须少于18个字符");
+	}
+	else{
+	var obj = document.getElementById("showcaseId");
+	obj.value = id;
+	var obj2 = document.getElementById("modifyTag");
+	obj2.value = 'yes';
+	var m=confirm("确定修改这个商品的副名称？");
+	if(true==m){
+		document.getElementById('viceName').value=numValue;
+		document.formgoods.action="/shop/scg.html";
+		document.formgoods.submit();
+		}
+		else{
+		}
+	}
+}
+
+function selectSort1(){
+
+	if(document.getElementById("newArrival").checked==true){
+	document.getElementById("hot").checked=false;
+	document.getElementById("selectSort").value='1';
+	}else{
+	document.getElementById("selectSort").value='';
+	}
+}
+
+function selectSort2(){
+	if(document.getElementById("hot").checked==true){
+	document.getElementById("newArrival").checked=false;
+	document.getElementById("selectSort").value='2';
+	}else{
+	document.getElementById("selectSort").value='';
+	}
+}
+
+function goodsNumberSelect(){
+	var goodsNumberSelect=document.getElementById("goodsNumber");
+ 	var goodsNumberValue=document.getElementById("goodsNumber").value;
+	var decimalPoint = goodsNumberValue.indexOf("\.");
+
+	if(isNaN(goodsNumberValue)||goodsNumberValue<0||decimalPoint>0){
+			alert("出错：请输入正确的数字.");
+			goodsNumberValue="";
+			goodsNumberSelect.select();
+            goodsNumberSelect.focus();
+	}
+	document.getElementById("goodsNumber").value=jQuery.trim(goodsNumberValue);
+}
+function allCheck() {
+
+  var objs = document.getElementsByName("ids");
+  var obj = document.getElementById("checkcon");
+  if(obj.checked == true){
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   objs[i].checked = true;
+				}
+			  }
+			}else{
+			  	 for(var i = 0; i < objs.length; i++) {
+        if(objs[i].type.toLowerCase() == "checkbox" ){
+          objs[i].checked = false;
+    	  }
+      }
+
+			 }
+
+}
+
+			function checkIds(){
+		     var objs = document.getElementsByName("ids");
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   if(objs[i].checked){
+				     return true;
+				   }
+				}
+			  }
+			  alert('至少选择一商品');
+			  return false;
+		}
+
+
+</script>
+#set($title = "橱窗推荐位管理 - 橱窗商品管理")
+<!-- start ads list -->
+<div class="main">
+	<h2>橱窗商品管理</h2>
+  <form name="form1" method="post" action="/shop/updatecab.html" enctype="multipart/form-data">
+	#springBind("cabinet.id")
+	<input name="${status.expression}" id="cabinet.id" type="hidden" value="$!{cabinet.id}">
+
+
+					<div id="print">
+			<div class="formBox">
+				<h3><i></i><span>修改橱窗基本信息</span></h3>
+				<div class="content">
+                 <table class="c6">
+			<tr><th><label class="red">*</label>橱窗推荐位名称：</th>
+              <td>#springBind("cabinet.cabinetName")
+      <input name="${status.expression}" id="cabinetName" type="text" value="$!{cabinet.cabinetName}">
+                <label class="red">${status.errorMessage}</label>
+</td>
+<th>
+			<label class="red">*</label>关键字：</th>
+			<td>
+					#springBind("cabinet.cabinetKeyword")
+      <input name="${status.expression}" id="cabinetKeyword" type="text" value="$!stringUtil.substringAfter($!{cabinet.cabinetUrl},'=')">
+<label class="red">${status.errorMessage}</label>
+</td>
+	<th>
+			<label class="red">*</label>次序：</th>
+			<td>
+				#springBind("cabinet.sortstr")
+	  <input name="${status.expression}" id="sortstr" type="text" value="$!{cabinet.sortstr}" size="5" onchange="checkValue('$!{cabinet.sortstr}');">
+				 <label class="red">${status.errorMessage}</label>
+</td>
+<th>
+			<label class="red">*</label>是否显示：</th>
+					<td>
+							#springBind("cabinet.isShowstr")
+	   <select name="${status.expression}">
+	    <option value="1" #if($!{cabinet.isShowstr}=='1') selected #end>是</option>
+	    <option value="0" #if($!{cabinet.isShowstr}=='0') selected #end>否</option>
+                        </select>
+                <label class="red">${status.errorMessage}</label>
+				</td>
+            </tr>
+			<tr>
+				<th><label class="red">*</label>橱窗图片：</th>
+				<td>
+					#if($!{cabinet.cabinetPic})
+						<img src="$upServer/$!{cabinet.cabinetPic}" width="95" height="100" />
+					#end
+					<input type="file" name="images" id="images" size="35" />
+					#springBind("cabinet.cabinetPic")
+					<label class="red">${status.errorMessage}</label>
+				</td>
+				<th>橱窗类型：</th>
+				<td>
+					#springBind("cabinet.cabinetType")
+					<select name="${status.expression}" value="$!{cabinet.cabinetType}">
+                        <option value="0" #if($!{cabinet.cabinetType}=='0') selected #end>请选择...</option>
+                        #foreach($enumCabinetType in $enumCabinetTypeMap.entrySet())
+                            <option value="$!{enumCabinetType.key}" #if($!{cabinet.cabinetType}==$!{enumCabinetType.key}) selected #end>$!{enumCabinetType.value}</option>
+                        #end
+					</select>
+				</td>
+			</tr>
+			  </table>
+			<table >
+	  <tr><input value="保存修改" type="button" class="btn" onClick="javascript:updateCabinet();"> <br /><br /></tr>
+				</tr>
+			</tbody>
+		</table>
+</div>
+    </div>
+</div>
+</form>
+
+  <br />
+  <form name="formgoods" method="post" action="">
+	<input name="cabinetId" type="hidden" value="$!{cabinet.id}">
+	<input name="showcaseId" id="showcaseId" type="hidden" value="">
+	<input name="deleteGoodsTag" id="deleteGoodsTag" type="hidden" value="$!{deleteGoodsTag}">
+	<input name="upTag" id="upTag" type="hidden" value="$!{upTag}">
+	<input name="downTag" id="downTag" type="hidden" value="$!{downTag}">
+	<input name="modifyTag" id="modifyTag" type="hidden" value="">
+	<input name="viceName" id="viceName" type="hidden" value="">
+	<input name="selectSort" id="selectSort" type="hidden" value="$!selectSort">
+	<input name="isCutprice" id="isCutprice" type="hidden" value="$!isCutprice">
+				<div class="listBox" style="margin-top:10px;">
+                      <h3><span>设置商品集合</span></h3>
+<table>
+  <tbody>
+   <tr>
+      <th>商品名称</th>
+	  <th>设置商品别名</th>
+      <th>次序</th>
+      <th>操作</th>
+    </tr>
+	#set($num=0)
+	#foreach($showcase in $!{queryshowcasePage.items})
+    	<tr>
+    		<td>#direct($!{showcase.goodsTitle})</td>
+    		<td>
+    			<input type="text" name="viceNameInput$num" id="viceNameInput$num" value="$!{showcase.viceName}"/>
+    			<input type="button" value="修改" onclick="doModify('$!{showcase.id}','viceNameInput$num')">
+    			#set($num = $num + 1)
+    		</td>
+    		<td>$!{showcase.sort}</td>
+    		<td>
+    			<a href="javascript:deleteGoods('$!{showcase.id}')">删除</a>
+    			#if($velocityCount != 1 || !$queryshowcasePage.firstPage)
+					<a href="javascript:showcaseUp('$!{showcase.id}')"><img src="${imageServer}/images/admin/up.gif" style="vertical-align:middle" /></a>
+				#end
+        		#if($velocityCount != $queryshowcasePage.items.size() || !$queryshowcasePage.lastPage)
+					<a href="javascript:showcaseDown('$!{showcase.id}')"><img src="${imageServer}/images/admin/dw.gif" style="vertical-align:middle" /></a>
+        		#end
+    		</td>
+    	</tr>
+	#end
+
+	  </tbody>
+  </table>
+ </form>
+  #if($!{queryshowcasePage.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$queryshowcasePage).put('slider_target',"/shop/showcp.html?cabinetId=$!{cabinet.id}&pageFlag=y").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>
+	    <input  name="newArrival" id="newArrival" type="checkbox" value="1" #if($!selectSort=="1") checked="true" #end onclick="selectSort1()">最新宝贝
+		<input  name="hot" id="hot" type="checkbox" value="2" #if($!selectSort=="2") checked="true" #end onclick="selectSort2()">热销排行
+		<input  name="isCutpriceSearch" id="isCutpriceSearch" type="checkbox" value="1" #if($!isCutprice=="1") checked="true" #end >特价促销
+
+		#if($!{addGoodsError})
+			<div class="mag-t1">$!{addGoodsError}</div>
+		#end
+<div class="searchBox">
+
+		<input name="addTag" id="addTag" type="hidden" value="$!{addTag}">
+		<!-- 分类 -->
+		<table>
+			<tr>
+		<th>价格: 从</th>
+		<td>	<input class="inp inp-w70" name="priceLowstr" id="priceLowstr" type="text"  value="$!{priceLowstr}"/>
+			</td><th>到</th><td><input class="inp inp-w70" name="priceHighstr" id="priceHighstr" type="text"  value="$!{priceHighstr}"/>
+				</td>
+				<th>&nbsp;</th>
+				<td>
+		<select name="catCode" id="catCode" class="select">
+			<option value="">-=请选择=-</option>
+			#foreach($category in $categorysFirst)
+					<option value="$!{category.catCode}" #if(${catCode} && ${catCode}== ${category.catCode}) selected #end>
+							#direct($!{category.cache})
+							#if($!category.catName.length()>20)
+                            <div title="$!category.catName">$!category.catName.substring(0,20)...</div>
+            				#else
+            					$!category.catName
+            				#end
+					</option>
+			#end
+		</select>
+		</td>
+		<th>商品名称 </th><td><input  class="inp inp-w160" name="goodsName" id="goodsName" value="$!{goodsName}"></td>
+			<th>&nbsp;</th>
+		<th>商品编码 </th><td><input class="inp inp-w160"  name="goodsSn" id="goodsSn" value="$!{goodsSn}"></td>
+		</tr>
+		<tr>
+		<th>库存>=</th><td><input class="inp inp-w70" name="goodsNumber" id="goodsNumber" value="$!{goodsNumber}" onchange="goodsNumberSelect()";></td>
+		<th>&nbsp;</th>
+        <td>&nbsp;</td>
+		<th><input  value=" 查询 " class="btn" type="button" onClick="javascript:searchGoods();"></th>
+		<font color="red">$!{priceLowstrError}</font> <font color="red">$!{priceHighstrError}</font>
+</tr>
+</table>
+</div>
+<input  value=" 添加商品关联 " class="btn" type="button" onClick="javascript:addGoodsToCabinet();">
+  <div class="clear"></div>
+<div class="listBox">
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+  <tr>
+    <th width="16%"><input onclick="javascript:allCheck();" id="checkcon" name="allbox" type="checkbox">全选</th>
+    <th><a>商品编码</a></th>
+	<th width="43%"><a>商品名称</a></th>
+	<th ><a>库存数量</a></th>
+<!--    <th width="41%">操作</th>   -->
+  </tr>
+  #foreach($goods in ${queryGoodsPage.items})
+  <tr align="center">
+    <td><input  name="ids" type="checkbox" value="$!{goods.id}"></td>
+    <td ><span>$!{goods.goodsSn}</span></td>
+	<td ><span>#direct($!{goods.title})</span></td>
+	<td ><span>$!{goods.goodsNumber}</span></td>
+	<!--
+    <td align="middle">
+	  <a title="查看" href="#" target="_blank">查看</a>
+      <a title="编辑" href="#">编辑</a>
+	  <a title="回收站"  href="javascript:;">删除</a>
+	</td>   -->
+	</tr>
+	#end
+  </tbody>
+</table><!-- end goods list --><!-- 分页 -->
+</div>
+  #if($!{queryGoodsPage.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$queryGoodsPage).put('slider_target',"/shop/scg.html?cabinetId=$!{cabinet.id}&pageFlag=n&isCutprice=$!{isCutprice}&selectSort=$!{selectSort}&catCode=$!{catCode}
+	&goodsName=$!{goodsName}&goodsSn=$!{goodsSn}&priceLowstr=$!{priceLowstr}&priceHighstr=$!{priceHighstr}&goodsNumber=$!{goodsNumber}").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+
+<div id="div_add_note"></div>

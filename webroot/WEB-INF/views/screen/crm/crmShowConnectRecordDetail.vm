@@ -1,0 +1,98 @@
+#set($layout = "/layout/default.vm")
+
+<body>
+<div class="main">
+	<h2>CRM系统 - $!connectRecordTypeMap.get("${connectRecord.type}")详情</h2>
+	
+	#if($message)
+		<div class="mag-t2">$!message</div>
+	#end
+
+	<form name="updateForm" id="updateForm" action="$appServer.get("/crm/crmUpdateConnectRecord.html")" method="post">
+		##springBind("connectRecord.id"0
+		<input type="hidden" name="id" id="connectRecord.id" value="$!connectRecord.id" />
+		<div class="formBox">
+			<h3><i></i><span>$!connectRecordTypeMap.get("${connectRecord.type}")详情信息</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>创建时间</th>
+						<td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!connectRecord.gmtCreate)</td>
+						<th>修改时间</th>
+						<td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!connectRecord.gmtModify)</td>
+					</tr>
+					<tr>
+						<th>客户名称</th>
+						<td>$!{connectRecord.userName}</td>
+						<th>类型</th>
+						<td>$!connectRecordTypeMap.get("${connectRecord.type}")</td>
+					</tr>
+					<tr>
+						<th>时间</th>
+						<td>
+							##springBind("connectRecord.gmtConnectTimeStr")
+							<input type="text" id="connectRecord.gmtConnectTimeStr" name="gmtConnectTimeStr" value="$!dateUtil.convertDateToString('yyyy-MM-dd',${connectRecord.gmtTime})" size="10" readonly="true" />
+							<script type="text/javascript">
+								Calendar.setup({
+									inputField : "connectRecord.gmtConnectTimeStr",
+									ifFormat   : "%Y-%m-%d",
+									align      : "BR"
+								});
+            				</script>
+						</td>
+						<th>状态</th>
+						<td>
+							#if($connectRecord.type == "connect") 
+								$!connectRecordStatusMap.get("$connectRecord.status")
+							#else
+								##springBind("connectRecord.status")
+								<select id="connectRecord.status" name="status" class="select">
+									#foreach($en in $connectRecordStatusMap.entrySet())
+										<option value="$en.key" #if("$en.key" == "$connectRecord.status")selected="selected"#end>$!en.value</option>
+									#end
+								</select>
+							#end
+						</td>
+					</tr>
+                
+                    <tr>
+                		<th>内容</th>
+                		<td>
+							##springBind("connectRecord.content")
+							<textarea cols="28" rows="4" id="connectRecord.content" name="content">$!connectRecord.content</textarea>
+						</td>
+    					
+    					<th>创建者</th>
+                		<td>$!{connectRecord.adminUser}</td>
+                	</tr>
+                </table>
+            </div>
+			
+			#if($adminAccess.has("A_CRM_CONNECT_RECORD_EDIT"))
+				#if($modifyFlag)
+					<div class="form-but">
+						<button type="button" class="button-s4" onclick="javascript:submitConnect();">修改信息</button>
+					</div>
+				#end
+			#end
+        </div>
+    </form>
+	
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	function submitConnect(){
+		var gmtConnectTimeStr = document.getElementById("connectRecord.gmtConnectTimeStr").value;
+		var connectContent = document.getElementById("connectRecord.content").value;
+		if (gmtConnectTimeStr.length == 0){
+			alert("时间必须选择");
+		} else if (connectContent.length == 0){
+			alert("内容必须填写");
+		} else if (connectContent.length > 1000) {
+			alert("内容不能超过1000个字");
+		} else {
+			document.getElementById('updateForm').submit();
+		}
+	}
+</script>

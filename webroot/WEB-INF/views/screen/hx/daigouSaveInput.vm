@@ -1,0 +1,148 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<script type="text/javascript"> 
+function check()
+{
+	var form = document.saveDaiGou;
+	if(form.daigouCode.value == "")
+	{
+		alert("代购编号不能为空");
+		form.daigouCode.focus();
+		return false;
+	}
+	else if(form.daigouCode.value.substr(0,2) != "DG")
+	{
+		alert("代购编号必须以DG开头")
+		form.daigouCode.focus();
+		return false;
+	}
+	else if(form.name.value == "")
+	{
+		alert("姓名不能为空");
+		form.name.focus();
+		return false;
+	}
+	else if(form.phone.value == "")
+	{
+		alert("手机号码不能为空")
+		form.phone.focus();
+		return false;
+	}
+	else if(!IDCardCheck(form.idcards.value))
+	{
+		//alert("客户身份证不能为空")
+		form.idcards.focus();
+		return false;
+	}
+	
+	/*
+	var display = jQuery("#show").css("display");
+	if(display != "none")
+	{
+		var paidAmount = jQuery("#paidAmount").val();
+		if(paidAmount == "")
+		{
+			alert("金额不能为空！");
+			return false;
+		}
+		if(isNaN(paidAmount))
+		{
+			alert("金额必须为数字！");
+			return false;
+		}
+	}
+	*/
+	return true;
+}
+
+function changePayment()
+{
+	var payment = jQuery("#payment");
+	
+	if(payment[0].value == 2)
+	{
+		jQuery("#show").show(1000);
+	}
+	else
+	{
+		jQuery("#show").hide(1000);
+	}
+	
+}
+
+</script>
+
+<style type="text/css">
+.red{color:red}
+	
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>添加代购凭证</h2>
+		
+		 	
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				$!message
+		</div>
+		 #end
+		 
+		 <center>
+		 <form action="save.html" name="saveDaiGou" method="post"  enctype="multipart/form-data" onsubmit="return check()">
+				代购编号:
+				#springBind("daigou.daigouCode")
+			  <input type="text" name="$!{status.expression}" value="$!{status.value}"  id="conId" maxlength="10" class="inp inp-w105" onblur="javascript:if(this.value.substr(0,2) != 'DG') alert('编号必须以DG开头') " /><span class="red" id="msg">*</span><br/><br/>
+			  
+			  客户名字：
+			  #springBind("customer.name")
+			  <input type="text" name="${status.expression}" value="$!{status.value}" id="name" maxlength="10" class="inp inp-w105" /><span class="red">*</span><br/><br/>
+			  
+			#*  
+			    支付方式:
+			  #springBind("daigou.payment")
+			<select name="${status.expression}" id="payment" onchange="changePayment()">
+				#foreach($payment in $paymentMap.entrySet())
+				<option value="$payment.key">$payment.value</option>	
+				#end
+			</select>
+			<span class="red">*</span><br/><br/>
+
+			<div style="display:none" id="show">
+			#springBind("daigou.paidAmount")
+			金额:<input type="text"  name="paidAmount" id="paidAmount" maxlength="8"/> <span class="red">*</span><br/><br/>
+			</div>
+			*#
+			  客户联系方式：
+			  #springBind("customer.phone")
+			  <input type="text" name="${status.expression}" value="$!{status.value}" id="phone"  maxlength="14" class="inp inp-w105"  onkeyup="value=value.replace(/[^\d]/g,'')"/><span class="red">*</span><br/><br/>
+			  
+			  
+			
+			  客户身份证号:
+			  #springBind("daigou.idcards")
+			  <input type="text"  style="width:150px"  name="${status.expression}" value="$!{status.value}" id="idcards"  class="inp inp-w105"  maxlength="18"/> <span class="red">*</span><br/><br/>
+			  
+			
+			  
+			  代购凭证图片:
+			  <input type="file" name="img"/><br/><br/>
+			  
+			  客户身份证图片:
+			  <input type="file" name="img2"/><br/><br/>
+			  备注：
+				#springBind("daigou.note")
+				<textarea cols="30" rows="3" name="${status.expression}" id="note">$!{status.value}</textarea><br/><br/>				 
+				
+		<div class="form-but">
+    		<button type="submit" id="allcheckbutton" class="button-s4">添加</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.savedaigou.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='list.html?isFirst=true';">返回 </button>
+		</div>
+		 
+		 </form>
+
+		 </center>
+    </div>

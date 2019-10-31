@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="WithdrawSearchSQL">
+	<typeAlias alias="withdraw"
+		type="com.huaixuan.network.biz.domain.Withdraw" />
+	<resultMap class="withdraw" id="withdrawSearchResult">
+		<result column="ID" property="id" />
+		<result column="USER_ID" property="userId" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="BANK_TYPE" property="bankType" />
+		<result column="BANK_BRANCH" property="bankBranch" />
+		<result column="STATUS" property="status" />
+		<result column="TRANS_AMOUNT" property="transAmount" />
+		<result column="GMT_APPLY" property="gmtApply" />
+		<result column="GMT_TO_BANK" property="gmtToBank" />
+		<result column="GMT_BANK_ACK" property="gmtBankAck" />
+		<result column="GMT_MODIFIED" property="gmtModified" />
+		<result column="FAIL_MEMO" property="failMemo" />
+		<result column="OPERATOR" property="operator" />
+		<result column="MEMO" property="memo" />
+	</resultMap>
+
+	<resultMap class="withdraw" id="withdrawSearchAllResult">
+		<result column="ID" property="id" />
+		<result column="USER_ID" property="userId" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="BANK_TYPE" property="bankType" />
+		<result column="BANK_BRANCH" property="bankBranch" />
+		<result column="STATUS" property="status" />
+		<result column="TRANS_AMOUNT" property="transAmount" />
+		<result column="GMT_APPLY" property="gmtApply" />
+		<result column="GMT_TO_BANK" property="gmtToBank" />
+		<result column="GMT_BANK_ACK" property="gmtBankAck" />
+		<result column="GMT_MODIFIED" property="gmtModified" />
+		<result column="FAIL_MEMO" property="failMemo" />
+		<result column="OPERATOR" property="operator" />
+		<result column="MEMO" property="memo" />
+		<result column="WITHDRAWAL_NAME" property="bankName" />
+		<result column="WITHDRAWAL_ACCOUNT" property="bankAccountNo" />
+		<result column="WITHDRAWAL_DESC" property="withdrawalDesc" />
+	</resultMap>
+
+	<!-- searchAll Withdraw List -->
+	<select id="getWithdrawSearchs" resultMap="withdrawSearchResult">
+		<![CDATA[
+		select * from ep_withdraw
+]]>
+
+	</select>
+
+
+	<!--  根据条件搜索账号公共SQL -->
+	<sql id="withdraw-searchCommon-condition">
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="userId">
+				ew.user_id=#userId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="createTimeStart">
+				<![CDATA[ew.GMT_APPLY >= STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="createTimeEnd">
+				<![CDATA[ew.GMT_APPLY < DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="enabledStatus">
+				ew.STATUS=#enabledStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="enabledBank">
+				ew.BANK_TYPE=#enabledBank#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="getWithdrawSearchCount" resultClass="java.lang.Integer"
+		parameterClass="java.lang.Long">
+		<![CDATA[
+		select count(*) from ep_withdraw
+]]>
+	</select>
+
+<!--  根据条件搜索账号统计满足条件的记录数 -->
+<select id="search-withdraw-count" resultClass="int">
+    <![CDATA[select count(ew.id) from ep_withdraw ew join emall_shop_info es ON ew.USER_ID = es.USER_ID ]]>
+    <include refid="withdraw-searchCommon-condition"/>
+</select>
+
+<!--  根据条件搜索账号，查询结果  -->
+	<select id="search-withdraw-query" parameterClass="java.util.Map"
+		resultMap="withdrawSearchAllResult">
+
+<![CDATA[
+		select ew.*,es.WITHDRAWAL_NAME,es.WITHDRAWAL_ACCOUNT,es.WITHDRAWAL_DESC from ep_withdraw ew join emall_shop_info es ON ew.USER_ID = es.USER_ID
+         ]]>
+	    <include refid="withdraw-searchCommon-condition"/>
+	    <![CDATA[ORDER BY ew.GMT_APPLY desc,ew.TRANS_AMOUNT desc ]]>
+		<![CDATA[ LIMIT #startRow#,#endRow# 
+        ]]>
+	</select>
+	<select id="search-withdraw-query-sumTransAmount" parameterClass="java.util.Map"
+		resultClass="java.lang.Long" >
+<![CDATA[
+		SELECT sum(ew.TRANS_AMOUNT) FROM ep_withdraw ew
+         ]]>
+	    <include refid="withdraw-searchCommon-condition"/>
+	</select>
+
+	<!-- 批量提交银行 -->
+<update id="subWithdraw" parameterClass="java.util.Map">
+
+		update ep_withdraw set
+		status = 'G',
+		GMT_TO_BANK =sysdate(),
+		GMT_MODIFIED =sysdate()
+		 where status='A' and id in (
+		  		<iterate property="ids" conjunction=",">
+	                #ids[]#
+	            </iterate>
+		  )
+
+</update>
+
+<update id="FullWithdraw" parameterClass="withdraw">
+<![CDATA[
+		update ep_withdraw set
+		status = 'S',
+		GMT_MODIFIED =sysdate()
+		 where id = #id#
+]]>
+</update>
+
+<update id="WrongWithdraw" parameterClass="withdraw">
+<![CDATA[
+		update ep_withdraw set
+		status = 'F',
+		GMT_MODIFIED =sysdate()
+		 where id = #id#
+]]>
+</update>
+
+<!-- 根据accountno取得所有提现申请记录 -->
+<select id="withdraw-searchMoneyRequiredWithdrawsByAccountNo-query" parameterClass="string" resultMap="withdrawSearchResult">
+		<![CDATA[
+		select * from ep_withdraw where status='A' and account_no=#value#
+         ]]>
+</select>
+</sqlMap>

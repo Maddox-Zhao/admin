@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BrandRuleSQL">
+<typeAlias alias="brandRule" type="com.huaixuan.network.biz.domain.shop.BrandRule"/>
+	<resultMap class="brandRule" id="brandRuleResult">
+		<result column="id" property="id"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="return_id" property="returnId"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	<resultMap class="brandRule" id="brandRuleResultWithNames">
+		<result column="id" property="id"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="return_id" property="returnId"/>
+		<result column="status" property="status"/>
+		<result column="brand_name" property="brandName"/>
+		<result column="name" property="ruleName"/>
+	</resultMap>
+
+<!-- create Brand object -->
+<insert id="addBrandRule" parameterClass="brandRule">
+<![CDATA[
+		insert into emall_brand_rel_rule(id,brand_id,return_id,status)
+		values(null,#brandId#,#returnId#,'y')
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<update id="updateBrandRuleStatusById" parameterClass="brandRule">
+ 		update emall_brand_rel_rule set status = #status#
+		 where return_id = #returnId#
+</update>
+
+<select id="getRuleBybrandId" parameterClass="java.lang.Long" resultMap="brandRuleResult">
+   <![CDATA[
+    select emall_brand_rel_rule.* from emall_brand_rel_rule where emall_brand_rel_rule.status = 'y' and emall_brand_rel_rule.brand_id = #value#
+   ]]>
+</select>
+
+<select id="getBrandRuleByRuleId" parameterClass="java.lang.Long" resultMap="brandRuleResultWithNames">
+   <![CDATA[
+    select b.id,
+	       b.brand_id,
+	       b.return_id,
+	       b.status,
+	       (select t.brand_name from emall_brand t where t.id = b.brand_id) as brand_name,
+	       '' as name
+	  from emall_brand_rel_rule b
+	 where b.status = 'y'
+	   and b.return_id = #value#
+   ]]>
+</select>
+
+<select id="getRuleBybrandIdWithNames" parameterClass="java.lang.Long" resultMap="brandRuleResultWithNames">
+   <![CDATA[
+    select emall_brand_rel_rule.id,
+           emall_brand_rel_rule.brand_id,
+           emall_brand_rel_rule.return_id,
+           emall_brand_rel_rule.status,
+    	   emall_brand.brand_name,
+    	   ioss_return_point.name
+    		 from emall_brand_rel_rule,emall_brand,ioss_return_point
+    		  where emall_brand_rel_rule.status = 'y' and emall_brand_rel_rule.brand_id = #value#
+    		  and emall_brand_rel_rule.brand_id=emall_brand.id and ioss_return_point.id=emall_brand_rel_rule.return_id
+   ]]>
+</select>
+
+<select id="getBrandRuleById" parameterClass="java.lang.Long" resultMap="brandRuleResult">
+  <![CDATA[
+	select emall_brand_rel_rule.* from emall_brand_rel_rule where emall_brand_rel_rule.ID = #value#
+  ]]>
+</select>
+
+
+
+<select id="getBrandRuleByMap" resultMap="brandRuleResult" parameterClass="java.util.Map">
+  <![CDATA[
+      select emall_brand_rel_rule.* from emall_brand_rel_rule where 1=1
+  ]]>
+  <isNotEmpty prepend="and" property="returnId">
+      emall_brand_rel_rule.return_id = #returnId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="brandId">
+      emall_brand_rel_rule.brand_id = #brandId#
+  </isNotEmpty>
+   <isNotEmpty prepend="and" property="status">
+      emall_brand_rel_rule.status = #status#
+  </isNotEmpty>
+</select>
+</sqlMap>

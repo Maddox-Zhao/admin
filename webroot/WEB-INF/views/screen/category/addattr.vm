@@ -1,0 +1,162 @@
+#set($layout = "layout/default.vm")
+	<div class="main">
+    
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t1">
+	#if($!message == "addfail")
+		添加属性失败！
+	#end
+</div>
+ #end
+        <!-- 表单模块 -->
+        <div class="formBox">
+          <form id="form1" name="form1" action="/attr/adda.html" method="post">
+        	<h3><i></i><span>添加属性</span></h3>
+            
+        	<div class="content">
+        		<table class="c2">
+                <tr>
+                    <th>属性名称：</th>
+                    <td> #springBind("attribute.attrName")
+                       <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> 
+					</td>
+                </tr>
+                <tr>
+                   <th>是否索引(默认为否)</th>
+                   <td> #springBind("attribute.isIndex")
+                       <input name="${status.expression}" type="radio"  value="0" checked="true"/> 否
+					   <input name="${status.expression}" type="radio"  #if("$!{status.value}" == "1") checked="true" #end value="1" /> 是
+                       <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+                <tr>
+                   <th>是否导航(默认为否)</th>
+                   <td> #springBind("attribute.isGuide")
+                       <input name="${status.expression}" type="radio"  value="0" checked="true"/> 否
+					   <input name="${status.expression}" type="radio"  #if("$!{status.value}" == "1") checked="true" #end value="1" /> 是
+                       <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+                <tr>
+                  <th>是否必填(默认为否)</th>
+                  <td> #springBind("attribute.isNeed")
+                       <input name="${status.expression}" type="radio"  value="0" checked="true"/> 否
+					   <input name="${status.expression}" type="radio"  #if("$!{status.value}" == "1") checked="true" #end value="1" /> 是
+                       <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr>
+                  <th style="width:200px;">该属性值的录入方式(默认手工输入)</th>
+                  <td> #springBind("attribute.inputType")
+                      <input type="radio" name="${status.expression}" value="text"    onclick="radioClicked(0,0)"   checked="true" /> 手工录入
+		              <input type="radio" name="${status.expression}" value="textArea"  onclick="radioClicked(0,0)"  #if("$!{status.value}"=="textArea")  checked="true" #end /> 多行文本框
+					  <input type="radio" name="${status.expression}" value="radio" #if("$!{status.value}"=="radio")  checked="true"  #end  onclick="radioClicked(1,0)" /> 单选  
+					  <input type="radio" name="${status.expression}" value="checkBox"  onclick="radioClicked(1,1)"  #if("$!{status.value}"=="checkBox")  checked="true" #end /> 复选
+                      <span class="red">*</span> <br/><span>选择单选或复选的时候，可选值列表必填，换行分割</span> <span class="error">$!{status.errorMessage}</span>
+				  </td>
+                </tr>
+                <tr id="ChooseDiv" #if($!{attribute.inputType}=="checkBox") style="" #else style="display:none" #end>
+                  <th>是否买家选购</th>
+                  <td> #springBind("attribute.isBuyerChoose")
+                       <input type="radio" id="radio1" name="${status.expression}" value="0"  checked="true" onclick="doAssociate('1');" /> 否 
+		               <input type="radio" id="radio2" name="${status.expression}" value="1" #if("$!{status.value}"=="1")  checked="true" #end onclick="doAssociate('2');"/> 是
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr id="ChooseDiv2" #if($!{attribute.inputType}=="checkBox") style="" #else style="display:none" #end>
+                  <th>是否产品属性(默认为否)</th>
+                  <td> #springBind("attribute.isInstance")
+                       <input type="radio" id="radio3" name="${status.expression}" value="0"   checked="true" onclick="doAssociate('3');" /> 否
+		               <input type="radio" id="radio4" name="${status.expression}" value="1"  #if("$!{status.value}"=="1") checked="true" #end onclick="doAssociate('4');"/> 是
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr>
+                  <th>可选值列表</th>
+                  <td>#springBind("attribute.attrValues")
+					  <textarea id="list" name="${status.expression}" cols="30" rows="5"  disabled="true">$!{status.value}</textarea>
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr>
+                  <th>属性描述</th>
+                  <td>#springBind("attribute.attrDesc")
+					  <textarea id="list" name="${status.expression}" cols="45" rows="5">$!{status.value}</textarea>
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+              </table>
+   	    </div>
+            <div class="form-but"><!-- 表单按钮区 -->
+                    
+            	<button type="button" class="button-s4" onclick="check();">确定</button>
+                <button type="reset" class="button-s4" onClick="resetForm();">重置</button>
+              
+          	</div><!-- 表单按钮区 END -->
+                    
+          </form>
+        </div> <!-- 表单模块 END -->
+   
+    </div>
+<script type="text/javascript">
+
+    function check(){
+	     document.form1.submit();
+	}
+
+	var list=document.getElementsByName("attribute.inputType");
+	var target=document.getElementById("list");
+	var value="";
+	for(var i=0;i<list.length;i++)
+		{
+			if(list[i].checked)
+			{
+				value=list[i].value;
+			}
+		}
+	if(value=="radio"||value=="checkBox")
+	{
+		target.disabled=false;
+	}
+
+
+	function radioClicked(id,type)
+	{
+        if(type*1==1){
+        	document.getElementById("ChooseDiv").style.display="";
+			document.getElementById("ChooseDiv2").style.display="";
+        }else{
+    		var rd1=document.getElementById('radio1');
+    		var rd3=document.getElementById('radio3');
+			rd1.checked=true;
+			rd3.checked=true;
+        	document.getElementById("ChooseDiv").style.display="none";
+			document.getElementById("ChooseDiv2").style.display="none";
+        }
+		var list=document.getElementById("list");
+		list.disabled = id > 0 ? false : true;
+	}
+	
+	function doAssociate(no){
+		var rd1=document.getElementById('radio1');
+		var rd2=document.getElementById('radio2');
+		var rd3=document.getElementById('radio3');
+		var rd4=document.getElementById('radio4');
+		if(no=='1' || no=='3'){
+			rd1.checked=true;
+			rd3.checked=true;
+		}else if(no=='2' || no=='4'){
+			rd2.checked=true;
+			rd4.checked=true;
+		}
+		
+		
+	}
+	
+	
+	function resetForm(){
+	  document.form1.reset();
+	}
+</script>

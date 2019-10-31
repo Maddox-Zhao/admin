@@ -1,0 +1,91 @@
+#set($layout = '')
+<head>
+  <title>尚上商贸</title>
+  <link rel="stylesheet" type="text/css" href="${imageServer}/styles/common.css" media="all" />
+  <script type="text/javascript" src="${imageServer}/scripts/dropmenu.js"></script>
+  <link rel="stylesheet" href="${imageServer}/jquery-ui/themes/base/jquery.ui.base.css">
+  <link rel="stylesheet" href="${imageServer}/jquery-ui/themes/base/jquery.ui.tabs.css">
+  <script type="text/javascript" src="${imageServer}/jquery-ui/jquery-1.4.4.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery-ui-1.8.7.custom.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.core.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.widget.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.tabs.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.mouse.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.draggable.js"></script>
+  <script type="text/javascript" src="${imageServer}/jquery-ui/ui/jquery.ui.dialog.js"></script>
+        
+    <script type="text/javascript">
+		/* 右侧菜单隐藏显示 */
+		$(function(){
+			$(".switch-show").toggle(
+				function(){
+					$(".body-menu").width(6);
+					$(".menu-c").addClass("ml10");
+					$(".main-content").width(1070);
+					$(".list-title-fixed").width(1070);
+				},function(){
+					$(".body-menu").width(156);
+					$(".menu-c").removeClass("ml10");
+					$(".main-content").width(920);
+					$(".list-title-fixed").width(920);
+				}
+			);
+		});
+    </script>
+
+
+    <script>
+	$(function() {
+		$( "#tabs" ).tabs();
+		$( ".form-box" ).tabs();
+		
+	});
+	
+	// 固定顶部的工具条组件
+	$(function(){
+		var mt = -1;
+
+		$(window).scroll(function(){
+
+			var scrollTop = getScrollTop(); //取得滚动条距离顶部的
+			var divMargin = $(".goods-list-title").offset(); //取得容器距离边界的距离
+			
+			if(mt == -1)mt = divMargin.top;
+			
+			if(scrollTop >= mt){
+				$(".list-title-fixed").show().css("left",(divMargin.left - 1)).css("right",10); //设置固定元素的显示 和left坐标
+			}
+			if(scrollTop < mt){
+				$(".list-title-fixed").hide(); // 隐藏固定元素
+			}
+		});
+		//绑定关闭事件
+		$(".list-title-fixed .close").click(
+			function () {
+				$(".list-title-fixed").hide();
+				$(window).unbind(); // 取消滚动条的事件绑定
+			}
+		);
+	})
+	
+	//取得滚动条距离顶部的高度
+	function getScrollTop() {    
+		var scrollPos = 0;     
+		if (typeof window.pageYOffset != 'undefined') {     
+		   scrollPos = window.pageYOffset;     
+		}     
+		else if (typeof window.document.compatMode != 'undefined' &&     
+		   window.document.compatMode != 'BackCompat') {     
+		   scrollPos = window.document.documentElement.scrollTop;     
+		}     
+		else if (typeof window.document.body != 'undefined') {     
+		   scrollPos = window.document.body.scrollTop;     
+		}     
+		return scrollPos;
+	} 
+
+
+	</script>
+    
+        
+</head>

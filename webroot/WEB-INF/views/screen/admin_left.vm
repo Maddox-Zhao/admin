@@ -1,0 +1,780 @@
+  #set($layout = 'layout\default.vm')
+<script src="${imageServer}/scripts/menuTree.js" type="text/javascript"></script>
+<body style="background:#EEF2FB;">
+<div class="menu-tree">
+  <h3 class="type"><a href="javascript:void(0)">欢迎使用</a></h3>
+  <div class="content">
+    <ul>
+      <li><a href="admin_right.html" target="main">管理员首页</a></li>
+    </ul>
+  </div>
+
+  #*
+  #if($!adminAccess.has('A_HUAIXUAN_MANAGE') || $!adminAccess.has('A_HUAIXUAN_STORE'))
+  <h3 class="type"><a href="javascript:void(0)">尚上管理</a></h3>
+  <div class="content">
+    <ul>
+	  
+      <li><a href="$appServer.get('/historyView/historyViewList.html?isFirst=true')" target="main">历史管理</a></li>
+	  <li><a href="$appServer.get('productview/productviewList.html')" target="main">现货查看</a></li>
+	  <li><a href="$appServer.get('productview/productviewAllList.html?isFirst=true')" target="main">产品状态查看</a></li>
+	  ##<li><a href="$!appServer/statistics/orderAnalysis.html" target="main">订单统计</a></li>
+	   #if($!adminAccess.has('A_HUAIXUAN_STORE'))
+	  ##<li><a href="$!appServer/statistics/storeAnalysis.html" target="main">库存统计</a></li>
+	  <li><a href="$!appServer/productview/brandStoreViewInit.html" target="main">品牌库存统计</a></li>
+	  
+	  #end
+    </ul>
+  </div>
+  #end
+
+  
+  
+  
+  
+  
+ #if($!adminAccess.has('A_COMMON_USER') || $!adminAccess.has('A_POINTS_VIEW_USER') || $!adminAccess.has('A_REG_USER_MODIFY_USER')
+	 || $!adminAccess.has('A_REG_USER_VIEW_USER') || $!adminAccess.has('A_ADMINISTRATORS_ADD_USER') || $!adminAccess.has('A_ADMINISTRATORS_DELETE_USER')
+	 || $!adminAccess.has('A_ADMINISTRATORS_MODIFY_USER') || $!adminAccess.has('A_ADMINISTRATORS_VIEW_USER') || $!adminAccess.has('A_ROLE_ADD_USER')
+	 || $!adminAccess.has('A_ROLE_MODIFY_USER') || $!adminAccess.has('A_ROLE_VIEW_USER') || $!adminAccess.has('A_LOG_VIEW_USER'))
+  <h3 class="type"><a href="javascript:void(0)">HX管理</a></h3>
+  <div class="content">
+    <ul>
+		<li><a href="$appServer.get('/hxaccount/list.html?isFirst=true')" target="main">现金账户</a></li>
+      <li><a href="$appServer.get('/consignment/consignmentViewList.html?isFirst=true')" target="main">寄卖管理</a></li>
+      <li><a href="$appServer.get('/acquisition/list.html?isFirst=true')" target="main">收购管理</a></li>
+      <li><a href="$appServer.get('/daigou/list.html?isFirst=true')" target="main">代购管理</a></li>
+
+    </ul>
+  </div>
+  #end
+
+*# 
+  
+  #if($!adminAccess.has('A_GOODS_MANAGER') || $!adminAccess.has('A_GOODS_ADD_USER') || $!adminAccess.has('A_GOODS_DELETE_USER')
+	 || $!adminAccess.has('A_GOODS_MODIFY_USER') || $!adminAccess.has('A_GOODS_VIEW_USER') || $!adminAccess.has('A_GOODS_INSTANCE_MODIFY_USER')
+	 || $!adminAccess.has('A_GOODS_INSTANCE_VIEW_USER') || $!adminAccess.has('A_CM_ADD_USER') || $!adminAccess.has('A_CM_DELETE_USER')
+	 || $!adminAccess.has('A_CM_MODIFY_USER') || $!adminAccess.has('A_CM_VIEW_USER') || $!adminAccess.has('A_AM_ADD_USER')
+	 || $!adminAccess.has('A_AM_DELETE_USER') || $!adminAccess.has('A_AM_MODIFY_USER') || $!adminAccess.has('A_AM_VIEW_USER')
+	 || $!adminAccess.has('A_PROMATION_ADD_USER') || $!adminAccess.has('A_PROMATION_DELETE_USER') || $!adminAccess.has('A_PROMATION_MODIFY_USER')
+	 || $!adminAccess.has('A_PROMATION_VIEW_USER') || $!adminAccess.has('A_COLLECTION_VIEW_USER'))
+  <h3 class="type"><a href="javascript:void(0)">商品管理</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has("A_GOODS_ADD_USER"))
+	  ##<li><a href="$appServer.get('/goods/scat.html')" target="main">商品发布</a></li>
+	  #end
+	  #if($!adminAccess.has("A_GOODS_DELETE_USER") || $!adminAccess.has("A_GOODS_MODIFY_USER") || $!adminAccess.has("A_GOODS_VIEW_USER"))
+	  <li><a href="$appServer.get('/goods/search.html')"  target="main">商品查询</a></li>
+      <li><a href="$appServer.get('/shop/shoppingCartvm.html')"  target="main">购物车商品查询</a></li>
+	  ##<li><a href="$appServer.get('/goods/clientPic.html')" target="main">导图片</a></li>
+	  #end
+	  #if( $!adminAccess.has("A_GOODS_MODIFY_USER"))
+	  ##<li><a href="$appServer.get('/goods/timetask/clientTb.html')" target="main">导产品数据（慎用）</a></li>
+	  ##<li><a href="$appServer.get('/goods/timetask/autoListing.html')" target="main">自动上架</a></li>
+	  ##<li><a href="$appServer.get('/goods/timetask/checkGoodsNum.html')" target="main">自动统一库存</a></li>
+	  ##<li><a href="$appServer.get('/goods/timetask/autoCheckNewPicture.html')" target="main">自动更新图片</a></li>
+	  ##<li><a href="$appServer.get('/shop/addBrandStoreDay.html')" target="main">品牌日数据</a></li>
+	  ##<li><a href="$appServer.get('/productview/addProductHistory.html')" target="main">保留产品历史</a></li>
+	  ##<li><a href="$appServer.get('/timetask/upactivestatus.html')" target="main">刷新活动状态</a></li>
+      ##<li><a href="$appServer.get('/timetask/sendMail.html')" target="main">sendMail</a></li>
+	  #end
+	  #if($!adminAccess.has("A_GOODS_INSTANCE_MODIFY_USER") || $!adminAccess.has("A_GOODS_INSTANCE_VIEW_USER"))
+	  <li><a href="$appServer.get('/instance/instance_search_init.html')" target="main">产品查询</a></li>
+	  #end
+
+	  #if($!adminAccess.has("A_CM_ADD_USER") || $!adminAccess.has("A_CM_DELETE_USER") || $!adminAccess.has("A_CM_MODIFY_USER") || $!adminAccess.has("A_CM_VIEW_USER"))
+	  <li><a href="$appServer.get('/category/cm.html')" target="main">类目管理</a></li>
+	  #end
+	  #*
+	  #if($!adminAccess.has("A_AM_ADD_USER") || $!adminAccess.has("A_AM_DELETE_USER") || $!adminAccess.has("A_AM_MODIFY_USER") || $!adminAccess.has("A_AM_VIEW_USER"))
+	  <li><a href="$appServer.get('/attr/am.html')" target="main">属性管理</a></li>
+	  #end
+
+	  #if($!adminAccess.has("A_PROMATION_ADD_USER") || $!adminAccess.has("A_PROMATION_DELETE_USER") || $!adminAccess.has("A_PROMATION_MODIFY_USER") || $!adminAccess.has("A_PROMATION_VIEW_USER"))
+	  <li><a href="$appServer.get('/goods/searchPromation.html')" target="main">套餐查询</a></li>
+	  #end
+      *#
+	  
+	  #if($!adminAccess.has("A_COLLECTION_VIEW_USER"))
+	  <li><a href="$appServer.get('/goods/searchCollection.html')" target="main">收藏管理</a></li>
+	  #end
+    </ul>
+  </div>
+  #end
+
+#if($adminAccess.has("A_ORDER_MODIFY_USER") || $adminAccess.has("A_ORDER_REF_CHA_USER") ||
+	$adminAccess.has("A_ORDER_ASSORT_USER") || $adminAccess.has("A_ORDER_VIEW_USER") ||
+	$adminAccess.has("A_REF_MODIFY_USER") || $adminAccess.has("A_REF_GOODS_VIEW_USER") ||
+	$adminAccess.has("A_REF_FINANCE_USER") || $adminAccess.has("A_WHOLESALE_APPLY_VIEW_USER") ||
+	$adminAccess.has("A_ORDER_DEPFIRST_MODIFY"))
+	<h3 class="type"><a href="javascript:void(0)">交易管理</a></h3>
+	<div class="content">
+		<ul>
+			#if($adminAccess.has("A_ORDER_MODIFY_USER") || $adminAccess.has("A_ORDER_REF_CHA_USER") ||
+				$adminAccess.has("A_ORDER_ASSORT_USER") || $adminAccess.has("A_ORDER_VIEW_USER") ||
+				$adminAccess.has("A_STOCKOUT_TRADE_MANAGE_USER") || $adminAccess.has("A_ORDER_DEPFIRST_MODIFY"))
+				#if($adminAccess.has("A_WHOLESALE_MANAGE_USER"))
+					<li><a href="$appServer.get('/trade/showl.html?orderType=w')" target="main">订单管理</a></li>
+					#if($adminAccess.has("A_ORDER_ASSORT_USER"))
+						##<li><a href="$appServer.get('/trade/showl.html?send=true&status=wait_seller_send_goods')" target="main">订单配货</a></li>
+					#end
+				#else
+					<li><a href="$appServer.get('/trade/showl.html?orderType=n')" target="main">订单管理</a></li>
+					#if($adminAccess.has("A_ORDER_ASSORT_USER"))
+						##<li><a href="$appServer.get('/trade/showl.html?send=true&status=wait_seller_send_goods')" target="main">订单配货</a></li>
+					#end
+				#end
+				#if($adminAccess.has("A_STOCKOUT_TRADE_MANAGE_USER"))
+					##<li><a href="$appServer.get('/trade/showStockoutList.html')" target="main">缺货订单管理</a></li>
+				#end
+				<li><a href="$appServer.get('/trade/orderList.html')" target="main">订单商品查询</a></li>
+			#end
+			#if($adminAccess.has("A_REF_MODIFY_USER") || $adminAccess.has("A_REF_FINANCE_USER"))
+				##<li><a href="$appServer.get('/igc/refundApplySearch.html')" target="main">退换货申请</a></li>
+				##<li><a href="$appServer.get('/trade/refundList.html')" target="main">退货/退款管理</a></li>
+			#end
+			#if($adminAccess.has("A_REF_GOODS_VIEW_USER"))
+				##<li><a href="$appServer.get('/goods/searchRefundGoods.html')" target="main">退货产品查询</a></li>
+			#end
+		</ul>
+	</div>
+#end
+
+    #if($!adminAccess.has('A_SHOP_MANAGE') || $!adminAccess.has('A_AFFICHE_ADD_USER') || $!adminAccess.has('A_AFFICHE_DELETE_USER')
+	 || $!adminAccess.has('A_AFFICHE_MODIFY_USER') || $!adminAccess.has('A_AFFICHE_VIEW_USER') || $!adminAccess.has('A_AD_ADD_USER')
+	 || $!adminAccess.has('A_AD_DELETE_USER') || $!adminAccess.has('A_AD_MODIFY_USER') || $!adminAccess.has('A_AD_VIEW_USER')
+	 || $!adminAccess.has('A_FL_ADD_USER') || $!adminAccess.has('A_FL_DELETE_USER') || $!adminAccess.has('A_FL_MODIFY_USER')
+	 || $!adminAccess.has('A_FL_VIEW_USER') || $!adminAccess.has('A_KW_ADD_USER') || $!adminAccess.has('A_KW_DELETE_USER')
+	 || $!adminAccess.has('A_KW_MODIFY_USER') || $!adminAccess.has('A_KW_VIEW_USER') || $!adminAccess.has('A_CAB_ADD_USER')
+	 || $!adminAccess.has('A_CAB_DELETE_USER') || $!adminAccess.has('A_CAB_MODIFY_USER')||$!adminAccess.has('A_CAB_VIEW_USER')
+	 ||$!adminAccess.has('A_BRAND_ADD_USER')||$!adminAccess.has('A_BRAND_DELETE_USER')||$!adminAccess.has('A_BRAND_MODIFY_USER')
+	 ||$!adminAccess.has('A_BRAND_VIEW_USER')||$!adminAccess.has('A_AR_ADD_USER')||$!adminAccess.has('A_AR_DELETE_USER')
+	 ||$!adminAccess.has('A_AR_MODIFY_USER')||$!adminAccess.has('A_AR_VIEW_USER')||$!adminAccess.has('A_SINFO_MODIFY_USER')
+	 ||$!adminAccess.has('A_NAV_ADD_USER')||$!adminAccess.has('A_NAV_DELETE_USER')||$!adminAccess.has('A_NAV_MODIFY_USER')
+	 ||$!adminAccess.has('A_NAV_VIEW_USER')||$!adminAccess.has('A_BARDL_MODIFY_USER')||$!adminAccess.has('A_ACTIVITY_ADD_USER')
+	 ||$!adminAccess.has('A_ACTIVITY_MODIFY_USER')||$!adminAccess.has('A_ACTIVITY_VIEW_USER')||$!adminAccess.has('A_WEBMSG_MANAGE_USER'))
+    <h3 class="type"><a href="javascript:void(0)">店铺管理</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has('A_BRAND_ADD_USER')||$!adminAccess.has('A_BRAND_DELETE_USER')||$!adminAccess.has('A_BRAND_MODIFY_USER')||$!adminAccess.has('A_BRAND_VIEW_USER'))
+      ##<li><a href="$appServer/shop/blist.html" target="main">品牌管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_AR_ADD_USER')||$!adminAccess.has('A_AR_DELETE_USER')||$!adminAccess.has('A_AR_MODIFY_USER')||$!adminAccess.has('A_AR_VIEW_USER'))
+	  ##<li><a href="$appServer/shop/arlist.html" target="main">资讯管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_SINFO_MODIFY_USER'))
+	  ##<li><a href="$appServer/shop/sinfo.html" target="main">店铺信息设置</a></li>
+	  #end
+	  #if($!adminAccess.has('A_AFFICHE_ADD_USER')||$!adminAccess.has('A_AFFICHE_DELETE_USER')||$!adminAccess.has('A_AFFICHE_MODIFY_USER')||$!adminAccess.has('A_AFFICHE_VIEW_USER'))
+      ##<li><a href="$appServer/shop/list.html" target="main">公告管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_NAV_ADD_USER')||$!adminAccess.has('A_NAV_DELETE_USER')||$!adminAccess.has('A_NAV_MODIFY_USER')||$!adminAccess.has('A_NAV_VIEW_USER'))
+      ##<li><a href="$appServer/shop/navlist.html" target="main">导航管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_BARDL_MODIFY_USER'))
+	  ##<li><a href="$appServer/shop/bardl.html?pageFlag=hot_sale" target="main">榜单管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_ACTIVITY_ADD_USER')||$!adminAccess.has('A_ACTIVITY_MODIFY_USER')||$!adminAccess.has('A_ACTIVITY_VIEW_USER'))
+	  <li><a href="$appServer/shop/activitylist.html" target="main">专场管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_KW_ADD_USER')||$!adminAccess.has('A_KW_DELETE_USER')||$!adminAccess.has('A_KW_MODIFY_USER')||$!adminAccess.has('A_KW_VIEW_USER'))
+	  ##<li><a href="$appServer/shop/kwlist.html" target="main">关键字管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_FL_ADD_USER')||$!adminAccess.has('A_FL_DELETE_USER')||$!adminAccess.has('A_FL_MODIFY_USER')||$!adminAccess.has('A_FL_VIEW_USER'))
+      ##<li><a href="$appServer/shop/fllist.html" target="main">友情链接管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_AD_ADD_USER')||$!adminAccess.has('A_AD_DELETE_USER')||$!adminAccess.has('A_AD_MODIFY_USER')||$!adminAccess.has('A_AD_VIEW_USER'))
+      ##<li><a href="$appServer/shop/adListAdmin.html?adType=d" target="main">广告管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_CAB_ADD_USER')||$!adminAccess.has('A_CAB_DELETE_USER')||$!adminAccess.has('A_CAB_MODIFY_USER')||$!adminAccess.has('A_CAB_VIEW_USER'))
+      ##<li><a href="$appServer/shop/cablist.html" target="main">橱窗推荐位管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_WEBMSG_MANAGE_USER'))
+      ##<li class="menu-item"><a href="$appServer/shop/awebmsgist.html" target="main">站内信管理</a></li>
+      #end
+    </ul>
+  </div>
+  #end
+
+
+#*
+#if($!adminAccess.has("A_REVIEW_REVERT_TO_USER") ||
+	$!adminAccess.has("A_REVIEW_VIEW_USER") ||
+	$!adminAccess.has("A_FB_REVERT_TO_USER") ||
+	$!adminAccess.has("A_FB_VIEW_USER"))
+  <h3 class="type"><a href="javascript:void(0)">售后管理</a></h3>
+  <div class="content">
+    <ul>
+		
+		#if($!adminAccess.has("A_REVIEW_REVERT_TO_USER") ||
+			$!adminAccess.has("A_REVIEW_VIEW_USER"))
+        <li><a href="$appServer/comment/scomments.html?isFirst=true" target="main">评论管理</a></li>
+		#end
+		
+		#if($!adminAccess.has("A_FB_REVERT_TO_USER") ||
+			$!adminAccess.has("A_FB_VIEW_USER"))
+        <li><a href="$appServer/feedback/showfb.html?isFirst=true" target="main">留言管理</a></li>
+		#end
+    </ul>
+  </div>
+#end
+ 
+#if($!adminAccess.has('A_STATISTICS_MANAGE')|| $!adminAccess.has('A_OANALYSIS_VIEW_USER')
+	|| $!adminAccess.has('A_CATAORDANALYSIS_VIEW_USER')|| $!adminAccess.has('A_SANALYSIS_VIEW_USER')
+	|| $!adminAccess.has('A_SANALYSIS_DETAIL_USER')|| $!adminAccess.has('A_HOTGOODS_VIEW_USER')
+	|| $!adminAccess.has('A_SLOWGOODS_VIEW_USER')|| $!adminAccess.has('A_CATSUM_VIEW_USER')
+	|| $!adminAccess.has('A_CANALYSIS_VIEW_USER')|| $!adminAccess.has('A_STORAGECOST_VIEW_USER')
+	|| $!adminAccess.has('A_INSTORAGE_VIEW_USER')|| $!adminAccess.has('A_IN_OUT_STAT_REPORT_USER')
+	)
+  <h3 class="type"><a href="javascript:void(0)">统计报表</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has('A_OANALYSIS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/orderAnalysis.html" target="main">订单统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_CATAORDANALYSIS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/catalogOrderAnalysis.html" target="main">类别订单统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_SANALYSIS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/saleAnalysis.html?actionType=goods" target="main">商品销售统计</a></li>
+      <li><a href="$!appServer/statistics/saleAnalysis.html?actionType=products" target="main">产品销售统计</a></li>
+	  <li><a href="$!appServer/statistics/sanalysisDepository.html" target="main">销售统计(商品分仓)</a></li>
+	  #end
+	  #if($!adminAccess.has('A_SANALYSIS_DETAIL_USER'))
+      <li><a href="$!appServer/statistics/saleAnalysisDetail.html" target="main">销售明细</a></li>
+	  #end
+	  #if($!adminAccess.has('A_HOTGOODS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/searchHotGoods.html" target="main">热销商品统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_SLOWGOODS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/searchSlowGoods.html" target="main">滞销商品统计</a></li>
+	   #end
+	  #if($!adminAccess.has('A_CATSUM_VIEW_USER'))
+      <li><a href="$!appServer/statistics/searchCatSum.html" target="main">类目销售汇总</a></li>
+	   #end
+	  #if($!adminAccess.has('A_CANALYSIS_VIEW_USER'))
+      <li><a href="$!appServer/statistics/catalogAnalysis.html" target="main">一级类目销售金额统计</a></li>
+	   #end
+	  #if($!adminAccess.has('A_STORAGECOST_VIEW_USER'))
+      <li><a href="$!appServer/statistics/searchStorageCost.html" target="main">类目库存成本汇总</a></li>
+	   #end
+	  #if($!adminAccess.has('A_INSTORAGE_VIEW_USER'))
+      <li><a href="$!appServer/statistics/searchInStorage.html" target="main">在库产品统计</a></li>
+	   #end
+	  #if($!adminAccess.has('A_IN_OUT_STAT_REPORT_USER'))
+      <li><a href="$!appServer/statistics/searchInOutStatReport.html" target="main">月进出货统计报表</a></li>
+	   #end
+    </ul>
+  </div>
+#end
+
+*#
+
+ #if($!adminAccess.has('A_COMMON_USER') || $!adminAccess.has('A_POINTS_VIEW_USER') || $!adminAccess.has('A_REG_USER_MODIFY_USER')
+	 || $!adminAccess.has('A_REG_USER_VIEW_USER') || $!adminAccess.has('A_ADMINISTRATORS_ADD_USER') || $!adminAccess.has('A_ADMINISTRATORS_DELETE_USER')
+	 || $!adminAccess.has('A_ADMINISTRATORS_MODIFY_USER') || $!adminAccess.has('A_ADMINISTRATORS_VIEW_USER') || $!adminAccess.has('A_ROLE_ADD_USER')
+	 || $!adminAccess.has('A_ROLE_MODIFY_USER') || $!adminAccess.has('A_ROLE_VIEW_USER') || $!adminAccess.has('A_LOG_VIEW_USER'))
+  <h3 class="type"><a href="javascript:void(0)">用户管理</a></h3>
+  <div class="content">
+    <ul>
+		<li><a href="admin/editPassword.html" target="main">修改密码</a></li>
+		#if($!adminAccess.has("A_ADMINISTRATORS_ADD_USER") || $!adminAccess.has("A_ADMINISTRATORS_DELETE_USER")
+		 || $!adminAccess.has("A_ADMINISTRATORS_MODIFY_USER") || $!adminAccess.has("A_ADMINISTRATORS_VIEW_USER"))
+        <li><a href="$appServer.get('/admin/showUserList.html')" target="main">员工管理</a></li>
+		##<li><a href="$appServer.get('/admin/showUserListTest.html')" target="main">测试员工管理</a></li>
+		#end
+		#if($!adminAccess.has("A_ROLE_ADD_USER") || $!adminAccess.has("A_ROLE_MODIFY_USER") || $!adminAccess.has("A_ROLE_VIEW_USER"))
+		  <li><a href="$appServer.get('/department/list.html')" target="main">部门管理</a></li>
+          <li><a href="$appServer.get('/role/roleList.html')" target="main">职务权限</a></li>
+		  <li><a href="$appServer.get('/dxrecord/todxrecordlist.html')" target="main">代销用户登录查看</a></li>
+		  <li><a href="$appServer.get('/loginLogoInformation/toshowLoginLog.html')" target="main">用户登录记录</a></li>
+		   #end
+          
+    	  
+    	 
+		#*
+	  <li><a href="$appServer.get('/admin/editPassword.html')" target="main">修改密码</a></li>
+	  <li><a href="$appServer.get('/admin/editCurUser.html')" target="main">修改用户信息</a></li>
+      #if($!adminAccess.has("A_ADMINISTRATORS_ADD_USER") || $!adminAccess.has("A_ADMINISTRATORS_DELETE_USER")
+		 || $!adminAccess.has("A_ADMINISTRATORS_MODIFY_USER") || $!adminAccess.has("A_ADMINISTRATORS_VIEW_USER"))
+      <li><a href="$appServer.get('/admin/showUserList.html')" target="main">员工管理</a></li>
+	  #end
+	  #if($!adminAccess.has("A_ROLE_ADD_USER") || $!adminAccess.has("A_ROLE_MODIFY_USER") || $!adminAccess.has("A_ROLE_VIEW_USER"))
+      <li><a href="$appServer.get('/role/roleList.html')" target="main">WEB端职务管理</a></li>
+      <li><a href="$appServer.get('/role/clientList.html')" target="main">CLIENT端职务管理</a></li>
+	  <li><a href="$appServer.get('/department/list.html')" target="main">部门管理</a></li>
+	  #end
+	  #if($!adminAccess.has("A_LOG_VIEW_USER"))
+	  <li><a href="$appServer.get('/admin/logSearch.html')" target="main">系统日志查询</a></li>
+	  #end *#
+    </ul>
+  </div>
+  #end
+#*
+  #if($!adminAccess.has("A_STOCK_ADD_USER") || $!adminAccess.has("A_STOCK_MODIFY_USER") ||
+	$!adminAccess.has("A_STOCK_CHECK_USER") || $!adminAccess.has("A_STOCK_EXPORT_USER") ||
+	$!adminAccess.has("A_STOCK_VIEW_USER") || $!adminAccess.has("A_STOCK_DETAILSEARCH_USER") ||
+	$!adminAccess.has("A_STOCK_GATHERSEARCH_USER") || $!adminAccess.has("A_REFUND_ADD_USER") ||
+	$!adminAccess.has("A_REFUND_VIEW_USER") || $!adminAccess.has("A_REFUND_DETAIL_VIEW_USER") ||
+	$!adminAccess.has("A_REFUND_GATHER_VIEW_USER") || $!adminAccess.has("A_SUPPLIER_SHOPPING_VIEW_USER") ||
+	$!adminAccess.has("A_ORDER_STORAGE_QUERY"))
+  <h3 class="type"><a href="javascript:void(0)">采购管理</a></h3>
+  <div class="content">
+    <ul>
+	#if($!adminAccess.has("A_STOCK_ADD_USER") || $!adminAccess.has("A_STOCK_MODIFY_USER") ||
+		$!adminAccess.has("A_STOCK_CHECK_USER") || $!adminAccess.has("A_STOCK_EXPORT_USER") ||
+		$!adminAccess.has("A_STOCK_VIEW_USER"))
+      <li><a href="$!appServer/stock/stock_search.html?isFirst=true" target="main">采购订单管理</a></li>
+	#end
+	#if($!adminAccess.has("A_STOCK_DETAILSEARCH_USER"))
+      <li><a href="$!appServer/stock/stock_detail_search.html?isFirst=true" target="main">采购产品明细查询</a></li>
+	#end
+	#if($!adminAccess.has("A_STOCK_GATHERSEARCH_USER"))
+      <li><a href="$!appServer/stock/stock_gather_search.html?isFirst=true" target="main">采购产品汇总查询</a></li>
+	#end
+	#if($!adminAccess.has("A_REFUND_ADD_USER") || $!adminAccess.has("A_REFUND_VIEW_USER"))
+      <li><a href="$!appServer/stock/refund/search_shopping_refund_list.html?isFirst=true" target="main">退货订单管理</a></li>
+	#end
+	#if($!adminAccess.has("A_REFUND_DETAIL_VIEW_USER"))
+      <li><a href="$!appServer/stock/refund/refund_detail_search.html?isFirst=true" target="main">退货产品明细查询</a></li>
+	#end
+	#if($!adminAccess.has("A_REFUND_GATHER_VIEW_USER"))
+      <li><a href="$!appServer/stock/refund/refund_gather_search.html?isFirst=true" target="main">退货产品汇总查询</a></li>
+	#end
+	#if($!adminAccess.has("A_SUPPLIER_SHOPPING_VIEW_USER"))
+	  <li><a href="$!appServer/stock/search_supplier_shopping_list.html?isFirst=true" target="main">供应商供货查询</a></li>
+	#end
+	#if($!adminAccess.has("A_ORDER_STORAGE_QUERY"))
+	  <li><a href="$!appServer/stock/day_stock_search.html?isFirst=true" target="main">订单库存查询</a></li>
+	#end
+    </ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has("A_SUPPLIER_ADD_USER") || $!adminAccess.has("A_SUPPLIER_DELETE_USER")
+	|| $!adminAccess.has("A_SUPPLIER_MODIFY_USER") || $!adminAccess.has("A_SUPPLIER_VIEW_USER") )
+  <h3 class="type"><a href="javascript:void(0)">供应商管理</a></h3>
+  <div class="content">
+    <ul>
+      <li><a href="$!appServer/supplier/searchSupplier.html" target="main">供应商列表</a></li>
+    </ul>
+  </div>
+  #end
+
+#if($!adminAccess.has('A_DEPOSITORY_ADD_USER') || $!adminAccess.has('A_DEPOSITORY_MODIFY_USER') ||
+		$!adminAccess.has('A_DEPOSITORY_VIEW_USER') || $!adminAccess.has('A_DEPLOCATION_ADD_USER') ||
+		$!adminAccess.has('A_STOCKOUT_SELECT') || $!adminAccess.has('A_DEPLOCATION_DELETE_USER') ||
+		$!adminAccess.has('A_DEPLOCATION_MODIFY_USER') || $!adminAccess.has('A_DEPLOCATION_VIEW_USER') ||
+		$!adminAccess.has('A_IN_DEPOSITORY_MODIFY_USER') || $!adminAccess.has('A_IN_DEPOSITORY_VIEW_USER') ||
+		$!adminAccess.has('A_OUT_DEPOSITORY_USER') || $!adminAccess.has('A_STORAGE_VIEW_USER')||
+		$!adminAccess.has('A_ZERO_STORAGE_VIEW_USER') || $!adminAccess.has('A_STORAGE_CHECK_ADD_USER') ||
+		$!adminAccess.has('A_STORAGE_CHECK_MODIFY_USER') || $!adminAccess.has('A_STORAGE_CHECK_VIEW_USER') ||
+		$!adminAccess.has('A_STORAGE_WARN_VIEW_USER') || $!adminAccess.has('A_DAMAGED_ADD_USER')||
+		$!adminAccess.has('A_DAMAGED_VIEW_USER') || $!adminAccess.has('A_DAMAGED_EDIT_USER') ||
+		$!adminAccess.has('A_DAMAGED_GOODS_VIEW_USER') || $!adminAccess.has('A_GETHER_IN_DEP_VIEW_USER') ||
+		$!adminAccess.has('A_GETHER_OUT_DEP_VIEW_USER') || $!adminAccess.has('A_STORAGE_LEDGER_USER')||
+		$!adminAccess.has('A_STOCK_ADD_USER') || $!adminAccess.has('A_STOCK_MODIFY_USER') ||
+		$!adminAccess.has('A_STOCK_CHECK_USER') || $!adminAccess.has('A_STOCK_EXPORT_USER') ||
+		$!adminAccess.has('A_STOCK_VIEW_USER') || $!adminAccess.has('A_STORAGE_MOVE_USER') ||
+		$!adminAccess.has('A_STORAGE_RETURN_USER') || $!adminAccess.has('A_STORAGE_DEPOTVIEW_USER') ||
+		$!adminAccess.has('A_STORAGE_AGE_USER'))
+
+  <h3 class="type"><a href="javascript:void(0)">仓库管理</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has('A_OUT_DEP_ANALYSIS'))
+	  <li><a href="$appServer.get('/storage/outDepAnalysis.html?init=true')" target="main">出库统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_DEP_FIRST_MODIFY') || $!adminAccess.has('A_DEP_FIRST_USER'))
+	  <li><a href="$appServer.get('/storage/searchDepFirst.html')" target="main">一级仓库管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_DEPOSITORY_ADD_USER') || $!adminAccess.has('A_DEPOSITORY_MODIFY_USER') || $!adminAccess.has('A_DEPOSITORY_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/searchDepository.html')" target="main">仓库管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_DEPLOCATION_ADD_USER') || $!adminAccess.has('A_DEPLOCATION_DELETE_USER') || $!adminAccess.has('A_DEPLOCATION_MODIFY_USER') || $!adminAccess.has('A_DEPLOCATION_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/searchDepLocation.html')" target="main">库位管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_IN_DEPOSITORY_MODIFY_USER') || $!adminAccess.has('A_IN_DEPOSITORY_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/addInDepository.html?init=true')" target="main">入库单管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_OUT_DEPOSITORY_USER'))
+	  <li><a href="$appServer.get('/storage/searchOutDepository.html?init=true')" target="main">出库单管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_VIEW_USER') || $!adminAccess.has('A_STORAGE_DEPOTVIEW_USER'))
+	  <li><a href="$appServer.get('/storage/list_storage.html')" target="main">库存查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_ZERO_STORAGE_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/list_zero_storage.html')" target="main">零库存查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_CHECK_ADD_USER') || $!adminAccess.has('A_STORAGE_CHECK_MODIFY_USER') || $!adminAccess.has('A_STORAGE_CHECK_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/list_storage_check.html')" target="main">库存盘点查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_WARN_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/list_storage_warn.html')" target="main">库存预警查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_DAMAGED_ADD_USER') || $!adminAccess.has('A_DAMAGED_VIEW_USER') || $!adminAccess.has('A_DAMAGED_EDIT_USER'))
+	  <li><a href="$appServer.get('/storage/damaged/list_damaged.html')" target="main">报残单管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_DAMAGED_GOODS_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/damaged/list_damaged_goods.html')" target="main">报残商品查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_GETHER_IN_DEP_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/gather_in_depository.html').addQueryData('init', 'true')" target="main">入库单成本汇总统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_GETHER_OUT_DEP_VIEW_USER'))
+	  <li><a href="$appServer.get('/storage/gather_out_depository.html').addQueryData('init', 'true')" target="main">出库单成本汇总统计</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STOCK_MODIFY_USER') || $!adminAccess.has('A_STOCK_CHECK_USER') || $!adminAccess.has('A_STOCK_EXPORT_USER') || $!adminAccess.has('A_STOCK_VIEW_USER'))
+	  <li><a href="$appServer.get('/stock/stock_search.html?isFirst=true&isCheck=true')" target="main">采购验收管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_LEDGER_USER'))
+	  <li><a href="$appServer.get('/storage/list_storage_ledger.html?initFlag=true')" target="main">库存台帐查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_MOVE_USER'))
+	  <li><a href="$appServer.get('/storage/list_move_storage.html')" target="main">移库外借管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_MOVE_DETAIL_USER'))
+	  <li><a href="$appServer.get('/storage/list_move_storage_detail.html')" target="main">移库外借详情</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_RETURN_USER'))
+	  <li><a href="$appServer.get('/storage/list_return_storage.html')" target="main">外借回调管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STOCKOUT_SELECT'))
+	  <li><a href="$appServer.get('/storage/list_storage_out_goods.html').addQueryData('init', 'true')" target="main">缺货登记查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_AGE_USER'))
+	  <li><a href="$appServer.get('/storage/storage_analysis_export_page.html')" target="main">库龄分析</a></li>
+	  #end
+	  #if($!adminAccess.has('A_STORAGE_REFUND_APPLY_USER') || $!adminAccess.has('A_STORAGE_REFUND_APPLY_DEPOSITORY') || $!adminAccess.has('A_STORAGE_REFUND_APPLY_PROCURE'))
+	  <li><a href="$appServer.get('/storage/list_storage_refund_apply.html').addQueryData('init', 'true')" target="main">库存退货申请单管理</a></li>
+	  #end
+	  #if($!adminAccess.has('A_ACTUAL_INVENTORY_USER'))
+	  <li><a href="$appServer.get('/storage/actual_inventory.html').addQueryData('init', 'true')" target="main">实际运费管理</a></li>
+	  #end
+    </ul>
+  </div>
+#end
+
+	#if($!adminAccess.has('A_EXPRESS_ANALYSIS_BY_EXP') || $!adminAccess.has('A_EXPRESS_ANALYSIS_BY_PRO')
+		|| $!adminAccess.has('A_EXPRESS_VIEW_USER') || $!adminAccess.has('A_EXPRESS_SET_USER')
+		|| $!adminAccess.has('A_EXPRESS_DIST_VIEW_USER') || $!adminAccess.has('A_EXPRESS_DIST_SET_USER')
+		|| $!adminAccess.has('A_EXPRESS_MOTOR_TRANS_INFO') || $!adminAccess.has('A_CASTWEIGHT_USER'))
+  <h3 class="type"><a href="javascript:void(0)">物流管理</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has('A_EXPRESS_ANALYSIS_BY_EXP'))
+      <li><a href="$appServer.get('/express/list_express_analysis_by_exp.html')" target="main">物流分析(物流公司)</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_ANALYSIS_BY_PRO'))
+      <li><a href="$appServer.get('/express/list_express_analysis_by_pro.html')" target="main">物流分析(省份)</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_VIEW_USER'))
+      <li><a href="$appServer.get('/express/list_express.html')" target="main">物流信息查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_SET_USER'))
+      <li><a href="$appServer.get('/express/add_express.html')" target="main">物流信息添加与修改</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_DIST_VIEW_USER'))
+      <li><a href="$appServer.get('/express/list_express_dist.html')" target="main">物流范围查询</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_DIST_SET_USER'))
+      <li><a href="$appServer.get('/express/select_express.html')" target="main">物流范围添加与修改</a></li>
+	  #end
+	  #if($!adminAccess.has('A_EXPRESS_MOTOR_TRANS_INFO'))
+	  <li><a href="$appServer.get('/express/list_motor_trans.html')" target="main">汽运信息</a></li>
+	  #end
+	  #if($!adminAccess.has('A_CASTWEIGHT_USER'))
+	  <li><a href="$appServer.get('/express/list_cast_weight.html')" target="main">计抛重量</a></li>
+	  #end
+    </ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has('A_AGENT_VIEW_USER') || $!adminAccess.has('A_INTERFACE_APPLY_USER'))
+  <h3 class="type"><a href="javascript:void(0)">代销管理</a></h3>
+  <div class="content">
+    <ul>
+	  #if($!adminAccess.has("A_INTERFACE_DATA_USER"))
+      <li><a href="$!appServer/agent/searchInterfaceTrade.html?init=true" target="main">接口同步数据查询</a></li>
+	  #end
+	  #if($!adminAccess.has("A_AGENT_VIEW_USER"))
+      <li><a href="$!appServer/agent/searchAgentTrade.html" target="main">代销会员销售查询</a></li>
+	  #end
+	  #if($!adminAccess.has("A_INTERFACE_APPLY_USER"))
+      <li><a href="$!appServer/agent/searchInterfaceApplyList.html" target="main">拍拍网店接入申请管理</a></li>
+	  #end
+	  #if($!adminAccess.has("A_TAOBAO_INTERFACE_APPLY_USER"))
+      <li><a href="$!appServer/agent/searchInterfaceApplyTaobaoList.html" target="main">淘宝网店接入申请管理</a></li>
+	  #end
+    </ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has("A_FINANCE_MANAGE_USER"))
+  <h3 class="type"><a href="javascript:void(0)">财务管理</a></h3>
+  <div class="content">
+    <ul>
+        <li><a href="$appServer/stock/due_search.html?isFirst=true" target="main">采购单付款管理</a></li>
+        <li><a href="$appServer/stock/due_estimate_search.html?isFirst=true" target="main">采购单暂估管理</a></li>
+        <li><a href="$appServer/trade/receive.html" target="main">收款管理</a></li>
+        <li><a href="$appServer/trade/codReceive.html" target="main">货到付款收款管理</a></li>
+        <li><a href="$appServer/trade/searchPeriodList.html" target="main">周期结算收款管理</a></li>
+        <li><a href="$appServer/storage/gatherFinanceInDepository.html" target="main">实际入库单管理</a></li>
+        <li><a href="$appServer/storage/estimateFinanceInDepository.html" target="main">暂估入库单管理</a></li>
+        <li><a href="$appServer/storage/gatherFinanceOutDepository.html" target="main">实际出库单管理</a></li>
+        <li><a href="$appServer/storage/estimateFinanceOutDepository.html" target="main">暂估出库单管理</a></li>
+        <li><a href="$appServer/express/freightStatistics.html?isFirst=true" target="main">运费统计</a></li>
+    </ul>
+  </div>
+  #end
+
+#if($!adminAccess.has("A_INNER_ACCOUNT_ADD")||$!adminAccess.has("A_SHOW_ACCOUNT_QUERY"))
+  <h3 class="type"><a href="javascript:void(0)">账户管理</a></h3>
+   <div class="content">
+	<ul>
+		#if($!adminAccess.has("A_INNER_ACCOUNT_ADD"))
+		<li><a href="$appServer/account/addInnerAccountPage.html" target="main">添加内部账户</a></li>
+		#end
+		#if($!adminAccess.has("A_SHOW_ACCOUNT_QUERY"))
+        <li><a href="$appServer/account/showAccountsQueryView.html" target="main">账户查询</a></li>
+		#end
+	</ul>
+  </div>
+#end
+
+  #if($!adminAccess.has("A_COUNTER_FILE_IMPORT")||$!adminAccess.has("A_COUNTER_FILE_SHOW")||$!adminAccess.has("A_OPEN_BANK_RECOVER"))
+  <h3 class="type"><a href="javascript:void(0)">对账管理</a></h3>
+   <div class="content">
+	<ul>
+		#if($!adminAccess.has("A_COUNTER_FILE_IMPORT"))
+		<li><a href="$appServer/counter/addImportCounterFilePage.html" target="main">对账文件导入</a></li>
+		#end
+		#if($!adminAccess.has("A_COUNTER_FILE_SHOW"))
+        <li><a href="$appServer/counter/showImportCounterFilePage.html" target="main">文件对账</a></li>
+		#end
+		#if($!adminAccess.has("A_OPEN_BANK_RECOVER"))
+        <li><a href="$appServer/counter/openBankRecoverPage.html" target="main">银行意外数据恢复</a></li>
+		#end
+	</ul>
+  </div>
+  #end
+
+  
+  #if($!adminAccess.has("A_PAYONLINE_ADMIN_SEARCH")||$!adminAccess.has("A_TRANS_LOG_CANCEL_SEARCH")||$!adminAccess.has("A_ADD_ACC_TRANS"))
+  <h3 class="type"><a href="javascript:void(0)">账务管理</a></h3>
+   <div class="content">
+	<ul>
+		#if($!adminAccess.has("A_PAYONLINE_ADMIN_SEARCH"))
+		<li><a href="$appServer/counter/showBankPayOnlineAdminSearch.html" target="main">支付流水查看</a></li>
+		#end
+		#if($!adminAccess.has("A_TRANS_LOG_CANCEL_SEARCH"))
+        <li><a href="$appServer/counter/showTransLogFlagCancelSeach.html" target="main">账务冲正</a></li>
+		#end
+		#if($!adminAccess.has("A_MANAGER_TRANS_LOG_APP"))
+		<li><a href="$appServer/counter/managerTransLogApp.html" target="main">账务冲正申请管理</a></li>
+		#end
+		#if($!adminAccess.has("A_ADD_ACC_TRANS"))
+		<li><a href="$appServer/counter/showAddAccTrans.html" target="main">账务补账</a></li>
+		#end
+		#if($!adminAccess.has("A_MANAGER_TRANS_APP"))
+		<li><a href="$appServer/counter/managerTransApp.html" target="main">账务补账申请管理</a></li>
+		#end
+	</ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has("A_CRM_REG_USER_SEARCH_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_USER") ||
+	$!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER") || $!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER") ||
+	$!adminAccess.has("A_CRM_USER_MODIFY_PERIOD_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_AUDIT_USER") ||
+	$!adminAccess.has("A_CRM_USER_MODIFY_EXPAND_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_VIP_USER") ||
+	$!adminAccess.has("A_CRM_CONNECT_RECORD_EDIT"))
+	<h3 class="type"><a href="javascript:void(0)">CRM用户管理</a></h3>
+  <div class="content">
+    <ul>
+		#if($!adminAccess.has("A_CRM_NEW_USER_DISPLAY") || $!adminAccess.has("A_CRM_REG_USER_SEARCH_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_USER") || $!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER") || $!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_PERIOD_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_AUDIT_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_EXPAND_USER") || $!adminAccess.has("A_CRM_USER_MODIFY_VIP_USER"))
+        	#if($!adminAccess.has("A_CRM_NEW_USER_DISPLAY"))
+              <li><a href="$appServer.get('/crm/crmRegusers.html?apply_stauts=init&isHasAgentManager=n')" target="main">新注册用户</a></li>
+			#end
+
+              <li><a href="$appServer.get('/crm/crmRegusers.html?apply_stauts=success&isHasAgentManager=y&type=d&actionType=track&isScrap=0')" target="main">维护中用户</a></li>
+
+        	#if($!adminAccess.has("A_CRM_SCRAP_USER_DISPLAY"))
+        	  <li><a href="$appServer.get('/crm/crmRegusers.html?apply_stauts=success&isHasAgentManager=y&type=d&actionType=track&isScrap=1')" target="main">废弃会员</a></li>
+			#end
+		#end
+		#if($!adminAccess.has("A_CRM_CONNECT_RECORD_SHOW") || $!adminAccess.has("A_CRM_CONNECT_RECORD_EDIT"))
+			<li><a href="$appServer.get('/crm/crmConnectManage.html?initFlag=true')" target="main">预约记录查询</a></li>
+		#end
+    </ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has("A_CRM_SHOW_L"))
+  <h3 class="type"><a href="javascript:void(0)">CRM订单管理</a></h3>
+  <div class="content">
+    <ul>
+		#if($!adminAccess.has("A_CRM_SHOW_L"))
+			<li><a href="$appServer.get('/crm/crmShowl.html')" target="main">订单管理展示</a></li>
+		#end
+    </ul>
+  </div>
+  #end
+
+  #if($!adminAccess.has("A_CRM_USER_RANK_SEARCH_USER") ||
+		$!adminAccess.has("A_CRM_PRODUCT_RANK_SEARCH_USER") ||
+		$!adminAccess.has("A_CRM_SALE_RANK_SEARCH_USER"))
+  <h3 class="type"><a href="javascript:void(0)">CRM订单统计</a></h3>
+  <div class="content">
+    <ul>
+		#if($!adminAccess.has("A_CRM_USER_RANK_SEARCH_USER"))
+			<li><a href="$appServer.get('/crm/crmCustomerRank.html')" target="main">客户销售排行</a></li>
+		#end
+		#if($!adminAccess.has("A_CRM_PRODUCT_RANK_SEARCH_USER"))
+			<li><a href="$appServer.get('/crm/crmProductRank.html')" target="main">产品销售排行</a></li>
+		#end
+		#if($!adminAccess.has("A_CRM_SALE_RANK_SEARCH_USER"))
+			<li><a href="$appServer.get('/crm/crmSalesmanRank.html')" target="main">销售人员销售排行</a></li>
+		#end
+    </ul>
+  </div>
+  #end
+  
+*#
+
+
+#if($!adminAccess.has("A_PRODUCT_MANAGER"))	  
+  <h3 class="type"><a href="javascript:void(0)">产品管理</a></h3>
+  <div class="content">
+    <ul>
+	  <li><a href="/product/list.html" target="main">产品列表</a></li>
+	  ##<li><a href="/product/aGooodsTest.html" target="main">测试产品列表</a></li>
+	  ##<li><a href="/product/aGoodsMiniTest.html" target="main">测试产品列表2</a></li>
+	  #if($!adminAccess.has("A_PRODUCT_SUOKU"))
+    	  <li><a href="/product/toGetSuoKuProductList.html" target="main">锁库产品</a></li>
+    	  <li><a href="/product/toGetSuoKuList.html" target="main">锁库订单</a></li>
+	  #end
+	  
+	  #if($!adminAccess.has("A_PRODUCT_SITE_MANAGER"))	  
+		<li><a href="/site/toList.html" target="main">站点列表</a></li>
+	  #end
+	  #if($!adminAccess.has('A_PRODUCT_YKD'))
+		<li><a href="/reservedOrder/list.html" target="main">预开单</a></li>
+	  #end
+	   #if($!adminAccess.has('A_PRODUCT_STOCK_SYN_LOG'))
+		<li><a href="/stockupdate/toSearchStockUpdate.html" target="main">平台库存更新记录</a></li>
+	  #end
+	   #if($!adminAccess.has('A_PRODUCT_PINGTAIRIZHI'))
+		<li><a href="/stockupdate/toSearchStockLog.html" target="main">平台日志</a></li>
+	  #end
+	   #if($!adminAccess.has('A_PRODUCT_SKUKUCUNBIAO'))
+		<li><a href="/HxStockUpdate/HxStockUpdateList.html" target="main">sku库存表</a></li>
+	   #end
+	   #if($!adminAccess.has('A_PRODUCT_DIAOHUOMINGXI'))
+		<li><a href="/product/toGetTransferList.html" target="main">调货明细</a></li>
+	   #end
+	  
+	    #if($!adminAccess.has('A_PRODUCT_STOCK_SYN_LOG'))
+		<li><a href="/timetask/SecurityTC.html" target="main">导入</a></li>
+		 #end
+		
+    </ul>
+  </div>
+ #end
+  
+  
+  
+  #if($!adminAccess.has("A_ORDER_MANAGER") && !$!adminAccess.has("A_ORDER_MANAGER_ONLY_BY_ORDERID"))
+      <h3 class="type"><a href="javascript:void(0)">订单管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="/order/orderlist.html" target="main">订单列表</a></li>
+		   #if($!adminAccess.has('A_ORDER_YKD'))
+			<li><a href="/reservedOrder/toShowOrderList.html" target="main">预开单订单</a></li>
+		   #end
+		    #if($!adminAccess.has('A_ORDER_MEILIHUITUISONG'))
+		   <li><a href="/HxStockOrder/HxStockOdderList.html" target="main">魅力惠推送订单</a></li>
+			#end
+			#if($!adminAccess.has('A_ORDER_FAHUOTONGZHI'))
+		   <li><a href="/plartFromOrderRecord/toSearchOrderId.html" target="main">魅力惠发货通知</a></li>
+			#end
+			#if($!adminAccess.has('A_ORDER_DINGDANXIANGQING'))
+		   <li><a href="/HxStockOrder/selectHxDetailsOdderList.html" target="main">订单详情</a></li>
+		    #end 
+			#if($!adminAccess.has('A_ORDER_MEILIHUITUISONG'))
+		   <li><a href="$appServer.get('/plartFromOrderRecord/toSearchWaybill.html')" target="main">魅力惠面单</a></li>
+		   #end
+ </ul>
+      </div>
+  #end
+  
+   
+    #if($!adminAccess.has("A_ORDER_MANAGER_ONLY_BY_ORDERID"))
+      <h3 class="type"><a href="javascript:void(0)">订单管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="/order/orderlisOnlyOrderid.html" target="main">订单列表</a></li>
+        </ul>
+      </div>
+  #end
+  
+  
+  #if($!adminAccess.has("A_CUSTOMER_MANAGER"))	  
+  <h3 class="type"><a href="javascript:void(0)">客户管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="/customer/toSearchCustomerMain.html" target="main">客户列表</a></li>
+		  <li><a href="$appServer.get('/user/regusers.html')" target="main">客户管理</a></li>
+        </ul>
+      </div>
+  #end
+	  
+	  
+#if($!adminAccess.has("A_PURCHASE_MANAGER"))	  
+<h3 class="type"><a href="javascript:void(0)">采购管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="/purchase/tolist.html" target="main">采购</a></li> 
+        </ul>
+      </div>
+#end
+
+#if($!adminAccess.has("A_DX_PRODUCT_MANAGER"))	  
+<h3 class="type"><a href="javascript:void(0)">产品管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="/product/toDxList.html" target="main">产品列表</a><> 
+        </ul>
+      </div>
+#end
+#if($!adminAccess.has("A_ORDER_MANAGER"))	  
+<h3 class="type"><a href="javascript:void(0)">供应商管理</a></h3>
+      <div class="content">
+        <ul>
+    	  <li><a href="$appServer.get('/provider/searchProvider.html')" target="main">银泰供应商产品信息</a></li>
+		  <li><a href="$appServer.get('/provider/searchProviderYShang.html')" target="main">云尚供应商产品信息</a></li>
+		  <li><a href="/provider/selectProvideOrderDetail.html" target="main">供应商产品订单详情</a></li>
+		  <li><a href="$appServer.get('/provider/providerLog.html')" target="main">订单推送日志</a></li> 
+		  <li><a href="/provider/providerOrder.html" target="main">推送成功后订单详情</a></li>
+		</ul>
+      </div>
+#end
+<!--<h3 class="type"><a href="javascript:void(0)">日志更新管理</a></h3>-->
+      <!--<div class="content">-->
+        <!--<ul>-->
+    	  <!--<li><a href="/LogUpdate/updateStockLogList.html" target="main">日志列表</a></li>-->
+ 
+        <!--</ul>-->
+      <!--</div>-->
+  
+</div>
+<script type="text/javascript">
+        var contents = document.getElementsByClassName('content');
+        var toggles = document.getElementsByClassName('type');
+
+        var myAccordion = new fx.Accordion(
+            toggles, contents, {opacity: true, duration: 400}
+        );
+        myAccordion.showThisHideOpen(contents[0]);
+    </script>
+</body>

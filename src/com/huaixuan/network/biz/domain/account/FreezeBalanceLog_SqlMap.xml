@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="FreezeAdminBalanceLogSQL">
+<typeAlias alias="freezeAdminBalanceLog" type="com.huaixuan.network.biz.domain.account.FreezeBalanceLog"/>
+	<resultMap class="freezeAdminBalanceLog" id="freezeAdminBalanceLogResult">
+		<result column="ID" property="id"/>
+		<result column="ACCOUNT_NO" property="accountNo"/>
+		<result column="ACTION_TYPE" property="actionType"/>
+		<result column="FREEZE_AMOUNT" property="freezeAmount"/>
+		<result column="BALANCE" property="balance"/>
+		<result column="FREEZE_BALANCE" property="freezeBalance"/>
+		<result column="ACTION_REASON" property="actionReason"/>
+		<result column="OPERATOR" property="operator"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="FREEZE_MEMO" property="freezeMemo"/>
+		<result column="RELATED_TRANS_LOG" property="relatedTransLog"/>
+	</resultMap>
+   <select id="freezeAdminBalanceLog-searchLogByAccountNo-query" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+       <![CDATA[ 
+		        select a.id,IFNULL(case when a.action_type='F' then a.freeze_amount end,0) in_amount,
+				IFNULL(case when a.action_type='W' then a.freeze_amount end,0) out_amount,a.balance,
+				b.trans_out_order_no order_no,b.bank_type,STR_TO_DATE(b.out_date,'%Y%m%d %H%i%s') out_date,
+				DATE_FORMAT(b.trans_dt,'%Y-%m-%d %H:%i:%s') trans_dt
+				from ep_freeze_balance_log a,ep_trans_log b
+				where a.related_trans_log=b.id
+				and a.action_reason='01'
+				and a.account_no=#accountNo# 
+				order by a.gmt_create desc
+		        LIMIT #startRow#,#endRow#
+        ]]>
+   </select>
+   
+   <select id="freezeAdminBalanceLog-searchLogByAccountNo-count" parameterClass="java.util.Map" resultClass="int">
+       <![CDATA[
+		        SELECT count(*) FROM ep_freeze_balance_log a,ep_trans_log b
+		        WHERE a.related_trans_log=b.id and a.ACCOUNT_NO =#accountNo#
+        ]]>
+   </select>
+	
+	<select id="sumAccountFreezeBalance" resultClass ="java.lang.Long">
+		<![CDATA[
+		select sum(FREEZE_AMOUNT) as sum_amount from ep_freeze_balance_log log where log.ACCOUNT_NO = #accountNo# and ACTION_TYPE = #actionType# and ACTION_REASON = #actionReason#
+		]]>
+	</select>
+	
+</sqlMap>

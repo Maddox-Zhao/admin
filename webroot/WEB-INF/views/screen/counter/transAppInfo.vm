@@ -1,0 +1,158 @@
+#set($layout = 'layout\default.vm')
+<div class="main">
+#set($title = "财务补帐申请管理 - 账务补帐申请信息")
+<h2>账务补帐申请信息</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>账务补帐申请信息</span></h3>
+<form action="doAddAccTrans.html"  method="post" name="transAppForm" >
+<script type="text/javascript">
+
+
+    function showTipMsg(msg,isError){
+    	var msgDiv = document.getElementById("msgDiv");
+    	msgArr = msg.split("$$");
+    	if(msgDiv){
+    		var showMsg = "<font color='blue'>◆提醒：</font>";
+    		for(var i=0;i<msgArr.length;i++){
+    			showMsg += "<br><font color='blue'>　"+msgArr[i]+"</font>"
+    		}
+    		msgDiv.innerHTML=showMsg;
+    	}
+    }
+
+    function formSubmit(status){
+			document.getElementById("status").value = status;
+			var message = "确认补帐？";
+			if(status == "fail"){
+				message = "确认退回？";
+			}
+            if(confirm(message)){
+                document.transAppForm.submit();
+    		}
+    }
+</script>
+
+	<div id="msgDiv" class=""></div>
+    <input type="hidden" name="accTransReq.subTransCode" value="$!transApp.subTransCode"/>
+    <input type="hidden" name="accTransReq.amount" value="$!transApp.amount"/>
+    <input type="hidden" name="accTransReq.innerBizNo" value="$!transApp.innerBizNo"/>
+    <input type="hidden" name="accTransReq.transDate" value="$!transApp.transDate"/>
+	<input type="hidden" name="accTransReq.memo" value="$!transApp.memo"/>
+
+	<input type="hidden" name="parMap.transAppId" value="$!transApp.id"/>
+	<input type="hidden" id="status" name="parMap.status" value=""/>
+
+	#if($!transApp.subTransCode.equals("400301"))
+		<input type="hidden" name="accTransReq.accountNo" value="$!transApp.inAccountNo"/>
+		<input type="hidden" name="accTransReq.outBizNo" value="$!transApp.outBizNo"/>
+		<input type="hidden" name="accTransReq.outDate" value="$!transApp.outDate"/>
+		<input type="hidden" name="accTransReq.bankType" value="$!transApp.bankType"/>
+	#elseif($!transApp.subTransCode.equals("500401")||$!transApp.subTransCode.equals("500301"))
+		<input type="hidden" name="accTransReq.accountNo" value="$!transApp.outAccountNo"/>
+		<input type="hidden" name="accTransReq.bankType" value="$!transApp.bankType"/>
+	#elseif($!transApp.subTransCode.equals("301101"))
+		<input type="hidden" name="accTransReq.inAccountNo" value="$!transApp.inAccountNo"/>
+		<input type="hidden" name="accTransReq.outAccountNo" value="$!transApp.outAccountNo"/>
+	#end
+
+
+  <table>
+     <tr>
+        <td class="label">状态 ：</td>
+        <td>
+			$!transApp.statusName
+         </td>
+      </tr>
+      <tr>
+        <td class="label"><span class="require-field">*</span>补帐类型 ：</td>
+        <td>
+			$!transApp.subTransCodeName
+         </td>
+      </tr>
+	  #if($!transApp.subTransCode.equals("400301") || $!transApp.subTransCode.equals("301101"))
+      <tr>
+        <td class="label"><span class="require-field">*</span>转入账户 ：</td>
+        <td>
+			$!transApp.inAccountNo
+         </td>
+      </tr>
+	  #end
+	  #if($!transApp.subTransCode.equals("500401") || $!transApp.subTransCode.equals("500301")||$!transApp.subTransCode.equals("301101"))
+      <tr>
+        <td class="label"><span class="require-field">*</span>转出账户： </td>
+        <td>
+			$!transApp.outAccountNo
+         </td>
+      </tr>
+	  #end
+      <tr>
+        <td class="label">金额 ：</td>
+        <td>
+          $!transApp.amount
+         </td>
+      </tr>
+	   #if($!transApp.subTransCode.equals("400301"))
+      <tr>
+        <td class="label"><span class="require-field">*</span>外部流水号： </td>
+        <td>
+          $!transApp.outBizNo
+         </td>
+      </tr>
+      <tr>
+        <td class="label">外部时间 ：</td>
+        <td>
+          $!transApp.outDate
+         </td>
+      </tr>
+	  #end
+      <tr>
+        <td class="label">内部流水号 ：</td>
+        <td>
+           $!transApp.innerBizNo
+         </td>
+      </tr>
+      <tr>
+        <td class="label">内部时间： </td>
+        <td>
+          $!transApp.transDate
+         </td>
+      </tr>
+	  #if($!transApp.subTransCode.equals("400301") || $!transApp.subTransCode.equals("500401") ||$!transApp.subTransCode.equals("500301"))
+      <tr>
+        <td class="label">银行名称： </td>
+        <td>
+           $!transApp.bankTypeName
+         </td>
+      </tr>
+	  #end
+      <tr>
+        <td class="label">备注：</td>
+        <td>
+          $!transApp.memo
+		</td>
+      </tr>
+      <tr>
+        <td colspan="2">
+        <div class="button-div">
+		  #if($!transApp.status.equals("new"))
+          <input type="button" value="通过" class="button" onclick="formSubmit('success');" />
+          <input type="button" value=" 回退 " class="button" onclick="formSubmit('fail');"/>
+		  #end
+        </div>
+        </td>
+      </tr>
+      </table>
+  </form>
+<script>
+    #set($errorFlag=true)
+    #if("$!message"=="操作成功")
+    	#set($errorFlag=false)
+    #end
+    #if("$!message"!="")
+    	showTipMsg("$!message",$!errorFlag)
+    #end
+</script>
+</div>
+</div>
+</html>

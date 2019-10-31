@@ -1,0 +1,5 @@
+2019-09-09 10:24:55,399 DEBUG [java.sql.Connection] - {conn-100000} Connection
+2019-09-09 10:24:55,463 DEBUG [java.sql.Connection] - {conn-100000} Preparing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-09-09 10:24:55,504 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Executing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-09-09 10:24:55,504 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Parameters: []
+2019-09-09 10:24:55,504 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Types: []

@@ -1,0 +1,118 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>代购管理</h2>
+		 <div class="tool">
+			<span><a href="/daigou/saveInput.html" hidefocus="true" class="bt_add">添加代购凭证</a></span>
+		 </div>
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+		 <form action="list.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>开单日期：从</th>
+        			<td >
+						#springBind("daigou.dateStart")
+        				<input type="text" name="${status.expression}" id="dateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105" />
+                    
+        			&nbsp; 到  &nbsp; 
+        			
+						#springBind("daigou.dateEnd")
+        				<input type="text" name="${status.expression}" id="dateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105"  />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "dateStart",
+            		          ifFormat   : "%Y-%m-%d ",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "dateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+					<th >&nbsp;</th>
+					<td>
+						状态：
+						#springBind("daigou.status")
+						#set($status = ${status.value} )
+						<select name="status">
+							<option value="">---请选择---</option>
+							<option value="no_pay" #if($status.equals("no_pay")) selected #end>未付</option>
+							<option value="part_paid" #if($status.equals("part_paid")) selected #end>已付部分</option>
+							<option value="paid" #if($status.equals("paid")) selected #end>已付全款</option>
+						</select>
+                    </td>
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+                </tr>
+    		</table>
+		</div>
+	</form>
+
+	
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>代购管理</span></h3>
+            <table >
+                <tr>
+					<th>代购编号</th>
+					<th>状态</th>
+					<th>总计金额</th>
+					<th >已付定金</th>
+					<th >客户身份证图片</th>
+					<th>代购凭证图片</th>
+					<th>代购时间</th>
+					<th>操作</th>
+                </tr>
+				
+				#if($query && $query.items.size()>0)
+				 #foreach($daigou in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$!daigou.daigouCode</td>
+					<td style="text-align:center;">#if($!daigou.status.equals("no_pay")) 未付 #end 
+						    #if($!daigou.status.equals("part_paid")) 已付部分#end
+							#if($!daigou.status.equals("paid")) 已付全款 #end
+					</td>
+					<td style="text-align:center;">$!daigou.amount</td>
+					<td style="text-align:center;">$!daigou.paidAmount</td>
+					<td style="text-align:center;">#if($!daigou.idcardsImage)<img src='${upServer}$imgUtil.changeLargeImgToSmal($!daigou.idcardsImage)' width="50"/>#end</td>
+					<td style="text-align:center;">#if($!daigou.daigouImage)<img src='${upServer}$imgUtil.changeLargeImgToSmal($!daigou.daigouImage)' width="50"/>#end</td>
+					<td style="text-align:center;">$dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{daigou.gmtCreate})</td>
+					<td style="text-align:center;">
+						<a href="#" onclick="javascript:if(confirm('确定删除？')){ location.href = 'delete.html?id=$!daigou.id'}">删除</a> &nbsp;&nbsp;
+							<a href="detail.html?id=$!daigou.id">查看</a>&nbsp;&nbsp;
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/daigou/list.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div> <!-- 列表模块 END -->
+</div>
+	

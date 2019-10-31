@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="InDepositorySQL">
+<typeAlias alias="inDepository" type="com.huaixuan.network.biz.domain.storage.InDepository"/>
+	<resultMap class="inDepository" id="inDepositoryResult">
+		<result column="id" property="id"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="type" property="type"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="creater" property="creater"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="gmt_in_dep" property="gmtInDep"/>
+		<result column="batch_Num" property="batchNum"/>
+		<result column="finance_status" property="financeStatus"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="tid" property="tid"/>
+		<result column="is_wholesale" property="isWholesale"/>
+	</resultMap>
+	<resultMap class="inDepository" id="inDepositoryResultDetail">
+	 <result column="good_code" property="goodCode"/>
+	 <result column="instance_name" property="instanceName"/>
+	 <result column="amount" property="amount"/>
+	 <result column="type" property="type"/>
+	 <result column="gmt_in_dep" property="gmtInDep"/>
+	 <result column="attrs" property="attrs"/>
+	 <result column="bill_num" property="billNum"/>
+	 <result column="batch_Num" property="batchNum"/>
+	 <result column="id" property="id"/>
+	 <result column="left_num" property="leftNum" nullValue="0"/>
+	 <result column="relation_num" property="relationNum"/>
+	 <result column="finance_status" property="financeStatus"/>
+	 <result column="dep_first_id" property="depFirstId"/>
+	 <result column="left_dep_num" property="leftDepNum" nullValue="0"/>
+	 <result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+	<resultMap class="inDepository" id="inDepositoryTypesResult">
+	 <result column="type" property="type"/>
+	</resultMap>
+	<resultMap class="inDepository" id="inDepositoryResultBySupplier">
+		<result column="id" property="id"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="type" property="type"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="creater" property="creater"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="gmt_in_dep" property="gmtInDep"/>
+		<result column="batch_Num" property="batchNum"/>
+		<result column="finance_status" property="financeStatus"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="tid" property="tid"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="name" property="supplierName" nullValue=""/>
+	</resultMap>
+	<resultMap id="supplierNameByIdMap" class="java.util.HashMap" >
+	    <result column="id" property="id"/>
+        <result column="supplierName" property="supplierName" nullValue=""/>
+   </resultMap>
+<!-- create InDepository object -->
+<insert id="addInDepository" parameterClass="inDepository">
+	insert into ioss_in_depository
+      (id,
+       bill_num,
+       type,
+       relation_num,
+       creater,
+       batch_Num,
+       gmt_create,
+       gmt_modify,
+       gmt_in_dep,
+       status,
+       finance_status,
+       dep_first_id,
+       <isNotEmpty prepend="" property="isWholesale">
+       	is_wholesale,
+       </isNotEmpty>
+       tid)
+    values(
+    	null,
+		#billNum#,
+		#type#,
+		#relationNum#,
+		#creater#,
+	    #batchNum#,
+		sysdate(),
+		sysdate(),
+		#gmtInDep#,
+		#status#,
+		'n',
+		#depFirstId#,
+		<isNotEmpty prepend="" property="isWholesale">
+			#isWholesale#,
+		</isNotEmpty>
+		#tid#
+		 )
+		 <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update InDepository object -->
+<update id="editInDepository" parameterClass="inDepository">
+<![CDATA[
+		update ioss_in_depository set
+		gmt_modify = sysdate(),
+		finance_status=#financeStatus#,
+		dep_first_id=#depFirstId#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete InDepository object -->
+<delete id="removeInDepository" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_in_depository where ioss_in_depository.ID = #value#
+]]>
+</delete>
+<!-- search InDepository object -->
+<select id="getInDepository" parameterClass="java.lang.Long" resultMap="inDepositoryResult">
+<![CDATA[
+		select ioss_in_depository.* from ioss_in_depository where ioss_in_depository.ID = #value#
+]]>
+</select>
+<!-- searchAll InDepository List -->
+<select id="getInDepositorys" resultMap="inDepositoryResult">
+<![CDATA[
+		select ioss_in_depository.* from ioss_in_depository
+]]>
+</select>
+<!-- shlin bengin -->
+<select id="getInDepositoryListsCount" resultClass="int">
+		select count(dep.id)
+		from ioss_in_depository dep
+		<isNotEmpty property="supplierId" prepend=",">
+		ioss_shopping_list shop,
+		ioss_supplier supplier
+		</isNotEmpty>
+		where 1=1
+		<isNotEmpty property="supplierId">
+			and dep.relation_num = shop.shopping_num
+			and shop.supplier_id = supplier.id
+			and supplier.id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="billNum">
+			dep.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			dep.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			dep.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			dep.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			dep.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			dep.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			dep.gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			dep.gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			dep.relation_num like CONCAT('%',#relationNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			dep.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId">
+			dep.dep_first_id = #depFirstId#
+		</isNotEmpty>
+</select>
+
+
+<select id="getInDepositoryLists" resultMap="inDepositoryResultBySupplier">
+	<include refid="pageSQLHead"/>
+		select dep.*
+		<isNotEmpty property="supplierId" prepend=",">
+		supplier.name
+		</isNotEmpty>
+		<isEmpty property="supplierId" prepend=",">
+		'' as name
+		</isEmpty>
+		from ioss_in_depository dep
+		<isNotEmpty property="supplierId" prepend=",">
+		ioss_shopping_list shop,
+		ioss_supplier supplier
+		</isNotEmpty>
+		where 1=1
+		<isNotEmpty property="supplierId">
+			and dep.relation_num = shop.shopping_num
+			and shop.supplier_id = supplier.id
+			and supplier.id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="billNum">
+			dep.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			dep.type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			dep.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			dep.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			dep.gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			dep.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			dep.gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			dep.gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			dep.relation_num like CONCAT('%',#relationNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			dep.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId">
+			dep.dep_first_id = #depFirstId#
+		</isNotEmpty>
+		order by dep.bill_num desc,dep.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getSupplierNameById" resultMap="supplierNameByIdMap">
+    select distinct dep.id as id,supplier.name as supplierName
+    from ioss_in_depository dep,
+    ioss_shopping_list shopp,
+    ioss_supplier supplier
+    where dep.relation_num  = shopp.shopping_num
+    and shopp.supplier_id = supplier.id
+	and dep.relation_num in(<iterate property="inDepositoryIds" conjunction=",">#inDepositoryIds[]#</iterate>)
+</select>
+
+<!-- shlin end -->
+<!--
+<select id="getInDepositoryListsCount" resultClass="int">
+<![CDATA[
+		select count(ioss_in_depository.id) from ioss_in_depository where 1=1
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			relation_num like CONCAT('%',#relationNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+</select>
+
+
+<select id="getInDepositoryLists" resultMap="inDepositoryResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_in_depository.* from ioss_in_depository where 1=1
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			gmt_modify >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeStart">
+<![CDATA[			gmt_in_dep >= STR_TO_DATE(#inDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="inDepTimeEnd">
+<![CDATA[			gmt_in_dep < DATE_ADD(STR_TO_DATE(#inDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="relationNum">
+			relation_num like CONCAT('%',#relationNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds">
+			dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId">
+			dep_first_id = #depFirstId#
+		</isNotEmpty>
+		order by bill_num desc,id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+-->
+
+<select id="getInDepositoryByParams" resultMap="inDepositoryResult">
+<![CDATA[
+		select ioss_in_depository.* from ioss_in_depository where 1=1
+]]>
+		<isNotEmpty prepend="and" property="relationNum">
+			relation_num = #relationNum#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+</select>
+
+<update id="updateInDepositoryStatusById" parameterClass="java.util.Map">
+<![CDATA[
+		update ioss_in_depository set gmt_modify = sysdate(),
+		status = #status#,
+		gmt_in_dep = #gmtInDep#
+		 where id = #id#
+]]>
+</update>
+
+<select id="getBatchNumById" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	SELECT ise.batch_num
+	FROM ioss_storage ise, ioss_in_depository iidd
+	WHERE iidd.relation_num = ise.id
+		AND iidd.type='in_check_more'
+        AND iidd.id = #id#
+</select>
+
+<select id="getUnFinishedInDepByRelNum" parameterClass="java.lang.String" resultClass="int">
+	select count(id)
+	from ioss_in_depository
+	where relation_num = #relationNum# and (status is null or status &lt;&gt; 'in_finished')
+</select>
+
+<select id="getFinishedInDepByRelNum" parameterClass="java.lang.String" resultClass="int">
+	select count(id)
+	from ioss_in_depository
+	where relation_num = #relationNum# and status = 'in_finished'
+</select>
+
+<select id="getInDepositoryStatusByDetailId" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	select iidd.status
+	from ioss_in_depository iidd, ioss_in_detail iid
+	where iidd.id = iid.in_depository_id and iid.id=#inDetailId#
+</select>
+
+<select id="getInDepositorysWithDetail" resultMap="inDepositoryResultDetail" parameterClass="java.util.Map">
+   <![CDATA[
+select gi.code as good_code,
+       gi.instance_name,
+       gi.attrs,
+       ide.amount,
+       ide.left_num,
+       id.type,
+       id.gmt_in_dep,
+       id.bill_num,
+       id.batch_Num,
+       id.id,
+       id.relation_num,
+       id.finance_status,
+       id.dep_first_id,
+       ide.left_dep_num,
+       ide.gmt_modify
+  from ioss_in_depository id, ioss_in_detail ide, ioss_goods_instance gi
+ where id.id = ide.in_depository_id
+   and gi.id = ide.goods_instance_id
+   and id.gmt_in_dep is not null
+   and id.status = 'in_finished'
+   ]]>
+   <isNotEmpty prepend="and" property="instanceName">
+         gi.instance_name like concat('%',#instanceName#,'%')
+   </isNotEmpty>
+	<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			id.gmt_in_dep >= STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			id.gmt_in_dep < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+	</isNotEmpty>
+   <isNotEmpty prepend="and" property="type2">
+        id.type=#type2#
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="ins">
+        id.type in(
+         <iterate property="ins" conjunction=",">
+          #ins[]#
+         </iterate>
+        )
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="code">
+		gi.code like concat('%',#code#,'%')
+	</isNotEmpty>
+ 	<isNotEmpty prepend="and" property="depfirstIds">
+		id.dep_first_id in(
+		  <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+		)
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depfirstId">
+	    id.dep_first_id = #depfirstId#
+	</isNotEmpty>
+	order by id.gmt_in_dep
+</select>
+
+<select id="getInDepositorysWithDetailCount" resultClass="java.lang.Integer">
+ <![CDATA[
+   select count(*) from ioss_in_depository id,ioss_in_detail ide,ioss_goods_instance gi
+   where id.id=ide.in_depository_id and gi.id=ide.goods_instance_id and id.gmt_in_dep is not null and id.status = 'in_finished'
+ ]]>
+   <isNotEmpty prepend="and" property="instanceName">
+         gi.instance_name like concat('%',#instanceName#,'%')
+   </isNotEmpty>
+   order by id.gmt_in_dep
+</select>
+
+<select id="getAllIntypes" resultMap="inDepositoryTypesResult">
+ <![CDATA[
+  select distinct(id.type) from ioss_in_depository id,ioss_in_detail ide where id.id=ide.in_depository_id and id.gmt_in_dep is not null
+ ]]>
+</select>
+
+<select id="getInDepByRelNum" resultMap="inDepositoryResult" parameterClass="java.lang.String">
+ <![CDATA[
+    select ioss_in_depository.* from ioss_in_depository where ioss_in_depository.relation_num = #value#
+ ]]>
+</select>
+</sqlMap>

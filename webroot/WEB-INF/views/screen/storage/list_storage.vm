@@ -1,0 +1,420 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 仓库管理")
+	#if($message)
+		<center ><div id="result" style="color:red;">$!message</div></center>
+	#end
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<form name="searchform" id="searchform" action="/storage/list_storage.html" method="post">
+		#springBind("storageQuery.orderBy")
+		<input type="hidden" id="orderBy" name="${status.expression}" value="$!{status.value}">
+		<div class="searchBox">
+		<h3><span>库存查询</span></h3>
+		<table>
+			<tr>
+                <th>产品名称：</th>
+				<td>
+					#springBind("storageQuery.instanceName")
+					<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+                <th>产品编码：</th>
+				<td>
+					#springBind("storageQuery.code")
+					<input type="text" id="code" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+        		<th>供应商：</th>
+				<td>
+					#springBind("storageQuery.supplierName")
+					<input type="text" id="supplierName" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+        	</tr>
+			<tr>
+				<th>类型：</th>
+				<td>
+					#springBind("storageQuery.storType")
+					<select name="${status.expression}" id="storType" class="inp">
+        				<option value="">-=请选择=-</option>
+        				<option value="v" #if("$status.value"=="v") selected #end>暂估</option>
+    					<option value="f" #if("$status.value"=="f") selected #end>实际</option>
+        			</select>
+                </td>
+				<th> 产品一级类目：</th>
+				<td>
+					#springBind("storageQuery.catCode")
+					<select name="${status.expression}" id="catCode" class="inp" onchange="selectTwoCatCode(this.value,'twoCatCode');">
+        				<option value="">-=请选择=-</option>
+        				#foreach($cat in $catList)
+        				<option value="$cat.catCode" #if("$cat.catCode"=="${status.value}") selected #end>$cat.catName</option>
+        				#end
+        			</select>
+                </td>
+
+				<th> 产品二级类目：</th>
+				<td>
+					#springBind("storageQuery.twoCatCode")
+					<select name="${status.expression}" id="twoCatCode" class="inp">
+        				<option value="">请选择</option>
+        				#foreach($twocat in $twocatListInit)
+        				<option value="$twocat.catCode" #if("$twocat.catCode"=="${status.value}") selected #end>$twocat.catName</option>
+        				#end
+        			</select>
+                </td>
+			</tr>
+			<tr>
+          #springBind("storageQuery.depfirstId")
+		  <th>一级仓库：</th>
+			<td>
+    			<select name="${status.expression}" id="depFirstId" onchange="selectDep(this.value);" class="select">
+					#if($depositoryFirstList.size() > 1 )
+					<option value="">-=请选择=-</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+    				<option value="$depfirst.id" #if("$depfirst.id"=="${status.value}") selected #end>$depfirst.depFirstName</option>
+    				#end
+    			</select>
+            </td>
+		#springBind("storageQuery.depId")
+         <th>仓库：</th>
+			<td>
+    			<select name="${status.expression}" id="depId" onchange="selectLoc(this.value);" class="select">
+    				<option value="">请选择</option>
+					#foreach($st in $depositoryList)
+    				<option value="$st.id" #if("$st.id"=="${status.value}") selected #end>$st.name</option>
+    				#end
+    			</select>
+			</td>
+		#springBind("storageQuery.locId")
+		<th id="labelLoc">库位 ：</th>
+			<td>
+		        <select name="${status.expression}" id="locId" class="select">
+                     <option value="">请选择</option>
+                     #foreach($depLocation in $depLocationLists)
+                     <option value="$!{depLocation.id}" #if("$!{depLocation.id}"=="${status.value}") selected #end>$!{depLocation.locName}</option>
+                    #end
+                 </select>
+		</td>
+				<th>
+					<input type="button" value=" 查询 " class="btn" onclick="checkForm();"/>
+                </th>
+        		<td>
+					<input type="reset" value=" 重置 " class="btn"/>
+                </td>
+				<th>
+					<input type="button" value=" Excel导出 " class="btn" onclick="doExport();"/>
+                </th>
+        	</tr>
+		</table>
+    </div>
+	</form>
+	#if($query && $query.items.size()>0)
+	<div class="tool">
+		 <div align="right">
+    			<font size='4'><strong><th>【 库存数量：</th></strong></font>
+    			<font size='4' color='red'><strong><th>$!moneyUtil.getFormatNumber(${storage.storageNumSum})</th></strong></font>
+    			#if($adminAccess.has("A_STORAGE_VIEW_USER"))
+    			<font size='4'><strong><th>&nbsp;&nbsp;&nbsp;库存成本：</th></strong></font>
+    			<font size='4' color="red"><strong><th>$!moneyUtil.getFormatMoney("${storage.storageCost}")</th></strong></font>
+    			<font size='4'><strong><th>元</th></strong></font>
+    			#end
+    			<font size='4'><strong><th> 】</th></strong></font>
+		 </div>
+    </div>
+	#end
+		<div class="listBox" id="listDiv">
+			<h3><span>库存列表</span></h3>
+			<table  id="listTable" name="listTable">
+
+					<tr>
+						<th width="">
+							<a href="#" onclick="goodsCode();">产品编码</a>
+						</th>
+						<th width="">
+							产品名称
+						</th>
+						<th width="">
+							类目
+						</th>
+						<th width="">
+							属性
+						</th>
+						<th width="">
+							单位
+						</th>
+						<th width="">
+							一级仓库
+						</th>
+						<th width="">
+							仓库
+						</th>
+						<th width="">
+							库位
+						</th>
+						<th width="">
+							供应商产品编码
+						</th>
+						<th width="">
+							<a href="#" onclick="supplierName();">供应商</a>
+						</th>
+						<th width="">
+							<a href="#" onclick="storageNumSum();">库存</a>
+						</th>
+						<th width="">
+							在途库存
+						</th>
+						<th width="">
+							可用库存
+						</th>
+						<th width="">
+							类型
+						</th>
+						#if($!adminAccess.has('A_STORAGE_VIEW_USER'))
+						<th width="">
+							成本均价
+						</th>
+						<th width="">
+							库存成本
+					    </th>
+						<th width="">
+							操作
+					    </th>
+						#else
+						<th width="">
+							操作
+					    </th>
+						#end
+					</tr>
+				#if($query && $query.items.size()>0)
+					#foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td>
+								$!{gi.code}
+							</td>
+							<td title="$!{gi.instanceName}">
+								$!controlUtil.getNoticesTitle($!{gi.instanceName},15)
+							</td>
+							<td title="$!categoryManager.getCatFullNameByCatcode($gi.catCode)">
+								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($gi.catCode),20)
+							</td>
+							<td title="$!attributeManager.getFullAttributeStringByAttrs($gi.attrs)">
+								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($gi.attrs),20)
+							</td>
+							<td>
+								$!{gi.goodsUnit}
+							</td>
+							<td>
+								$!{gi.depFirstName}
+							</td>
+							<td>
+								$!{gi.depositoryName}
+							</td>
+							<td>
+								$!{gi.depLocationName}
+							</td>
+							<td>
+								$!{gi.supplier_code}
+							</td>
+							<td title="$!{gi.supplierName}">
+								<a href="$appServer/supplier/viewSupplier.html?sid=$!{gi.supplierId}" target="_blank">$!controlUtil.getNoticesTitle($!{gi.supplierName},10)</a>
+							</td>
+							<td align="right">
+								$!{gi.storageNumSum}
+							</td>
+							<td align="right">
+								$!{gi.wayNum}
+							</td>
+							<td align="right">
+								$!{gi.instanceExistNum}
+							</td>
+							<td>
+								#if("$!{gi.storType}" == "v")
+								暂估
+								#else
+								实际
+								#end
+							</td>
+						#if($!adminAccess.has('A_STORAGE_VIEW_USER'))
+							<td>
+								$!moneyUtil.getFormatMoney($!{gi.averagePrice},'0.00')
+							</td>
+							<td>
+								$!moneyUtil.getFormatMoney($!{gi.storageCost},'0.00')
+							</td>
+							<td align="center">
+								#if($!{gi.depType}=="common_dep")
+								<a href="$appServer/storage/storageRefundPage.html?supplierId=$!{gi.supplierId}&locId=$!{gi.locId}&goodsInstanceId=$!{gi.goodsInstanceId}&averagePrice=$!{gi.averagePrice}&storType=$!{gi.storType}">退货</a>
+								##<a href="javascript:refund('$!{gi.supplierId}','$!{gi.locId}','$!{gi.goodsInstanceId}','$!{gi.averagePrice}');">退货</a>
+								#else
+								无
+								#end
+							</td>
+						#else
+							<td align="center">
+								#if($!{gi.depType}=="common_dep")
+								<a href="$appServer/storage/storageRefundPage.html?supplierId=$!{gi.supplierId}&locId=$!{gi.locId}&goodsInstanceId=$!{gi.goodsInstanceId}&averagePrice=$!{gi.averagePrice}&storType=$!{gi.storType}" target="_blank">退货</a>
+								##<a href="javascript:refund('$!{gi.supplierId}','$!{gi.locId}','$!{gi.goodsInstanceId}','$!{gi.averagePrice}');">退货</a>
+								#else
+								无
+								#end
+							</td>
+						#end
+
+						</tr>
+					#end
+				#end
+			</table>
+			<!-- 分页 -->
+            #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_storage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+		</div>
+</div>
+<script language="javascript" type="text/javascript">
+	function refund(supplierId,locId,goodsInstanceId,averagePrice){
+		var ref = window.showModalDialog("storageRefundPage.html?supplierId="+supplierId+"&locId="+locId+"&goodsInstanceId="+goodsInstanceId+"&averagePrice="+averagePrice,null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+		if(ref=="true"){
+			document.searchform.submit();
+		}
+	}
+
+	var twocatList = new Array();
+		var k=0;
+        #foreach($twocat in $twocatList)
+            twocatList[k] = new Array("$!{twocat.catCode}","$!{twocat.parentCode}","#direct($!{twocat.catName})");
+            k++;
+        #end
+		var num=k;
+		function selectTwoCatCode(code,twoCatCode){
+            var obj = document.getElementById(twoCatCode);
+            var length = obj.length = 0;
+    		obj.options[length++] = new Option("请选择", "");
+            for(var m=0; m<num; m++){
+                if( twocatList[m][1] == code){
+                    obj.options[length] = new Option(twocatList[m][2], twocatList[m][0]);
+                    length++;
+                }
+            }
+        }
+
+	function doExport(){
+		var form1=document.getElementById('searchform');
+		form1.action="/storage/do_export_storage.html";
+		form1.submit();
+		form1.action="/storage/list_storage.html";
+	}
+
+	function goodsCode(){
+	    var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("Asc")>=1){
+		  document.getElementById("orderBy").value="goodsCodeDesc";
+		}
+		else{
+		  document.getElementById("orderBy").value="goodsCodeAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+
+	function supplierName(){
+	    var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("Asc")>=1){
+		   document.getElementById("orderBy").value="supplierIdDesc";
+		}else{
+		   document.getElementById("orderBy").value="supplierIdAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+
+	function storageNumSum(){
+		var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("Asc")>=1){
+		document.getElementById("orderBy").value="storageNumSumDesc";
+		}else{
+		   document.getElementById("orderBy").value="storageNumSumAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+
+window.onload=function(){
+	   var obj3 = document.getElementById("depFirstId");
+	   var obj = document.getElementById("depId");
+	   var objloc = document.getElementById("labelLoc");
+	   var obj2 = document.getElementById("locId");
+	#if($!depositoryFirstList)
+	 #if($!depositoryFirstList.size()==0)
+       var length3 = obj3.length3 = 0;
+	   obj3.options[length3++] = new Option("您没有权限", "");
+	 #else
+	   obj.style.display='';
+	   obj2.style.display='';
+
+	   if(obj.value == ""&& obj3.value != ""){
+	   var length = obj.length = 0;
+       obj.options[length++] = new Option("请选择", "");
+		var code = obj3.value;
+		   jQuery.post('$appServer/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   if(list != null){
+		   	 for(var i=0;i<list.length;i++){
+    		     var dep=list[i];
+    			 obj.options[length++] = new Option(dep.name, dep.id);
+    		    }
+    		   }
+		   });
+       }
+
+	  #end
+    #else
+	   var length3 = obj3.length3 = 0;
+	   obj3.options[length3++] = new Option("您没有权限", "");
+    #end
+	 }
+
+function selectDep(code){
+    var obj = document.getElementById("depId");
+	var obj2 = document.getElementById("locId");
+	var objloc = document.getElementById("labelLoc");
+	var length = obj.length = 0;
+
+		obj.style.display='';
+		obj2.style.display='';
+
+		obj.options[length++] = new Option("请选择", "");
+		jQuery.post('$appServer/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   if(list != null){
+    		   for(var i=0;i<list.length;i++){
+    		     var dep=list[i];
+    			 obj.options[length++] = new Option(dep.name, dep.id);
+    		   	}
+    		  }
+			});
+
+	    var obj2 = document.getElementById("locId");
+    	var length2 = obj2.length = 0;
+    	obj2.options[length2] = new Option("请选择", "");
+}
+
+function selectLoc(code){
+    var obj = document.getElementById("locId");
+	var length = obj.length = 0;
+	obj.options[length++] = new Option("请选择", "");
+	jQuery.post('$appServer/storage/selectLoc.html',{param:code},function(selectloclist){
+		   var list=selectloclist;
+		   obj.style.display='';
+		   if(list != null){
+		   for(var i=0;i<list.length;i++){
+		     var loc=list[i];
+			 obj.options[length++] = new Option(loc.locName, loc.id);
+		   }
+		}});
+}
+
+function checkForm(){
+  document.getElementById("instanceName").value = jQuery.trim(document.getElementById("instanceName").value);
+  document.getElementById("code").value = jQuery.trim(document.getElementById("code").value);
+  document.getElementById("supplierName").value = jQuery.trim(document.getElementById("supplierName").value);
+  document.searchform.submit();
+}
+</script>
+</div>

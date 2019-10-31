@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="MiniuiBase">
+	<resultMap class="com.huaixuan.network.biz.domain.base.MiniUiBase" id="miniuiBaseResultMap">
+		<result column="id" property="id"   />
+		<result column="name" property="name" />
+	</resultMap>
+	
+<select id="selectSiteByType" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		 select idSite id,name from site where type in ( $type$ ) order by idSite
+]]>
+
+</select>
+
+<select id="selectSiteByName" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		 select idSite id,name from site where  name = #beforelocation#
+]]>
+
+</select>
+
+<select id="getSiteWhereMenDian" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT idSite id,NAME FROM site WHERE TYPE in ( $type$ ) AND idSite in (216) ORDER BY idSite
+]]>
+
+</select>
+
+
+
+<select id="selectAllSellChannel" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT   idSellChannel id,NAME FROM  sellchannel WHERE  (idSellChannel != 0  AND idSellChannel != -1)
+]]>
+
+</select>
+
+
+<select id="selectCurrency" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT idCurrency id,name from currency where idCurrency != 0  
+]]>
+</select>
+
+
+<select id="selectPayment" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT idPayment id,name from payment where idPayment != 0  
+]]>
+</select>
+
+<select id="selectProvince" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+<![CDATA[
+		SELECT id,region_name NAME FROM emall_region LIMIT 28
+]]>
+</select>
+
+<!-- 获取当前登录用户的销售渠道 传入登录的ID  eg:1000007 -->
+<select id="selectSellChannelByAccount" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT site.idSellChannel id,sc.name
+		FROM
+		employee ep,site,sellchannel sc
+		WHERE ep.idEmployee = #idAccount#
+		AND site.idSite = ep.idSite
+		AND sc.idSellChannel = site.idSellChannel
+]]>
+</select>
+
+
+<!-- 获取当前登录用户可操作的站点  传入登录的ID  eg:1000007 -->
+<select id="selectSiteByAccount" parameterClass="java.lang.String" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		SELECT site.idSite id,site.name  FROM emall_admin ea,site
+		WHERE ea.user_name =  #idAccount#
+		AND ea.site = site.idSite
+]]>
+</select>
+
+
+
+
+
+<!--查询供货商 -->
+<select id="selectSupplier" parameterClass="java.util.Map" resultMap="miniuiBaseResultMap">
+
+<![CDATA[
+		 select idSupply id,name from supply where 1=1
+		 
+]]>
+<isNotNull prepend="and" property="name">
+	name like '%$name$%'
+</isNotNull>
+<isNotNull prepend="and" property="idSupplier">
+	idSupply = #idSupplier#
+</isNotNull>
+
+ ORDER BY NAME 
+</select>
+
+
+ 
+
+
+
+
+</sqlMap>

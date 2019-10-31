@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AttributeSQL">
+	<typeAlias alias="attribute"
+		type="com.huaixuan.network.biz.domain.goods.Attribute" />
+	<resultMap class="attribute" id="attributeResult">
+		<result column="id" property="id" />
+		<result column="attr_name" property="attrName" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="attr_code" property="attrCode" />
+		<result column="group_id" property="groupId" />
+		<result column="input_type" property="inputType" />
+		<result column="attr_values" property="attrValues" />
+		<result column="status" property="status" />
+		<result column="is_index" property="isIndex" />
+		<result column="is_guide" property="isGuide" />
+		<result column="is_need" property="isNeed" />
+		<result column="is_buyer_choose" property="isBuyerChoose" />
+		<result column="is_instance" property="isInstance" />
+	</resultMap>
+
+	<!-- create Attribute object -->
+	<insert id="addAttribute" parameterClass="attribute">
+		<![CDATA[
+		insert into emall_attribute
+		(id,attr_name,attr_desc,attr_code,group_id,input_type,attr_values,status,is_index,is_guide,is_need,is_buyer_choose,is_instance )values(
+		null,
+		#attrName#,
+		#attrDesc#,
+		#attrCode#,
+		-1,
+		#inputType#,
+		#attrValues#,
+		1,
+		#isIndex#,
+		#isGuide#,
+		#isNeed#,
+		#isBuyerChoose#,
+		#isInstance#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update Attribute object -->
+	<update id="editAttribute" parameterClass="attribute">
+		<![CDATA[
+		update emall_attribute set attr_name = #attrName#,
+		attr_desc = #attrDesc#,
+		input_type = #inputType#,
+		attr_values = #attrValues#,
+		is_index = #isIndex#,
+		is_guide = #isGuide#,
+		is_need = #isNeed#,
+		is_buyer_choose = #isBuyerChoose#,
+		is_instance = #isInstance#
+		 where id = #id#
+]]>
+	</update>
+	<!-- delete Attribute object -->
+
+	<update id="removeAttribute" parameterClass="java.lang.Long">
+		<![CDATA[
+		update emall_attribute e set e.status = 0 where e.ID = #value#
+]]>
+	</update>
+
+	<delete id="removeALLAttribute">
+		<![CDATA[
+		delete from emall_attribute
+]]>
+	</delete>
+
+	<!-- search Attribute object -->
+	<select id="getAttribute" parameterClass="java.lang.Long"
+		resultMap="attributeResult">
+		<![CDATA[
+		select emall_attribute.* from emall_attribute where emall_attribute.ID = #value# and emall_attribute.status=1
+]]>
+	</select>
+
+	<select id="getAttributeByName" parameterClass="string"
+		resultMap="attributeResult">
+		<![CDATA[
+		select emall_attribute.* from emall_attribute where emall_attribute.attr_name = #attrName#  and  emall_attribute.status=1
+]]>
+	</select>
+
+	<select id="getAttributeByAttrCode" parameterClass="string"
+		resultClass="int">
+		<![CDATA[
+		select count(*) from emall_attribute e where e.attr_code = #attrCode# and e.status=1
+		]]>
+	</select>
+
+	<!-- 根据attr_code查询 -->
+	<select id="getAttributeIsBuyerChoose" parameterClass="string"
+		resultMap="attributeResult">
+		<![CDATA[
+		select t.* from emall_attribute t
+			where t.attr_code=#attrCode# and t.status=1
+		]]>
+	</select>
+
+	<select id="getAttributesByName" parameterClass="map"
+		resultMap="attributeResult">
+		                  <include refid="pageSQLHead"/>
+		<![CDATA[
+		select emall_attribute.* from emall_attribute where emall_attribute.status=1  and
+		 emall_attribute.attr_code  not in
+		(select ec.attr_code from emall_cat_attr_rel ec where  ec.cat_code=#catCode# and ec.enable=1)
+]]>
+		<isNotEmpty prepend="and" property="attrName">
+			emall_attribute.attr_name like #attrName#
+		</isNotEmpty>
+		        <include refid="pageSQLFoot"/>
+	</select>
+
+	<!-- searchAll Attribute List associated to the category -->
+	<select id="getAttributes" resultMap="attributeResult"
+		parameterClass="string">
+		<![CDATA[
+		select emall_attribute.* from emall_attribute  where   emall_attribute.attr_code  not in
+		(select ec.attr_code from emall_cat_attr_rel ec where  ec.cat_code=#catCode# and ec.enable=1)
+		and  emall_attribute.status=1
+]]>
+	</select>
+
+	<select id="getAttributesAll" resultMap="attributeResult">
+		                  <include refid="pageSQLHead"/>
+		<![CDATA[
+		select emall_attribute.* from emall_attribute  where    emall_attribute.status=1
+]]>
+          <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getAttrAllCount" resultClass="int">
+	    <include refid="pageSQLHead"/>
+		select count(*) from emall_attribute where
+		emall_attribute.status=1
+		<include refid="pageSQLFoot"/>
+
+	</select>
+
+	<select id="checkEditNameAvaiOrNot" resultClass="int"
+		parameterClass="attribute">
+		<![CDATA[
+	select count(*) from  emall_attribute e where e.attr_name=#attrName# and e.status=1
+]]>
+		<isNotNull prepend="and" property="id">e.id != #id#</isNotNull>
+	</select>
+	<select id="getAttributesByNameCount" parameterClass="map"
+		resultClass="int">
+		<![CDATA[
+		select count(*) from emall_attribute where emall_attribute.status=1  and
+		emall_attribute.attr_code  not in
+		(select ec.attr_code from emall_cat_attr_rel ec where  ec.cat_code=#catCode# and ec.enable=1)
+]]>
+		<isNotEmpty prepend="and" property="attrName">
+			emall_attribute.attr_name like #attrName#
+		</isNotEmpty>
+	</select>
+
+</sqlMap>

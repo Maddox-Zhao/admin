@@ -1,0 +1,259 @@
+#set($layout = "layout/print.vm")
+#set($title = "出库单打印")
+
+<script >
+	function preview(oper){
+		var ids = document.getElementById("ids").value;
+		jQuery.post('$appServer.get("/storage/updateIsOutDepositoryPrinted.html")',{ids:ids},
+			function(message){
+		   		if(message != null && message != ""){
+		   	 		alert(message);
+    		   	}
+		   	});
+
+        bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml = document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML = prnhtml;
+		window.print();
+		window.document.body.innerHTML = bdhtml;
+	}
+
+	function cl(){
+		window.close();
+	}
+
+	//获取当前格式化后的时间
+    function getNowFormatDate()
+    {
+       var day = new Date();
+
+       var Year = 0;
+       var Month = 0;
+       var Day = 0;
+	   var CurrentDate = "";
+       //初始化时间
+       //Year       = day.getYear();//有火狐下2008年显示108的bug
+       Year       = day.getFullYear();//ie火狐下都可以
+       Month      = day.getMonth()+1;
+       Day        = day.getDate();
+
+
+       CurrentDate += Year + "-";
+
+       if (Month >= 10 )
+       {
+        CurrentDate += Month + "-";
+       }
+       else
+       {
+        CurrentDate += "0" + Month + "-";
+       }
+       if (Day >= 10 )
+       {
+        CurrentDate += Day ;
+       }
+       else
+       {
+        CurrentDate += "0" + Day ;
+       }
+
+       document.write(CurrentDate);
+    }
+</script>
+
+<body>
+	<input id="ids" type="hidden" value="$!idStr" />
+
+    <h1>
+    	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+    	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+    </h1>
+
+	<div id="print">
+
+        #set($index = 0)
+        #foreach($outDepositoryVO in $outDepositoryVOList)
+        	#set($outDepositoryDispaly = $!outDepositoryVO.outDepository)
+        	#set($prodRelationOutList = $outDepositoryVO.prodRelationOutList)
+        	#set($otherInfoMap = $!outDepositoryVO.otherInfoMap)
+        	#set($index = $index + 1)
+        	#set($no = 10)
+        	#set($no_2 = $no - 1)
+        	#set($pageSize = 0)
+			
+        	#if($prodRelationOutList)
+        		#if($prodRelationOutList.size() % $no == 0)
+        			#set($sumPageSize=$prodRelationOutList.size() / $no)
+        		#else
+        			#set($sumPageSize=$prodRelationOutList.size() / $no + 1)
+        		#end
+				
+        		#foreach($obj in $prodRelationOutList)
+        			#set($count = $velocityCount - 1)
+        			#if($count % $no == 0)
+        				#set($pageSize = $pageSize + 1)
+        				#if($pageSize >= 1)
+                        	<!-- added by chenyan 2010/01/04 start增加了IE7的支持 -->
+                        	<div #if($index > 1) style="page-break-before:always " #end>
+                					#if($index > 1) <br style="height:0; line-height:0"> #end
+                        	<!-- added by chenyan 2010/01/04 end -->
+                        		<table width="100%" style="border: 1px solid #006699;border-collapse:collapse;">
+                        			<tr>
+                            			<td height="20" colspan="9">&nbsp;&nbsp;</td>
+                            		</tr>
+        				#end
+            		<tr>
+            			<td style="border: 1px solid #006699;" colspan="9">
+            				<table width="100%">
+            					<tr>
+            						<td colspan="8" align="center"><font size="$titleSize"><B>1858$!outDepositoryTypeMap.get("$!{outDepositoryDispaly.type}")出库单</B></font></td>
+            					</tr>
+                        		<tr>
+        							<td width="300"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;日期：<script>getNowFormatDate()</script></font></td>
+        							#set($count = 0)
+        							#if($outDepositoryDispaly.type == "out_sales_change")
+        								<td width="250"><font size="$fontSize">收货人:$!outDepositoryDispaly.receiver</font></td>
+        							#else
+        								#foreach($tradePackage in $outDepositoryDispaly.tradePackageList)
+        									#if($!tradePackage.receiver && $count==0)
+        										<td width="250"><font size="$fontSize">收货人:$!tradePackage.receiver</font></td>
+        									#end
+        									#set($count=1)
+        								#end
+        							#end
+            						<td width="325"><font size="$fontSize">编号：</font><img src="$appServer/CreateBarCode?code=${outDepositoryDispaly.billNum}&barType=CODE39&checkCharacter=n&checkCharacterInText=n"/></td>
+                        		</tr>
+        						<tr>
+                        			<td colspan="3">
+										#if($!{outDepositoryDispaly.type}=="out_sales")
+											<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;订单：</font>
+        										#if(!$outDepositoryDispaly.tradePackageList || $outDepositoryDispaly.tradePackageList.size() == 0)
+                            						<font size="$fontSize">&nbsp;&nbsp;$!{outDepositoryDispaly.relationNum}</font>
+                            					#else
+                            						#foreach($tradePackage in $outDepositoryDispaly.tradePackageList)
+                            							<font size="$fontSize">&nbsp;&nbsp;$tradePackage.tid</font>
+                                        			#end
+        										#end
+        								#elseif($!{outDepositoryDispaly.type}=="out_shopping")
+											<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;供应商：</font>
+        									#foreach($supplierName in $!otherInfoMap.supplierNameSet)
+        										<font size="$fontSize">&nbsp;&nbsp;$!supplierName</font>
+											#end
+        								#else
+        									<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;关联单号：$!outDepositoryDispaly.relationNum</font>
+        								#end
+        							</td>
+        							#if($!{outDepositoryDispaly.type}=="out_shopping")
+        								<td>
+        									<font size="$fontSize">关联单号：$!outDepositoryDispaly.relationNum </font>
+        								</td>
+        							#end
+        						</tr>
+        						<tr>
+									#if("$!{outDepositoryDispaly.type}" == "out_sales")
+										<td><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;一级仓库：$!depositoryNameMap.get($!outDepositoryDispaly.depFirstId) </font></td>
+										<td colspan="2">
+											<table width="100%" cellspacing="0" cellpadding="0">
+												<tr>
+													<td><font size="$fontSize">发票抬头：$!otherInfoMap.invoiceName</font></td>
+													<td align="right"><font size="$fontSize" style="text-align:right;">页码：$pageSize / $sumPageSize</font></td>
+												</tr>
+											</table>
+										</td>
+									#else
+										<td colspan="2"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;一级仓库：$!depositoryNameMap.get($!outDepositoryDispaly.depFirstId) </font></td>	
+                						<td align="right"><font size="$fontSize">页码：$pageSize / $sumPageSize</font></td>
+									#end
+        						</tr>
+        						#if($!{outDepositoryDispaly.type}=="out_sales")
+                        		<tr>
+                        			<td><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;客户：$!{otherInfoMap.buyNick}</td>
+            						<td><font size="$fontSize">运输：$!{otherInfoMap.expressName}</td>
+            						<td><font size="$fontSize">付款方式：$!expressDistPaymentMap.get("$!{otherInfoMap.expressPayment}")</font></td>
+                        		</tr>
+        						#end
+                        	</table>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td width="7%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品编码</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品名称</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">属性</font></td>
+            			<td width="4%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单位</font></td>
+            			<td width="8%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">仓库</font></td>
+            			<td width="8%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">库位</font></td>
+            			<td width="5%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">数量</font></td>
+            			<td width="10%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单价(￥)</font></td>
+            			<td width="8%" style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">金额(￥)</font></td>
+            		</tr>
+        			#end
+            		<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.instanceCode</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">$!obj.instanceName</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">$!attributeManager.getFullAttributeStringByAttrs($!obj.attrs)</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.goodsUnit</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">$!obj.depName</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">$!obj.locName</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!obj.amount</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!obj.unitPrice,'0.00')</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!obj.money,'0.00')</font></td>
+            		</tr>
+        			#if($velocityCount==$prodRelationOutList.size())
+        			<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center" colspan="2"><font size="$fontSize">运&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;费(￥)</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!{otherInfoMap.shippingAmount},'0.00')&nbsp;</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center" colspan="3"><font size="$fontSize">数量合计</font></td>
+        				<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!otherInfoMap.sumCount</font></td>
+        				<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">货款合计(￥)</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!{otherInfoMap.sumMoney},'0.00')</font></td>
+            		</tr>
+        			<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center" colspan="8"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;合 &nbsp;&nbsp;&nbsp;&nbsp;计 &nbsp;&nbsp;&nbsp;&nbsp;</font></td>
+        				<td style="border: 1px solid #006699;background: #fff;" align="right"><font size="$fontSize">$!moneyUtil.getFormatMoney($!{otherInfoMap.countMoney},'0.00')</font></td>
+            		</tr>
+        			#end
+        			#if($count%$no==$no_2 || $velocityCount==$prodRelationOutList.size())
+        			<tr>
+            			<td height="30" style="border: 1px solid #006699;background: #fff;" colspan="9">
+        					<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;备注：$!otherInfoMap.remark</font>
+        					#if($!{outDepositoryDispaly.type}=="out_shopping")
+                                          <br><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;采购单号：
+        									#foreach($shoppingNum in $!otherInfoMap.shoppingNumSet)
+        										$shoppingNum ;
+        									#end
+                                          </font>
+        					#end
+        				</td>
+            		</tr>
+					#if($!{outDepositoryDispaly.type}=="out_sales")
+						<tr>
+							<td height="30" style="border: 1px solid #006699;background: #fff;" colspan="9">
+								<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;客服备注：$!otherInfoMap.serviceNote</font>
+							</td>
+						</tr>
+					#end
+            		<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" colspan="9">
+            				<table width="100%">
+                        		<tr>
+                        			<td width="330"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;制单：$!{outDepositoryDispaly.creater}</font></td>
+            						<td width="320"><font size="$fontSize">仓管：$!{outDepositoryDispaly.modifier}</font></td>
+            						<td width="320"><font size="$fontSize">打包：</font></td>
+                        		</tr>
+                        	</table>
+            			</td>
+            		</tr>
+					</table>
+					#end
+        		#end
+            	</div>
+        	#end
+        #end
+	</div>
+
+    <h1>
+    	<span class="action-span"><a href="#" onclick="cl();">关闭</a></span>
+    	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+    </h1>
+
+</body>

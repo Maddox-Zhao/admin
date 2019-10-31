@@ -1,0 +1,133 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+    <h2>售后管理 - 评论管理</h2>
+	<div class="searchBox">
+    	<h3><span>搜索评论</span></h3>
+    	<form  name="searchForm"  action="$appServer/comment/scomments.html" method="post">
+    		<table >
+    			<tr>
+    				<th>用户名：</th>
+                    <td>
+    					<input type="text"  name="userNickname" value="$!queryObject.userNickname"  size="20"  value="" />
+    				</td>
+    				<th>评论对象：</th>
+    				<td >
+    					<input type="text"  name="goodsName"  value="$!queryObject.goodsName"  size="20"  value=""></input>
+                    </td>
+                </tr>
+
+    			<tr>
+    				<th>评论时间：</th>
+                    <td>
+    					<input value="$!queryObject.gmtCreateStart" type="text" name="gmtCreateStart" size="10" theme="simple" id="datestart" />
+    				到
+    					<input value="$!queryObject.gmtCreateEnd" type="text" name="gmtCreateEnd" size="10" theme="simple" id="dateend" />
+            			  <script type="text/javascript">
+            			      Calendar.setup({
+            			          inputField : "datestart",
+            			          ifFormat   : "%Y-%m-%d",
+            			          align      : "BR"
+            			      });
+            			      Calendar.setup({
+            			          inputField : "dateend",
+            			          ifFormat   : "%Y-%m-%d",
+            			          align      : "BR"
+            			      });
+            			</script>
+                    </td>
+					<th>是否回复：</th>
+    				<td >
+    					<select name="replyFlag">
+    								<option value="">请选择</option>
+    								<option value="yes" #if($!{queryObject.replyFlag}== "yes") selected #end>已回复</option>
+    								<option value="no" #if($!{queryObject.replyFlag}== "no") selected #end>未回复</option>
+    					</select>
+                    </td>
+                </tr>
+
+    			<tr>
+    				<th>是否显示：</th>
+                    <td>
+    					<select name="status">
+    								<option value="">请选择</option>
+    								<option value="0" #if($!{queryObject.status}== "0") selected #end>隐藏</option>
+    								<option value="1" #if($!{queryObject.status}== "1") selected #end>显示</option>
+    					</select>
+    				</td>
+					<th></th>
+                    <td>
+    					<input class="button" value=" 查询" type="submit" onClick="return doCheck(searchForm);"/>
+    				</td>
+                </tr>
+
+            </table>
+        </form>
+    </div>
+        <div class="listBox" id="listDiv" >
+        	<table>
+        		<th width="3%">序号</th>
+				<th width="15%">用户名</th>
+        		<th width="30%">评论对象</th>
+        		<th width="10%">IP地址</th>
+        		<th width="20%">评论时间</th>
+        		<th>显示状态</th>
+        		<th>回复状态</th>
+        		<th>操作</th>
+
+		#foreach($comment in $query.items)
+				<tr>
+					#set ($value=($!query.currentPage - 1)*$!query.pageSize+$velocityCount)
+					<td  align="center">$value</td>
+					<td  align="center">$!comment.userNickname</td>
+					<td  align="center">$!comment.goodsName</td>
+					<td  align="center">$!comment.ipAddress</td>
+					<td  align="center">$!date.format('yyyy-MM-dd HH:mm:ss',${comment.gmtCreate})</td>
+					#if($comment.status=="0")
+						<td>隐藏</td>
+						#elseif($comment.status=="1")
+						<td>显示</td>
+					#end
+					#if($comment.replyFlag=="yes")
+						<td>已回复</td>
+						#else
+						<td>未回复</td>
+					#end
+					<td>
+							<a href="$appServer/comment/detailcomm.html?commentId=$comment.id">详情</a>
+					</td>
+				</tr>
+		#end
+            </table>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/comment/scomments.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+	#end
+
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+		function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+	function doCheck(searchForm){
+		    var s_date=document.getElementById("datestart").value.replace(/-/g, "/");
+    		var e_date=document.getElementById("dateend").value.replace(/-/g, "/");
+    		var bb_date1=new Date(Date.parse(s_date));
+    		var ee_date1=new Date(Date.parse(e_date));
+
+    		if(ee_date1 < bb_date1){
+    				   alert("起始时间不能大于结束时间！");
+    			   return false;
+    		}
+			return true;
+	}
+</script>

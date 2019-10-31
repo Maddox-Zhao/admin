@@ -1,0 +1,292 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 订单详情")
+
+<body>
+<div class="main">
+
+	<h2>管理中心-确认订单</h2>
+
+	<div class="tool">
+		<span><a href="$!appServer.get("/trade/showl.html")" hidefocus="true" class="bt_ren">返回</a></span>
+		##<span><a href="$!appServer.get("/feedback/fdedit.html?toUserId=$trade.buyId")" hidefocus="true" class="bt_all">发送留言</a></span>
+	</div>
+
+	#if($success && $message)
+		<div class="mag-t1">${message}</div>
+	#elseif($message)
+		<div class="mag-t1">${message}</div>
+	#end
+	
+
+	<form name="form1" id="form1" method="post">
+    	<input type="hidden" name="invoice" id="invoice" value=""/>
+    	<input type="hidden" name="tradedepId" id="tradedepId" value="$!trade.depFirstId"/>
+		<input type="hidden" id="tid" size="24" name="tid" value="$!{trade.tid}">
+		#springBind("trade.id")
+		<input type="hidden" id="trade.id" size="24" name="${status.expression}" value="$!{status.value}">
+    	<div class="formBox">
+			#set($currency = "HKD")
+    				#if($trade.tradeType == "13")
+    					#set($currency = "RMB")
+    				#else
+						#set($currency = "HKD")
+    				#end
+    		<h3><i></i><span>订单信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>订单号：</th>
+        			    <td style="width:240px;">$!trade.tid</td>
+        			    <th>订单金额：</th>
+        			    <td style="width:240px;">$currency<span id="amountFirstSpan" style="color:red;">$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount,$!trade.shippingAmount),'0.00')</span></td>
+    				</tr>
+					
+    				<tr>
+    					<th>订单状态：</th>
+        			    <td>$!enumTradeStatusMap.get("$!trade.status")</td>
+        			    <th>支付状态：</th>
+        			    <td>
+    						#if("$trade.payStatus" == "no_pay")
+    							未付款 
+    						#elseif("$trade.payStatus" == "paid")
+    							已付款
+    						#end
+    					</td>
+    				</tr>
+    				<tr>
+    					<th>下单时间：</th>
+    					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.gmtCreate)</td>
+    					<th>支付时间：</th>
+    					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.payTime)</td>
+    				</tr>
+					
+					<tr>
+    					<th >订单类型：</th>
+    					<td>#if($trade.tradeType == "13")代销订单#elseif($trade.tradeType == "14")特惠订单#else 现货订单 #end</td>
+						<th ></th>
+    					<td></td>
+    				</tr>
+					#*
+    				<tr>
+    					<th>索要发票：</th>
+    					<td colspan="3">
+    						#if(${trade.status} == "trade_finish" || ${trade.status} == "trade_close")
+    							<input name="trade.invoice" id="trade.invoice" type="checkbox" value="trade.invoice" #if($!trade.invoice=="y") checked="true" #end disabled="disabled"/>
+    						#else
+    							<input name="trade.invoice" id="trade.invoice" type="checkbox" value="trade.invoice" #if($!trade.invoice=="y") checked="true" #end onclick="modifyInvoice()">
+    						#end
+                        </td>
+    				</tr>
+					*#
+    			</table>
+    		</div>
+			
+    		<h4><span>商品列表</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+    				<tr>
+    					<th style="width:150px;text-align:center;">商品名称</th>
+    					<th style="text-align:center;">选购属性</th>
+    					<th style="text-align:center;">原价</th>
+						<th style="width:150px;text-align:center;">实际售价</th>
+    					<th style="width:120px;text-align:center;">购买数量</th>
+    					<th style="text-align:center;">小计</th>
+    					<th style="text-align:center;">商品库存</th>
+    					<th style="text-align:center;">删除</th>
+    				</tr>
+    			#set($goodsPriceAcount = 0)
+    			#set($marketPriceAcount = 0)
+    			#foreach($order in $orderList)
+    				#set($goodsAcount = $moneyUtil.mul($order.goodsNumber, $order.goodsPrice))
+    				#set($goodsPriceAcount = $moneyUtil.add($goodsPriceAcount, $moneyUtil.mul($order.goodsNumber, $order.goodsPriceSc)))
+    				#set($marketPriceAcount = $moneyUtil.add($marketPriceAcount, $moneyUtil.mul($order.goodsNumber, $order.marketPrice)))
+    				<tr  id="sc_tr_$!order.id">
+    					<td>
+    						<a href="$!{liangpin99Server}/l/gdetail_$!{order.goodsId}.htm" target="_blank">$!order.goodsTitle</a>
+    					</td>
+    					<td style="text-align:center;">$!order.buyAttr</td>
+    					<td align="center" class="r">$currency $!moneyUtil.getFormatMoney($!order.goodsPriceSc,'0.00')</td>
+						<td align="center" class="r">$currency<span ></span>
+						<input type="text" name="goodsPriceDis_${order.id}" id="goodsPriceDis_${order.id}" value="$!moneyUtil.getFormatMoney($order.goodsPrice,'0.00')" size="6"/>
+						<input type="button" value="修改价格" onclick="javascript:modifyOrderPrice('$!order.id','$!trade.tid');"/>
+						</td>
+    				#if($trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods"||$trade.status == "wait_seller_confirm") && $trade.payStatus && $trade.payStatus != 'paid')
+    					<td align="center" >
+    						<input type="text" name="goodsNumber_${order.id}" id="goodsNumber_${order.id}" value="$!order.goodsNumber" size="2"/>
+    						<input type="button" value="修改数量" onclick="javascript:modifyGoodsNumber('$!order.id','$!trade.tid');"/>
+    					</td>
+    				#else
+    					<td align="center">$!order.goodsNumber (件|个)</td>
+    				#end
+    					<td align="center" class="r">$currency<span id="goodsPriceOrderAll_${order.id}" style="color:red;">$!moneyUtil.getFormatMoney($math.mul($order.goodsPrice,$order.goodsNumber),'0.00')</span></td>
+    					<td align="center">
+						<input type="hidden" id="instanceHkExistNum_${order.id}" name="instanceHkExistNum_${order.id}" value="$!order.instanceHkExistNum">
+						$!order.instanceHkExistNum
+    					</td>
+						<td>
+							<input type="button" value="删除" onclick="javascript:deleteGoodsNumberToZero('$!order.id','$!trade.tid');"/>
+						</td>
+    				</tr>
+    			#end
+    			</table>
+            </div>
+
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>商品原总价：</th>
+						<input type="hidden" id="page_goodsPriceAcount" name="page_goodsPriceAcount" value="$!goodsPriceAcount">
+    					<td>$currency<span id="goodsAmountDis" style="color:red;">$!moneyUtil.getFormatMoney($!goodsPriceAcount, '0.00')</span></td>
+    					<th>实付金额：</th>
+    					<td>$currency<span id="amountTwoSpan"  style="color:red;">$!moneyUtil.getFormatMoney($!trade.amount, '0.00')</span></td>
+    				</tr>
+    			</table>
+    		</div>
+			
+			<h4><span>其他信息</span></h4>
+			<div class="content">
+				<table class="c6">
+    				<tr>
+    					
+    					<th>买家订单备注：</th>
+    					<td style="width:250px;">$!trade.buyerNote</td>
+    				</tr>
+    				<tr>
+    					<th>客服订单备注：</th>
+    					<td >
+    						<textarea cols="70" rows="5" name="csMessage" id="csMessage">$!trade.seviceNote</textarea>
+    					</td>
+       				</tr>
+    			</table>
+    		</div>
+			
+	</div>
+		<div class="form-but">
+			<button type="button" class="button-s4" onclick="confirmTrade();">确认订单</button>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script type="text/javascript">
+	
+	function modifyOrderPrice(id,tid){
+	
+		//获取输入的productId
+		var price = document.getElementById("goodsPriceDis_" + id).value;
+		//请求
+		//alert(goodsInstanceId);
+		if(!isNumberP(price)){
+			alert('价格输入错误，保留小数点后2位！');
+			return;
+		}
+		if(confirm("您确定要修改出售价格？")){
+    		jQuery.post('$!{appServer}/trade/udtpp.html?time='+new Date().getTime(),{orderId:id,tid:tid,price:price},function(obj){
+    			
+				var msgType = obj.jsonMsgType;
+    			var message = obj.jsonMessage;
+    			if (msgType == 'false') {
+    				alert(message);
+    			}else{
+    				var price = obj.jsonTradeAmount;
+    				document.getElementById("amountTwoSpan").innerHTML=price+".00";
+    				document.getElementById("amountFirstSpan").innerHTML=price+".00";
+    				document.getElementById("goodsPriceOrderAll_"+id).innerHTML=obj.jsonOrderPriceAll+".00";
+    				
+    				alert(message);
+    			}
+    		},"json");
+		}
+	}
+
+	
+	String.prototype.trim = function() {
+      return this.replace(/(^\s*)|(\s*$)/g, "");
+   }
+   
+    function isNumberP(val)
+       {
+         var reg = /^\d*(\.\d{0,2})?$/;
+         return reg.test(val);
+       }
+
+	function isNumber( s )
+	{
+  	 	var regu = "^[0-9]+$";
+		var re = new RegExp(regu);
+   		if (s.search(re) != -1) {
+   			return true;
+   		} else {
+  			return false;
+ 		}
+	}
+	
+	function deleteGoodsNumberToZero(orderId,tid)
+	{
+		if(confirm("确定删除？")){
+		  jQuery.post('$appServer.get("/trade/deleteGoodsNumberToZero.html")',{orderId:orderId,tid:tid},function(obj){
+           
+			//window.location.href = '$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)';
+			var msgType = obj.jsonMsgType;
+			var message = obj.jsonMessage;
+			if (msgType == 'false') {
+				alert(message);
+			}else{
+				var goodsPriceAcountSc = document.getElementById("page_goodsPriceAcount").value;
+				var price = obj.jsonTradeAmount;
+				var comSc = obj.jsonComSc;
+				var goodsPriceAcount = parseFloat(goodsPriceAcountSc)+parseFloat(comSc);
+				var price = obj.jsonTradeAmount;
+    			document.getElementById("amountTwoSpan").innerHTML=price+".00";
+    			document.getElementById("goodsAmountDis").innerHTML=goodsPriceAcount+".00";
+				var tr = "sc_tr_" + orderId;
+				document.getElementById(tr).style.display = "none";
+			}
+		  });
+		 }
+	}
+	function modifyGoodsNumber(orderId,tid){
+		var goodsNumber = document.getElementById('goodsNumber_'+orderId).value;
+		var instanceHkExistNum = document.getElementById('instanceHkExistNum_'+orderId).value;
+	    if (isNaN(goodsNumber) || goodsNumber < 1) {
+		     alert('商品的数量必须是数字！并且商品的数量必须大于0！');
+		     return;
+	    }
+		
+		if (instanceHkExistNum < goodsNumber) {
+		     alert('商品的数量不能大于库存！');
+		     return;
+	    }
+		
+		if(confirm("您确定要修改商品数量？")){
+		  jQuery.post('$appServer.get("/trade/checkGoodsNumber.html")',{orderId:orderId,tid:tid,goodsNumber:goodsNumber},function(obj){
+           
+			//window.location.href = '$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)';
+			var msgType = obj.jsonMsgType;
+			var message = obj.jsonMessage;
+			if (msgType == 'false') {
+				alert(message);
+			}else{
+				var goodsPriceAcountSc = document.getElementById("page_goodsPriceAcount").value;
+				var price = obj.jsonTradeAmount;
+				var comSc = obj.jsonComSc;
+				var goodsPriceAcount = parseFloat(goodsPriceAcountSc)+parseFloat(comSc);
+				document.getElementById("page_goodsPriceAcount").value = goodsPriceAcount;
+				document.getElementById("amountTwoSpan").innerHTML=price+".00";
+				document.getElementById("amountFirstSpan").innerHTML=price+".00";
+				document.getElementById("goodsAmountDis").innerHTML=goodsPriceAcount+".00";
+				document.getElementById("goodsPriceOrderAll_"+orderId).innerHTML=obj.jsonOrderPriceAll+".00";
+				
+				alert(message);
+			}
+		  });
+		}
+	}
+	
+	function confirmTrade(){
+	    document.form1.action="$appServer.get("/trade/sellerConfirmTrade.html")";
+        document.form1.submit();
+	}
+
+</script>

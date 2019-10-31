@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserInfoSQL">
+<typeAlias alias="userInfo" type="com.huaixuan.network.biz.domain.user.UserInfo"/>
+	<resultMap class="userInfo" id="userInfoResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="user_name" property="userName"/>
+		<result column="birthday" property="birthday"/>
+		<result column="qq" property="qq"/>
+		<result column="msn" property="msn"/>
+		<result column="wangwang" property="wangwang"/>
+		<result column="office_phone" property="officePhone"/>
+		<result column="home_phone" property="homePhone"/>
+		<result column="mobile_phone" property="mobilePhone"/>
+		<result column="question" property="question"/>
+		<result column="answer" property="answer"/>
+		<result column="address_id" property="address_id"/>
+		<result column="trade_address_id" property="tradeAddressId"/>
+		<result column="how_know" property="howKnow"/>
+	</resultMap>
+
+<!-- create UserInfo object -->
+<insert id="addUserInfo" parameterClass="userInfo">
+<![CDATA[
+insert into emall_user_info
+  (id,
+   user_id,
+   user_name,
+   birthday,
+   qq,
+   msn,
+   wangwang,
+   office_phone,
+   home_phone,
+   mobile_phone,
+   question,
+   answer,
+   address_id,
+   how_know)
+values
+  (null,
+   #userId#,
+   #userName#,
+   #birthday#,
+   #qq#,
+   #msn#,
+   #wangwang#,
+   #officePhone#,
+   #homePhone#,
+   #mobilePhone#,
+   #question#,
+   #answer#,
+   #address_id#,
+   #howKnow#)
+
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update UserInfo object -->
+<update id="editUserInfo" parameterClass="userInfo">
+<![CDATA[
+update emall_user_info
+   set user_name        = #userName#,
+       birthday         = #birthday#,
+       qq               = #qq#,
+       msn              = #msn#,
+       wangwang         = #wangwang#,
+       office_phone     = #officePhone#,
+       home_phone       = #homePhone#,
+       mobile_phone     = #mobilePhone#,
+       address_id       = #address_id#,
+       trade_address_id = #tradeAddressId#,
+       how_know         = #howKnow#
+ where id = #id#
+
+]]>
+</update>
+<!-- delete UserInfo object -->
+<delete id="removeUserInfo" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_user_info where emall_user_info.ID = #value#
+]]>
+</delete>
+<!-- search UserInfo object -->
+<select id="getUserInfo" parameterClass="java.lang.Long" resultMap="userInfoResult">
+<![CDATA[
+		select emall_user_info.* from emall_user_info where emall_user_info.ID = #value#
+]]>
+</select>
+<!-- search UserInfo object -->
+<select id="getUserInfoByUserId" parameterClass="java.lang.Long" resultMap="userInfoResult">
+<![CDATA[
+		select emall_user_info.* from emall_user_info where emall_user_info.USER_ID = #value#
+]]>
+</select>
+<!-- searchAll UserInfo List -->
+<select id="getUserInfos" resultMap="userInfoResult">
+	
+<![CDATA[
+		select emall_user_info.* from emall_user_info
+]]>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+</sqlMap>

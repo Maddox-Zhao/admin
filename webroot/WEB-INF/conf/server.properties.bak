@@ -1,0 +1,46 @@
+#jdbc
+jdbc.driverClassName = com.mysql.jdbc.Driver
+
+
+jdbc.url=jdbc\:mysql\://192.168.1.111\:3306/shenzhoutest?characterEncoding\=utf-8&zeroDateTimeBehavior\=convertToNull
+#jdbc.url=jdbc\:mysql\://58.246.195.106\:3306/shenzhou?characterEncoding\=utf-8&zeroDateTimeBehavior\=convertToNull
+#jdbc.url=jdbc:mysql://localhost:3306/erpdate?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+#jdbc.url=jdbc:mysql://112.64.139.82:33061/huaixuan?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+jdbc.username=root
+jdbc.password=123456
+
+jdbc.minIdle=20
+jdbc.maxActive=20
+jdbc.maxWait=-1
+
+#open develop mode
+system.devMode=true
+
+#web module config
+app.server.host=www.b2cerp.net
+app.server.port=8072
+image.server.host=www.b2cerp.net
+image.server.port=8072
+up.server.host=www.b2cerp.net
+up.server.port=90
+liangpin99.server.host=www.b2cerp.net
+liangpin99.server.port=8072
+
+#system encoding
+file.encoding=UTF-8
+web.encoding=UTF-8
+#web.encoding=GBK
+web.contentType=text/html;charset=${web.encoding}
+web.stamp=13
+
+#for cookie
+cookie.aes.key=t/8p0e3w5AC.q1f2
+cookie.aes.iv=4930526051021708
+#domain not start with .
+#app.domain=b2cerp.net
+app.domain=www.b2cerp.net
+
+file.upload.dir=d:/upload
+#file.upload.dir=/var/www/upload
+liangpin99.url=www.b2cerp.net
+inAccountNo=11185101000000009999

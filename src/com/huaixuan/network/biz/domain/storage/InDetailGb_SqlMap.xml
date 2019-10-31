@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="InDetailGbSQL">
+
+<typeAlias alias="inDetailGb" type="com.huaixuan.network.biz.domain.storage.InDetailGb"/>
+
+	<resultMap class="inDetailGb" id="inDetailGbResult">
+		<result column="id" property="id"/>
+		<result column="relation_id" property="relationId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="in_depository_id" property="inDepositoryId"/>
+		<result column="amount" property="amount"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="due_fee" property="dueFee"/>
+		<result column="fact_fee" property="factFee"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="stor_id" property="storId"/>
+		<result column="left_num" property="leftNum"/>
+		<result column="stor_type" property="storType"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="left_dep_num" property="leftDepNum"/>
+		<result column="bill_id" property="billId"/>
+	</resultMap>
+
+<insert id="addInDetailGb" parameterClass="inDetailGb">
+<![CDATA[
+		insert into ioss_in_detail_gb
+		(id,relation_id,goods_instance_id,goods_id,in_depository_id,amount,unit_price,due_fee,fact_fee,gmt_create,gmt_modify,status,stor_id,left_num,stor_type,dep_first_id,left_dep_num,bill_id )values( null,
+		#relationId#,
+		#goodsInstanceId#,
+		#goodsId#,
+		#inDepositoryId#,
+		#amount#,
+		#unitPrice#,
+		#dueFee#,
+		#factFee#,
+		sysdate(),
+		sysdate(),
+		#status#,
+	    #storId#,
+	    #leftNum#,
+	    #storType#,
+	    #depFirstId#,
+	    #leftDepNum#,
+	    #billId#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+</sqlMap>

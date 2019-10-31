@@ -1,0 +1,255 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "新增采购订单")
+</head>
+<div class="main">
+	<h2>采购管理 - 新增采购订单</h2>
+	<div class="tool">
+        <span><a href="${appServer}/stock/stock_search.html" hidefocus="true" class="bt_add">采购订单列表</a></span>
+    </div>
+	<div class="formBox">
+		<h3><i></i><span>新增采购单</span></h3>
+		<div class="content">
+		<form id="form1" name="addStock"  action="$appServer/stock/add_stock.html" method="post">
+			<input type="hidden" id="flag" name="flag" value="add" />
+
+			#if($errorInfo && $errorInfo != "")<div class="warning_min" id="modifyError">$!errorInfo</div>#end
+
+			<table>
+
+				#if($addType && $addType=="w")
+					<input type="hidden" id="isWholesale" name="isWholesale" value="w" />
+					#if($tid && $tid.length > 0)
+					<tr>
+        					<th>批发订单号</th>
+        					<td>
+        						<input type="text" id="tid" name="tid" value="$tid" readonly="true"/>
+        					</td>
+					</tr>
+					<tr>
+    					<th><span class=red>*</span>一级批发仓库</th>
+    					<td>
+							#if($depositoryFirstList)
+    					      #foreach($depfirst in $depositoryFirstList)
+    							#if("$depfirst.id"=="$depFirstId")
+									<input type="text" id="depFirstName" name="depFirstName" value="$depfirst.depFirstName" readonly="true"/>
+									<input type="hidden" id="depFirstId" name="depFirstId" value="$depfirst.id" />
+								#end
+    						  #end
+    						#end
+    					</td>
+					</tr>
+					#else
+					<tr>
+    					<th>批发订单号</th>
+    					<td>
+    						<input type="text" id="tid" name="tid" value="$!{shoppingList.tid}" onchange="checkTidExist(this.value);"/>
+    					</td>
+					</tr>
+
+					<tr>
+    					<th><span class=red>*</span>一级批发仓库</th>
+    					<td>
+							<select name="depFirstId" id="depFirstId" style="width:150px;">
+    							<option value="" >-=请选择一级仓库=-</option>
+        						#if($depositoryFirstList)
+        					      #foreach($depfirst in $depositoryFirstList)
+    								#if("${depfirst.type}"=="w")
+										<option value="$depfirst.id" #if("$depfirst.id"=="$shoppingList.depFirstId") selected #end>$depfirst.depFirstName</option>
+    								#end
+        						  #end
+        						#end
+        					</select>
+    					</td>
+					</tr>
+					#end
+				#else
+					<input type="hidden" id="isWholesale" name="isWholesale" value="n" />
+				#end
+
+				<tr>
+					<th><span class=red>*</span>采购单号</th>
+					<td>
+						<input type="text" id="shoppingNum" name="shoppingNum" value="$!{stockId}" readonly="readonly" />
+					</td>
+				</tr>
+				<tr>
+					<th>关联单号</th>
+					<td>
+						<input  type="text" name="relationShoppingNum" id="relationShoppingNum" value="$!{shoppingList.relationShoppingNum}" onchange="checkStockIsExist(this.value);"/>
+					</td>
+				</tr>
+				<tr>
+					<th>合同编号</th>
+					<td>
+						<input  type="text" name="primitiveNum" id="primitiveNum" value="$!{shoppingList.primitiveNum}" onKeyUp="textLimitCheck(this,58);"/>
+					</td>
+				</tr>
+				<tr>
+					<th><span class=red>*</span>供应商</th>
+					<td>
+						<input type="text" name="supplierName" id="supplierName" value="$!{shoppingList.supplierName}" readonly/>
+					<input type="hidden" name="supplierId" id="supplierId" value="$!{shoppingList.supplierId}" readonly/>
+					<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+					</td>
+				</tr>
+				<tr>
+					<th><span class=red>*</span>采购时间</th>
+					<td>
+						<input type="text" name="shoppingTime_str" id="shoppingTime_str" size="15" theme="simple" readonly="true" />
+        			    <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "shoppingTime_str",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        				</script>
+					</td>
+				</tr>
+
+
+				<tr>
+					<th><span class=red>*</span>预期到货时间</th>
+					<td>
+						<input type="text" name="arriveTime_str" id="arriveTime_str" size="15" theme="simple" "readonly=true" />
+        			    <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "arriveTime_str",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        				</script>
+					</td>
+				</tr>
+
+				<tr>
+					<th><span class=red>*</span>库存类型</th>
+					<td>
+						#if($addType && "$addType"=="w")
+						<select name="storType" id="storType" theme="simple">
+    						#foreach($s in $storTypeMap.entrySet())
+    							<option value="$!{s.key}" >$!{s.value}</option>
+    						#end
+						</select>
+    					<script type="text/javascript">$("#shoppingList\\.storType").attr("value",'v'); </script>
+    					#else
+						<select name="storType" id="storType" theme="simple">
+    						#foreach($s in $storTypeMap.entrySet())
+    							<option value="$!{s.key}" >$!{s.value}</option>
+    						#end
+						</select>
+    					#end
+                    </select>
+					</td>
+				</tr>
+				<tr>
+					<th>备注</th>
+					<td>
+						<textarea cols="50" rows="3" id="remark" name="remark" onKeyUp="textLimitCheck(this,280);">$!{shoppingList.remark}</textarea>
+					</td>
+				</tr>
+
+			</table>
+			<div class="form-but">
+				<input class="but" value=" 下一步 " type="button"  onclick="javascript:formSubmit();">
+				<input class="but" value=" 重 置 " type="reset">
+				<input value="insert" name="act" type="hidden">
+			</div>
+		</form>
+	</div>
+</div>
+</div>
+<script language="javascript" type="text/javascript">
+	function sesp(){
+     	var ret = window.showModalDialog("$appServer/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}
+    }
+
+		function formSubmit(){
+			var supplierIdstr = document.getElementById("supplierId").value;
+			var storTypestr = document.getElementById("storType").value;
+			var date1str = document.getElementById("arriveTime_str").value;
+		    var date2str = document.getElementById("shoppingTime_str").value;
+			var supplierId=supplierIdstr.replace(/-/g, "/");
+			var date1=date1str.replace(/-/g, "/");
+    		var date2=date2str.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(date1));
+            var e_date=new Date(Date.parse(date2));
+
+			#if($addType && "$addType"=="w")
+			var depFirstIdstr = document.getElementById("depFirstId").value;
+			if(depFirstIdstr==""){
+    			alert("一级批发仓库不能为空！");
+    			return false;
+    		}
+			#end
+			if(supplierId==""){
+				alert("供货商必须选择！");
+    			return false;
+			}
+
+			if(date2==""){
+				alert("采购时间必须填写！");
+    			return false;
+			}
+			if(date1==""){
+				alert("预期到货时间必须填写！");
+    			return false;
+			}
+
+			if(storTypestr==""){
+				alert("库存类型必须选择！");
+    			return false;
+			}
+
+    		if(e_date > b_date){
+    			alert("采购时间不能大于预期到货时间！");
+    			return false;
+    		}
+
+        	document.getElementById("form1").submit();
+	    }
+
+
+	function checkStockIsExist(relationShoppingNum){
+		var shopNum=relationShoppingNum.replace(/-/g, "/");
+		var msgDiv=document.getElementById("error");
+		if(shopNum != ""){
+			jQuery.get('checkStockByDwr.html',{param:shopNum},function(message){
+		        var shoppingNum=document.getElementById("relationShoppingNum");
+		        var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        if (msgType == 'false') {
+			         alert("关联采购订单不存在！");
+			         shoppingNum.value="";
+		        }
+		    },'json');
+		}
+	}
+
+	function checkTidExist(tid){
+		var tidStr=tid.replace(/-/g, "/");
+		var msgDiv=document.getElementById("error");
+		if(tidStr != ""){
+			jQuery.get('$appServer/stock/checkTidByJQuery.html',{param:tidStr},function(message){
+		        var tidObj=document.getElementById("tid");
+		        var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        if (msgType == 'false') {
+			         alert("批发订单号不存在！");
+			         tidObj.value="";
+		        }
+		    },'');
+		}
+	}
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+
+</script>

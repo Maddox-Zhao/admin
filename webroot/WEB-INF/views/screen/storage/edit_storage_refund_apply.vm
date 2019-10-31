@@ -1,0 +1,106 @@
+#set($layout = "layout/default.vm")
+
+#if($!message && $!message == 'longerror')
+	  <div class="warning" style="width:1003px">出错：备注过长，请重新操作！</div>
+#end
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<form  name="form1" action="" method="post">
+		<div class="searchBox">
+			<h3><span>库存退货申请单修改 </span></h3>
+        	<table>
+        		<input type="hidden" name="applyRelationNum" value="$!relationNum"/>
+        		<tr>
+        		  <th>产品编号：</th>
+        		  <td>$!{storageRefundApply.code}
+        		  </td>
+        	 	  <th>产品名称：</th>
+        		  <td>$!{storageRefundApply.instanceName}</td>
+
+        		  <th>类目：</th>
+        		  <td>$!categoryManager.getCatFullNameByCatcode($storageRefundApply.catCode)</td>
+        	 	  <th>属性：</th>
+        		  <td>$!attributeManager.getFullAttributeStringByAttrs($storageRefundApply.attrs)</td>
+        		</tr>
+
+        		<tr>
+        		  <th>单位：</th>
+        		  <td>$!storageRefundApply.goodsUnit
+        		  </td>
+        	 	  <th>成本均价：</th>
+        		  <td>$!moneyUtil.getFormatMoney($!storageRefundApply.refPrice,'0.00')
+        		  </td>
+
+        		  <th>仓库名称：</th>
+        		  <td>$!{storageRefundApply.depositoryName}</td>
+        		  <th>供应商：</th>
+        		  <td>$!{storageRefundApply.supplierName}
+        		  </td>
+        		</tr>
+        	</table>
+        </div>
+
+
+		<div class="listBox" id="listDiv">
+		<table  id="listTable" name="listTable">
+			<tr>
+	    		<th colspan="11"  scope="col">产品库存列表</th>
+			</tr>
+			<tr>
+				<th>序号</th>
+		        <th>库位名称</th>
+		        <th>批次</th>
+		        <th>库存类型</th>
+				<th>库存数量</th>
+		        <th>退货数量</th>
+				<th>成本均价</th>
+				<th>应收金额</th>
+				<th>实收金额</th>
+				<th>退货原因</th>
+				<th>备注</th>
+			</tr>
+			#if($storageRefundApplyList)
+				#foreach($obj in $storageRefundApplyList)
+	    		<tr #if($velocityCount%2==0) class="bg" #end>
+					<td align="center">$velocityCount
+						<input type="hidden" name="id" id="id_$velocityCount" value="$!obj.id"/>
+					</td>
+	      			<td>$!obj.depLocationName
+					</td>
+	      			<td>$!obj.batchNum
+					</td>
+					<td align="center">$!storTypeMap.get($!obj.storType)</td>
+					<td>$!obj.storageNum
+						<input type="hidden" name="storageNum" id="storageNum_$velocityCount" value="${obj.storageNum}" />
+					</td>
+					<td>$!obj.refundNum</td>
+					<td>￥$!moneyUtil.getFormatMoney($!obj.refPrice,'0.00')</td>
+	      			<td>￥$!moneyUtil.getFormatMoney($!obj.dueFee,'0.00')</td>
+					<td>￥$!moneyUtil.getFormatMoney($!obj.factFee,'0.00')</td>
+					<td align="center">$!enumShoppingRefundReason.get("$obj.reason")</td>
+					<td><input  type="text" name="remark" value="$!obj.memo" size="30" maxlength="120"/></td>
+				</tr>
+		  		#end
+			#end
+	    </table>
+		#if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0)
+	  		没有记录！
+		#end
+ </div>
+
+<div align="center">
+	#if($storageRefundApplyList)
+    <input type="button" name="finish" value="确认修改" #if(!$storageRefundApplyList || $storageRefundApplyList.size() == 0) disabled="false" #else onclick="javascript:finishModify('$!relationNum');" #end/>
+	#end
+ </div>
+</form>
+<script language="javascript" type="text/javascript">
+
+function finishModify(relationNum){
+    if(confirm("确认备注信息修改？")){
+		document.forms[0].action = "refundApplyFailModify.html";
+		document.forms[0].submit();
+	}
+}
+</script>
+</div>

@@ -1,0 +1,74 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>代销客户登录查看</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	<!--导出Excel相关HTML-->
+
+     <form id="excelForm" method="post" target="excelIFrame">
+      
+ 
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+					##<td class="form-label" style="width:60px;">代销客户：</td>
+                    ##<td style="width:150px">
+                      ##  <input name="userName" id="userName" class="mini-textbox" onenter="search()" />
+                    ##</td>
+					<td class="form-label" style="width:60px;">客户名称：</td>
+					<td style="width:100px" align="center">
+                            <input name="name" class="mini-textbox"/>
+                        </td>
+					<td rowspan="2">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+						<a class="mini-button" iconCls="icon-search" onclick="statistics()">统计</a>
+                    </td>
+				</tr>
+            </table>
+        </div>
+    </div>
+	 </form>
+
+	 <iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+	 
+	
+	
+ 
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:470px;" allowResize="true" 
+        url="dxrecordlist.html"  idField="userName"     pageSize="50" pageIndex="1"  >
+        <div property="columns">
+            <div type="indexcolumn"></div>
+            <div field="userName" width="120" headerAlign="center" align="center" allowSort="true">代销客户</div>
+			<div field="name" width="120" headerAlign="center" align="center" allowSort="true">客户名称</div>
+            <div field="time" width="120" headerAlign="center" align="center"  allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss" >登录时间</div>
+			<div field="ip" width="120" headerAlign="center" align="center"  allowSort="true">登录IP</div>
+            <div field="count" width="120" headerAlign="center" align="center" allowSort="true">登陆次数</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		 function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+			data.type=1;
+            grid.load(data);
+         }
+		 function statistics() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+			data.type=2;
+            grid.load(data);
+         }
+</script>
+</body>
+</html>

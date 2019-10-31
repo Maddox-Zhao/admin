@@ -1,0 +1,118 @@
+/* 提示信息窗按钮 */
+.tk-small-button{
+background:url(../images/submit_btn.png) no-repeat -2px -1px;
+border:1px solid #CCCCCC;
+margin-right:10px;
+padding:2px 10px 1px;
+}
+.tk-small-button span{
+color:#444;
+height:22px;
+cursor:pointer;
+float:none;
+line-height:22px;
+}
+
+/* 默认按钮 */
+input[type="submit"], input[type="reset"], .px input .submit{
+background:url(../images/submit_btn.png) no-repeat;
+background-position:-2px -1px;
+border:1px solid #ccc;
+height:20px;
+line-height:20px;
+color:#404040;
+padding:0px 5px;
+cursor:pointer;
+}
+.small-btn{
+	color:#404040;
+background:url(../images/submit_btn.png) no-repeat;
+border:1px solid #ccc;
+float:left;
+}
+.small-btn span{border:1px solid #FFFFFF;
+display:block;
+cursor:pointer;
+line-height:18px;
+padding:0 8px;}
+.tk-small-button:hover, .small-btn:hover{text-decoration:none;
+}
+/* 注册页面提交按钮 */
+input.reg_btn{
+margin:10px 0px;
+background:url(../images/skin/login/reg_btn.png) no-repeat;
+border:none;
+width:168px;
+height:24px;
+font-size:14px;
+color:#000;
+}
+.bj_t_btn, .bj_t_btn span, .dtlisted a, .dtlisted a span, .tj_shopcart, .tj_shopcart span, .r_btn a, .r_btn a span, .ask_btn, .ask_btn span{
+	background-image:url(../images/list_btn_bg.png);
+	background-repeat:no-repeat;
+display:block;
+	}
+.dtlisted a:link, .dtlisted a:visited, .dtlisted a span, .tj_shopcart:link, .tj_shopcart span, .tj_shopcart:visited{
+color:#444;
+}
+.dtlisted a span, .tj_shopcart span, .r_btn a span, .bj_t_btn span, .ask_btn span{
+background-position:right -20px;
+margin-left:8px;
+padding-right:8px;
+cursor:pointer;
+height:20px;
+line-height:20px;
+
+}
+
+.tj_shopcart, .r_btn{
+width:90px;
+margin:0px auto;}
+.r_btn_m{width:80px;margin-left:10px}
+.bj_t_btn, .r_btn a {
+background-position:left -40px;
+}
+.r_btn a, .r_btn a span{
+_float:right;
+}
+.bj_t_btn{width:80px;margin:0px auto;}
+.bj_t_btn span, .r_btn a span{
+background-position:right -60px;
+font-weight:100;
+}
+.ask_btn{width:61px;
+margin-top:-16px;
+*margin-top:0px;
+margin-left:160px;
+*margin-left:20px;
+position:absolute;}
+.ask_btn span{margin-left:18px;
+padding-right:10px;
+font-weight:100;
+_padding-top:2px;
+_height:18px;
+overflow:hidden;}
+.dtlisted a:hover, .tj_shopcart:hover, .bj_t_btn:hover, .r_btn a:hover, .ask_btn:hover{
+text-decoration:none;}
+
+.px input[type="submit"]{width:50px;}
+
+.btn {
+background:transparent url(../images/btn.png) no-repeat scroll 0 0;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:78px;
+}
+
+.btnl {
+background:transparent url(../images/btnl.png) no-repeat scroll 0 0;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:105px;
+}
+.btn-confirm {
+color:white;
+font-weight:bold;
+}

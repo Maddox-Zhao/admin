@@ -1,0 +1,337 @@
+#set($layout = 'layout\default.vm')
+#set($title = "管理中心 - 供应商详情")
+
+<div class="main">
+	<h2>管理中心 - 供应商详情</h2>
+	
+	<!-- 表单模块 -->
+	<div class="formBox">
+		<h3><i></i><span>供应商信息</span></h3>
+		<div class="content">
+			<table class="c2">
+				<tr>
+					<th>供应商编码：</th>
+					<td>$!{supplier.id}</td>
+					<th>&nbsp;</th>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>供应商名称：</th>
+					<td>$!{supplier.name}</td>
+					<th>简称：</th>
+					<td>$!{supplier.shortName}</td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>联系人：</th>
+					<td>$!{supplier.linkman}</td>
+					<th>负责人：</th>
+					<td>$!{supplier.chargeMan}</td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>联系电话：</th>
+					<td>$!{supplier.tel}</td>
+					<th>手机：</th>
+					<td>$!{supplier.mobile}</td>
+				</tr>
+				<tr>
+					<th>传真：</th>
+					<td>$!{supplier.fax}</td>
+					<th>QQ/MSN：</th>
+					<td>$!{supplier.im}</td>
+				</tr>
+				<tr>
+					<th>email：</th>
+					<td>$!{supplier.email}</td>
+					<th>&nbsp;</th>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th>地址：</th>
+					<td>$!{supplier.address}</td>
+					<th>&nbsp;</th>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<th>供应商等级：</th>
+					<td>
+						#if("g"==$!supplier.grade)
+							优良
+						#elseif("n"==$!supplier.grade)
+							普通
+						#elseif("b"==$!supplier.grade)
+							差
+						#end
+					</td>
+					<th>营销方式：</th>
+					<td>
+						#if("j"==$!supplier.marketing)
+							经销
+						#elseif("l"==$!supplier.marketing)
+							联营
+						#elseif("d"==$!supplier.marketing)
+							代销
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>及时到货率：</th>
+					<td>$!{supplier.arrivePer}%</td>
+					<th>退货率：</th>
+					<td>$!{supplier.returnPer}%</td>
+				</tr>
+				<tr>
+					<th>付款方式：</th>
+					<td>
+						#if("m"==$!supplier.payment)
+							月结
+						#elseif("c"==$!supplier.payment)
+							现金
+						#end
+					</td>
+					<th>开户银行：</th>
+					<td>$!supplier.bank</td>
+				</tr>
+				<tr>
+					<th>银行帐号：</th>
+					<td>$!{supplier.bankNum}</td>
+					<th>收款人：</th>
+					<td>$!{supplier.payee}</td>
+				</tr>
+				<tr>
+					<th>经营范围：</th>
+					<td colspan="3">$!{supplier.brand}</td>
+				</tr>
+				<tr>
+					<th>备注：</th>
+					<td colspan="3">$!{supplier.remark}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	#if($success)
+		<div class="mag-t2">${success}</div>
+	#elseif($error)
+		<div class="mag-t1">${error}</div>
+	#end
+
+	<div class="searchBox" style="margin-top:10px;">
+		<h3><span>搜索供应商商品</span></h3>
+		<div class="success_min" id="modifySuccess" style="display:none">修改金额成功</div>
+		<div class="warning_min" id="modifyError" style="display:none">修改金额失败</div>
+		<div class="success_min" id="modifyCodeSuccess" style="display:none">修改编码成功</div>
+		<div class="warning_min" id="modifyCodeError" style="display:none">修改编码失败</div>
+		<form action="viewSupplier.html" name="searchSupplierGoods" method="post" id="searchSupplierGoods">
+			<input type="hidden" name="sid" value="$!{supplier.id}" />
+			<table>
+				<tr>
+					
+                    <th>产品名称：</th>
+					<td>
+						<input type="text" name="title" id="parMap.title" value="$!parMap.title" />
+					</td>
+					<th>产品编码：</th>
+					<td>
+						<input type="text" name="code" id="parMap.code" value="$!parMap.code" />
+					</td>
+					<th>供应商产品编码：</th>
+					<td>
+						<input type="text" name="supplierCode" id="parMap.supplierCode" value="$!parMap.supplierCode" />
+					</td>
+					<td>
+						<input name="search" type="button" value="查询" class="button" onclick="formSubmit();"/>
+						<input type="button" value="Excel导出" class="button" onclick="doExport();"/>
+						<script language="javascript" type="text/javascript">
+							function formSubmit(){
+								document.getElementById("parMap.title").value=document.getElementById("parMap.title").value.trim();
+								document.getElementById("parMap.code").value=document.getElementById("parMap.code").value.trim();
+								document.getElementById("parMap.supplierCode").value=document.getElementById("parMap.supplierCode").value.trim();
+								document.searchSupplierGoods.submit();
+							}
+						</script>
+						<a href="$appServer/supplier/addSupplierGoods.html?sid=$!{supplier.id}">新增产品</a>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>供应商商品列表</span></h3>
+		<table>
+			<tr>
+				<th>产品名称</th>
+				<th>产品编码</th>
+				<th>供应商产品编码</th>
+				<th>单位</th>
+				<th>类目</th>
+				<th>进货价格</th>
+				<th>操作</th>
+			</tr>
+			#foreach($goods in $query.items)
+				#set($price="")
+				<tr #if($velocityCount%2==0) class="bg" #end>
+					<td align="center">$!goods.goodsInstanceName</td>
+					<td align="center">$!goods.code</td>
+					<td align="center">
+						<span id='supplier_code_edit_$!goods.id'>
+							<input type="text" name="newSupplierCode" value="$!goods.supplierCode" id="newSupplierCode_$!goods.id"  title="点击修改编码" onclick="clearDisplayInfo();" onchange="editSupplierCode('$!goods.id','$!goods.supplierCode');" size="20" maxLength="30"/>
+						</span>
+					</td>
+					<td align="center">$!goods.goodsUnit</td>
+					<td align="center">$!goods.catCode</td>
+					<td align="center">
+						￥<span id='supplier_price_edit_$!goods.id'>
+							#set($price=$!moneyUtil.getFormatMoney($!goods.consultPrice,'0.00'))
+							<input type="text" name="newSupplierPrice" value="$!price" id="newSupplierPrice_$!goods.id"  title="点击修改金额" onclick="clearDisplayInfo();" onchange="editSupplierPrice('$!goods.id','$!price');" size="10" maxLength="11"/>
+						</span>
+					</td>
+					<td align="center">
+						<a href="#" onclick="javascript:delSupplierGoods($!goods.id)">删除</a>
+					</td>
+				</tr>
+			#end
+		</table>
+
+		<!-- 分页 -->
+		<div class="pages-box" >
+			#if($query.items.size()>0)
+				$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/supplier/viewSupplier.html?sid=$!{supplier.id}").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+			#else
+				没有结果！
+			#end
+		</div>
+	</div>
+</div>
+<script language="javascript" type="text/javascript">
+    String.prototype.trim = function() {
+    // 用正则表达式将前后空格
+    // 用空字符串替代。
+    return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+	
+    function delSupplierGoods(goodsId){
+    	if (confirm("确定要删除?")){
+			document.forms.searchSupplierGoods.action = '${appServer}/supplier/delSupplierGoods.html?supplierGoodsId=' + goodsId;
+			document.forms.searchSupplierGoods.submit();
+			document.forms.searchSupplierGoods.action = '$appServer/supplier/viewSupplier.html';
+    	}
+    }
+	
+    function clearDisplayInfo(){
+    var msgDiv=document.getElementById("modifyCodeSuccess");
+    var msgDiv2=document.getElementById("modifyCodeError");
+    var msgDiv3=document.getElementById("modifySuccess");
+    var msgDiv4=document.getElementById("modifyError");
+    msgDiv.style.display="none";
+    msgDiv2.style.display="none";
+    msgDiv3.style.display="none";
+    msgDiv4.style.display="none";
+    }
+    //DWR的方式修改订单金额
+    function editSupplierCode(goodsId,oldValue){
+    var newTradeAmount=document.getElementById('newSupplierCode_' + goodsId);
+    var newTradeAmountValue=newTradeAmount.value;
+    var msgDiv=document.getElementById("modifyCodeSuccess");
+    var msgDiv2=document.getElementById("modifyCodeError");
+    jQuery.ajax({
+    type: "POST",
+    url:"$appServer.get('/supplier/editDwrGoodsCode.html')",            			
+    data :{param1:goodsId,param2:newTradeAmountValue},
+    success:function(data){
+    callBackEditCode(data,newTradeAmount);
+    }
+    });
+    }
+    function callBackEditCode(msg,newTradeAmount){
+    var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+    var msgValue = msg.substring(msg.indexOf("\',\'") + 3, msg
+    .lastIndexOf("\']"));
+    var msgDiv=document.getElementById("modifyCodeSuccess");
+    var msgDiv2=document.getElementById("modifyCodeError");
+    if (msgType == 'true') {
+    msgDiv2.style.display="none";
+    msgDiv.style.display="";
+    } else{
+    alert("修改失败!");
+    msgDiv2.style.display="";
+    msgDiv.style.display="none";
+    }
+    }
+    //DWR的方式修改订单金额
+    function editSupplierPrice(goodsId,oldValue){
+    var newTradeAmount=document.getElementById('newSupplierPrice_' + goodsId);
+    var newTradeAmountValue=newTradeAmount.value;
+    var msgDiv=document.getElementById("modifySuccess");
+    var msgDiv2=document.getElementById("modifyError");
+    if(newTradeAmountValue==null||newTradeAmountValue.trim()==""){
+    alert("出错：您没有输入.");
+    newTradeAmount.value=oldValue;
+    newTradeAmount.select();
+    newTradeAmount.focus();
+    msgDiv2.style.display="";
+    msgDiv.style.display="none";
+    }
+    else if(!isNumber(newTradeAmountValue)){
+    alert("出错：您输入了不正确的金额.");
+    newTradeAmount.value=oldValue;
+    newTradeAmount.select();
+    newTradeAmount.focus();
+    msgDiv2.style.display="";
+    msgDiv.style.display="none";
+    }else if(newTradeAmountValue>100000000){
+    alert("出错：您输入的金额太大.");
+    newTradeAmount.value=oldValue;
+    newTradeAmount.select();
+    newTradeAmount.focus();
+    msgDiv2.style.display="";
+    msgDiv.style.display="none";
+    }		
+    else{
+    newTradeAmountValue=parseFloat(newTradeAmountValue);
+    jQuery.ajax({
+    type: "POST",
+    url:"$appServer.get('/supplier/editDwrGoodsPrice.html')",            			
+    data :{param1:goodsId,param2:newTradeAmountValue},
+    success:function(data){
+    callBackEditTradeAmount(data,newTradeAmount);
+    }
+    });
+    }
+    }
+    function callBackEditTradeAmount(msg,newTradeAmount){
+    var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+    var msgValue = msg.substring(msg.indexOf("\',\'") + 3, msg
+    .lastIndexOf("\']"));
+    var msgDiv=document.getElementById("modifySuccess");
+    var msgDiv2=document.getElementById("modifyError");
+    if (msgType == 'true') {
+    msgDiv2.style.display="none";
+    msgDiv.style.display="";
+    } else{
+    alert("修改订单金额失败!");
+    msgDiv2.style.display="";
+    msgDiv.style.display="none";
+    }
+    }
+    function isNumber(val)
+    {
+    var reg = /^[\d|\.|,]+$/;
+    return reg.test(val);
+    }
+    function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00'
+    : ( (mnt*10 == Math.floor(mnt*10)) ?
+    mnt + '0' : mnt);
+    }
+    function doExport(){
+    var form1=document.getElementById("searchSupplierGoods");
+    form1.action="doExportSupplier.html";
+    form1.submit();
+    form1.action="viewSupplier.html";
+    }
+</script>
+</div>

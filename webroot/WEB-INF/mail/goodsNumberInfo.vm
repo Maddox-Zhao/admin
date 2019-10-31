@@ -1,0 +1,73 @@
+
+<table width="1047"  border="0" align="center"  style="border:1px #CCCCCC">
+	#set($count = -1)
+  
+  #foreach($sendGoodsInfo in $list)
+	#if($count == -1)
+	<tr>
+    	<td width="200" align="center">图片</td>
+		#if($sendGoodsInfo.userRank.equals("e") || $sendGoodsInfo.userRank.equals("s"))
+    	<td width="100" align="center">代销价</td>
+		#end
+    	<td width="149" align="center">品牌</td>
+        <td width="66" align="center">品名</td>
+        <td width="63" align="center">型号</td>
+        <td width="47" align="center">材质</td>
+        <td width="63" align="center">颜色</td>
+    	<td width="109" align="center">类型</td>
+    	<td width="120" align="center">该类型对应的尺寸</td>
+    	<td width="100" align="center">现有库存</td>
+		#set($count = 1)
+  </tr>
+	#end
+  <tr>
+	<td align="center">
+		#if($!sendGoodsInfo.middleImg)
+			<img src="http://image.lussomoda.com.cn:10000/$!sendGoodsInfo.middleImg"   width="120" height="120"/></td>
+		#else
+			<img src="../images/noimage_275_287.jpg"  width="100" height="100"/></td>
+		#end
+	#if($sendGoodsInfo.userRank.equals("e") || $sendGoodsInfo.userRank.equals("s"))
+    <td align="center">$!sendGoodsInfo.discountPrice</td>
+	#end
+	<td align="center">$!sendGoodsInfo.brand</td>
+    <td align="center">$!sendGoodsInfo.series</td>
+    <td align="center">$!sendGoodsInfo.type</td>
+    <td align="center">$!sendGoodsInfo.material</td>
+    <td align="center">$!sendGoodsInfo.color</td>
+
+
+
+	#if($sendGoodsInfo.hasStock == 1)
+			<td align="center"><span style="color:red">新增加</span></td>
+	#elseif($sendGoodsInfo.hasStock == 0)
+			<td align="center" <span style="color:red">已售完</span></td>
+	#elseif($sendGoodsInfo.hasStock == 2)
+        	<td align="center">增加</td>
+	#elseif($sendGoodsInfo.hasStock == 3)
+        	<td align="center">减少</td>
+	#end
+	
+	
+	<td align="center">
+		#if($!sendGoodsInfo.stock.size() == 0)
+			无
+		#else
+		<div style="border: 2px solid #CCCCCC;font:'微软雅黑'; font-size:12px"">
+		#foreach($map in $!sendGoodsInfo.stock.entrySet())
+			#if($map.key && $map.key != "")
+				尺寸:$map.key|个数：$map.value<br/>
+			#end
+		#end
+		</div>
+		#end
+	</td>
+	<td align="center">$!sendGoodsInfo.goodsNum</td>
+   </tr>
+  #end
+</table>
+
+
+
+
+

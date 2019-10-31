@@ -1,0 +1,178 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购管理 - 采购产品明细查询")
+
+<div class="main">
+<h2>采购管理 - 采购产品明细查询</h2>
+	<div class="searchBox">
+		<h3><span>搜索采购产品明细</span></h3>
+<form action="$appServer/stock/stock_detail_search.html" name="searchForm" method="post">
+		<table >
+			<tr >
+            	<th>产品编码：</th>
+				<td >
+					<input type="text" name="instanceCode" id="instanceCode" value="$!{queryObject.instanceCode}" size="15" theme=“simple" />
+                </td>
+				<th>产品名称：</th>
+				<td >
+					<input type="text" name="instanceName" id="instanceName" value="$!{queryObject.instanceName}" size="15" theme="simple" />
+                </td>
+			</tr>
+			<tr >
+            	<th>供应商：</th>
+				<td >
+					<input type="text" name="supplierName" id="supplierName" value="$!{queryObject.supplierName}" readonly/>
+            		<input type="hidden" name="supplierId" id="supplierId" value="$!{queryObject.supplierId}" readonly/>
+            		<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+            		<input type="button" value="清空" class="button" onclick="clearSupplier();"/>
+                </td>
+				<th>库存类型：</th>
+				<td >
+					<select name="storType" id="storType" theme="simple">
+						<option value="">-=请选择=-</option>
+						#foreach($s in $storTypeMap.entrySet())
+							<option value="$!{s.key}" #if($!{queryObject.storType} == ${s.key}) selected="true" #end>$!{s.value}</option>
+						#end
+                    </select>
+                </td>
+			</tr>
+			<tr >
+            	<th>采购时间：从</th>
+				<td >
+					<input type="text" name="startTime" id="startTime" value="$!{queryObject.startTime}" size="10" theme="simple" readonly="true" />
+                </td>
+				<th>到</th>
+				<td >
+					<input type="text" name="endTime" id="endTime" value="$!{queryObject.endTime}" size="10" theme="simple" readonly="true" />
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "startTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "endTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </td>
+			</tr>
+			<tr >
+				<th></th>
+    			<td >
+    				<input type="button" value=" 查询 " class="button"  onclick="javascript:formSubmit();"/>
+					<input type="button" value="Excel导出" class="button" onclick="javascript:doExport();"/>
+                </td>
+            </tr>
+        </table>
+	</form>
+</div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>采购订单号</th>
+        <th>供应商名称</th>
+        <th>采购时间</th>
+        <th>产品编码</th>
+		<th>产品名称</th>
+		<th>类目</th>
+		<th>属性</th>
+		<th>库存类型</th>
+		<th>单位</th>
+		<th>采购数量</th>
+		<th>验收数量</th>
+        <th>单价（￥）</th>
+        <th>应付金额（￥）</th>
+        <th>实付金额（￥）</th>
+      </tr>
+      #foreach($shopping in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td>&nbsp;$!shopping.shoppingNum</td>
+		<td>&nbsp;$!shopping.supplierName</td>
+        <td>&nbsp;$!date.format("yyyy-MM-dd",$!shopping.shoppingTime)&nbsp;</td>
+		<td>&nbsp;$!shopping.goodsInstanceCode</td>
+		<td>&nbsp;$!shopping.instanceName</td>
+		<td title="$!shopping.catCode">&nbsp;
+			#if ($!shopping.catCode.length()<20)
+				$!shopping.catCode
+			#else
+				$!controlUtil.getNoticesTitle($!shopping.catCode,20)
+			#end
+		 </td>
+         <td title="$!shopping.attrs">&nbsp;
+			#if ($!shopping.attrs.length()<20)
+				$!shopping.attrs
+			#else
+				$!controlUtil.getNoticesTitle($!shopping.attrs,20)
+			#end
+		 </td>
+		 <td>&nbsp;$!storTypeMap.get("${shopping.storType}")</td>
+		<td>&nbsp;$!shopping.units</td>
+		<td align="right">$!shopping.amount</td>
+		<td align="right">$!shopping.receiveNum</td>
+		<td align="right">$!moneyUtil.getFormatMoney($!shopping.unitPrice,'0.00')</td>
+        <td align="right">$!moneyUtil.getFormatMoney($!shopping.dueFee,'0.00')</td>
+		<td align="right">$!moneyUtil.getFormatMoney($!shopping.factFee,'0.00')</td>
+      </tr>
+	  #end
+    </table>
+	</div>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/stock_detail_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function clearSupplier(){
+		document.getElementById("supplierId").value="";
+		document.getElementById("supplierName").value="";
+	}
+
+	function sesp(){
+     	var ret = window.showModalDialog("$appServer/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}
+    }
+
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="$appServer/stock/export_shopping_detail_search.html";
+		form1.submit();
+		form1.action="$appServer/stock/stock_detail_search.html";
+	}
+		function formSubmit(){
+			var dateStart1=document.getElementById('startTime').value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById('endTime').value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+			document.getElementById('instanceName').value=document.getElementById('instanceName').value.trim();
+			document.getElementById('instanceCode').value=document.getElementById('instanceCode').value.trim();
+			document.getElementById('supplierId').value=document.getElementById('supplierId').value.trim();
+			document.getElementById('startTime').value=document.getElementById('startTime').value.trim();
+			document.getElementById('endTime').value=document.getElementById('endTime').value.trim();
+
+        	document.forms[0].submit();
+	    }
+</script>
+</body>

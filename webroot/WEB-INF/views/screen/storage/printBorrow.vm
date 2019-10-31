@@ -1,0 +1,159 @@
+#set($layout = "layout/print.vm")
+#set($title = "管理中心 - 打印单据")
+#set($base = true)
+<body>
+
+    <form id="form1" name="form1" action="$appServer/storage/printBorrow.html?moveCode=$!moveCode&&printType=$printType&countNum=$!{sumNum}" method="post">
+
+    <h1>
+		<span class="action-span"><a href="#" onclick="cl();" hidefocus="true" class="bt_wu">关闭</a></span>
+    	<span class="action-span"><a href="javascript:preview(1);" hidefocus="true" class="bt_wu">打印</a></span>
+
+    	<span class="action-span">每页条数
+    		<select name="pageNum" id="pageNum" onChange="submitForm();">
+    			<option value="1" #if("$!pageNum"=="1") selected #end>1</option>
+    			<option value="2" #if("$!pageNum"=="2") selected #end>2</option>
+    			<option value="3" #if("$!pageNum"=="3") selected #end>3</option>
+    			<option value="4" #if("$!pageNum"=="4") selected #end>4</option>
+    			<option value="5" #if("$!pageNum"=="5") selected #end>5</option>
+    			<option value="6" #if("$!pageNum"=="6") selected #end>6</option>
+    			<option value="7" #if("$!pageNum"=="7") selected #end>7</option>
+    			<option value="8" #if("$!pageNum"=="8") selected #end>8</option>
+    			<option value="9" #if("$!pageNum"=="9") selected #end>9</option>
+    			<option value="10" #if("$!pageNum"=="10") selected #end>10</option>
+    		</select>
+    	</span>
+    	<span class="action-span">字体大小
+    		<select name="fontSize" id="fontSize" onChange="submitForm();">
+    			<option value="2" #if("$!fontSize"=="2") selected #end>小</option>
+    			<option value="3" #if("$!fontSize"=="3") selected #end>中</option>
+    			<option value="4" #if("$!fontSize"=="4") selected #end>大</option>
+    		</select>
+    	</span>
+    </h1>
+    <div style="border-right: #DDF0FE 1px solid; border-top: #DDF0FE 1px solid; background: #eef8f9; border-left: #DDF0FE 1px solid; border-bottom: #DDF0FE 1px solid">
+    <div id="print">
+    	#set($titleSize=$fontSize + 1)
+    	#set($no=$!pageNum)
+    	#set($no_2=$no - 1)
+    	#set($pageSize=0)
+    	<table width="970" style="border: 1px solid #006699;border-collapse:collapse;">
+    			#if($query.items.size()%$no==0)
+    				#set($sumPageSize=$query.items.size()/$no)
+    			#else
+    				#set($sumPageSize=$query.items.size()/$no+1)
+    			#end
+
+    			#foreach($obj in $query.items)
+    				#set($count=$velocityCount - 1)
+    				#if($count%$no==0)
+    					#set($pageSize=$pageSize+1)
+    					#if($pageSize>1)
+    				<tr>
+            			<td height="20" colspan="7">&nbsp;&nbsp;</td>
+            		</tr>
+    					#end
+            		<tr>
+            			<td style="border: 1px solid #006699;" colspan="7">
+            				<table width="100%">
+            					<tr>
+    								#if("$!{printType}"=="move")
+    								<td colspan="8" align="center"><font size="$titleSize"><B>1858移库单</B></font></td>
+
+    								#elseif("$!{printType}"=="transfer")
+    								<td colspan="8" align="center"><font size="$titleSize"><B>1858外借单</B></font></td>
+
+    								#elseif("$!{printType}"=="moveReturn")
+    								<td colspan="8" align="center"><font size="$titleSize"><B>1858移库归还单</B></font></td>
+
+    								#elseif("$!{printType}"=="transferReturn")
+    								<td colspan="8" align="center"><font size="$titleSize"><B>1858外借归还单</B></font></td>
+    								#end
+            					</tr>
+                        		<tr>
+                        			<td width="400"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;日期：$!date.format('yyyy-MM-dd',${storageMoveLog.gmtCreate})</font></td>
+    								<td width="400"><font size="$fontSize">编号：$!{storageMoveLog.moveCode}</font></td>
+    								<td width="170" align="center"><font size="$fontSize">页码：$pageSize / $sumPageSize</font></td>
+                        		</tr>
+                        	</table>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品编码</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">产品名称</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">属性</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">单位</font></td>
+    					<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">数量</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">调出一级仓库及仓库及库位</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center"><font size="$fontSize">调入一级仓库及仓库及库位</font></td>
+            		</tr>
+    				#end
+
+            		<tr>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.code</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.instanceName</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!attributeManager.getFullAttributeStringByAttrs($!obj.attrs)</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.goodsUnit</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!obj.moveNum</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!{obj.oldDepLocationName}（$!{obj.oldDepFirstName},$!{obj.oldDepositoryName}）</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!{obj.depLocationName}（$!{obj.depFirstName},$!{obj.depositoryName}）&nbsp;</font></td>
+            		</tr>
+    				#if($velocityCount==$query.items.size())
+    				<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" align="center" colspan="4"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;合 &nbsp;&nbsp;&nbsp;&nbsp;计 &nbsp;&nbsp;&nbsp;&nbsp;</font></td>
+            			<td style="border: 1px solid #006699;background: #fff;"><font size="$fontSize">&nbsp;$!countNum</font></td>
+    					<td style="border: 1px solid #006699;background: #fff;">&nbsp;</td>
+    					<td style="border: 1px solid #006699;background: #fff;">&nbsp;</td>
+            		</tr>
+    				#end
+    				#if($count%$no==$no_2 || $velocityCount==$query.items.size())
+    				<tr>
+            			<td height="30" style="border: 1px solid #006699;background: #fff;" colspan="7">
+    						<font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;备注：</font>
+    					</td>
+            		</tr>
+            		<tr>
+            			<td style="border: 1px solid #006699;background: #fff;" colspan="7">
+            				<table width="100%">
+                        		<tr>
+    								#if("$!{printType}"=="move")
+                        			<td width="490"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;仓管：$!userName</font></td>
+            						<td width="480"><font size="$fontSize"></font></td>
+    								#else
+    								<td width="490"><font size="$fontSize">&nbsp;&nbsp;&nbsp;&nbsp;仓管：$!userName</font></td>
+            						<td width="480"><font size="$fontSize">外借人：</font></td>
+    								#end
+                        		</tr>
+                        	</table>
+            			</td>
+            		</tr>
+    				#end
+    			#end
+    	</table>
+    </div>
+    </div>
+	<h1>
+		<span class="action-span"><a href="#" onclick="cl();" hidefocus="true" class="bt_wu">关闭</a></span>
+    	<span class="action-span"><a href="javascript:preview(1);" hidefocus="true" class="bt_wu">打印</a></span>
+    </h1>
+    </form>
+
+<script >
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+
+	function cl(){
+		window.close();
+	}
+
+	function submitForm(){
+		document.getElementById('form1').submit();
+	}
+</script>
+
+</body>

@@ -1,0 +1,77 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>职务管理</h2>
+		#set($message = $request.getParameter('message'))
+		#if($!message)
+        <div class="mag-t2">
+			#if($!message && $!message == "insertrolesuccess")
+		                  新增角职务成功！
+	        #elseif($!message && $!message == "modifyrolesuccess")
+			       编辑职务成功！
+			#elseif($!message && $!message == "modifypersuccess")
+			       设置权限成功！
+			#end
+        </div>
+		#end
+		
+		#if($!adminAccess.has("A_ROLE_ADD_USER"))
+       <div class="tool">
+
+            <span><a href="/role/addRole.html?type=web" hidefocus="true" class="bt_add">新增</a></span>
+
+
+        </div>
+		#end
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>职务管理</span></h3>
+            <table >
+                <tr>
+                    <th>名称</th>
+                    <th>描述</th>
+                    ##<th>部门</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($role in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+						
+                    <td style="text-align:center;">$!{role.name}</td>
+                	<td style="text-align:center;">$!{role.display}</td>
+					##<td style="text-align:center;">$!{role.department.name}</td>
+                    <td style="text-align:center;">
+						#if("$!{role.status}" == "1")
+							正常
+						#else
+							禁用
+						#end
+					</td>
+                    <td>
+						#if($!adminAccess.has("A_ROLE_MODIFY_USER"))
+						<a href="$appServer/role/editRole.html?id=$!{role.id}&type=web">编辑</a>
+						#end
+						<a href="$appServer/role/roleAuthorityList.html?id=$!{role.id}">权限</a>
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/role/roleList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+        </div> <!-- 列表模块 END -->
+
+
+    </div>

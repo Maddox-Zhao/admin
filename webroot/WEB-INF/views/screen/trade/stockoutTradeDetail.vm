@@ -1,0 +1,669 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 缺货订单详情")
+
+#set($wholesaleshipping = ($trade.status && $trade.status == "wait_buyer_pay" && $trade.wholesaleStatus && $trade.wholesaleStatus =="wait_confirm" && $trade.payStatus && $trade.payStatus != 'paid'))
+
+<head>
+<script type="text/javascript">
+    var alertMsg = {
+    	"wscomfirm":"您确定要修改批发订单物流费用？",
+    	"shippingAmountValid":"请输入有效的批发订单物流价格",
+    	"shippingAmountMax":"您输入的批发订单物流费用过大  请核对后再修改",
+    	"wsModifySucess":"批发订单物流费用已成功修改",
+    	"ws_priceError":"总金额小于点卷折扣金额，请重新输入",
+    	"wsErrorOther":"无法修改物流费用，请重新登录后再修改",
+    	"ws_tradeIdNotNum":"订单号不是数字",
+    	"ws_depFirstIdNotNum":"一级仓库ID非法",
+    	"ws_depFirstIdIsNull":"请选择一级仓库",
+    	"ws_depositoryIsNull":"选择的一级仓库不存在",
+    	"ws_depositoryNotW":"选择的一级仓库不是批发类型",
+    	"ws_numberError":"输入的运费不符合规范"
+	}
+
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+        window.document.body.innerHTML=bdhtml;
+	}
+
+	function confirmMessage(){
+       var tradeId = $!trade.tid;
+       var smessage=document.getElementById("csMessage").value;
+       if( null==smessage||smessage=='')
+       {
+    	   alert("提交之前请输入您的留言信息");
+    	   return;
+       }
+       if(smessage.length>200)
+       {
+       	alert("您输入的留言太长");
+       	return
+       }
+	    document.form1.action="$appServer.get("/trade/messageConserve.html")";
+        document.form1.submit();
+	}
+
+	function modifyGoodsPrice(id,goodsCount){
+	var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	   var errMsg = '价格出错，请核对后再输入';
+		if(confirm("您确定要修改商品价格？")){
+			var afterModify = 				document.getElementById('goodsPrice_'+id).value;
+			if(!reg.test(afterModify)){
+				alert(errMsg);
+				return;
+			} else if (afterModify > 100000000) {
+				alert("您输入的商品价格过大，请核对后再修改");
+				return;
+			}
+
+									jQuery.get('modifyGoodsPriceJson.html',{param1:afterModify,param2:id},function(message){
+            var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		            var msgValueAmount = message.substring(message.indexOf("\',\'amount:") + 10, message.lastIndexOf(";goodsAmount:"));
+		            var msgValueGoodsAmount = message.substring(message.indexOf(";goodsAmount:") + 13, message.lastIndexOf(";tradeAmount:"));
+		            var msgValueTradeAmount = message.substring(message.indexOf(";tradeAmount:") + 13, message.lastIndexOf("\']"));
+            		if((msgType != null) && (msgType != '') && (msgType=='true')){
+			            var amountFirstSpan = document.getElementById('amountFirstSpan');
+			            var amountTwoSpan = document.getElementById('amountTwoSpan');
+
+			            if (msgValueAmount == null || msgValueAmount == '') {
+    			             amountFirstSpan.innerHTML="0.00";
+    			             amountTwoSpan.innerHTML="0.00";
+            } else {
+				                 amountFirstSpan.innerHTML=msgValueTradeAmount;
+    			             amountTwoSpan.innerHTML=msgValueAmount;
+            }
+					            var goodsAmountDis = document.getElementById('goodsAmountDis');
+			            if (msgValueGoodsAmount == null || msgValueGoodsAmount == '') {
+				                goodsAmountDis.innerHTML="0.00";
+			           } else {
+				                goodsAmountDis.innerHTML=msgValueGoodsAmount;
+			           }
+			           var goodsPrice = document.getElementById('goodsPriceDis_' + id);
+			           goodsPrice.innerHTML=(document.getElementById('goodsPrice_'+id).value * goodsCount).toFixed(2);;
+			           alert("商品价格已成功修改");
+		          }
+		            else if(msgType='numfalse'){
+		            alert("修改后价格不能低于成本价");
+		          }
+		          else if (msgType=='numberError'){
+			           alert(errMsg);
+		          } else if(msgType=='priceError'){
+		            alert("总金额小于点卷折扣金额，请重新输入");
+		          }else {
+			          alert("无法修改商品价格，请重新登录后再修改");
+		          }
+
+		    },'json');
+
+		 //	TradeAction.modifyGoodsPriceDwr(afterModify,id,function(msg){callBackModifyGoodsPrice(msg,goodsCount,id);});
+		}
+	}
+
+	function modifyShippingAmount(id){
+		if(confirm("您确定要修改物流费用？")){
+			var afterModify = document.getElementById('shippingAmount').value;
+	   var reg = /^[0-9]+.?[0-9]?$/;
+	   var errMsg = '请输入有效的物流价格';
+			if(!reg.test(afterModify)){
+				alert(errMsg);
+				return;
+			} else if (afterModify > 100000000) {
+				alert("您输入的物流费用过大，请核对后再修改");
+				return;
+			}
+			jQuery.get('$appServer.get("/trade/modifyShippingAmountJson.html")',{param1:afterModify,param2:id},function(message){
+			  callBackModifyShippingAmount(message);
+			},'json');
+		 //	TradeAction.modifyShippingAmountDwr(afterModify,id,function(msg){callBackModifyShippingAmount(msg);});
+		}
+	}
+
+	function callBackModifyShippingAmount(msg){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValueAmount = msg.substring(msg.indexOf("\',\'amount:") + 10, msg.lastIndexOf(";goodsPriceAcount:"));
+		var msgValueGoodsAmount = msg.substring(msg.indexOf(";goodsPriceAcount:") + 18, msg.lastIndexOf(";agentPrice:"));
+				var msgValueAgentAmount = msg.substring(msg.indexOf(";agentPrice:") + 11, msg.lastIndexOf("\']"));
+		if((msgType != null) && (msgType != '') && (msgType=='true')){
+			var amountFirstSpan = document.getElementById('amountFirstSpan');
+			var amountTwoSpan = document.getElementById('amountTwoSpan');
+			 var amountAgent = document.getElementById('amountAgent');
+			if (msgValueAmount == null || msgValueAmount == '') {
+    			amountFirstSpan.innerHTML="0.00";
+    			amountTwoSpan.innerHTML="0.00";
+            } else {
+				amountFirstSpan.innerHTML=msgValueGoodsAmount;
+    			amountTwoSpan.innerHTML=msgValueAmount;
+            }
+            if(amountAgent!=null){
+            	amountAgent.innerHTML=msgValueAgentAmount;
+            }
+			alert("物流费用已成功修改");
+		} else if (msgType=='numberError'){
+			alert(errMsg);
+		} else if(msgType=='priceError'){
+		    alert("总金额小于点卷折扣金额，请重新输入");
+		} else {
+			alert("无法修改物流费用，请重新登录后再修改");
+		}
+	}
+
+	function isPriceNumber(val) {
+	   	var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	   var errMsg = '价格出错，请核对后再输入';
+	  if(!reg.test(val)){
+	  	alert(errMsg);
+	  }
+	}
+
+	function isPriceNumberTwo(val) {
+	   var reg = /^[0-9]+.?[0-9]?$/;
+	   var errMsg = '请输入有效的物流价格';
+	  if(!reg.test(val)){
+	  	alert(errMsg);
+	  }
+	}
+
+	function modifyWsShippingAmount(id){//修改批发订单的一级仓库和运费
+	 if(confirm(alertMsg.wscomfirm)){
+	     var afterModify = document.getElementById('wsShippingAmount').value;
+		 var depFirstId= document.getElementById('trade.depFirstId').value;
+	     var reg = /^[0-9]+.?[0-9]?$/;
+		 if(!reg.test(afterModify)){
+			alert(alertMsg.shippingAmountValid);
+			return;
+		  } else if (afterModify > 100000000) {
+			alert(alertMsg.shippingAmountMax);
+			return;
+		}
+
+		if(depFirstId==null || depFirstId==''){
+		    alert(alertMsg.ws_depFirstIdIsNull);
+			return;
+		}
+
+		var tradeId = id;
+		var regInt = /^[0-9]+$/;
+		if(!reg.test(tradeId)){
+			alert(alertMsg.shippingAmountValid);
+			return;
+		}
+			jQuery.get('$appServer.get("/trade/modifyWsShippingAmountJson.html")',{modifyAmount:afterModify,tradeId:id,depFirstId:depFirstId},function(message){
+			callBackWsShippingModify(message);
+			},'json');
+	  }
+	}
+
+	function callBackWsShippingModify(msg){
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+		var msgValueAmount = msg.substring(msg.indexOf("\',\'amount:") + 10, msg.lastIndexOf(";goodsPriceAcount:"));
+		var msgValueGoodsAmount = msg.substring(msg.indexOf(";goodsPriceAcount:") + 18, msg.lastIndexOf(";agentPrice:"));
+				var msgValueAgentAmount = msg.substring(msg.indexOf(";agentPrice:") + 11, msg.lastIndexOf("\']"));
+		if((msgType != null) && (msgType != '') && (msgType=='true')){
+			var amountFirstSpan = document.getElementById('amountFirstSpan');
+			var amountTwoSpan = document.getElementById('amountTwoSpan');
+			 var amountAgent = document.getElementById('amountAgent');
+			if (msgValueAmount == null || msgValueAmount == '') {
+    			amountFirstSpan.innerHTML="0.00";
+    			amountTwoSpan.innerHTML="0.00";
+            } else {
+				amountFirstSpan.innerHTML=msgValueGoodsAmount;
+    			amountTwoSpan.innerHTML=msgValueAmount;
+            }
+       if(amountAgent!=null){
+          amountAgent.innerHTML=msgValueAgentAmount;
+        }
+			alert(alertMsg.wsModifySucess);
+		} else if(msgType=='false'){
+			alert(alertMsg.wsErrorOther);
+		} else {
+		   var msgTitle = getMsgTitle(msgType);
+		   alert(msgTitle);
+		}
+	}
+
+	function getMsgTitle(msg){
+	  var msgTitle = msg;
+	  msgTitle = alertMsg['ws_'+msgTitle];
+	  return msgTitle;
+	}
+
+	function modifyGoodsNumber(orderId){
+		var goodsModify = document.getElementById('goodsNumber_'+orderId).value;
+	    if (isNaN(goodsModify) || goodsModify < 1) {
+		     alert('商品的数量必须是数字！并且商品的数量必须大于0！');
+		     return;
+	    }
+		if(confirm("您确定要修改商品数量？")){
+		  jQuery.post('$appServer.get("/trade/checkGoodsNumber.html")',{param1:orderId,param2:goodsModify},function(message){
+            if(message.indexOf("success") > -1){
+			   window.location.href = '$appServer.get("/trade/detail.html").addQueryData("tradeId", $trade.tid)';
+		    }else{
+			   alert("商品数量小于最小起批量！");
+			   return;
+		    }
+		  },'json');
+		}
+	}
+
+	$(function(){
+		$("#logistics").click(function(){
+			var params="regionCodeEndSel=$!trade.district&paymentTempSel=payment_first&goodsWeightTotal=&depositoryFirstId=$!trade.depFirstId&tradeId=$!trade.id";
+			jQuery.ajax({
+		         type:"get",
+		         url: 'disExpressSel.html',
+		         dataType: "json",
+		         data:params,
+		         success:function(data){
+		         	if(data!=""){
+			         	if(data.error!="error"){
+				         	$("#log").html("");
+				         	for(var i = 0 ; i < data.length; i++){
+				         		$("#log").append("<div><input type=\"radio\" id=\"rad\" name=\"rad\" value=\""+data[i].expressId+"\" />"+data[i].expressName+"</div>");
+				         	}
+				         	$("#saveExpress").attr("disabled","");
+			         	}else{
+			         		alert(data.msg);
+			         	}
+			        }
+		         }
+			});
+		});
+
+		$("#saveExpress").click(function(){
+			var rad = $(":radio:checked");
+			if(rad.val()!=undefined){
+				jQuery.ajax({
+			         type:"get",
+			         url: 'saveExpress.html',
+			         dataType: "json",
+			         data:"tradeId=$!trade.id&expressId="+rad.val(),
+			         success:function(data){
+			         	if(data.success=="success"){
+			         	 	alert(data.msg);
+			         	 	$("#log").html($(rad).parent().text());
+			         	 	$("#saveExpress").attr("disabled","disabled");
+			         	 	$("#logistics").attr("disabled","disabled");
+			         	}else if(data.error=="error"){
+				         	alert(data.msg);
+			         	}
+			         }
+				});
+			}else{
+				alert("请选择物流!");
+			}
+		});
+
+	});
+</script>
+</head>
+
+
+<body>
+<div class="main">
+	<h2>管理中心-缺货订单详情</h2>
+
+	<div class="tool">
+		<span><a href="javascript:history.go(-1);" hidefocus="true" class="bt_ren">返回</a></span>
+		<span><a href="javascript:preview(1);" hidefocus="true" class="bt_par">打印</a></span>
+	</div>
+
+	<form name="form1" id="form1" method="post">
+		<span id="print">
+    		<div class="formBox">
+        		<h3><i></i><span>订单信息</span></h3>
+    			<div class="content">
+        			<table class="c6">
+    					<tr>
+        					<th>订单号：</th>
+            			    <td>$!trade.tid</td>
+            			    <th>订单金额：</th>
+            			    <td>￥<span id="amountFirstSpan">$!moneyUtil.getFormatMoney($math.add($!trade.goodsAmount,$!trade.shippingAmount),'0.00')</span></td>
+        				</tr>
+    					<tr>
+        					<th>订单状态：</th>
+            			    <td>$!enumTradeStatusMap.get("$!trade.status")</td>
+            			    <th>支付状态：</th>
+            			    <td>
+        						#if("$trade.payStatus" == "no_pay")
+        							未付款 
+        						#elseif("$trade.payStatus" == "paid")
+        							已付款
+        						#end
+        					</td>
+    					</tr>
+    					<tr>
+        					<th>下单时间：</th>
+        					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.gmtCreate)</td>
+        					<th>支付时间：</th>
+        					<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $trade.payTime)</td>
+        				</tr>
+    					<tr>
+    						<th>使用积分：</th>
+    						<td>$!trade.userPoint</td>
+    						<th>
+    							#if(${trade.interTid})
+    								外部订单号：
+    							#else
+    								赠送积分：
+    							#end
+    						</th>
+    						<td>
+    							#if(${trade.interTid})
+    								$!{trade.interTid}
+    							#else
+    								$!trade.sendPoint
+    							#end
+    						</td>
+    					</tr>
+    					#*
+    					<tr>
+    						<td><div align="right"><strong>使用点卷：</strong></div></td>
+    						<td>$!trade.ticketAmount</td>
+    						<td><div align="right"><strong>点卷优惠金额：</strong></div></td>
+    						<td>$!math.mul($!trade.ticketAmount,$!rate)</td>
+    					</tr>
+    					*#
+        		  	</table>
+    			</div>
+    
+    			<h4><span>商品列表</span></h4>
+    			<div class="content">
+    				<table class="c6">
+        				<tr>
+        					<th>商品名称</th>
+        					<th>编码</th>
+        					<th>选购属性</th>
+        					<th>商品价格</th>
+        					<th>购买数量</th>
+        					<th>小计</th>
+        					<th>商品库存情况</th>
+    					#*
+        				#if("$trade.type" == "2" && "$trade.expressPayment" == "goods_first")
+        					<th>代收金额</th>
+        				#else
+        					<th>&nbsp;</th>
+        				#end
+        				*#
+        				</tr>
+    					#set($goodsPriceAcount = 0)
+    					#set($marketPriceAcount = 0)
+    					#foreach($order in $orderList)
+    						#set( $goodsAcount = $moneyUtil.mul($order.goodsNumber,$order.goodsPrice))
+    						#set( $goodsPriceAcount = $moneyUtil.add( $goodsPriceAcount,$goodsAcount))
+    						#set( $marketPriceAcount = $moneyUtil.add($marketPriceAcount,$moneyUtil.mul($order.goodsNumber,$order.marketPrice)))
+                            <tr>
+            					<td>
+            						<a href="$!{liangpin99Server}/l/gdetail_$!{order.goodsId}.htm" target="_blank">$!order.goodsTitle</a>
+            					</td>
+            					<td>$!order.goodsSn</td>
+            					<td>$!order.buyAttr</td>
+            			##	#if($trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods") && $trade.payStatus && $trade.payStatus != 'paid')
+            			##		<td>
+            			##			￥
+            			##			<input type="text" name="goodsPrice_${order.id}" id="goodsPrice_${order.id}" value="$!moneyUtil.getFormatMoney($!order.goodsPrice,'0.00')" onblur="javascript:isPriceNumber(this.value);" size="8"/>
+            			##			&nbsp;&nbsp;&nbsp;&nbsp;
+            			##			<input type="button" value="修改商品价格" onclick="javascript:modifyGoodsPrice('$!order.id','$!order.goodsNumber');"/>
+            			##		</td>
+            			##	#else
+            					<td align="center" class="r">￥$!moneyUtil.getFormatMoney($!order.goodsPrice,'0.00')</td>
+            			##	#end
+        					#if($trade.isWholesale && $trade.isWholesale=="w" && $trade.status && ($trade.status == "wait_buyer_pay" || $trade.status == "wait_seller_send_goods") && $trade.payStatus && $trade.payStatus != 'paid')
+        						<td>
+        							<input type="text" name="goodsNumber_${order.id}" id="goodsNumber_${order.id}" value="$!order.goodsNumber" size="8"/>
+        							<input type="button" value="修改商品数量" onclick="javascript:modifyGoodsNumber('$!order.id');"/>
+        						</td>
+        					#else
+        						<td align="center">$!order.goodsNumber (件|个)</td>
+        					#end
+        						<td align="center" class="r">￥<span id="goodsPriceDis_${order.id}">$!moneyUtil.getFormatMoney($math.mul($order.goodsPrice,$order.goodsNumber),'0.00')</span></td>
+        						<td align="center" class="r">
+        						#foreach($storage in ${order.storagelist})
+        							<label>$!depositoryNameMap.get($!storage.depFirstId) -&gt; $!storage.depositoryName</label>($!storage.storageNumSum)<br/>
+        						#end
+        						</td>
+        						#*
+            					<td align="center" class="r">
+            					#if($!order.agentSellPrice)
+            						￥$!moneyUtil.getFormatMoney($!order.agentSellPrice,'0.00')
+            					#end
+            					</td>
+            					*#
+        					</tr>
+    					#end
+        		  	</table>
+    			</div>
+    
+    		#if($packageMap && $packageMap.size() > 0)
+        		<h4><span>套餐列表</span></h4>
+        		<div class="content">
+        			<table class="c6">
+        				<tr>
+        					<th>套餐名称</th>
+        					<th>商品[选购属性]</th>
+        					<th>合计价</th>
+        					<th>套餐价</th>
+        					<th>套餐数量</th>
+        					<th>本套餐合计</th>
+        				</tr>
+        			#foreach($packages in $!packageMap.entrySet())
+        				<tr>
+        					<td align="center">$!packages.key.name</td>
+        					<td align="center">
+        					#foreach($p in $packages.value)
+        						<a href="$!{liangpin99Server}/l/gdetail_$!{p.goodsId}.htm" target="_blank">$stringUtil.abbreviate($!{p.goodsTitle},15)</a>
+        						$!p.goodsSn
+        						#if("$!{p.buyAttr}" != "")
+        							&nbsp;&nbsp;[$!p.buyAttr]
+        						#end
+        						<br/>
+        					#end
+        					</td>
+        					<td align="center" class="r">￥$!moneyUtil.getFormatMoney($!packages.key.goodsAmount, '0.00')</td>
+        					<td align="center" class="r">￥$!moneyUtil.getFormatMoney($!packages.key.packageAmount, '0.00')</td>
+        					<td align="center">$!packages.key.number 个</td>
+        					<td align="center" class="r">￥$!moneyUtil.getFormatMoney($math.mul($!packages.key.packageAmount, $!packages.key.number), '0.00')</td>
+        				</tr>
+        				#set($packageAcount = $moneyUtil.mul($!packages.key.packageAmount, $!packages.key.number))
+        				#set($goodsPriceAcount = $moneyUtil.add($goodsPriceAcount, $!packageAcount))
+        			#end
+        			</table>
+                </div>
+        	#end
+    
+        		<div class="content">
+        			<table class="c6">
+        				<tr>
+        					<th>商品总价：</th>
+        					<td>￥<span id="goodsAmountDis">$!moneyUtil.getFormatMoney($!goodsPriceAcount, '0.00')</span></td>
+        					<th>实付金额：</th>
+        					<td>￥<span id="amountTwoSpan">$!moneyUtil.getFormatMoney($!trade.amount, '0.00')</span></td>
+        					#*
+        					#if("$!trade.type" == "2" && "$trade.expressPayment" == "goods_first")
+        					<th>代收总金额:</th>
+        					<td>￥<span id="amountAgent">$!moneyUtil.getFormatMoney($moneyUtil.add($trade.agentSellAmount, $trade.shippingAmount), '0.00')</span></td>
+        					#end
+        					*#
+        				</tr>
+        			</table>
+        		</div>
+    
+        		<h4><span>收货人信息</span></h4>
+        		<div class="content">
+        			<table class="c6">
+        				<tr>
+        					<th>收货人：</th>
+        					<td>$!trade.receiver</td>
+        					<th>地址：</th>
+        					<td>$!{address}</td>
+        				</tr>
+        				<tr>
+        					<th>邮编：</th>
+        					<td>$!{trade.zipcode}</td>
+        					<th>移动电话：</th>
+        					<td>$!{trade.mobile}</td>
+        				</tr>
+                    </table>
+                </div>
+    
+    			<h4><span>支付信息</span></h4>
+        		<div class="content">
+    				<table class="c6">
+        				<tr>
+        					<th>支付方式：</th>
+        					<td>
+        						#if("$trade.expressPayment" == "goods_first")
+        							货到付款
+        						#elseif("$trade.expressPayment" == "period_pay")
+        							周期结算
+        						#else
+        							网上支付
+        						#end
+        					</td>
+        					<th>支付平台：</th>
+        					<td>
+        						#if("$trade.payment.toLowerCase()" == "alipay")
+        							支付宝
+        						#elseif("$trade.payment.toLowerCase()" == "chinabank")
+        							网银在线
+        						#elseif("$trade.payment.toLowerCase()" == "tenpay")
+        							财付通
+        						#elseif("$trade.payment.toLowerCase()" == "payease")
+        							首信易
+        						#elseif("$trade.payment.toLowerCase()" == "icbc")
+        							工商银行
+        						#elseif("$trade.payment.toLowerCase()" == "yezf")
+        							余额支付
+        						#end
+        					</td>
+        				</tr>
+                    </table>
+                </div>
+    		## 如果该笔订单(淘宝同步订单)在熙浪后台ERP中的状态是等待买家付款，则该笔订单物流金额可以修改，如果该笔订单状态为等待卖家配货，则物流金额不可修改，只能查看。
+        	## 以下代码针对分销平台
+        	#if("${trade.tradeType}" == "4")
+    			<h4><span>物流选择</span></h4>
+    			<div class="content">
+    				<table class="c6">
+        				<tr>
+        					<th>物流公司选择：</th>
+        					<td id="log"></td>
+        					<td colspan="4">
+        						<input type="button" id="logistics" name="logistics" value="物流选择" />
+        						<input type="button" id="saveExpress" name="saveExpress" value="保存" disabled="disabled" />
+        					</td>
+        				</tr>
+                    </table>
+    			</div>
+    		#end
+    
+    		#if(!$trade.isWholesale || ("$trade.isWholesale" == "n"))
+    			#if($trade.expressName)
+    			<h4><span>物流信息</span></h4>
+    			<div class="content">
+    				<table class="c6">
+        				<tr>
+        					<th>物流公司：</th>
+        				#if("${trade.tradeType}" != "4" && ("$trade.status" == "wait_buyer_pay" || "$trade.status" == "wait_seller_send_goods"))
+            				<td>
+        						<select name="expressId" id="expressId" >
+        						#foreach($obj in $expressInfoList)
+        							<option value="$!{obj.id}" #if("$!{trade.expressId}"=="$!{obj.id}") selected #end>$!obj.expressName</option>
+        						#end
+        						</select>
+        						<input type="button" onclick="javascript:modifyExpress('$!trade.tid');" value="保存" />
+        					</td>
+        				#else
+        					<td >$!trade.expressName</td>
+        				#end
+        					<th>物流费用：</th>
+        				#if(("$trade.status" == "wait_buyer_pay" || "$trade.status" == "wait_seller_send_goods") && $trade.payStatus && $trade.payStatus != "paid")
+        					<td>
+        						￥<input type="text" name="shippingAmount" id="shippingAmount" value="$!moneyUtil.getFormatMoney($!trade.shippingAmount,'0.0')" onblur="javascript:isPriceNumberTwo(this.value);" size="10"/>
+        						&nbsp;&nbsp;&nbsp;&nbsp;
+        						<input type="button" value="修改物流费用" onclick="javascript:modifyShippingAmount('$!trade.id');"/>
+        					</td>
+        				#else
+        					<td>&nbsp; ￥$!moneyUtil.getFormatMoney($!trade.shippingAmount, '0.0')</td>
+        				#end
+        				#if($!trade.expressCode)
+        					<th>物流单号：</th>
+        					<td>$!trade.expressCode</td>
+        				#else
+        					<td>&nbsp;</td>
+        					<td>&nbsp;</td>
+        				#end
+        				</tr>
+        				<tr>
+        					<th>订单总重量：</th>
+        					<td>$!trade.totalWeight</td>
+        					<th>物流重量信息：</th>
+        					<td>首重&nbsp;$!moneyUtil.getFormatMoney($!trade.weightFirst,'0.00')，首重价格&nbsp;$!trade.weightFirstMoney；续重&nbsp;$!moneyUtil.getFormatMoney($!trade.weightNext,'0.00')，续重价格&nbsp;$!trade.weightNextMoney</td>
+        					<td>&nbsp;</td>
+        					<td>&nbsp;</td>
+        				</tr>
+    				</table>
+    			</div>
+        		#end
+    	    #elseif("$trade.isWholesale" == "w")
+    			<h4><span>物流信息</span></h4>
+    			<div class="content">
+    				<table>
+    					<tr>
+    						<th><span class="require-field">*</span>一级仓库：</th>
+    					#if($wholesaleshipping)
+    						<td>
+    							<select name="trade.depFirstId" id="trade.depFirstId">
+        							<option value="">请选择....</option>
+        						#foreach($depFirst in $depositoryFirstList)
+        							<option value="$!{depFirst.id}" #if("$!{trade.depFirstId}" == "${depFirst.id}") selected="true" #end>$!{depFirst.depFirstName}</option>
+        						#end
+        						</select>
+        					</td>
+        				#else
+        					<td>
+        						#foreach($depFirst in $depositoryFirstList)
+        							#if($!{trade.depFirstId} == ${depFirst.id})
+        								$!{depFirst.depFirstName}
+        							#end
+        						#end
+        					</td>
+        				#end
+        					<th><span class="require-field">*</span>物流费用：</th>
+        				#if($wholesaleshipping)
+        					<td>
+        						￥<input type="text" name="shippingAmount" id="wsShippingAmount" value="$!moneyUtil.getFormatMoney($!trade.shippingAmount,'0.0')" onblur="javascript:isPriceNumberTwo(this.value);" size="10"/>
+        						&nbsp;&nbsp;&nbsp;&nbsp;
+        						<input type="button" value="修改物流费用" onclick="javascript:modifyWsShippingAmount('$!trade.id');"/>
+        					</td>
+        				#else
+        					<td>￥$!moneyUtil.getFormatMoney($!trade.shippingAmount,'0.0')</td>
+        				#end
+        				</tr>
+                    </table>
+                </div>
+    		#end
+    			<h4><span>其他信息</span></h4>
+    			<div class="content">
+    				<table class="c6">
+    					<tr>
+    						<th>发票抬头:</th>
+    						<td>$!trade.invoiceName</td>
+    						<th>买家订单备注：</th>
+    					#if($trade.memo)
+    						<td>$!trade.buyerNote</td>
+    						<th>修改价格记录：</th>
+    						<td>$!trade.memo</td>
+    					#else
+    						<td>$!trade.buyerNote</td>
+    					#end
+    					</tr>
+    				</table>
+    			</div>
+			</div>
+		</span>
+	</form>
+	
+</div>
+</body>

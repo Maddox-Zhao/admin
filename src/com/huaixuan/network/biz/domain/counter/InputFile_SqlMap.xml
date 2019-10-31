@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="InputFileSQL">
+<typeAlias alias="InputFile" type="com.huaixuan.network.biz.domain.counter.InputFile"/>
+<typeAlias alias="inputFileSearchBean" type="com.huaixuan.network.biz.domain.counter.InputFileSearchBean"/>
+<typeAlias alias="baseBankPayOnline" type="com.huaixuan.network.biz.domain.base.payment.BaseBankPayOnline"/>
+
+   <resultMap class="InputFile" id="InputFileResult">
+		<result column="BATCH_ID" property="batchId"/>
+		<result column="OPERATE_TYPE" property="operateType"/>
+		<result column="BANK_TYPE" property="bankType"/>
+		<result column="WAIT_DEAL_COUNT" property="waitDealCount"/>
+		<result column="STATUS" property="status"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_DEAL_DATE" property="gmtDealDate"/>
+		<result column="DEAL_OPERATOR" property="dealOperator"/>
+		<result column="GMT_MODIFIED" property="gmtModified"/>
+		<result column="FILE_NAME" property="fileName"/>
+	</resultMap>
+	
+	<!-- 银行订单全字段 -->
+	<resultMap class="baseBankPayOnline" id="bankPayOnlineResult">
+		<result column="ID" property="id" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="PAY_DEST" property="payDest" />
+		<result column="INNER_BILL_NO" property="innerBillNo" />
+		<result column="INNER_DATE" property="innerDate" />
+		<result column="GMT_CREATE" property="gmtCreate" />
+		<result column="BANK_TYPE" property="bankType" />
+		<result column="PAY_DATE" property="payDate" />
+		<result column="PAYMENT_TYPE" property="paymentType" />
+		<result column="BANK_BILL_NO" property="bankBillNo" />
+		<result column="PAY_AMOUNT" property="payAmount" />
+		<result column="REAL_AMOUNT" property="realAmount" />
+		<result column="IS_SUCCEED" property="isSucceed" />
+		<result column="IS_CHECK" property="isCheck" />
+		<result column="CHECK_USER" property="checkUser" />
+		<result column="CHECK_DATE" property="checkDate" />
+		<result column="BANK_TRANS_DATE" property="bankTransDate" />
+		<result column="BANK_AUTH_NO" property="bankAuthNo" />
+		<result column="BANK_SERIAL_NO" property="bankSerialNo" />
+		<result column="BANK_ERROR_CODE" property="bankErrorCode" />
+		<result column="ORDER_SEQ" property="orderSeq" />
+		<result column="FLAG_COMPARE" property="flagCompare" />
+		<result column="GMT_MODIFIED" property="gmtModified" />
+		<result column="GMT_TO_BANK" property="gmtToBank" />
+		<result column="OUT_ACCOUNT_NO" property="outAccountNo" />
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.counter.BankCompareItem" id="BankCompareItemReResult">
+		<result column="BANK_BILL_NO" property="bankBillNo"/>
+		<result column="RECOUNT" property="recount"/>
+	</resultMap>
+	
+		
+<!-- 得到导入文件批次表seq的值 -->	
+<select id="getInputFileSeq" resultClass="java.lang.Long">
+<![CDATA[
+		SELECT max(a.id)+1 FROM ep_input_file a 
+]]>
+</select>	
+	
+<!-- create InputFile object -->
+<insert id="addInputFile" parameterClass="InputFile">
+<![CDATA[
+		insert into ep_input_file
+		(BATCH_ID,OPERATE_TYPE,BANK_TYPE,WAIT_DEAL_COUNT,STATUS,GMT_CREATE,GMT_DEAL_DATE,DEAL_OPERATOR,GMT_MODIFIED,FILE_NAME )values( #batchId#,
+		#operateType#,
+		#bankType#,
+		#waitDealCount#,
+		#status#,
+		sysdate(),
+		sysdate(),
+		#dealOperator#,
+		sysdate(),
+		#fileName#
+		)
+]]>
+</insert>
+
+
+<!-- 文件批次表查询 -->	
+<select id="getInputFileByParameterMap" resultMap="InputFileResult" parameterClass="java.util.Map">
+	
+	<![CDATA[
+		select ep_input_file.* from ep_input_file 
+	]]>
+	<dynamic prepend="where" >
+	    <isNotEmpty prepend="and" property="batchId">
+			<![CDATA[BATCH_ID= #batchId#]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="datestart">
+			<![CDATA[GMT_CREATE>=STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateend">
+			<![CDATA[GMT_CREATE<= DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="operateType">
+			<![CDATA[OPERATE_TYPE= #operateType#]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bankType">
+			<![CDATA[BANK_TYPE= #bankType#]]>
+		</isNotEmpty>
+	</dynamic>
+	order by ep_input_file.BATCH_ID desc
+	<isNotEmpty property="startRow" >
+		<isNotEmpty property="endRow" >
+			<![CDATA[ LIMIT #startRow#,#endRow# 
+	        ]]>
+         </isNotEmpty>
+    </isNotEmpty> 
+</select>
+
+
+<!-- 计算文件批次表count -->	
+<select id="getInputFileByParameterMapCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+	<![CDATA[
+		select count(*) from ep_input_file  
+	]]>
+	<dynamic prepend="where" >
+	    <isNotEmpty prepend="and" property="batchId">
+			<![CDATA[BATCH_ID= #batchId#]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="datestart">
+			<![CDATA[GMT_CREATE>=STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateend">
+			<![CDATA[GMT_CREATE<= DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="operateType">
+			<![CDATA[OPERATE_TYPE= #operateType#]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="bankType">
+			<![CDATA[BANK_TYPE= #bankType#]]>
+		</isNotEmpty>
+	</dynamic>
+</select>
+
+
+				<!-- 查询该批次重复的银行订单号sql  2010.9.3 cw-->	
+				<select id="BANK_COMPARE_EQUAL_BANKBILLNO" resultMap="BankCompareItemReResult" parameterClass="InputFile">
+				Select bank_bill_no, count(1) recount
+				                         from ep_bank_compare_item 
+				                        where batch_id = #batchId#
+				                        group by bank_bill_no
+				                       having count(1) > 1
+				</select>
+				
+				<!-- 删除该批次重复的银行订单号sql 2010.9.3 cw-->	
+				<delete id="BANK_COMPARE_DELETE_EQUAL_BANKBILLNO" parameterClass="InputFile">
+				 delete ep_bank_compare_item
+				 where bank_bill_no = (select a.bank_bill_no
+				                         from ep_bank_compare_item a
+				                        where a.batch_id = #batchId#
+				                        group by a.bank_bill_no
+				                       having count(1) > 1)
+				 and batch_id = #batchId#
+				</delete>
+
+<!-- 修改，银行成功，系统未成功的处理sql -->	
+  <update id="BANK_COMPARE_UPDATE_NOT_EQUAL_SUCC" parameterClass="inputFileSearchBean">
+	   Update ep_bank_pay_online a
+	           SET (a.REAL_AMOUNT, a.PAY_DATE, a.BANK_SERIAL_NO,
+		            a.IS_CHECK, a.IS_SUCCEED,a.FLAG_COMPARE, a.CHECK_USER, a.GMT_MODIFIED
+        	        ) =
+		       (SELECT b.PAY_AMOUNT, STR_TO_DATE(b.PAY_DATE,'%Y%m%d %H%i%s'),b.BANK_BILL_NO, 
+		               'N', 'Y', 'F', #operator#, sysdate()
+             	        FROM ep_bank_compare_item b
+            	        WHERE a.BANK_BILL_NO = b.BANK_BILL_NO  
+              		     AND a.BANK_TYPE = #bankType#  
+                         AND a.IS_SUCCEED &lt;> 'Y'   
+                         AND a.FLAG_COMPARE IS NULL 
+                        AND b.BATCH_ID = #batchId#        
+                        <isNotEmpty  property="datestart">   
+                         AND b.GMT_CREATE >=  STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')
+                        </isNotEmpty>
+                        <isNotEmpty  property="dateend">  
+                        AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+                        </isNotEmpty>
+                )
+ 	     WHERE ROWID IN (
+               SELECT a.ROWID
+               FROM ep_bank_pay_online a, ep_bank_compare_item b
+               WHERE a.BANK_BILL_NO = b.BANK_BILL_NO 
+               AND b.BATCH_ID = #batchId#   
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+               </isNotEmpty>
+
+               AND a.BANK_TYPE = #bankType#  
+               AND a.IS_SUCCEED &lt;> 'Y'   
+               AND a.FLAG_COMPARE IS NULL)  
+  </update>
+  
+  
+  <!-- 修改，银行成功，系统成功，但是金额不等的处理sql-->	
+  <update id="BANK_COMPARE_UPDATE_EQUAL_SUCC" parameterClass="inputFileSearchBean">
+	  UPDATE ep_bank_pay_online a
+   		SET a.IS_CHECK = 'N',
+       		a.FLAG_COMPARE = 'U',
+       		a.CHECK_USER = #operator#,
+		    a.GMT_MODIFIED = sysdate()
+ 	  WHERE ROWID IN (
+          	SELECT a.ROWID
+            	FROM ep_bank_pay_online a, ep_bank_compare_item b
+             	WHERE a.BANK_TYPE = #bankType#
+             	AND a.IS_SUCCEED = 'Y'
+             	AND a.FLAG_COMPARE IS NULL
+             	AND a.BANK_BILL_NO = b.BANK_BILL_NO
+             	AND a.PAY_AMOUNT &lt;> b.PAY_AMOUNT
+                AND b.BATCH_ID = #batchId#
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+               </isNotEmpty>
+               )
+  </update>
+
+
+
+
+  <!-- 生成对账报表，统计两边成功的条数的处理sql-->	
+  <select id="BANK_COMPARE_SUM_EQUAL_SUCC" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  	SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_bank_pay_online a, 
+      	        ep_bank_compare_item b
+                WHERE a.BANK_BILL_NO = b.BANK_BILL_NO
+                AND a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.PAY_AMOUNT = b.PAY_AMOUNT
+                AND a.FLAG_COMPARE is null
+                AND b.BATCH_ID = #batchId#
+                <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+               </isNotEmpty>
+  </select>
+  
+  
+  
+  
+    <!-- 生成对账报表，统计两边待处理和金额不等条数的处理sql-->	
+  <select id="BANK_COMPARE_SUM_NOT_EQUAL_SUCC" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  	SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_bank_pay_online a, 
+      	        ep_bank_compare_item b
+                WHERE a.BANK_BILL_NO = b.BANK_BILL_NO
+                AND a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND (a.FLAG_COMPARE = 'U' or a.FLAG_COMPARE = 'F')
+                AND b.BATCH_ID = #batchId#
+                <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+               </isNotEmpty>
+  </select>
+  
+  
+    <!-- 生成对账报表，统计两边待处理条数的处理sql  2010.9.3 cw-->	
+  <select id="BANK_COMPARE_WAITE_DEAL_COUNT" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  	SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_bank_pay_online a, 
+      	        ep_bank_compare_item b
+                WHERE a.BANK_BILL_NO = b.BANK_BILL_NO
+                AND a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.FLAG_COMPARE = 'F'
+                AND b.BATCH_ID = #batchId#
+                <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+               </isNotEmpty>
+  </select>
+  
+  
+   <!-- 生成对账报表，统计两边金额不等条数的处理sql   2010.9.3 cw-->	
+  <select id="BANK_COMPARE_SUM_NOT_EQUAL_COUNT" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  	SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_bank_pay_online a, 
+      	        ep_bank_compare_item b
+                WHERE a.BANK_BILL_NO = b.BANK_BILL_NO
+                AND a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.FLAG_COMPARE = 'U'
+                AND b.BATCH_ID = #batchId#
+                <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') 
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+               </isNotEmpty>
+  </select>
+  
+      <!-- 生成对账报表，统计两边待处理条数的处理sql(银行)-->	
+  <select id="BANK_COMPARE_SUM_WAIT_DEAL" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">              
+   SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_bank_pay_online a
+                WHERE 
+                a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.FLAG_COMPARE = 'F'
+                
+            <!-- 如果扣款时间为空，就默认为前一天 -->      
+           <isEmpty  property="createDate"> 
+              AND a.PAY_DATE  >= DATE_SUB(STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s'),INTERVAL 1 DAY) 
+              AND a.PAY_DATE  &lt; STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s')      
+            </isEmpty>
+                
+             <!-- 如果扣款时间不为空-->         
+           <isNotEmpty property = "createDate">
+              AND a.PAY_DATE  >= STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s')
+              AND a.PAY_DATE  &lt; DATE_ADD(STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)             
+           </isNotEmpty>
+  </select>
+  
+  
+  
+ <!-- 得到待处理数据(银行)sql-->	
+  <select id="GET_BANK_PAYONLINE_WAIT_DEAL" resultMap="bankPayOnlineResult"  parameterClass="inputFileSearchBean">
+  	SELECT  a.*
+	        FROM 
+      	        ep_bank_pay_online a
+                WHERE 
+                a.BANK_TYPE = #bankType#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.FLAG_COMPARE = 'F'           
+         <!-- 如果扣款时间为空，就默认为前一天 -->      
+           <isEmpty  property="createDate"> 
+              AND a.PAY_DATE  >= DATE_SUB(STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s'),INTERVAL 1 DAY) 
+              AND a.PAY_DATE  &lt; STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s')     
+            </isEmpty>
+                
+             <!-- 如果扣款时间不为空-->         
+           <isNotEmpty property = "createDate">
+              AND a.PAY_DATE  >= STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s')
+              AND a.PAY_DATE  &lt; DATE_ADD(STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)            
+           </isNotEmpty>
+  </select>
+  
+  
+  
+  
+   <!-- 生成对账报表，统计两边待处理条数的处理sql(代充，代付)-->	
+  <select id="TERMINAL_COMPARE_SUM_WAIT_DEAL" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">              
+   SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_terminal_pay a
+                WHERE 
+                a.IS_SUCCEED = 'Y'
+                AND a.FLAG_COMPARE = 'F'
+                
+            <!-- 如果扣款时间为空，就默认为前一天 -->      
+           <isEmpty  property="createDate"> 
+              AND a.GMT_PAY  >= DATE_SUB(STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s'),INTERVAL 1 DAY) 
+              AND a.GMT_PAY  &lt; STR_TO_DATE(DATE_FORMAT(sysdate(),'%Y%m%d'), '%Y%m%d %H%i%s')      
+            </isEmpty>
+                
+             <!-- 如果扣款时间不为空-->         
+           <isNotEmpty property = "createDate">
+              AND a.GMT_PAY  >= STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s')
+              AND a.GMT_PAY  &lt; DATE_ADD(STR_TO_DATE(#createDate#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)            
+           </isNotEmpty>
+  </select>
+  
+  
+   
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+<!-- 修改，网点成功，系统未成功的处理sql -->	
+  <update id="TERMINAL_COMPARE_UPDATE_NOT_EQUAL_SUCC" parameterClass="inputFileSearchBean">
+	  	     Update ep_terminal_pay a
+	           SET (a.IS_SUCCEED, a.FLAG_COMPARE, a.IS_CHECK,
+		   a.PAY_AMOUNT, a.GMT_PAY,a.CHECK_USER, a.GMT_MODIFIED
+        	       ) =
+		       (SELECT 'Y', 'F','N', 
+		               b.PAY_AMOUNT, STR_TO_DATE(b.PAY_DATE,'%Y%m%d %H%i%s'), #operator#,sysdate()
+             	        FROM ep_terminal_compare_item b
+            	        WHERE a.OUT_BIZ_NO = b.OUT_BIZ_NO  
+                        AND b.BATCH_ID = #batchId#          
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') 
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+               </isNotEmpty>
+               AND a.IS_SUCCEED &lt;> 'Y'   
+               AND a.FLAG_COMPARE IS NULL
+              )
+ 	     WHERE ROWID IN (
+               SELECT a.ROWID
+               FROM ep_terminal_pay a, ep_terminal_compare_item b
+               WHERE a.OUT_BIZ_NO = b.OUT_BIZ_NO 
+               AND b.BATCH_ID = #batchId#  
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+               </isNotEmpty>
+               AND a.IS_SUCCEED &lt;> 'Y'   
+               AND a.FLAG_COMPARE IS NULL) 
+  </update>
+  
+  
+  
+    <!-- 生成对账报表，统计两边成功的条数的处理sql,网点-->	
+  <select id="TERMINAL_COMPARE_SUM_EQUAL_SUCC" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  	SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_terminal_pay a, 
+      	        ep_terminal_compare_item b
+                WHERE a.OUT_BIZ_NO = b.OUT_BIZ_NO
+                AND b.BATCH_ID = #batchId#
+                AND a.IS_SUCCEED = 'Y'
+                AND a.PAY_AMOUNT = b.PAY_AMOUNT
+                AND a.FLAG_COMPARE is null
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') 
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+               </isNotEmpty>
+  </select>
+  
+  
+      <!-- 生成对账报表，统计两边待处理条数的处理sql(代充，代付)-->	
+  <select id="TERMINAL_COMPARE_SUM_NOT_EQUAL_SUCC" resultClass="java.lang.Integer"  parameterClass="inputFileSearchBean">
+  SELECT  count(*) as TOTLE_COUNT	
+	        FROM 
+      	        ep_terminal_pay a, 
+      	        ep_terminal_compare_item b
+                WHERE a.OUT_BIZ_NO = b.OUT_BIZ_NO
+                AND b.BATCH_ID = #batchId#
+                AND a.FLAG_COMPARE = 'F'
+               <isNotEmpty  property="datestart">   
+                 AND b.GMT_CREATE >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s')  
+               </isNotEmpty>
+               <isNotEmpty  property="dateend">  
+                 AND b.GMT_CREATE &lt; DATE_ADD(STR_TO_DATE(#dateend#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) 
+               </isNotEmpty>
+  </select>
+
+
+
+
+<!-- 修改对账文件 -->
+<update id="editInputFile" parameterClass="InputFile">
+<![CDATA[
+		update ep_input_file set
+		STATUS = #status#,
+		GMT_DEAL_DATE = sysdate(),
+		GMT_MODIFIED= sysdate()
+		 where BATCH_ID = #batchId#
+		
+]]>
+</update>
+<!-- delete InputFile object -->
+<delete id="removeInputFile" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ep_input_file where ep_input_file.ID = #value# 
+]]>
+</delete>
+<!-- search InputFile object -->
+<select id="getInputFile" parameterClass="java.lang.Long" resultMap="InputFileResult">
+<![CDATA[
+		select ep_input_file.* from ep_input_file where ep_input_file.ID = #value# 
+]]>
+</select>
+<!-- searchAll InputFile List -->
+<select id="getInputFiles" resultMap="InputFileResult">
+<![CDATA[
+		select ep_input_file.* from ep_input_file
+]]>
+</select>
+</sqlMap>

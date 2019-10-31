@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="customer">
+	<typeAlias alias="Customer" type="com.huaixuan.network.biz.domain.hx.Customer" />
+	<resultMap id="CustomerResult" class="com.huaixuan.network.biz.domain.hx.Customer">
+		<result column="idCustomer" property="idCustomer" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="VIPnum" property="vipNum" />
+		<result column="phone" property="phone" />
+		<result column="address" property="address" />
+		<result column="email" property="email" />
+		<result column="password" property="password" />
+		<result column="remark" property="remark" />
+	</resultMap>
+	<select id="getOneCustomerId" parameterClass="Customer" resultClass="java.lang.Integer">	
+		select idCustomer from Customer
+		<dynamic prepend="where">
+			<isNotEmpty property="phone" prepend="and">
+				phone = #phone#
+			</isNotEmpty>
+		</dynamic>
+		LIMIT 1
+	</select>	
+	
+	<insert id="addOneCustomer" parameterClass="Customer">
+		insert into Customer(name,type,phone,password)
+		 values(#name#,1,#phone#,123)
+		 <selectKey keyProperty="idCustomer" resultClass="java.lang.Integer">
+		 	select
+			last_insert_id() as id from Customer limit 1
+		 </selectKey>
+	</insert>
+	
+	
+ 
+	<!-- 自动刷新活动框的状态 -->
+	<update id="updateActiveStatusToOpen">
+		<![CDATA[ UPDATE hx_moveframe t SET t.status='open' WHERE SYSDATE() >= t.gmt_start AND SYSDATE() <= DATE_ADD(t.gmt_end,INTERVAL 1 DAY)]]>
+	</update>
+		<!-- 自动刷新活动框的状态 -->
+	<update id="updateActiveStatusToWait">
+		<![CDATA[	UPDATE hx_moveframe t SET t.status = 'wait' WHERE SYSDATE() < DATE_ADD(t.gmt_start,INTERVAL 1 DAY)]]>
+	</update>
+	
+		<!-- 自动刷新活动框的状态 -->
+	<update id="updateActiveStatusToClose">
+ 		<![CDATA[ UPDATE hx_moveframe t SET t.status = 'closed' WHERE SYSDATE() > DATE_ADD(t.gmt_end,INTERVAL 1 DAY) ]]>
+	</update>
+	
+
+	
+</sqlMap>

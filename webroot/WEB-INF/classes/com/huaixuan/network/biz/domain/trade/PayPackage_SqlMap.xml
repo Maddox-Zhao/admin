@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PayPackageSQL">
+<typeAlias alias="payPackage" type="com.huaixuan.network.biz.domain.trade.PayPackage"/>
+	<resultMap class="payPackage" id="payPackageResult">
+		<result column="ID" property="id"/>
+		<result column="PACKAGE_ID" property="packageId"/>
+		<result column="TID" property="tid"/>
+		<result column="AMOUNT" property="amount"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+	</resultMap>
+	<resultMap class="payPackage" id="payPackageResultWithTid">
+	    <result column="TID" property="tid"/>
+	</resultMap>
+<select id="getPayPackageSequences" resultClass="java.lang.Long">
+<![CDATA[
+		SELECT max(a.id)+1 FROM emall_pay_package a 
+]]>
+</select>
+<!-- create PayPackage object -->
+<insert id="addPayPackage" parameterClass="payPackage">
+<![CDATA[
+		insert into emall_pay_package
+		(ID,PACKAGE_ID,TID,AMOUNT,GMT_CREATE,GMT_MODIFY )values( null,
+		#packageId#,
+		#tid#,
+		#amount#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update PayPackage object -->
+<update id="editPayPackage" parameterClass="payPackage">
+<![CDATA[
+		update emall_pay_package set PACKAGE_ID = #packageId#,
+		TID = #tid#,
+		AMOUNT = #amount#,
+		GMT_MODIFY = sysdate()
+		 where ID = #id#
+]]>
+</update>
+<!-- delete PayPackage object -->
+<delete id="removePayPackage" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_pay_package where emall_pay_package.ID = #value# 
+]]>
+</delete>
+<!-- search PayPackage object -->
+<select id="getPayPackage" parameterClass="java.lang.Long" resultMap="payPackageResult">
+<![CDATA[
+		select emall_pay_package.* from emall_pay_package where emall_pay_package.ID = #value# 
+]]>
+</select>
+<!-- searchAll PayPackage List -->
+<select id="getPayPackages" resultMap="payPackageResult">
+<![CDATA[
+		select emall_pay_package.* from emall_pay_package
+]]>
+</select>
+
+<!-- search PayPackage List by payPackageId -->
+<select id="getPayPackagesByPId" resultMap="payPackageResult">
+<![CDATA[
+		select t.* from emall_pay_package t where t.PACKAGE_ID = #payPackageId#
+]]>
+</select>
+
+<select id="getDistinctTidPayPackagesByPId" resultMap="payPackageResultWithTid" resultClass="java.util.List">
+<![CDATA[
+		select distinct(t.tid) as tid from emall_pay_package t where t.PACKAGE_ID = #payPackageId#
+]]>
+</select>
+</sqlMap>

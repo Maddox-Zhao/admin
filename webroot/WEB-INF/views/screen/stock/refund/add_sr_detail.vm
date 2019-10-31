@@ -1,0 +1,351 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<div class="tool">
+        <span><a href="${appServer}/stock/refund/search_sr_detail_list.html?shoppingRefId=$!id&refNum=" hidefocus="true" class="bt_wu">返回</a></span>
+	</div>
+
+    <form  name="theForm"  action="$appServer/stock/refund/addSRDetails.html" method="post">
+    	<div class="form-box">
+    		<input  type="hidden" name="id" id="shopRefId"  value = "$!id" />
+    		<input  type="hidden" name="status" id="status"  value = "$!status" />
+    		<table >
+    			<tr>
+                    <th><span class="red">*</span>采购订单号</th>
+                    <td>
+                        <input type="text" name="sn" id="sn" value="$!shoppingNum" size="20" theme="simple" onblur="javascript:this.value=jQuery.trim(this.value)" />
+                    </td>
+                    <th>产品名称</th>
+                    <td>
+                        <input type="text" name="in" id="in" value="$!instanceName" size="15" theme="simple" onblur="javascript:this.value=jQuery.trim(this.value)" />
+                    </td>
+                    <th></th>
+                    <td>
+                        <input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+                    </td>
+                </tr>
+            </table>
+    	</div>
+
+    	<div class="listBox" id="listDiv">
+        	<table  id="listTable" name="listTable" >
+              <tr>
+                   <th width="5%">产品名称</th>
+                   <th width="5%">产品编码</th>
+                   <th width="5%">验收数量</th>
+                   <th width="5%">库存数量</th>
+                   <th width="5%">采购单价</th>
+                   <th width="5%">退货正品数量</th>
+                   <th width="5%">退货残品数量</th>
+                   <th width="5%">退货单价</th>
+                   <th width="5%">应收金额</th>
+                   <th width="5%">实收金额</th>
+                   <th width="5%">退货原因</th>
+                   <th width="5%">备注</th>
+             </tr>
+
+                 #foreach($shoppingDetailSearch in $shoppingDetailSearchLists)
+                <tr>
+                    <th>
+                    <input  type="hidden" name="shoppingId" id="shoppingId_${velocityCount}" value = "$!shoppingDetailSearch.shoppingId" />
+                    <input  type="hidden" name="goodsId" id="goodsId_${velocityCount}" value = "$!shoppingDetailSearch.goodsId" />
+                    <input  type="hidden" name="goodsInstanceId" id="goodsInstanceId_${velocityCount}" value = "$!shoppingDetailSearch.goodsInstanceId" />
+        			<input  type="hidden" name="units" id="units_${velocityCount}" value = "$!shoppingDetailSearch.units" />
+                    <input  type="hidden" name="instanceName" id="instanceName_${velocityCount}" value = "$!shoppingDetailSearch.instanceName" />
+
+                    <input  type="text" name="shoppingNum" id="shoppingNum_${velocityCount}" value = "$!shoppingDetailSearch.instanceName" size="5%" readonly=true /">
+                    </th>
+                    <th>
+                        <input  type="text" name="instanceCode" id="instanceCode_${velocityCount}" value = "$!shoppingDetailSearch.goodsInstanceCode" size="5%"  readonly=true />
+                    </th >
+                    <th>
+                        <input  type="text" name="receiveNum" id="receiveNum_${velocityCount}" value = "$!shoppingDetailSearch.receiveNum" size="5%"  readonly=true />
+                    </th >
+    				<th>
+                        <input  type="text" name="existNum" id="existNum_${velocityCount}" value = "$!shoppingDetailSearch.existNum" size="5%"  readonly=true />
+                    </th >
+                     <th>
+                        <input  type="text" name="unitPrice" id="unitPrice_${velocityCount}" value = "$!shoppingDetailSearch.unitPrice" size="5%" readonly=true />
+                    </th>
+                    <th>
+                        <input  type="text" name="ref_num" id="ref_num_${velocityCount}" size="5%" value = "$!shoppingDetailSearch.existNum" onchange="plusfee(${velocityCount});"/>
+                    </th>
+
+                    <th>
+                        <input  type="text" name="damaged_num" id="damaged_num_${velocityCount}" size="5%" onchange="plusfee(${velocityCount});"/>
+                    </th>
+
+                    <th>
+                        <input  type="text" name="ref_price" id="ref_price_${velocityCount}" size="5%" value = "$!shoppingDetailSearch.unitPrice" onchange="plusfee(${velocityCount});" />
+                    </th>
+
+                    <th>
+                        <input  type="text" name="due_fee" id="due_fee_${velocityCount}" size="5%"/>
+                    </th>
+
+                    <th>
+                        <input  type="text" name="fact_fee" id="fact_fee_${velocityCount}"  size="5%"/>
+                    </th>
+
+                    <th>
+						<select name="reason" id="reason_${velocityCount}" >
+							<option value="">请选择</option>
+							#foreach($s in $enumShoppingRefundRMap.entrySet())
+								<option value="$s.key">$s.value</option>
+							#end
+                        </select>
+                    </th>
+
+                    <th>
+                        <input  type="text" id="remark_${velocityCount}" name="remark"  size="5%"/>
+                    </th>
+               </tr>
+             #end
+        	</table>
+			#if( $shoppingDetailSearchLists.size() == 0)
+                <table>
+                    <tr >
+                        <td align="center"> 没有结果！</td>
+                   </tr>
+               </table>
+		   #end
+          #if( $shoppingDetailSearchLists.size() > 0)
+    		<table>
+    			<tr>
+                   <th align="right"><input type="button" align="center" value=" 确定 " class="button"  onclick="addSubmit();"/> </th>
+                   <th align="left"><input class="button" align="center" value=" 重置 " type="reset"></th>
+          		</tr>
+    		</table>
+    	  #end
+      </div>
+  	</form>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+    function selectid(){
+        var id = document.getElementById("idstr").value;
+        var obj = document.getElementById("adPositionIdstr");
+        obj.value=id;
+    }
+
+    function formSubmit(){
+         if(document.getElementById("sn").value==""){
+		  document.getElementById("sn").value==' ';
+          alert("请输入采购单号查询");
+          return false;
+         }
+          document.theForm.action="$appServer/stock/refund/search_shopping_rd.html";
+          document.theForm.submit();
+        }
+
+    function plusfee(count){
+     var status=document.getElementById("status").value;
+     if("stock_finished"==status){
+          document.getElementById("damaged_num_"+count).value='';
+          document.getElementById("ref_num_"+count).value='';
+          document.getElementById("ref_price_"+count).value='';
+       alert('采购退货单已经完成，不能再添加产品');
+      return;
+     }
+         //var   de = /^(-|\+)?\d+(\.\d+)?$/;
+         var ref_num=document.getElementById("ref_num_"+count).value;
+         var ref_price=document.getElementById("ref_price_"+count).value;
+         var damagedNum=document.getElementById("damaged_num_"+count).value;
+     var total=0;
+     var shoppingId=document.getElementById("shoppingId_"+count).value;
+     var goodsInstanceId=document.getElementById("goodsInstanceId_"+count).value;
+     var instanceCode=document.getElementById("instanceCode_"+count).value;
+
+     var shopRefId=document.getElementById("shopRefId").value;
+
+     var receiveNum=document.getElementById("receiveNum_"+count).value;
+
+     var existNum=document.getElementById("existNum_"+count).value;
+
+     if((ref_num!='' || damagedNum !='') && ref_price!='' ){
+         if(!validateInt(damagedNum)){
+           return;
+         }
+         if(!validateInt(ref_num))
+            return;
+
+        if(!validateFloat(ref_price)){
+                return;
+        }
+        if(ref_num=='')
+           ref_num=0;
+        if(damagedNum=='')
+          damagedNum=0;
+         total=parseInt(ref_num, 10)+ parseInt(damagedNum, 10);
+		  jQuery.post('$appServer/stock/refund/validateGoodInstanceId.html',{param1:shopRefId,param2:shoppingId,param3:goodsInstanceId,param4:instanceCode,param5:total,param6:receiveNum,param7:existNum},function(message){
+             if(message=="success"){
+                var ref_num=document.getElementById("ref_num_"+count).value;
+                if(!ref_num)
+                  ref_num=0;
+                  var ref_price=document.getElementById("ref_price_"+count).value;
+                  var damagedNum=document.getElementById("damaged_num_"+count).value;
+                if(!damagedNum)
+                  damagedNum=0;
+                  var dueFee=( parseInt(ref_num, 10)+ parseInt(damagedNum, 10)) * parseFloat(ref_price);
+                  document.getElementById("due_fee_"+count).value=dueFee.toFixed(2);
+                  document.getElementById("fact_fee_"+count).value=dueFee.toFixed(2);
+             }else{
+                  document.getElementById("damaged_num_"+count).value='';
+                  document.getElementById("ref_num_"+count).value='';
+                  document.getElementById("ref_price_"+count).value='';
+                  alert(message);
+             }
+		   },'');
+          }
+        }
+
+    function validateInt(obj){
+
+         var   re   =/^[0-9]*[1-9][0-9]*$/;　　//正整数
+         if(obj!=''){
+             if(obj==0){
+              alert("请输入大于0的数据");
+                return false;
+              }
+              if(!re.test(obj)){
+             alert("请输入数字类型的数据");
+             return false;
+               }
+         }
+         return true;
+        }
+
+    function validateFloat(obj){
+         var   de = /^(-|\+)?\d+(\.\d+)?$/;
+         if(obj!=''){
+             if(obj==0){
+              alert("请输入大于0的数据");
+                return false;
+              }
+              if(!de.test(obj)){
+             alert("请输入浮点类型的数据");
+             return false;
+               }
+         }
+         return true;
+        }
+
+
+     function addSubmit(){
+         var   re   = /^[0-9]*[1-9][0-9]*$/;　　//正整数
+         var   de = /^(-|\+)?\d+(\.\d+)?$/;   　
+         var receiveNum=document.getElementsByName("receiveNum");
+     	 var exist_num=document.getElementsByName("existNum");
+     	 var flag = false ;
+         var damaged_num=document.getElementsByName("damaged_num");
+         var ref_num=document.getElementsByName("ref_num");
+         var ref_price=document.getElementsByName("ref_price");
+         var due_fee=document.getElementsByName("due_fee");
+         var fact_fee=document.getElementsByName("fact_fee");
+         var reasons=document.getElementsByName("reason");
+
+        for(var i=0;i<receiveNum.length;i++){
+          var receive_num=receiveNum[i].value;
+      var existNum=exist_num[i].value;
+          var refNum=ref_num[i].value;
+          var refPrice=ref_price[i].value;
+          var damagedNum=damaged_num[i].value;
+          var dueFee=due_fee[i].value;
+          var factFee=fact_fee[i].value;
+          var reason=reasons[i].value;
+           if(factFee!=""){
+             if(!de.test(factFee)){
+                alert("应收金额请输入浮点数类型的数据");
+                return ;
+              }
+           }
+
+           if(dueFee!=""){
+             if(!de.test(dueFee)){
+                 alert("实收金额请输入浮点数类型的数据");
+                return ;
+              }
+           }
+
+           if(damagedNum!=""){
+             if(damagedNum==0){
+              alert("请输入大于0的数据");
+                return ;
+             }
+             if(!re.test(damagedNum)){
+                 alert("请输入数字类型的数据");
+                return ;
+              }
+              if(parseInt(damagedNum) > parseInt(receive_num)){
+                alert("退货残品数量不能大于采购验收数量");
+                return ;
+              }
+           if(parseInt(damagedNum) > parseInt(existNum)){
+                alert("退货残品数量不能大于库存数量");
+                return ;
+              }
+           }
+
+          if(refNum!=""){
+             if(refNum==0){
+              alert("请输入大于0的数据");
+                return ;
+             }
+             if(!re.test(refNum)){
+                 alert("请输入数字类型的数据");
+                 return ;
+             }
+             if(parseInt(refNum) > parseInt(receive_num)){
+                alert("退货正品数量不能大于采购验收数量");
+                return ;
+              }
+          if(parseInt(refNum) > parseInt(existNum)){
+                alert("退货正品数量不能大于库存数量");
+                return ;
+              }
+          }
+
+          if(damagedNum!="" && refNum!=""){
+            var total=parseInt(refNum) + parseInt(damagedNum);
+             if(total > parseInt(receive_num)){
+                alert("退货正品数量和退货残品数量的和不能大于采购验收数量");
+                return ;
+              }
+          if(total > parseInt(existNum)){
+                alert("退货正品数量和退货残品数量的和不能大于库存数量");
+                return ;
+              }
+      }
+
+          if(refPrice != ""){
+            if(!de.test(refPrice)){
+                alert("请输入浮点数类型的数据");
+                return ;
+            }
+        if(damagedNum=="" &&  refNum==""){
+         alert("退货正品数量和退货残品数量不能同时为空!");
+                return ;
+        }
+          }
+
+          if(damagedNum!="" ||  refNum!=""){
+           if(refPrice == ""){
+            alert("退货单价不能为空");
+            return ;
+            }
+            if(reason==""){
+             alert("请选择退货原因");
+             return ;
+            }
+        flag=true;
+          }
+        }
+     if(flag)
+         document.theForm.submit();
+     else
+      alert("请输入数据!");
+        }
+</script>

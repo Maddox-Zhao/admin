@@ -1,0 +1,170 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 分配库位")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 分配库位</h2>
+
+	#if($succFlag)
+		<div class="mag-t2" id="modifySuccess">产品库存分配成功</div>
+	#end
+	#if($errorInfo && $errorInfo != "")
+		<div class="mag-t1" id="modifyError">$!errorInfo</div>
+	#end
+
+	<!-- 表单模块 -->
+	<form name="form1" action="outDepositoryOpt.html?optId=$!{optId}&optType=$!{optType}" method="post">
+		<div class="formBox">
+			<h3><i></i><span>产品基本信息</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>产品编号</th>
+						<td>$!{outDetailBaseInfo.code}</td>
+						<th>产品名称</th>
+						<td>$!{outDetailBaseInfo.instanceName}</td>
+					</tr>
+					<tr>
+						<th>一级仓库</th>
+						<td colspan="3">$!{outDetailBaseInfo.depFirstName}</td>
+					</tr>
+					<tr>
+						#if("${optType}" == 'out_shopping')
+							<th>数量</th>
+							<td>$!{outDetailBaseInfo.outNum}</td>
+							<th>供应商</th>
+							<td>$!{outDetailBaseInfo.supplierName}</td>
+						#else
+							<th>数量</th>
+							<td colspan="3">$!{outDetailBaseInfo.outNum}</td>
+						#end
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>产品库存列表</span></h3>
+			#if(${outDepStatus} != 'out_finished')
+				<input type="hidden" name="optTypeFinish" id="optTypeFinish" value=""/>
+				<table>
+					<tr>
+						<th>供应商</th>
+						<th>库位名称</th>
+						<th>仓库名称</th>
+						<th>批次</th>
+						<th>库存类型</th>
+						<th>库存数量</th>
+						<th>出库数量</th>
+					</tr>
+					#if($outStorageList)
+						#foreach($outStorageInfo in $outStorageList)
+							#if("$optType" == "out_storage_refund")
+								#if("$!{outStorageInfo.oriCount}" != "")				
+                    	    		<tr #if($velocityCount % 2 == 0) class="bg" #end>
+        								<td>$!outStorageInfo.supplierName</td>
+        								<td>$!outStorageInfo.locName</td>
+        								<td>$!outStorageInfo.depName</td>
+        								<td>$!outStorageInfo.batchNum</td>
+        								<td align="center">$!storTypeMap.get($!outStorageInfo.storType)</td>
+        								<td align="center">$!outStorageInfo.storageNum</td>
+                    	      			<td>
+        									#if($!{outStorageInfo.depType}=="common_dep")
+        										<input type="text" name="disCount" id="disCount_${velocityCount}" value="$!outStorageInfo.oriCount" onblur="javascript:isNumber(this.value,'请输入大于0的正整数！');" class="inp"/>
+        									#else
+        										<font color="red">外借库不允许出库</font>
+        									#end
+                    					</td>
+                    	    	  		<input type="hidden" name="storageId" id="storageId_${velocityCount}" value="$!outStorageInfo.id"/>
+                    	    	  		<input type="hidden" name="locId" id="locId_${velocityCount}" value="$!outStorageInfo.locId"/>
+                    				</tr>
+								#end
+							#else
+								<tr #if($velocityCount % 2 == 0) class="bg" #end>
+									<td>$!outStorageInfo.supplierName</td>
+									<td>$!outStorageInfo.locName</td>
+									<td>$!outStorageInfo.depName</td>
+									<td>$!outStorageInfo.batchNum</td>
+									<td align="center">$!storTypeMap.get($!outStorageInfo.storType)</td>
+									<td align="center">$!outStorageInfo.storageNum</td>
+									<td>
+										#if($!{outStorageInfo.depType}=="common_dep")
+											<input type="text" name="disCount" id="disCount_${velocityCount}" value="$!outStorageInfo.oriCount" onblur="javascript:isNumber(this.value,'请输入大于0的正整数！');" class="inp"/>
+										#else
+											<font color="red">外借库不允许出库</font>
+										#end
+									</td>
+									<input type="hidden" name="storageId" id="storageId_${velocityCount}" value="$!outStorageInfo.id"/>
+									<input type="hidden" name="locId" id="locId_${velocityCount}" value="$!outStorageInfo.locId"/>
+								</tr>
+							#end
+						#end
+					#end
+				</table>
+				#if(!$outStorageList || $outStorageList.size() == 0)
+					没有可分配的库存！
+				#end
+			#else
+				<table>
+					<tr>
+						<th>供应商</th>
+						<th>库位名称</th>
+						<th>仓库名称</th>
+						<th>批次</th>
+						<th>库存类型</th>
+						<th>出库数量</th>
+					</tr>
+					#if($outDetailInfoForDisList)
+						#foreach($outDetailInfoForDisInfo in $outDetailInfoForDisList)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>$!outDetailInfoForDisInfo.supplierName</td>
+								<td>$!outDetailInfoForDisInfo.locName</td>
+								<td>$!outDetailInfoForDisInfo.depName</td>
+								<td>$!outDetailInfoForDisInfo.batchNum</td>
+								<td align="center">$!storTypeMap.get($!outDetailInfoForDisInfo.storType)</td>
+								<td align="center"> $!outDetailInfoForDisInfo.amount</td>
+							</tr>
+						#end
+					#end
+				</table>
+				#if(!$outDetailInfoForDisList || $outDetailInfoForDisList.size() == 0)
+					没有可分配的库存！
+				#end
+			#end
+		</div>
+	</form>
+
+	<div class="formBox">
+		<div class="form-but">
+			#if(${outDepStatus} != 'out_finished')
+				<button type="button" class="button-s4" #if(!$outStorageList || $outStorageList.size() == 0) disabled="disabled" #else onclick="javascript:finishOpt();" #end>完成</button>
+			#end
+			<button type="button" class="button-s4" onclick="javascript:window.close();">关闭</button>
+		</div>
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+ 		String.prototype.trim = function() {
+        	// 用正则表达式将前后空格
+        	// 用空字符串替代。
+        	return this.replace(/(^\s*)|(\s*$)/g, "");
+		}
+
+	function finishOpt(){
+		document.getElementById("optTypeFinish").value="y";
+		document.form1.submit();
+	}
+
+	function isNumber(val,errMsg)
+	{
+		  if(val != ""){
+	    var reg = /^[\d|\.|,]+$/;
+	    if(!reg.test(val)){
+	  	    alert(errMsg);
+	    }
+	  }
+	}
+</script>

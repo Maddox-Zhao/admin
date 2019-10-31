@@ -1,0 +1,119 @@
+/*******************
+     商品详细页面
+******************/
+
+
+.xl-main-goods{width:735px; margin:10px 0 0 0px; height:auto; float:right; line-height:18px; _overflow:hidden;}
+
+.goods-box{border:#e7e7e7 1px solid;  height:auto;width:730px;}
+
+.goods-box .bj_btn01{ background:url(../images/goods/bj_btn01.gif) no-repeat; border:0; width:97px; height:22px;}
+.goods-box .bj_btn02{ background:url(../images/goods/bj_btn02.gif) no-repeat; border:0; width:125px; height:43px; color:#d84700; font-weight:bold; font-size:14px; margin-right:5px;}
+.bj_btn03{ background:url(../images/goods/button24_bg.png) no-repeat; border:0; width:99px; height:24px; color:#fff; font-weight:bold; font-size:14px; margin-right:5px; line-height:24px;}
+
+
+
+.goods-box .l{ width:330px; float:left; text-align:left;padding:0px 0px 8px 15px;vertical-align:middle;}
+.goods-box .l .photo{ display:block; margin:5px auto; width:300px;height:310px; border:1px solid #ccc;}
+.goods-box .l .photo img{width:298px;height:308px;}
+.goods-box .l ul{ margin-left:10px; margin-top:5px;}
+.goods-box .l ul li{ float:left; margin-right:6px; cursor:pointer;}
+.goods-box .l ul li img{ width:50px; padding:1px; background-color:#fff; border:1px solid #ccc;}
+.goods-box .l ul li.c img{border:1px solid #F00;}
+.goods-box .r{ float:left; width:360px;}
+.goods-box .r .bh{ width:130px; display:inline; *float:left;}
+.goods-box .r ul.sx li img{ padding-right:5px; display:;}
+.goods-box .r h3{ font-size:18px; line-height:32px; height:32px; margin:10px 0;background:url(../images/goods/h3_bg3.gif) repeat-x; text-indent:10px;}
+.goods-box .r ul.sx{ margin:0px 10px;}
+.goods-box .r ul.sx li{ line-height:30px; border-bottom:1px dashed #e7e7e7; clear:both; display:block; height:100%; overflow:hidden; }
+.goods-box .r ul.sx li dd.sp{ line-height:30px;  width:140px; float:left;}
+.goods-box .r ul.sx li dd.sp2{ line-height:30px; width:200px; float:left;}
+.goods-box .r ul.sx li span{ color:#333; font-weight:600;}
+.goods-box .r ul.sx li span.red{ color:#F00;}
+.goods-box .r ul.sx li.but{ border-bottom:0; margin-top:10px;}
+.goods-box .r ul.sx li.but a{ margin-right:10px;}
+.goods-box .r ul.sx li span.red{ font-size:18px;}
+.goods-box .r ul.sx span.box-cm{ height:21px; padding:1px 10px; line-height:21px; color:#666; margin:0 5px; font-weight:normal; border:#eee 1px solid;Cursor:hand;}
+.goods-box .r ul.sx span.box-xz {
+border:1px solid #ff6600;
+color:#666666;
+font-weight:normal;
+height:21px;
+line-height:21px;
+margin:0 5px;
+padding:1px 10px;
+Cursor:hand;
+}
+
+.goods-tab{ margin:10px auto; height:29px; line-height:29px;background:url(../images/goods/g_tab_bg.gif) repeat-x; clear:both;}
+.goods-tab ul{ height:27px; line-height:27px; }
+.goods-tab ul li{ float:left; width:84px; text-align:center; margin-right:8px;background:url(../images/goods/g_tab_bg.gif) 0 -60px no-repeat;}
+.goods-tab ul li.current{ background:url(../images/goods/g_tab_bg.gif) 0 -30px no-repeat;}
+.goods-tab ul li a{ color:#333;}
+.goods-tab ul li.current a{ color:#fff; font-weight:600;}
+.goods-tab2{ margin:10px auto; height:29px; line-height:29px;background:url(../images/goods/g_tab_bg.gif) repeat-x;}
+.goods-tab2 ul{ height:27px; line-height:27px; margin-left:5px;}
+.goods-tab2 ul li{ float:left; width:84px; text-align:center; margin-right:8px;background:url(../images/goods/g_tab_bg.gif) 0 -60px no-repeat;}
+.goods-tab2 ul li.current{ background:url(../images/goods/g_tab_bg.gif) 0 -30px no-repeat;}
+.goods-tab2 ul li a{ color:#333;}
+.goods-tab2 ul li.current a{ color:#fff; font-weight:600; height:27px;}
+
+.goods-c{ margin:10px;}
+.goods-c ul li div.attname{ width: auto; *width: auto; _width:90px; min-width:55px;  margin-right:3px;  text-align: left; background:#f6f6f6; height:16px; line-height:16px; float:left;}
+.goods-c .pot_xx{ text-align: left;}
+.goods-c .pot_xx img{text-align: center;}
+.xl-main-goods h3{ margin:10px 0; line-height:30px; border-bottom:1px dashed #ccc; font-size:14px; color:#696969; text-indent:0;
+     background:url(../images/in04.jpg) 10px center no-repeat;padding-left:30px;}
+.goods-box h3{text-align:left; font-size:18px;padding-left:30px;background:none;}
+
+.xl-main-goods h4{ border:1px solid #ccc; text-indent:10px; line-height:30px; height:30px; font-size:14px;
+    background:url(../images/goods/h4_bg.gif);}
+.table-tjhy{ margin-bottom:30px;}
+.table-tjhy th{ font-weight:300;}
+.table-tjhy td input.but{ border:0; cursor:pointer; width:49px; height:20px; line-height:20px; text-align:center;
+    background:url(../images/but_bg2.gif) no-repeat;}
+
+.pl-box{ border:1px solid #ccc; margin-top:10px; margin-bottom:5px;}
+.pl-box ul{ display:block; margin:3px 20px;}
+.pl-box ul li{ line-height:30px;}
+.pl-box ul li.name span{ float:right;}
+.pl-box ul li.hf{ border-top:1px dotted #ccc;}
+
+.gm_list{}
+.gm_list th{
+border-bottom:1px solid #DDD7CD;
+}
+.gm_list td{border-bottom:1px dotted #CDCDCD; line-height:30px}
+.td_c{
+text-align:center;
+}
+.freeback_edit{ width:735px; border:1px solid #CDCDCD; margin-bottom:10px;}
+.freeback_edit th{ background:#FAF8F6;}
+.freeback_edit td,.freeback_edit th{ padding:5px 5px; border-bottom:1px solid #CDCDCD; }
+.freeback_edit td.center{ text-align:center;}
+.freeback_redio li{float:left}
+.freeback_redio .rank-rate-x{margin-top:3px;}
+.gm_list th, .list-table th{background-color:#FAF8F6;line-height:25px;
+padding:5px;}
+/* 放大镜 start */
+.xl-box-208{ width:208px; height:auto; float:left; clear:both; border:#e6e6e7 1px solid; margin:10px 0 0 0;}
+.xl-box-208 .title{ height:30px; line-height:30px; border-bottom:#e6e6e7 1px solid; font-size:14px; font-weight:bold; }
+.xl-box-208 .title span{ line-height:30px; height:30px; padding:0 0 0 5px; width:120px; float:left;}
+.xl-box-208 .title a{ float:right; padding:0 10px 0 0; width:40px; font-weight:normal; font-size:12px; color:#666; text-align:right;}
+.xl-box-208 ul{ margin:10px 5px;}
+.xl-box-208 ul li{ margin:5px 0;}
+.xl-box-208 ul li img{ float:left; height:50px; width:50px; padding:0 5px 0 0;}
+.xl-box-208 ul li .name{ line-height:16px; height:50px; width:140px; float:left;}
+/* 放大镜 end */
+
+/*2010-12-13商品详情增加*/
+.goods-box .r ul.sx li.box{ border:1px solid #e7e7e7;padding:5px 15px 5px 5px;background-color:#f6f6f6}
+.goods-box .r ul.sx li.box dl{ height:25px; line-height:25px; }
+.goods-box .r ul.sx li.box dl.dl_box{ height:55px; line-height:25px; }
+.goods-box .r ul.sx li.box p{ _padding-top:3px; margin-left:65px;*margin-left:5px;_margin-left:0px; }
+.goods-box .r ul.sx li.box dl dt{ width:65px; float:left;}
+.goods-box .r ul.sx li.box dl dd{  *margin-left:60px;}
+.goods-box .r ul.sx li.box dl dd select.province{ width:120px;}
+.goods-box .r ul.sx li.box dl dd select.city{ width:120px;}
+.goods-box .r ul.sx li.box dl b{ font-size:16px; font-weight:bold; color:#ff0000;}
+.goods-box .r ul.sx li.box dl button{ background:url(../images/goods/jisuan-btn.png) left top no-repeat; width:62px; height:22px; line-height:22px; text-align:center; border:0px; margin-left:120px; color:#8b8b8b;}

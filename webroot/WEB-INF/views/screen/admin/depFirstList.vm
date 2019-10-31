@@ -1,0 +1,35 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+        <!-- 表单模块 -->
+      <div class="formBox">
+		 <form action="$appServer.get('/admin/saveDepFirstToUser.html')" name="form1" id="form1" method="post">
+        	<h3><i></i><span>用户仓库权限管理</span></h3>
+
+        	<div class="content">
+        		<table class="c5">
+					<tr>
+                       <input type="hidden" name="adminId" value="$!{admin.id}" />
+					</tr>
+	                #foreach($r in $depFirstList)
+        	          <tr>
+        		         <td class="label"></td>
+        		         <td>
+        			       <input type="checkbox" name="depFirstIds" value="$!{r.id}" #if($!selectMap.get("${r.id}")=="$!admin.id") checked="true" #end/>$!{r.depFirstName}
+						 </td>
+        	          </tr>
+		           #end
+              </table>
+			</div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="submit" class="button-s4">保存</button>
+                <button type="button" class="button-s4" onclick="#if(!$!{url})history.go(-1)#else javascript:location.href= '$!{appServer}/$!{url}' #end">取消</button>
+
+          	</div>
+
+         </form>
+        </div>
+    </div>

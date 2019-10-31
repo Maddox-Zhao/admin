@@ -1,0 +1,308 @@
+﻿@charset "utf-8";
+/*
+ * Copyright (c) 2009, hundsun Inc. All rights reserved.
+ * Code licensed under the New BSD License.
+ * version: 091011
+ * @Franky.li
+ */
+/*added by chenyan 20110119 start.new index page */
+/* header start*/
+/**********************************************************************/
+/* 新年背景 */
+body{  margin:0 auto;}
+.newyear_center{ width:975px; height:auto; margin:0 auto; padding:0px 10px 0 10px; clear:both;}
+.newyear_top{  width:975px; margin:0 auto; }
+/* end 新年背景 */
+.dx01_wrap{ width:955px; height:auto; margin:0 auto; padding:0px 10px 0 10px; background:#fff; float:left;   clear:both;}
+.w955{ width:955px; height:auto; float:left; clear:both;}
+.w715{ width:715px; height:auto; float:left; clear:both;}
+.w230{ width:230px; height:auto; float:left; clear:both;}
+
+.dx01_top{ height:75px; clear:both;}
+.dx01_logo{ float:left; margin-top:13px;}
+.dx01_topnav{ width: auto; height:33px; line-height:33px; background: url(../../images/index20100113/bj_topnav.jpg) left bottom  no-repeat; float:right; text-align:right; padding:0 5px 0 20px;}
+.dx01_topnav a{ padding:0 5px;}
+.clor_c8c8c8{ color:#c8c8c8;}
+
+.dx01_nav{ height:32px;  border-bottom:#e54112 3px solid; _overflow:hidden;}
+.dx01_nav ul{ float:left;}
+.dx01_nav ul li{ width:115px; height:29px; overflow:hidden; float:left; background: url(../../images/index20100113/dx01.jpg) 0px -35px no-repeat; margin-left:1px; line-height:32px; text-align:center; padding-top:3px;}
+.dx01_nav ul li.selected{background: url(../../images/index20100113/dx01.jpg) no-repeat;}
+.dx01_nav ul li a{ color:#fff; font: bold 14px "宋体"; text-decoration:none;}
+.dx01_cart{ width:91px; height:29px; line-height:32px; padding-top:3px; background: url(../../images/index20100113/bj_cart.jpg); float:right; padding-left:60px;}
+.dx01_cart a{ color:#f00;}
+
+.dx01_nav_02 { height:32px; overflow:hidden;}
+.dx01_nav_02 ul li{ float:left; padding:0 20px 0 10px; background:url(../../images/index20100113/icon_arrow.jpg) 0 10px no-repeat; line-height:32px;}
+.dx01_search{ width:280px; float:right; text-align:right;}
+.dx01_input_txt{ background:url(../../images/index20100113/bj_btn_search.jpg); width:206px; height:24px; line-height:24px; padding-left:20px; margin-top:3px; border:0; color:#bbb;}
+.dx01_btn{ width:47px; height:20px; background:url(../../images/index20100113/dx01.jpg) 0 -207px no-repeat; border:0; vertical-align:top; margin-top:6px;}
+/*header end*/
+/*added by chenyan 20110119 end.new index page */
+
+* {margin:0px;padding:0px;color: #737373;font-size:12px;font-style:normal;}
+html,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{
+	margin:0;padding:0;border:0;outline:0;font-size:12px;font-family:Arial, Helvetica, taho;vertical-align:baseline;border:0px;background:transparent;}
+body{line-height:1;margin:0px auto;}
+ol,ul{list-style:none;}
+blockquote,q{quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none;}
+:focus{outline:0;}
+ins{text-decoration:none;}
+del{text-decoration:line-through;}
+table{border-collapse:collapse;border-spacing:0;}
+a:focus{outline:1px dotted;}
+hr{border:0 #ccc solid;border-top-width:1px;clear:both;height:0;}
+h1, h2, h3, h4, h5, h6 {font-weight: bold;}
+h1{font-size:25px;}
+h2{font-size:23px;}
+h3{font-size:21px;}
+h4{font-size:19px;}
+h5{font-size:17px;}
+h6{font-size:15px;}
+ol{list-style:decimal;}
+ul{list-style:disc;list-style:none;}
+select option {padding-right:3px;}
+cite, blackquote, em, i {font-style: italic;}
+strong, b {font-weight: bold;}
+pre, code {font-family: monospace;}
+acronym, abbr {cursor: help;}
+.gray {
+	color: gray;
+	margin-right:3px
+}
+.red {
+	color: red;
+	margin-right:3px
+}
+.green {
+	color: green;
+	margin-right:3px
+}
+.orange{
+	color: #ff6600;
+}
+a{ text-decoration:none; color:#959595;}
+a:hover{text-decoration:underline; color:#f60;}
+
+/*  清理浮动元素 */
+.clear {height:0px;clear:both;overflow:hidden;}
+/*  使用:after伪类来实现浮动清理 */
+.clearfix:after {content:" ";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix{ /* IE7 hack */display:inline-block;}
+* html .clearfix{ /* IE-mac, IE5, IE6 */
+	height:1%;}
+.clearfix{display:block;}
+/* visibility可以隐藏元素，但是还是会在布局中占位 */
+.invisible {visibility:hidden;}
+/* 从布局上隐藏元素 */
+.hidden {display: none;}
+.right{ float:right;}
+.left{ float:left;}
+.mid{ vertical-align:middle;}
+.center{ text-align:center;}
+.color-red{ color:#f00;}
+.color-f60{ color:#f60;}
+.blod{ font-weight:bold;}
+.t10{ margin-top:10px; clear:both;}
+
+
+/*  safari      */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+}
+
+/*  ie 8   */
+/*/
+
+/*/
+
+
+
+/* 页头页尾 */
+/* 顶部搜索框的搜索联想记忆弹出框 start*/
+     .onmouset_out {
+       background-color: #FFFFFF;
+     }
+     .onmouset_over {
+       background-color: #fff;
+       color:#2a2a2a;
+     }
+     .completeDiv{
+		position :absolute;
+		background :#99CCFF;
+		z-Index :10001;
+		}
+	.iframe{
+		position :absolute;
+		background :#99CCFF;
+		z-Index :10002;
+		}
+	.contentDiv{
+		position :absolute;
+		background :#99CCFF;
+		z-Index :10003;
+		}
+/* 顶部搜索框的搜索联想记忆弹出框 end*/
+
+/*头部-star*/
+/* 页头 */
+.xl-top{
+width:100%; height:24px; line-height:24px; background:#f7f7f7; border-bottom:#d2d2d2 1px solid;}
+
+/* hongjw修改于2010.7.16 line:335－348 */
+.xl-top-c{width:955px; text-align:left; margin:0 auto;}
+.xl-top a{ color:#1f3d99; margin-left:0px;}
+.xl-top .nr-left{ float:left; width:300px; text-indent:0; height:28px; line-height:28px; text-align:left;}
+.xl-top .nr-left span{ margin-left:0px;}
+.xl-top .nr-right{ float:right; height:28px; line-height:28px; text-align:right;}
+.xl-top .nr-right a{ margin-right:10px;}
+
+.xl-955{ width:955px; margin:0 auto; overflow:hidden;}
+
+.xl-header{height: auto; float:left; clear:both;}
+.xl-header .logo{margin:0 0 0 25px; width:310px; float:left;}
+/* hongjw修改于2010.8.6 line:348-369 */
+.xl-header-1{ height:80px;  clear:both; padding:25px 0 0px 0; overflow:hidden/*为兼容IE6和FF*/;}
+.xl-search{ width:538px; margin:20px 0 0 25px; float:left;}
+.xl-search .inp{ width:356px; height:22px;padding:13px 0 7px 20px; background:url(../../images/bj_1858.jpg) -217px -40px no-repeat; border:0;  float:left;}
+.xl-search .but{ width:137px; height:42px; background:url(../../images/bj_1858.jpg) -601px -40px no-repeat; float:left; border:0; padding:0; margin:0;}
+.xl-search ul{ width:150px; position:relative; top:-68px; left:36px;  *left:64px; clear:both; }
+.xl-search ul li{ float:left; width:60px; height:27px; line-height:27px; text-align:center;}
+.xl-search ul li.search-tab{background:url(../../images/search_tab.gif) no-repeat; font-weight:bold;}
+
+
+.xl-nav{ height:auto; float:left; clear:both;}
+.xl-nav-c{ height:37px; width:915px; background:url(../../images/bj_1858.jpg) left 0 repeat-x; float:left;}
+.xl-nav-l{ width:10px; height:37px; background:url(../../images/bj_1858.jpg) -150px -40px no-repeat; float:left;}
+.xl-nav-r{ width:10px; height:37px; background:url(../../images/bj_1858.jpg) -178px -40px no-repeat;; float: right;}
+.xl-nav-c{ height:37px; padding:0px 0 0 20px;}
+.xl-nav-c span{ width:37px; height:30px; text-align:center; line-height:30px; color:#fff;  font-size:14px; font-weight: bold; padding:0 0 0 0px; float:left; margin:5px 0px 0px 0;}
+.xl-nav-c span.menu-77{ width:67px;}
+.xl-nav-c span.selected,.xl-nav-c li.selected2{ width:57px; height:30px; color:#c33; background:url(../../images/bj_menu.jpg) no-repeat; margin:7px 0 0 0;}
+.xl-nav-c span.menu-77-selected{ width:77px; height:30px; color:#c33; background:url(../../images/bj_menu_77.jpg) no-repeat; margin:7px 0 0 0;}
+.xl-nav-c span a,.xl-nav-c li a:hover{ color:#fff; font-size:14px;}
+.xl-nav-c span.selected a,.xl-nav-c li.selected a:hover,.xl-nav-c li.selected2 a,.xl-nav-c li.selected2 a:hover,.xl-nav-c span.menu-77-selected a{ color:#c33; font-size:14px;}
+.xl-nav-c span img{ margin:7px 0px 0 0;}
+
+/*头部-end*/
+
+
+/*底部-star*/
+/* hongjw修改于2010.8.6 line:375 */
+.xl-footer{ width:955px; line-height:20px; height: auto;clear: both; margin:5px auto;}
+.xl-footer a{ color:#666;}
+.service{height:145px; clear:both; background:url(../../images/bj_bottom.gif) no-repeat; padding:30px 0 0 265px;}
+.service dl{ width:138px; height:auto; float:left; margin:0px 0 0 0px; line-height:20px; }
+.service dl dt{ font-size:14px ; font-weight:bold; line-height:27px; color:#bb0303; margin-bottom:10px;}
+
+.links{ width:953px; border:#f1f0f0 1px solid; height: auto; line-height:25px; margin:10px 0 10px 0; float:left;}
+.links dl dt{ margin:0 10px; color:#bb0303; float:left; width:60px; }
+.links dl dd{ float:left; padding:0 10px; text-align:left; width:852px; _width:842px;}
+.xl-bottom{ text-align:center; margin:10px 0;}
+
+.copyright{margin:8px 0px 8px 0px; text-align:center; line-height:22px;}
+.copyright a{ margin:0 10px;}
+.footer_help{ text-align:center;}
+.banquan{ line-height:22px; color:#666666; text-align:center;}
+/*底部-end*/
+
+/*搜索无结果信息提示-start*/
+.tips_min{
+	padding: .67em 1em .67em 2.5em;
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 1.3em;
+	text-align: left;
+}
+/*搜索无结果信息提示-end*/
+
+/* 支付选择 */
+.p-title{ margin:20px 0 0; line-height:30px; text-indent:33px; font-size:14px; color:#603C1C; background: #ffc url(../images/icon_293.gif) 10px 6px no-repeat;}
+.pay-tab{ margin:0px; margin-top:20px; float:left;}
+.pay-tab li{ float:left; line-height:27px; height:27px; width:120px; background: url(../../images/pay_tab_bg.gif) no-repeat; margin-right:8px; text-align:center}
+.pay-tab li.current{ background: url(../../images/pay_tab_c_bg.gif) no-repeat;}
+.pay-tab li a{ color:#000; font-size:14px; font-weight:600;}
+.pay-tab li.current a{ color:#fff;}
+.pay-box{ border:1px solid #ec970f; background-color:#f4bd52; width:948px; }
+.bgccc{ border:1px solid #ccc;background-color:#eee;}
+.table-2-14{ margin:5px; background-color:#fff;}
+.table-2-14 table{ border:0; width:730px !important;  width:720px;}
+.table-2-14 table td{color:#000;font-size:14px; padding:10px 0 10px 5px;}
+.table-2-14 table td.tb-label{ width:25%; line-height:15px;text-align:right; }
+.table-2-14 table td.tb-field{ width:70%; }
+
+.table-2-14 table .tb-field .f-f90{ width:180px; float:left;}
+.table-2-14 table .tb-field .f-red{ width:100px; float:left;}
+.table-2-14 table .tb-field .f-red span{ font-size:12px; color:#333; font-weight:300;}
+.statement{ border:1px solid #ffcc33; background-color:#fff4c2; padding:8px; margin-bottom:10px; line-height:18px; font-size:12px; width:80%;}
+.statement span.red{ color:#FF0000; font-weight:600; padding:0px 3px;}
+
+/* 购物流程 */
+.num{ width:950px; line-height:23px; height:23px; overflow:hidden; margin:10px 0;background:#e4e4e4;}
+.num li{ float:left; width:190px; text-align:center; line-height:23px; margin:0;}
+.num li span{display:block; line-height:23px; height:23px;font-size:14px; color:#BA7B12}
+.num li.current{background:#ffa900 url(../images/num_l.gif) top left no-repeat;}
+.num li.current span{background: url(../images/num_r.gif) top right no-repeat; font-weight:600; color:#fff;}
+
+
+/* 成功页面 */
+
+.success-box, .error-box{ height:314px; width:750px;background: url(../../images/success_bg.gif) no-repeat; margin:20px auto;}
+.success-box h2, .error-box h2{ text-align:center; line-height:70px; height:70px; color:#1e6e19;}
+.success-box dl, .error-box dl{ margin:20px 0 0 230px;}
+.success-box dl dt, .error-box dl dt { line-height:30px; font-size:14px; color:#003366}
+.success-box dl dd,  .error-box dl dd{ margin-left:24px; line-height:20px; font-size:13px;background: url(../images/login/dd_bg.gif) left 5px no-repeat; }
+.success-box dl dd a,  .error-box dl dd a{ margin-left:15px;}
+
+/* 错误页 */
+.error-box{ background: url(../../images/error_bg.gif) no-repeat; }
+.error-box h2{color:#570000;}
+
+/*红色按钮和灰色按钮*/
+.btn-confirm  {
+color:white;
+font-weight:bold;
+}
+
+.btn {
+ background:url(../images/button24_bg.png) no-repeat scroll 0 0 transparent;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:99px;
+}
+.btn a{color:#fff;font-weight:bold; line-height:25px;}
+.btn_h {
+ background:url(../images/button25_bg.png) no-repeat scroll 0 0 transparent;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:99px;
+}
+.btn_h a{color:#000;line-height:25px;}
+
+/*cw*/
+a.f-link{color:#7903ff;}
+.f-red{ color:#790300; font-weight:600;}
+
+
+
+/*added by chenyan 20110119 start.new index page */
+/*foot start*/
+.dx01_kf{ width:955px; height:170px; background:url(../../images/index20100113/bj_kf.jpg) repeat-x;}
+.dx01_kf_pic{ width:198px; height:170px; background: url(../../images/index20100113/footer_kf.jpg) no-repeat; padding-left:30px; float:left;}
+.dx01_kf_c{ width:140px; float:left; padding-top:10px;}
+.dx01_kf_c dt{ font:bold 14px "宋体"; color:#e54112; padding:10px 0 5px 0}
+.dx01_kf_c dd{ padding-top:10px;}
+.dx01_kf_c dd a{ color:#666;}
+
+.dx01_cooperate{ margin:5px 0 10px 0; width:955px; height:auto; float:left; clear:both; padding:10px 0 0 0; border-top:#dbdbdb 1px solid; border-bottom:#b8b8b8 1px dashed;} 
+.dx01_cooperate dl{ clear:both;}
+.dx01_cooperate dl dt{ float:left;}
+.dx01_cooperate dl dd{ float:left; line-height:25px; padding-top:2px; text-align:justify; width:875px; }
+.dx01_cooperate dl dd a{ padding:0 3px; height:25px; line-height:25px; }
+
+.dx01_bottom{ text-align:center;}
+.dx01_bottom p.info a{ padding:0 5px;}
+/*foot end*/
+/*added by chenyan 20110119 end */

@@ -1,0 +1,163 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>采购</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	<!--导出Excel相关HTML-->
+     <form id="excelForm"  action="/product/exportProduct.html" method="post" target="excelIFrame">
+      
+ 
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+					 <td class="form-label" style="width:60px;">采购ID：</td>
+                    <td style="width:150px">
+                        <input name="idPurchaseLifeCycle" id="idPurchaseLifeCycle" class="mini-textbox" onenter="search()" />
+                    </td>
+					 <td class="form-label" style="width:60px;">采购单号：</td>
+                    <td style="width:150px">
+                        <input name="idPurchase" id="idPurchase" class="mini-textbox" onenter="search()" />
+                    </td>
+                    <td class="form-label" style="width:60px;">供货商：</td>
+                    <td style="width:150px">
+                        <input name="supplyName" id="supplyName" class="mini-textbox" onenter="search()" />
+                    </td>
+					<td rowspan="2">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+                    </td>
+					</tr>
+					<tr>
+                    <td class="form-label" style="width:60px;">订单状态：</td>
+                    <td style="width:150px">
+                        <input  name="idStatus" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td> 
+					<td class="form-label" style="width:60px;">货款状态：</td>
+                    <td style="width:150px">
+                        <input  name="idMoneyStatus" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="moneyStatusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td> 
+					<td class="form-label" style="width:60px;">发起人：</td>
+                    <td style="width:150px">
+                        <input name="operatorName" id="operatorName" class="mini-textbox" onenter="search()" />
+                    </td>
+					 
+                </tr>
+            </table>
+        </div>
+    </div>
+	 </form>
+	 <iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+	 
+	
+	
+ 
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:470px;" allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        url="list.html"  idField="idPurchaseLifeCycle"  onRowdblclick="edit()"  pageSize="50" allowAlternating="true" pageIndex="1"  >
+        <div property="columns">
+            <div type="indexcolumn"></div>
+            <div field="idPurchaseLifeCycle" width="120" headerAlign="center" align="center" allowSort="true">采购ID</div>
+            <div field="idPurchase" width="120" headerAlign="center" align="center"  allowSort="true">采购单号</div>
+			<div field="supplyName" width="120" headerAlign="center" align="center"  allowSort="true">货源</div>
+			<div field="moneyStatus" width="120" headerAlign="center" align="center"  allowSort="true">货款状态</div>
+			<div field="status" width="120" headerAlign="center" align="center"  allowSort="true">采购状态</div>
+			<div field="sentDate" width="120" headerAlign="center" align="center"  allowSort="true">航班日期</div>
+			<div field="taxesReate" width="120" headerAlign="center" align="center"  allowSort="true">税率</div>
+			<div field="lastOperatorName" width="120" headerAlign="center" align="center"  allowSort="true">最后经手人</div>
+			<div field="operatorName" width="120" headerAlign="center" align="center"  allowSort="true">发起人</div>
+			<div field="isBilling" width="120" headerAlign="center" align="center"  allowSort="true" renderer="onActionRenderer">是否报关</div>
+             
+        </div>
+    </div>
+    <script type="text/javascript">
+	 
+        var statusData = [{id: 11,value: "已提交，等待审核"  },  { id: 12, value: "已审核，等待采购" }, {id: 13, value: "已采购，等待发货"},{ id: 14, value: "已发货，等待完成" },{ id: 15,value: "已完成"},{ id: 16,value: "已关闭"}] ;
+		var moneyStatusData = [{id: 21,value: "未付款"  },  { id: 22, value: "已付款，等待确认" }, {id: 23, value: "已确认"}] ;
+		mini.parse();
+        var grid = mini.get("datagrid1");
+        
+        
+        //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            grid.load(data);
+        }
+		
+		
+		 function onActionRenderer(e) {
+		 	var s = "";
+		 	if(0 == e.value)
+			{
+            	var s = '<a class="New_Button" href="javascript:kaipiao(' + e.row.idPurchaseLifeCycle + ')">报关</a>';
+			}
+			else
+			{
+				s = "已报关";
+			}
+            return s;
+        }
+		
+		function kaipiao(idPurchaseLifeCycle)
+		{
+			var data = {idPurchaseLifeCycle: idPurchaseLifeCycle,isBilling: 1}; //已开票
+			 if (confirm(idPurchaseLifeCycle + " 确定报关？")) {
+                    mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '处理中,请勿关闭...'
+                        });
+                    jQuery.ajax({
+                        url: "/purchase/updatePurchaseLifecyle.html",
+						type: "post",
+						data: data,
+                        success: function(text) {
+							mini.unmask(); 
+							if("ok" == text)
+							{
+								grid.reload();
+							}
+                        },
+                        error: function() {
+							mini.unmask(); 
+						}
+                    });
+        	}
+		}
+		
+        function edit() {
+            var row = grid.getSelected();
+            if (row) {
+               var win = mini.open({
+                    url: "toEditPurchaseOrder.html",
+                    title: "订单详情",
+                    width: 900,
+                    height: 460,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        iframe.contentWindow.SetData(row);
+						iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                         grid.reload();
+                    }
+                });
+            } 
+			else 
+			{
+                alert("请选中一条记录");
+            }
+        }
+		       
+</script>
+</body>
+</html>

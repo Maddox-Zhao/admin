@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CategorySQL">
+	<cacheModel id="category-cache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="addCategory" />
+		<flushOnExecute statement="editCategory" />
+		<flushOnExecute statement="changeLeafStatus" />
+		<flushOnExecute statement="changeSearchStatus" />
+		<flushOnExecute statement="removeCategory" />
+		<flushOnExecute statement="removeCategoryAll" />
+		<property name="size" value="1000" />
+	</cacheModel>
+	<typeAlias alias="category"
+		type="com.huaixuan.network.biz.domain.goods.Category" />
+	<resultMap class="category" id="categoryResult">
+		<result column="id" property="id" />
+		<result column="cat_name" property="catName" />
+		<result column="cat_desc" property="catDesc" />
+		<result column="pic_path" property="picPath" />
+		<result column="cat_code" property="catCode" />
+		<result column="sort_order" property="sortOrder" />
+		<result column="is_show" property="isShow" />
+		<result column="child_nums" property="childNums" />
+		<result column="depth" property="depth" />
+		<result column="parent_code" property="parentCode" />
+		<result column="is_leaf" property="isLeaf" />
+		<result column="is_search" property="isSearch" />
+		<result column="common_agent_agio" property="commonAgentAgio" />
+		<result column="point_proportional" property="pointProportional" />
+	</resultMap>
+	<!-- create Category object -->
+	<insert id="addCategory" parameterClass="category">
+		<![CDATA[
+		insert into emall_category
+		(id,cat_name,cat_desc,pic_path,cat_code,sort_order,is_show,child_nums,depth,parent_code,is_leaf,is_search,
+		common_agent_agio,point_proportional)values(
+		null,
+		#catName#,
+		#catDesc#,
+		#picPath#,
+		#catCode#,
+		#sortOrder#,
+		#isShow#,
+		#childNums#,
+		#depth#,
+		#parentCode#,
+		1,
+		#isSearch#,
+		#commonAgentAgio#,
+		#pointProportional#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update Category object -->
+	<update id="editCategory" parameterClass="category">
+		<![CDATA[
+		update emall_category set cat_name = #catName#,
+		cat_desc = #catDesc#,
+		]]>
+		<isNotNull prepend="" property="picPath">
+			pic_path = #picPath#,
+		</isNotNull>
+		<![CDATA[
+		cat_code = #catCode#,
+		common_agent_agio = #commonAgentAgio#,
+		point_proportional = #pointProportional#,
+		sort_order = #sortOrder#,
+		is_search=#isSearch#,
+		is_show=#isShow#
+	where id = #id#
+			]]>
+	</update>
+
+	 <update id="editCategoryIsShow" parameterClass="category">
+        <![CDATA[
+        update emall_category set is_show = #isShow#
+        where cat_code LIKE concat(#catCode#,'%')
+        ]]>
+    </update>
+
+	<update id="changeLeafStatus" parameterClass="category">
+		update emall_category set is_leaf=#isLeaf# where
+		cat_code=#catCode#
+	</update>
+
+	<update id="changeSearchStatus" parameterClass="category">
+		update emall_category set is_search=#isSearch# where 1=1
+		<isNotEmpty property="catCode" prepend="and">
+			cat_code=#catCode#
+		</isNotEmpty>
+		<isNotEmpty property="parentCode" prepend="and">
+			parent_code=#parentCode#
+		</isNotEmpty>
+	</update>
+
+	<!-- delete Category object -->
+	<update id="removeCategory" parameterClass="string">
+		<![CDATA[
+		delete from emall_category  where emall_category.cat_code = #catCode#
+]]>
+	</update>
+
+	<delete id="removeCategoryAll">
+		<![CDATA[
+		delete from emall_category
+]]>
+	</delete>
+
+	<!-- search Category object -->
+	<select id="getCategory" parameterClass="java.lang.Long"
+		resultMap="categoryResult">
+		<![CDATA[
+		select emall_category.* from emall_category where emall_category.ID = #value#
+]]>
+	</select>
+
+	<select id="getCategoryByName" parameterClass="category"
+		resultMap="categoryResult">
+		<![CDATA[
+		select emall_category.* from emall_category where emall_category.cat_name = #catName#
+	]]>
+		<isNotEmpty property="parentCode" prepend="and">
+			parent_code=#parentCode#
+		</isNotEmpty>
+		<isNotEmpty property="isShow" prepend="and">
+            is_show=#isShow#
+        </isNotEmpty>
+	</select>
+
+    <select id="getCategoryListByParentCode" parameterClass="category"
+        resultMap="categoryResult">
+        <![CDATA[
+        select emall_category.* from emall_category where is_show=1
+    ]]>
+        <isNotEmpty property="parentCode" prepend="and">
+            parent_code=#parentCode#
+        </isNotEmpty>
+    </select>
+
+	<select id="getCategoryByCode" parameterClass="string"
+		resultMap="categoryResult">
+		<![CDATA[
+		select emall_category.* from emall_category where emall_category.cat_code = #catCode#
+]]>
+	</select>
+
+    <select id="getCategoryListByCode" parameterClass="string"
+        resultMap="categoryResult">
+        <![CDATA[
+        select emall_category.* from emall_category where  is_show=1 and emall_category.parent_code = #catCode#
+    ]]>
+    </select>
+
+	<!-- searchAll Category List -->
+	<select id="getCategorys" resultMap="categoryResult">
+		<![CDATA[
+		select emall_category.* from emall_category
+		order by emall_category.sort_order asc
+]]>
+	</select>
+
+	<select id="getChildCountOfTheCategory" resultClass="int"
+		parameterClass="category">
+		<![CDATA[
+		select count(*) from emall_category e where  e.parent_code = 	#parentCode#  and e.is_show=1  and  e.cat_code!='-1'
+	]]>
+	</select>
+
+
+	<select id="getChildOfTheCategory" resultMap="categoryResult"
+		parameterClass="string" cacheModel="category-cache">
+		<![CDATA[
+		select e.* from  emall_category e where  e.parent_code = 	#parentCode#  and e.is_show=1 and e.cat_code !='-1' order by e.sort_order asc
+		]]>
+	</select>
+	<update id="AddChildCountOFTheCategory" parameterClass="string">
+		<![CDATA[
+	update emall_category  ec  set ec.child_nums=ec.child_nums+1,is_leaf=0  where ec.cat_code=#catCode#
+
+	]]>
+	</update>
+	<!-- user when do the sorting,the sql is to find the before record -->
+	<select id="getLastCategoryInfo" parameterClass="category"
+		resultMap="categoryResult">
+		<![CDATA[
+		select ee.*
+          from (select *
+                  from emall_category e
+                 where e.parent_code = #parentCode#
+                   and e.sort_order <= #sortOrder#
+                   and e.is_show = 1) ee
+         order by ee.sort_order desc LIMIT 1
+
+		]]>
+	</select>
+	<select id="getNextCategoryInfo" parameterClass="category"
+		resultMap="categoryResult">
+		<![CDATA[
+		select ee.*
+          from (select *
+                  from emall_category e
+                 where e.parent_code = #parentCode#
+                   and e.sort_order >= #sortOrder#
+                   and e.is_show = 1
+                   and e.id != #id#) ee
+         order by ee.sort_order asc LIMIT 1
+
+		]]>
+	</select>
+	<select id="checkEditNameAvaiOrNotForCategory" resultClass="int"
+		parameterClass="category">
+		<![CDATA[
+	select count(*) from  emall_category e where e.cat_name=#catName#
+]]>
+		<isNotNull prepend=" and " property="parentCode">
+			e.parent_code = #parentCode#
+		</isNotNull>
+		<isNotNull prepend=" and " property="id">
+			e.id != #id#
+		</isNotNull>
+	</select>
+	<select id="getGoodsAcountRelatedToCategory" resultClass="int"
+		parameterClass="string">
+		<![CDATA[
+		select count(*) from emall_goods eg where eg.cat_code=#catCode# and eg.goods_status!='delete'
+		]]>
+	</select>
+	<select id="getMaxDepth" resultClass="int" parameterClass="int">
+		<![CDATA[
+		select max(depth) from  emall_category
+	]]>
+	</select>
+	<select id="getCategoryByDepth" resultMap="categoryResult"
+		parameterClass="int">
+		<![CDATA[
+		select e.* from emall_category e where e.depth=#depth# and e.is_show=1 order by  e.parent_code asc,  e.sort_order asc
+	]]>
+	</select>
+	<select id="getCategoryList" resultMap="categoryResult">
+		<![CDATA[
+		select e.* from emall_category e where  e.is_show=1 and e.is_search=1 and  e.parent_code
+		not in(select e.cat_code from emall_category e where  e.is_show=1 and e.is_search=0 and e.cat_code!='-1') order by e.cat_code asc
+		]]>
+	</select>
+
+	<select id="getCategoryNotShownByOrder" resultMap="categoryResult">
+		  select cat.* from emall_category cat,(
+		    select c.cat_code,sum(n.amount) as saleSum 
+		    from ioss_out_depository m,
+		    	ioss_prod_relation_out n,
+		    	ioss_storage p,
+		    	emall_trade a,
+		    	emall_trade_package tp,
+		    	emall_order b,
+		    	emall_goods c
+		    where a.tid = b.tid 
+		    	and b.goods_id = c.id 
+		    	and m.relation_num = tp.merge_tid
+       			and a.tid = tp.tid
+		        and m.id = n.out_dep_id 
+		        and  n.storage_id = p.id
+		        and b.goods_instance_id = n.goods_instance_id
+		        and m.type ='out_sales'
+		        and a.status in ('trade_finish','wait_buyer_confirm_goods') group by c.cat_code) t
+		  where cat.cat_code = t.cat_code(+)
+		  and cat.is_show=1 and cat.is_search=1 and cat.cat_code!='-1'
+		<isNotNull property="codes">
+			and cat.cat_code not in(
+			select e.cat_code from emall_category e
+			where e.is_show=1 and e.is_search=0 and e.cat_code!='-1' and cat.depth >1
+			<iterate prepend="AND" property="codes" open="(" close=")" conjunction="or">
+				e.cat_code like concat(#codes[]#,'%')
+			</iterate>
+			)
+		</isNotNull>
+		 order by t.saleSum desc nulls last
+	</select>
+
+	<select id="getCategoryNotShow" resultMap="categoryResult">
+		<![CDATA[
+		select a.* from emall_category a where  a.is_show=1 and a.is_search=1 and a.cat_code!='-1'
+	]]>
+		<isNotNull property="codes">
+			and a.cat_code not in( select e.cat_code from emall_category
+			e where e.is_show=1 and e.is_search=0 and e.cat_code!='-1'
+			<iterate prepend="AND" property="codes" open="(" close=")"
+				conjunction="or">
+				e.cat_code like concat(#codes[]#,'%')
+			</iterate>
+			)
+		</isNotNull>
+		order by a.cat_code asc
+	</select>
+
+	<select id="getCategoryNotShownId" resultClass="String">
+		select e.cat_code from emall_category e where e.is_show=1 and
+		e.is_search=0 and e.cat_code!='-1'
+	</select>
+
+	<select id="getRightChildInfoOfTheParent" resultMap="categoryResult" parameterClass="string">
+		<![CDATA[
+		select e.* from  emall_category e where  e.parent_code = 	#parentCode#  and e.is_show=1 and e.cat_code !='-1' order by e.sort_order asc
+        ]]>
+	</select>
+
+	<select id="getCategoryByCatCode" resultMap="categoryResult" parameterClass="string">
+		<![CDATA[
+		   select e.* from emall_category e where  e.cat_code =  #value#
+        ]]>
+	</select>
+	
+    <select id="getCategoryListByCategory" parameterClass="category"
+        resultMap="categoryResult">
+        <![CDATA[
+        select emall_category.* from emall_category where 1=1
+        ]]>
+        <isNotEmpty property="parentCode" prepend="and">
+            parent_code=#parentCode#
+        </isNotEmpty>
+        <isNotEmpty property="depth" prepend="and">
+            depth=#depth#
+        </isNotEmpty>
+        <isNotEmpty property="isShow" prepend="and">
+            is_show=#isShow#
+        </isNotEmpty>
+    </select>
+</sqlMap>

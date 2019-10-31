@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap >
+
+<typeAlias alias="webSiteEmail" type="com.huaixuan.network.biz.domain.goods.WebSiteEmail"/>
+
+<!-- create webSiteEmail object -->
+<insert id="addWebSiteEmail" parameterClass="webSiteEmail">
+<![CDATA[
+       INSERT INTO emall_web_site_email
+         (id, title, status, content, gmt_create, gmt_modify, type)
+       values
+      (null, #title#, #status#, #content#, sysdate(), sysdate(), #type#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<update id="editWebSiteEamilStatus" parameterClass="webSiteEmail">
+<![CDATA[
+        update emall_web_site_email set status = #status#,
+        gmt_modify= sysdate()
+        where id=#id#
+]]>
+</update>
+
+
+<update id="updateWebSite" parameterClass="webSiteEmail">
+<![CDATA[
+        update emall_web_site_email set title = #title#,
+        content = #content#,
+        gmt_modify= sysdate()
+        where id=#id#
+]]>
+</update>
+
+
+<update id="removeWebSiteEamil" parameterClass="webSiteEmail">
+<![CDATA[
+        update emall_web_site_email set status = #status#,
+        gmt_modify= sysdate()
+        where id=#id#
+]]>
+</update>
+
+
+    <sql id="COMMON_CONDITION">
+        <isNotEmpty property="id" prepend="and ">
+            id = #id#
+        </isNotEmpty>
+        <isNotEmpty property="status" prepend="and">
+            status=#status#
+        </isNotEmpty>
+        <isNotEmpty property="fromUser" prepend="and">
+            from_user = #fromUser#
+        </isNotEmpty>
+        <isNotEmpty property="toUser" prepend="and">
+            to_user = #toUser#
+        </isNotEmpty>
+
+        <isNotEmpty property="gmtCreate" prepend="and">
+            gmt_create <![CDATA[ < ]]> #gmtCreate#
+        </isNotEmpty>
+        order by gmt_create desc
+    </sql>
+<!-- search WebSiteEmai object -->
+<select id="getWebSiteEmail"  resultClass="webSiteEmail">
+<include refid="pageSQLHead" />
+<![CDATA[
+select id,
+       title,
+       status,
+       content,
+       gmt_create as gmtCreate,
+       gmt_modify as gmtModify,
+       type
+  from emall_web_site_email
+ where status != 'delete'
+
+]]>
+<include refid="COMMON_CONDITION" />
+<include refid="pageSQLFoot" />
+</select>
+
+<select id="getWebSiteEmailQuery"  resultClass="webSiteEmail">
+<![CDATA[
+select id,
+       title,
+       status,
+       content,
+       gmt_create as gmtCreate,
+       gmt_modify as gmtModify,
+       type
+  from emall_web_site_email
+ where status != 'delete'
+
+]]>
+<include refid="COMMON_CONDITION" />
+</select>
+
+<select id="countWebSiteEmail"  resultClass="java.lang.Integer">
+<![CDATA[
+      select count(1)
+ from emall_web_site_email where status!='delete'
+]]>
+<include refid="COMMON_CONDITION" />
+</select>
+
+    <sql id="COMMON_RATION_CONDITION">
+         <isNotEmpty property="id" prepend="and">
+            b.id=#id#
+        </isNotEmpty>
+        <isNotEmpty property="status" prepend="and">
+            b.status=#status#
+        </isNotEmpty>
+        <isNotEmpty property="fromUser" prepend="and">
+            b.from_user = #fromUser#
+        </isNotEmpty>
+        <isNotEmpty property="toUser" prepend="and">
+            b.to_user = #toUser#
+        </isNotEmpty>
+        <isNotEmpty property="gmtCreate" prepend="and">
+            b.gmt_create  &lt;  #gmtCreate#
+        </isNotEmpty>
+        order by b.gmt_create desc
+    </sql>
+
+<select id="getWebSiteEmailRelation"  resultClass="webSiteEmail">
+<include refid="pageSQLHead"/>
+<![CDATA[
+select b.id,
+       title,
+       b.status,
+       content,
+       b.gmt_create as gmtCreate,
+       b.gmt_modify gmtModify,
+       type,
+       b.from_user as fromUser,
+       b.to_user as toUser
+  from emall_web_site_email a, emall_web_site_relation b
+ where a.status != 'delete'
+   and b.status != 'delete'
+   and a.id = b.web_site_id
+
+]]>
+<include refid="COMMON_RATION_CONDITION" />
+<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="countWebSiteEmailRelation"  resultClass="java.lang.Integer">
+<![CDATA[
+select count(1)
+  from emall_web_site_email a, emall_web_site_relation b
+ where a.status != 'delete'
+   and b.status != 'delete'
+   and a.id = b.web_site_id
+
+]]>
+<include refid="COMMON_RATION_CONDITION" />
+</select>
+
+</sqlMap>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="productDAO">
+	<typeAlias alias="product" type="com.huaixuan.network.biz.domain.hy.Product" />
+	<resultMap id="productResult" class="com.huaixuan.network.biz.domain.hy.Product">
+		<result column="idBrand" property="idBrand" />
+		<result column="idSeries" property="idSeries" />
+		<result column="Size" property="size" />
+		<result column="targetCustomers" property="targetCustomers" />
+		<result column="Color" property="color" />
+		<result column="Material" property="material" />
+		<result column="Type" property="type" />
+		<result column="Picture" property="picture" />
+		<result column="idProduct" property="idProduct" />
+		<result column="idStatus" property="idStatus" />
+		<result column="idLocation" property="idLocation" />
+		<result column="cost" property="cost" />
+		<result column="idCostCurrency" property="idCostCurrency" />
+		<result column="HXPrice" property="hxPrice" />
+		<result column="HKHXPrice" property="hkhxPrice" />
+		<result column="CNPrice" property="cnPrice" />
+		<result column="EUPrice" property="euPrice" />
+		<result column="HKPrice" property="hkPrice" />
+		<result column="goods_id" property="goodsId" />
+		<result column="instance_id" property="instanceId" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="gmt_export" property="gmtExport" />
+	</resultMap>
+	<resultMap id="ProductResultForSendMail" class="product">
+		<result property="idProduct" column="idProduct" />
+		<result property="idBrand" column="idBrand" />
+		<result property="idSeries" column="idSeries" />
+		<result property="type" column="Type" />
+		<result property="material" column="Material" />
+		<result property="color" column="Color" />
+		<result property="picture" column="Picture" />
+		<result property="size" column="Size" />
+		<result property="idSeries" column="idSeries" />
+		<result property="goodsId" column="goods_id" />
+	</resultMap>
+	
+	<resultMap id="idProductAndgoodsId" class="product">
+		<result property="idProduct" column="idProduct" />
+		<result property="goodsId" column="goods_id" />
+	</resultMap>
+	
+
+	<select id="getProductClientToBrowser" resultMap="productResult"
+		parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*,q.idStatus as idStatus,q.idLocation as idLocation,q.cost as  cost,
+	   		q.idCostCurrency as idCostCurrency,q.HXPrice as HXPrice ,q.HKHXPrice as HKHXPrice
+	   from Product t,LifeCycle q where t.idProduct=q.idProduct AND q.idStatus!=7
+	   		and t.goods_id is null and t.instance_id is null and t.gmt_create > DATE_SUB(SYSDATE(),INTERVAL 365 DAY) and t.gmt_export is null
+	   ]]>
+		<isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  q.idLocation = #idLocation# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="size" prepend="and">
+		<![CDATA[  t.Size = #size# ]]>
+		</isNotEmpty>
+		order by t.gmt_modify ASC,t.idProduct DESC
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+
+	</select>
+
+	<select id="getProductByCustomerOrderId" resultMap="productResult"
+		parameterClass="java.lang.Long">
+       <![CDATA[ 
+	   select
+	   t.*,q.idStatus as idStatus,q.idLocation as idLocation,q.cost as  cost,
+	   		q.idCostCurrency as idCostCurrency,q.HXPrice as HXPrice ,q.HKHXPrice as HKHXPrice
+	   from Product t,LifeCycle q where t.idProduct=q.idProduct AND q.idStatus!=7
+	   		and q.idOrder = #value#
+	   ]]>
+		order by t.idProduct desc
+
+	</select>
+
+	<select id="getProductNumByPramas" resultClass="java.lang.Long"
+		parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select count(*) 
+	   from Product t,LifeCycle q where t.idProduct=q.idProduct AND q.idStatus!=7
+	   ]]>
+		<isNotEmpty property="idOrder" prepend="and">
+		<![CDATA[  q.idOrder = #idOrder# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="instanceId" prepend="and">
+		<![CDATA[  t.instance_id = #instanceId# ]]>
+		</isNotEmpty>
+
+	</select>
+
+
+	<select id="getProductByMap" resultMap="productResult"
+		parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*,q.idStatus as idStatus,q.idLocation as idLocation,q.cost as  cost,
+	   		q.idCostCurrency as idCostCurrency,q.HXPrice as HXPrice ,q.HKHXPrice as HKHXPrice
+	   from Product t,LifeCycle q where t.idProduct=q.idProduct AND q.idStatus!=7
+	   ]]>
+		<isNotEmpty property="productId" prepend="and">
+		<![CDATA[  t.idProduct = #productId# ]]>
+		</isNotEmpty>
+
+	</select>
+
+	<select id="getProductByOrderId" parameterClass="java.lang.Long"
+		resultMap="ProductResultForSendMail">
+		SELECT t.* FROM Product t ,emall_order_product e WHERE t.idProduct =
+		e.productId AND e.orderId =#oid#
+	</select>
+
+	<insert id="insertProductVSOrderId" parameterClass="java.util.Map">
+		insert into
+		emall_order_product(id,productId,orderId)
+		values(null,#poductId#,#orderId#)
+	</insert>
+
+	<update id="updateProductToBrowser" parameterClass="java.util.Map">
+		UPDATE
+		Product
+		SET gmt_modify = sysdate(),
+		goods_id=#goodsId#,
+		instance_id=#instanceId#,
+		gmt_export = sysdate()
+		WHERE idProduct =
+		#idProduct#
+	</update>
+
+	<select id="selectProductById" parameterClass="java.lang.Long"
+		resultMap="ProductResultForSendMail">
+		SELECT *
+		from Product
+		where idProduct = #id#
+	</select>
+
+	<select id="getProducttoCheckNum" resultMap="productResult"
+		parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*,q.idStatus as idStatus,q.idLocation as idLocation,q.cost as  cost,
+	   		q.idCostCurrency as idCostCurrency,q.HXPrice as HXPrice ,q.HKHXPrice as HKHXPrice
+	   from Product t,LifeCycle q where t.idProduct=q.idProduct AND q.idStatus!=7
+	   		and t.goods_id is not null and t.instance_id is not null 
+	   ]]>
+		<isNotEmpty property="gmtPictureTag" prepend="and">
+		<![CDATA[  t.gmt_picture >= DATE_SUB(SYSDATE(),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="statusTag" prepend="and">
+		<![CDATA[  ( q.idStatus = 1 or q.idStatus = 2 ) ]]>
+		</isNotEmpty>
+		order by t.idProduct desc
+
+	</select>
+
+	<select id="getProducts" resultMap="productResult"
+		parameterClass="java.util.List">
+		select * from
+		Product
+		where
+		idProduct in
+		<iterate open="(" close=")" conjunction=",">
+			#value[]#
+		</iterate>
+		oreder by idProduct desc
+	</select>
+
+	<update id="updateProductStatusByProductId" parameterClass="java.util.Map">
+		UPDATE LifeCycle
+		SET idStatus = #status#
+		WHERE idProduct = #productId#
+	</update>
+
+
+
+   <select id="getProductByDate" resultMap="idProductAndgoodsId"
+		parameterClass="java.util.Map">
+		SELECT 
+		  p.`goods_id`,p.`idProduct` 
+		FROM
+		  product p,
+		  (SELECT 
+		    l.idProduct,
+		    co.date 
+		  FROM
+		    lifecycle l,
+		    `customerorder` co 
+		  WHERE l.`idOrder` = co.`idOrder` 
+		    AND l.`idStatus` IN ('3', '4') 
+		    <isNotEmpty property="sellDateStart">
+				<![CDATA[ and co.date >= #sellDateStart#  ]]>
+		   </isNotEmpty>
+		   <isNotEmpty property="sellDateEnd">
+					<![CDATA[ and co.date <= '$sellDateEnd$ 23:59:59'  ]]>
+		   </isNotEmpty>
+		  ORDER BY co.date DESC) cl 
+		WHERE p.`idProduct` = cl.idProduct 
+	</select>
+
+<select id="getBySellDate" resultMap="idProductAndgoodsId">
+		SELECT 
+		  * 
+		FROM
+		  product p,
+		  (SELECT 
+		    co.`date`,
+		    co.`idOrder`,
+		    l.`idProduct` 
+		  FROM
+		    lifecycle l,
+		    `customerorder` co 
+		  WHERE co.`idOrder` = l.`idOrder` 
+		    AND l.idStatus != 7 
+		    AND co.`date` >= DATE_SUB(SYSDATE(), INTERVAL 93 DAY) 
+		   <![CDATA[ AND co.`date` < SYSDATE() ]]>
+		  ORDER BY co.`date` DESC) col 
+		WHERE p.`idProduct` = col.`idProduct` 
+		AND (p.`goods_id` IS NOT NULL OR p.`goods_id`!=0)
+		ORDER BY col.date DESC 
+	</select>
+
+</sqlMap>

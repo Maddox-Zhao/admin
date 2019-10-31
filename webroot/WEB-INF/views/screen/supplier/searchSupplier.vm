@@ -1,0 +1,135 @@
+#set($layout = 'layout\default.vm')
+
+<div class="main">
+
+<h2>供应商管理</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>搜索供应商</span></h3>
+    <form action="searchSupplier.html" name="searchForm" id="searchForm" method="post">
+    <table>
+      <tr>
+        <th>供应商名称：</th>
+        			#springBind("supplier.name")
+        <td><input  type="text" name="${status.expression}" id="supplier.name"  value="$!{status.value}" /></td>
+        <th>供应商等级：</th>
+        <td>
+        			#springBind("supplier.grade")
+        <select name="${status.expression}">
+	<option value="" #if(""==$!{status.value}) selected #end>-=请选择=-</option>
+	<option value="g" #if("g"==$!{status.value}) selected #end>优良</option>
+	<option value="n" #if("n"==$!{status.value}) selected #end>普通</option>
+	<option value="b" #if("b"==$!{status.value}) selected #end>差</option>
+	</select></td>
+        <th>&nbsp;</th>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <th>经营范围：</th>
+        <td>
+        #springBind("supplier.brand")
+        <input  type="text" name="${status.expression}"  id="supplier.brand" value="$!{status.value}" /></td>
+        <th>状态：</th>
+        <td>
+        #springBind("supplier.status")
+        <select name="${status.expression}">
+	<option value="" #if(""==$!{status.value}) selected #end>-=请选择=-</option>
+	<option value="v" #if("v"==$!{status.value}) selected #end>正常</option>
+	<option value="d" #if("d"==$!{status.value}) selected #end>失效</option>
+	</select></td>
+        <th>&nbsp;</th>
+        <td><button type="submit" class="btn" onclick="formSubmit();">搜 索</button></td>
+      </tr>
+    </table>
+    </form>
+  </div>
+  #if($!adminAccess.has('A_SUPPLIER_ADD_USER'))
+<div class="tool">
+            <span><a href="${appServer}/supplier/addSupplier.html" hidefocus="true" class="bt_add">新增供应商</a></span>
+        </div>
+  #end
+
+        <div class="clear"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+
+<!-- 订单列表 -->
+<div class="listBox">
+          <h3><span>供应商列表</span></h3>
+    <table>
+      <tr>
+      <th>供应商编码</th>
+        <th>供应商名称</th>
+        <th>联系人</th>
+        <th>联系电话</th>
+        <th>email</th>
+        <th>客户等级</th>
+		<th>状态</th>
+        <th>经营范围</th>
+        <th>操作</th>
+      </tr>
+	  #foreach($supplier in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+	  <td  align="center">$!supplier.id</td>
+		 <td  align="center"><a href="$appServer/storage/list_storage.html?supplierName=$!supplier.getNameUrl()&&supplierId=$!supplier.id" target="_blank">$!supplier.name</a></td>
+		 <td  align="center">$!supplier.linkman</td>
+		 <td  align="center">$!supplier.tel</td>
+		 <td  align="center">$!supplier.email</td>
+		 <td  align="center">#if("g"==$!supplier.grade)优良
+			                 #elseif("n"==$!supplier.grade)普通
+						     #elseif("b"==$!supplier.grade)差
+	                         #end
+	  </td>
+	  <td  align="center">#if("v"==$!supplier.status)正常
+			                 #elseif("d"==$!supplier.status)失效
+	                         #end
+	  </td>
+		 <td  align="center">$!supplier.brand</td>
+		 <td align="center">#if($!adminAccess.has('A_SUPPLIER_VIEW_USER'))<a href="viewSupplier.html?sid=$!supplier.id">查看</a>#end #if($!adminAccess.has('A_SUPPLIER_MODIFY_USER'))<a href="editSupplier.html?sid=$!supplier.id">编辑</a>#end
+		 #if($!adminAccess.has('A_SUPPLIER_DELETE_USER'))
+		 #if("d"==$!supplier.status)<a href="#" onclick="javascript:enable($!supplier.id)" >激活</a>#end
+		 #if("v"==$!supplier.status)<a href="#" onclick="javascript:disable($!supplier.id)" >失效</a>#end
+		 #end
+		 </td>
+	  </tr>
+	  #end
+
+    </table>
+    <!-- 分页 -->
+<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/supplier/searchSupplier.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+			function formSubmit(){
+	    	document.getElementById("supplier.name").value=jQuery.trim(document.getElementById("supplier.name").value);
+	    	document.getElementById("supplier.brand").value=jQuery.trim(document.getElementById("supplier.brand").value);
+        		document.getElementById('searchForm').submit();
+	}
+
+	function enable(sid){
+		var answer = confirm("确定要激活?")
+		if (answer){
+			window.location = 'enable.html?sid='+sid;
+		}
+
+		}
+		function disable(sid){
+		var answer = confirm("确定要失效?")
+		if (answer){
+			window.location = 'disable.html?sid='+sid;
+		}
+
+		}
+</script>

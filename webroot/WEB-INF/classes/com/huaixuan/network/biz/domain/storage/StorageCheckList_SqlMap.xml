@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="StorageCheckListSQL">
+<typeAlias alias="storageCheckList" type="com.huaixuan.network.biz.domain.storage.StorageCheckList"/>
+	<resultMap class="storageCheckList" id="storageCheckListResult">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="dep_id" property="depId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="stor_num" property="storNum"/>
+		<result column="check_num" property="checkNum"/>
+		<result column="status" property="status"/>
+		<result column="check_id" property="checkId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="price" property="price" nullValue="0.00"/>
+	</resultMap>
+
+	<resultMap class="storageCheckList" id="storageCheckFullListResult">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="instance_name" property="goodsInstanceName"/>
+		<result column="attrs" property="attribute"/>
+		<result column="dep_id" property="depId"/>
+		<result column="name" property="depName"/>
+		<result column="loc_name" property="locName"/>
+		<result column="loc_id" property="locId"/>
+		<result column="stor_num" property="storNum"/>
+		<result column="check_num" property="checkNum"/>
+		<result column="status" property="status"/>
+		<result column="check_id" property="checkId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="code" property="code"/>
+		<result column="price" property="price" nullValue="0.00"/>
+	</resultMap>
+<!-- create StorageCheckList object -->
+<insert id="addStorageCheckList" parameterClass="storageCheckList">
+<![CDATA[
+		insert into ioss_storage_check_list
+		(id,goods_id,goods_instance_id,dep_id,loc_id,stor_num,check_num,status,check_id,gmt_create,gmt_modify,price )values( null,
+		#goodsId#,
+		#goodsInstanceId#,
+		#depId#,
+		#locId#,
+		#storNum#,
+		#checkNum#,
+		#status#,
+		#checkId#,
+		sysdate(),
+		sysdate(),
+		#price#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update StorageCheckList object -->
+<update id="editStorageCheckList" parameterClass="storageCheckList">
+<![CDATA[
+		update ioss_storage_check_list set goods_id = #goodsId#,
+		goods_instance_id = #goodsInstanceId#,
+		dep_id = #depId#,
+		loc_id = #locId#,
+		stor_num = #storNum#,
+		check_num = #checkNum#,
+		status = #status#,
+		check_id = #checkId#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete StorageCheckList object -->
+<delete id="removeStorageCheckList" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_storage_check_list where ioss_storage_check_list.ID = #value#
+]]>
+</delete>
+<!-- search StorageCheckList object -->
+<select id="getStorageCheckList" parameterClass="java.lang.Long" resultMap="storageCheckListResult">
+<![CDATA[
+		select ioss_storage_check_list.* from ioss_storage_check_list where ioss_storage_check_list.ID = #value#
+]]>
+</select>
+<!-- searchAll StorageCheckList List -->
+<select id="getStorageCheckLists" resultMap="storageCheckListResult">
+<![CDATA[
+		select ioss_storage_check_list.* from ioss_storage_check_list
+]]>
+</select>
+
+<select id="getStorageCheckListsByCountParameterMap" resultClass="java.lang.Integer">
+      <![CDATA[
+		select count(ioss_storage_check_list.id) from ioss_storage_check_list,ioss_depository,ioss_dep_location,ioss_goods_instance where
+         ioss_dep_location.id=ioss_storage_check_list.loc_id and ioss_depository.id = ioss_storage_check_list.dep_id and ioss_goods_instance.id = ioss_storage_check_list.goods_instance_id
+      ]]>
+
+		<isNotEmpty prepend="and" property="locId">
+			ioss_storage_check_list.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locName">
+			ioss_dep_location.loc_name like CONCAT('%',#locName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depName">
+			ioss_depository.name like CONCAT('%',#depName#,'%')
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsInstanceName">
+			ioss_goods_instance.instance_name like CONCAT('%',#goodsInstanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			ioss_storage_check_list.dep_id = #depId#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_storage_check_list.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="checkId">
+			ioss_storage_check_list.check_id = #checkId#
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+			ioss_storage_check_list.status = #status#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsInstanceCode">
+			ioss_goods_instance.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+</select>
+
+
+   <select id="getStorageCheckListsByParameterMap" resultMap="storageCheckFullListResult">
+   	<include refid="pageSQLHead"/>
+      <![CDATA[
+		select ioss_storage_check_list.*,ioss_depository.name,ioss_dep_location.loc_name,ioss_goods_instance.instance_name,ioss_goods_instance.code,ioss_goods_instance.attrs from ioss_storage_check_list,ioss_depository,ioss_dep_location,ioss_goods_instance where
+            ioss_dep_location.id=ioss_storage_check_list.loc_id and ioss_depository.id = ioss_storage_check_list.dep_id and ioss_goods_instance.id = ioss_storage_check_list.goods_instance_id
+       ]]>
+		<isNotEmpty prepend="and" property="locId">
+			ioss_storage_check_list.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			ioss_storage_check_list.dep_id = #depId#
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="locName">
+			ioss_dep_location.loc_name like CONCAT('%',#locName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depName">
+			ioss_depository.name like CONCAT('%',#depName#,'%')
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="goodsInstanceName">
+			ioss_goods_instance.instance_name like CONCAT('%',#goodsInstanceName#,'%')
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_storage_check_list.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="checkId">
+			ioss_storage_check_list.check_id = #checkId#
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="status">
+			ioss_storage_check_list.status = #status#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsInstanceCode">
+			ioss_goods_instance.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		order by ioss_goods_instance.code asc,ioss_storage_check_list.loc_id asc
+		<include refid="pageSQLFoot"/>
+    </select>
+
+</sqlMap>

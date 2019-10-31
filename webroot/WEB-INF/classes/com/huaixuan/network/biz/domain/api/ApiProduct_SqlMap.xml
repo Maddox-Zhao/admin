@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="AutoSyncDataNameSpace">
+ 
+	<resultMap class="com.huaixuan.network.biz.domain.autosyn.StockData" id="stockData">
+		<result column="brandName" property="brandName"/>
+		<result column="seriesName" property="seriesName"/>
+		<result column="idBrand" property="idBrand"/>
+		<result column="idSeries" property="idSeries"/>
+		<result column="type" property="type"/>
+		<result column="material" property="material"/>
+		<result column="color" property="color"/>
+		<result column="size" property="size"/>
+		<result column="sku" property="sku"/>
+		<result column="num" property="num"/>
+		<result column="picUrl" property="picUrl"/>
+	</resultMap>
+	
+	
+	<resultMap class="com.huaixuan.network.biz.domain.product.Product" id="stockDataPrice">
+		<result column="sku" property="sku"/>
+		<result column="euPrice" property="euPrice"/>
+		<result column="smPrice" property="smPrice"/>
+		<result column="ssPrice" property="ssPrice"/>
+	</resultMap>
+	
+ 
+
+<!--根据站点查询可售库存-->
+<select id="searchStockBySitesForApi" parameterClass="java.util.Map"  resultMap="stockData">
+select * from (
+			SELECT
+			  b.name    brandName,
+			  s.name    seriesName,
+			  t.*,
+			  CONCAT('http://www.hkshangshang.com:88/upload/',REPLACE(b.name,' ',''),'_',TYPE,'_',material,'_',color,'.jpg') picUrl
+			FROM (SELECT
+			        idBrand,
+			        idSeries,
+			        TYPE,
+			        material,
+			        color,
+			        size,
+			        sku,
+			        COUNT(TYPE)    num
+			      FROM Product t,
+			        LifeCycle q
+			      WHERE t.idProduct = q.idProduct
+			          AND q.idStatus = 1
+			          AND sku IS NOT NULL
+			          AND q.idLocation in $idLocation$
+			      GROUP BY idBrand,idSeries,TYPE,Material,color,size,sku
+			) t,
+			  brand b,
+			  series s
+			WHERE t.idSeries = s.idSeries
+			    AND t.idBrand = b.idBrand
+			   
+			ORDER BY TYPE,num
+) p
+LIMIT $startRow$,$endRow$
+</select>
+
+
+
+<!--根据站点查询可售库存-->
+<select id="searchStockBySitesForApiCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+select count(idBrand) total  from (
+			SELECT
+			  b.name    brandName,
+			  s.name    seriesName,
+			  t.*
+			FROM (SELECT
+			        idBrand,
+			        idSeries,
+			        TYPE,
+			        material,
+			        color,
+			        size,
+			        sku,
+			        COUNT(TYPE)    num
+			      FROM Product t,
+			        LifeCycle q
+			      WHERE t.idProduct = q.idProduct
+			          AND q.idStatus = 1
+			          AND sku IS NOT NULL
+			          AND q.idLocation in  $idLocation$
+			      GROUP BY idBrand,idSeries,TYPE,Material,color,size,sku
+			) t,
+			  brand b,
+			  series s
+			WHERE t.idSeries = s.idSeries
+			    AND t.idBrand = b.idBrand
+			   
+			ORDER BY TYPE,num
+) p
+</select>
+
+
+
+<!--根据sku查询欧洲价-->
+<select id="searchEuPriceBySkus" parameterClass="java.util.List" resultMap="stockDataPrice">
+	SELECT DISTINCT
+	  sku,
+	  euprice      euPrice,
+	  hkhxprice    smPrice,
+	  hxprice      ssPrice
+	 FROM product p,
+	  lifecycle l
+	 WHERE l.idProduct = p.idProduct
+	    AND l.idStatus != 7
+     AND sku IN 
+	 <iterate conjunction="," open="(" close=")" >
+ 			#sku[]# 
+	 </iterate>
+</select>
+ 
+</sqlMap>

@@ -1,0 +1,77 @@
+@charset "utf-8";
+/* CSS Document */
+.toggle,  .collapsed{
+background:url(../../images/toggle_bg.gif) no-repeat }
+.toggle,  .collapsed{
+display:block;
+height:20px;
+margin:0px auto;
+text-indent:-999px;
+width:685px;
+overflow:hidden;
+}
+.toggle{outline:none; background-position:0 -80px;}
+.toggle:hover {
+	background-position: 0px -120px;
+}
+.collapsed {
+outline:none;
+	background-position: 0px 0px
+}
+.collapsed:hover {
+	background-position: 0px -40px
+}
+
+.item-list-tabs li, .item-list-tabs li a {
+	background: url(../../images/skin/login/tabview_bg.gif) no-repeat;
+	float: left; }
+	.item-list-tabs li{
+	background-position: left 7px;
+	cursor: pointer;
+	margin-right: 8px;
+	line-height:28px;
+	vertical-align:bottom;
+	text-align: center
+}
+.item-list-tabs li a {
+background-position: right 7px;
+	line-height: 22px;
+	padding-top: 8px;
+	margin-left:10px;
+	_margin-left:5px;
+	padding:8px 10px 0px 0px;
+	display: block; color: #111;
+}
+.item-list-tabs li a:link, .item-list-tabs li a:visited{color:#624C92;}
+.item-list-tabs .current {
+	background-position: left -40px;
+}
+.item-list-tabs .current a{
+	background-position: right -40px;
+	font-weight: bold; color: #333;
+}
+.item-list-tabs a:hover {
+	text-decoration: none
+}
+.item-list-tabs .current a:hover{cursor: default; }
+.item-list-tabs a span{
+blr:expression(this.onFocus=this.blur());
+outline:none;
+}
+.msg{
+background:transparent url(../../images/msg_bg.png) no-repeat 3px -97px;
+border-color:#FF8C40;
+color:#404040;
+float:right;
+line-height:18px;
+padding:2px 10px 2px 23px;
+margin-bottom:10px;
+}
+
+
+
+
+
+
+
+

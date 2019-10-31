@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="reservedOrder">
+		<typeAlias alias="reservedOrder" type="com.huaixuan.network.biz.domain.reserved.ReservedOrder"/>
+		<resultMap class="reservedOrder" id="reservedOrderResult">
+			<result property="id" column="id"/>
+			<result property="idCustomer" column="idCustomer"/>
+			<result property="idOrder" column="idOrder"/>
+			<result property="subTotal" column="subTotal"/>
+			<result property="idCurrency" column="idCurrency"/>
+			<result property="idPayment" column="idPayment"/>
+			<result property="idChannel" column="idChannel"/>
+			<result property="amountCard" column="amountCard"/>
+			<result property="amountCash" column="amountCash"/>
+			<result property="idSite" column="idSite"/>
+			<result property="status" column="status"/>
+			<result property="createUserId" column="createUserId"/>
+			<result property="createUserName" column="createUserName"/>
+			<result property="createDate" column="createDate"/>
+			<result property="lastUpdateDate" column="lastUpdateDate"/>
+		</resultMap>
+		
+		<resultMap class="reservedOrder" id="reservedOrderResultShow" extends="reservedOrderResult">
+			<result property="currencyName" column="currencyName"/>
+			<result property="paymentName" column="paymentName"/>
+			<result property="sellChannelName" column="sellChannelName"/>
+			<result property="customerName" column="customerName"/>
+		</resultMap>
+		
+	<sql id="ReservedFields">
+			id,idOrder,idCustomer,subTotal,idCurrency,idPayment,idChannel,amountCard,amountCash,idSite,status,createDate,lastUpdateDate
+	</sql>
+	
+	<!-- 根据ID获取 -->
+	<select id="selectReservedOrderById" parameterClass="java.lang.Long" resultMap="reservedOrderResult">
+		select <include refid="ReservedFields"/>
+		  from hx_reserved_order
+		 where id = #id#
+	</select>
+	<!-- 添加 -->
+	<insert id="insertReservedOrder" parameterClass="reservedOrder">
+		insert into hx_reserved_order(
+ 			id,
+ 			idOrder,
+			idCustomer,
+			subTotal,
+			idCurrency,
+			idPayment,
+			idChannel,
+			amountCard,
+			amountCash,
+			idSite,
+			status,
+			createUserId,
+			createUserName,
+			createDate,
+			lastUpdateDate
+		) values (
+ 			NULL,
+ 			#idOrder#,
+			#idCustomer#,
+			#subTotal#,
+			#idCurrency#,
+			#idPayment#,
+			#idChannel#,
+			#amountCard#,
+			#amountCash#,
+			#idSite#,
+			#status#,
+			#createUserId#,
+			#createUserName#,
+			sysdate(),
+			sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<!-- 更新 -->
+	<update id="updateReservedOrderByNotNull" parameterClass="reservedOrder">
+		update hx_reserved_order 
+		<dynamic prepend="set">
+			 lastUpdateDate= sysdate()
+			<isNotNull   property="idCustomer">
+				,idCustomer=#idCustomer#
+			</isNotNull>
+			<isNotNull   property="idOrder">
+				,idOrder=#idOrder#
+			</isNotNull>
+			
+			<isNotNull   property="subTotal">
+				,subTotal=#subTotal#
+			</isNotNull>
+			<isNotNull  property="idCurrency">
+				,idCurrency=#idCurrency#
+			</isNotNull>
+			<isNotNull   property="idPayment">
+				,idPayment=#idPayment#
+			</isNotNull>
+			<isNotNull  property="idChannel">
+				,idChannel=#idChannel#
+			</isNotNull>
+			<isNotNull  property="amountCard">
+				, amountCard=#amountCard#
+			</isNotNull>
+			<isNotNull  property="amountCash">
+				,amountCash=#amountCash#
+			</isNotNull>
+			<isNotNull prepend="," property="idSite">
+				idSite=#idSite#
+			</isNotNull>
+			<isNotNull  property="status">
+				,status=#status#
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	
+	
+	<!--  订单展示 -->
+	
+	<sql id="ReservedOrder.Search">
+		<isNotEmpty property="id">
+		     and o.id in($id$)
+		</isNotEmpty>
+		<isNotEmpty property="idCustomer">
+		     and o.idCustomer = #idCustomer#
+		</isNotEmpty>
+		<isNotEmpty property="customerName">
+		     and co.name like '%$customerName$%'
+		</isNotEmpty>
+		<isNotEmpty property="idChannel">
+		     and o.idChannel  = #idChannel#
+		</isNotEmpty>
+		<isNotEmpty property="idCurrency">
+		     and o.idCurrency  = #idCurrency#
+		</isNotEmpty>
+		<isNotEmpty property="status">
+				and  o.status in ($status$)
+		</isNotEmpty>
+		<isNotEmpty property="sellDateStart">
+				 <![CDATA[ and o.createDate >= #sellDateStart#   ]]>
+		</isNotEmpty>
+		<isNotEmpty property="sellDateEnd">
+				 <![CDATA[ and o.createDate <= '$sellDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		
+		
+	</sql>
+	<select id="searchReservedOrderList" parameterClass="java.util.Map" resultMap="reservedOrderResultShow">
+		SELECT o.*,c.name currencyName,co.name customerName,pm.name paymentName,sc.name sellChannelName
+		FROM hx_reserved_order o,
+		  currency c,
+		  customer co,
+		  payment pm,
+		  sellchannel sc
+		WHERE o.idCustomer = co.idCustomer
+		    AND o.idCurrency = c.idCurrency
+		    AND pm.idPayment = o.idPayment
+		    AND sc.idSellChannel = o.idChannel
+		   <include refid="ReservedOrder.Search"  />
+		   order by o.createDate desc
+	</select>
+	
+	<select id="searchReservedOrderListCnt" parameterClass="java.util.Map"  resultClass="java.lang.Integer">
+		SELECT count(o.id) 
+		FROM hx_reserved_order o,
+		  currency c,
+		  customer co,
+		  payment pm,
+		  sellchannel sc
+		WHERE o.idCustomer = co.idCustomer
+		    AND o.idCurrency = c.idCurrency
+		    AND pm.idPayment = o.idPayment
+		    AND sc.idSellChannel = o.idChannel
+		   <include refid="ReservedOrder.Search"  />
+	</select>
+	
+	<select id="searchReservedOrderListPrice" parameterClass="java.util.Map"  resultClass="java.lang.String">
+		SELECT  CONCAT(ROUND(SUM(o.subTotal),2) ,',', 0 ) a
+		FROM hx_reserved_order o,
+		  currency c,
+		  customer co,
+		  payment pm,
+		  sellchannel sc
+		WHERE o.idCustomer = co.idCustomer
+		    AND o.idCurrency = c.idCurrency
+		    AND pm.idPayment = o.idPayment
+		    AND sc.idSellChannel = o.idChannel
+		   <include refid="ReservedOrder.Search"  />
+	</select>
+	
+	
+	
+</sqlMap>

@@ -1,0 +1,111 @@
+#set($layout = "layout/default.vm")
+<div class="main">
+
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	 <div class="mag-t1">
+		$!message
+	 </div>
+ #end
+
+<script language="javascript" type="text/javascript">
+function showDep()
+{
+var depFirstId = document.getElementById("depFirstId").value;
+ location.href='$appServer/storage/zeroStoreCheck.html?depFirstId='+depFirstId+'&goodsInsId=$!goodsInsId';
+}
+</script>
+<div class="tool">
+	<th>一级仓库：</th>
+	#springBind("storageQuery.depfirstId")
+    <select name="${status.expression}" id="depFirstId" class="select" onchange="showDep();">
+    			#if($depositoryFirstList)
+					#foreach($depfirst in $depositoryFirstList)
+    				   <option value="$depfirst.id" #if("$depfirst.id"=="$!{status.value}") selected #end>$depfirst.depFirstName</option>
+      				#end
+    			#else
+    				   <option value="">您不能选择</option>
+    			#end
+   </select>
+</div>
+	<form action="$appServer/storage/finishZeroStoreCheck.html" name="finishForm" method="post">
+		<input type="hidden" name="goodsInsId" id="goodsInsId" value="$!goodsInsId"/>
+      <div class="listBox">
+        <table>
+          <tr>
+    		<th>产品编码</th>
+            <th>产品名称</th>
+    		<th>属性</th>
+    		<th>供应商</th>
+    		<th>一级仓库</th>
+			<th>仓库名</th>
+			<th>库位</th>
+    		<th>批次</th>
+    		<th>库存类型</th>
+            <th>库存数量</th>
+            <th>盘盈数量</th>
+          </tr>
+    	  #foreach($obj in $storageLists)
+    	  <tr #if($velocityCount%2==0) class="bg" #end>
+    		 <td  align="left">$!obj.code</td>
+    		 <td  align="left">$!obj.instanceName</td>
+    		 <td  align="left">$!attributeManager.getFullAttributeStringByAttrs($obj.attrs)</td>
+    		 <td  align="center">$!obj.supplierName</td>
+    		 <td  align="center">$!obj.depFirstName</td>
+			 <td  align="center">$!obj.depositoryName</td>
+			 <td  align="center">$!obj.depLocationName</td>
+    		 <td  align="center">$!obj.batchNum</td>
+    		 <td  align="center">$!storTypeMap.get($!obj.storType)</td>
+    		 <td  align="center">$!obj.storageNum</td>
+			 <td  align="center">
+				<input type="text" name="checkNum" value="" id="checkNum_$velocityCount" onchange="javascript:checkPanYingNum(${velocityCount});" size="8" maxLength="8"/>
+				<input type="hidden" name="storageId" id="storageId" value="$!obj.id"/>
+			 </td>
+    	  </tr>
+    	  #end
+
+        </table>
+      </div>
+	</form>
+
+	#if($storageLists.size()>0)
+	<div class="form-but">
+		<button type="button" name="finish" class="button-s4" onclick="javascript:finishCheck();">完成盘盈操作</button>
+		<button type="button" name="close" class="button-s4" onclick="window.history.back(-1);">返回</button>
+    	<script language="javascript" type="text/javascript">
+    		function finishCheck(){
+    			var answer = confirm("确定要完成零库存盘盈操作？")
+    			if (answer){
+    				document.finishForm.submit();
+    			}
+    		}
+     	</script>
+    </div>
+	#end
+</div>
+<script language="javascript" type="text/javascript">
+	function checkPanYingNum(count_no){
+    	var obj_checkNum=document.getElementById('checkNum_' + count_no);
+    	var checkNum = obj_checkNum.value;
+    	if(!isIntNumber(checkNum)){
+    		alert("请输入正整数！");
+    		obj_checkNum.value = "";
+    		obj_checkNum.select();
+            obj_checkNum.focus();
+    		return false;
+    	}
+		return true;
+	}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^\d+$/;
+	  return reg.test(val);
+	}
+
+</script>

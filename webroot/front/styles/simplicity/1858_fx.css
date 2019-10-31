@@ -1,0 +1,19 @@
+/*******************
+     分销首页
+******************/
+.fx-1{ height:375px; margin:10px 0 10px 0; float:left; clear:both;}
+
+.fx-2{ height:154px; margin-bottom:10px !important; *margin-bottom:0px !important; *margin-bottom:0px; float:left; clear:both;}
+
+.fx-youshi{ width:731px; height:154px; float:left; background:url(../../images/bj_fx.gif) no-repeat; padding:10px 0 0 30px;}
+.fx-youshi ul{ margin:0px 0 0 0px; width:340px; float:left;}
+.fx-youshi div.l{padding-top:11px;padding-top:10px !important;color:#fff;font-weight:bold;float:left; width:336px;margin-bottom:12px}
+.fx-youshi ul li{ line-height:20px;}
+.fx-youshi ul li span{ padding-right:5px; font-size:12px;}
+.fx-youshi-pf{ position:relative; left:60px;}
+
+
+
+.fx-entryway{ width:180px; height:154px; background:url(../../images/bj_entryway.gif) no-repeat; float:right;}
+.fx-entryway .nr{ width:128px;  height:40px; line-height:35px; text-align:center;  font-weight:bold; background:url(../../images/bj_btn_fx.gif) no-repeat; margin:8px 0 0 28px; border:0; }
+.fx-entryway .nr a{color:#e62d25; font-size:14px;}

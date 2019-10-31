@@ -1,0 +1,69 @@
+#set($layout = 'layout/default.vm')
+#set($title = "管理中心 - 商品开票公司关联")
+#set($base = true)
+	
+<body>
+	<div class="main">
+		<h2>管理中心 - 商品开票公司关联</h2>
+		
+		#if($success)
+			<div class="mag-t2">商品关联开票公司成功</div>
+		#end
+		#if($error)
+			<div class="mag-t1">${error}</div>
+		#end
+		
+		<form name="form1" action="$appServer/goods/goodsBillRel.html" method="post">
+    		<div class="listBox">
+        		<h3><i></i><span>现关联信息</span></h3>
+        		<div class="content">
+        			<table>
+    					<tr>
+							<th>商品编码</th>
+    						<th>商品名称</th>
+    						<th>开票公司</th>
+    					</tr>
+						#foreach($g in $goodsList)
+    					<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td>$!g.goodsSn</td>
+    						<td>
+								<input type="hidden" name="gids" value="$!g.id">
+								$!g.title
+    						</td>
+							<td>$!goodsBillMap.get($g.billId).value</td>
+						</tr>
+						#end
+    				</table>
+    			</div>
+			</div>
+			
+			<div class="formBox" style="margin-top:20px;">
+				<h3><i></i><span>新的关联</span></h3>
+				<div class="content">
+    				<table class="c2">
+    					<tr>
+    						<th>开票公司：</th>
+    						<td>
+    							<select name="bid" style="min-width:200px;width:auto;">
+    								#foreach($b in $goodsBillList)
+    									<option value="$!b.id">$!b.value</option>
+    								#end
+    							</select>
+    						</td>
+    					</tr>
+    				</table>
+				</div>
+			</div>
+			<div class="form-but">
+				<button type="button" class="button-s4" onclick="javascript:confirm();">确定</button>
+				<button type="button" class="button-s4" onclick="javascript:window.close();">关闭</button>
+			</div>
+		</form>
+	</div>
+</body>
+
+<script type="text/javascript">
+	function confirm() {
+		document.forms.form1.submit();
+	}
+</script>

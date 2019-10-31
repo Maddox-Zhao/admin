@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ResourcesSQL">
+<typeAlias alias="resources" type="com.huaixuan.network.biz.domain.admin.Resources"/>
+
+    <cacheModel id="resources-cache" type="LRU">
+    	<flushInterval hours="24"/> 
+        <flushOnExecute statement="addResources" />
+        <flushOnExecute statement="editResources" />
+        <flushOnExecute statement="removeResources" />
+        <property name="size" value="1000" />
+    </cacheModel>
+
+	<resultMap class="resources" id="resourcesResult">
+		<result column="Id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="type" property="type"/>
+		<result column="name" property="name"/>
+		<result column="name_cn" property="nameCn"/>
+		<result column="value" property="value"/>
+		<result column="resource_order" property="resourceOrder"/>
+	</resultMap>
+<!-- create Resources object -->
+<insert id="addResources" parameterClass="resources">
+<![CDATA[
+insert into ioss_resources
+  (Id, gmt_create, gmt_modify, type, name, name_cn, value, resource_order)
+values
+  (null,
+   #gmtCreate#,
+   #gmtModify#,
+   #type#,
+   #name#,
+   #nameCn#,
+   #value#,
+   #resourceOrder#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Resources object -->
+<update id="editResources" parameterClass="resources">
+<![CDATA[
+		update ioss_resources set gmt_create = #gmtCreate#,
+		gmt_modify = #gmtModify#,
+		type = #type#,
+		name = #name#,
+		name_cn = #nameCn#,
+		value = #value#,
+		resource_order = #resourceOrder#
+		 where Id = #id#
+
+]]>
+</update>
+<!-- delete Resources object -->
+<delete id="removeResources" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_resources where ioss_resources.ID = #value#
+]]>
+</delete>
+<!-- search Resources object -->
+<select id="selectResources" parameterClass="java.lang.Long" resultMap="resourcesResult" cacheModel="resources-cache">
+<![CDATA[
+		select ioss_resources.* from ioss_resources where ioss_resources.ID = #value#
+]]>
+</select>
+<!-- searchAll Resources List -->
+<select id="getResourcess" resultMap="resourcesResult" cacheModel="resources-cache">
+<![CDATA[
+		select ioss_resources.* from ioss_resources
+]]>
+</select>
+
+    <sql id="RESOURCES.CONDITION">
+        <isNotEmpty property="type" prepend="and">
+            type = #type#
+        </isNotEmpty>
+        <isNotEmpty property="name" prepend="and">
+            name = #name#
+        </isNotEmpty>
+    </sql>
+<select id="getResourcesValueByType" resultMap="resourcesResult" parameterClass="java.util.Map" cacheModel="resources-cache">
+<![CDATA[
+        select ioss_resources.* from ioss_resources where 1=1
+]]>
+      <include refid="RESOURCES.CONDITION" />
+      order by resource_order asc
+</select>
+
+<select id="getResourcesByMap" resultMap="resourcesResult" parameterClass="java.util.Map" cacheModel="resources-cache">
+		<![CDATA[
+        select ioss_resources.* from ioss_resources where 1=1
+		]]>
+         <include refid="RESOURCES.CONDITION" />
+         order by resource_order asc
+</select>
+</sqlMap>

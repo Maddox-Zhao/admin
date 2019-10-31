@@ -1,0 +1,95 @@
+#set($layout = "layout/default.vm")
+#set($title = "计抛重量查询")
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+	<form action="/express/list_cast_weight.html" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>计抛重量查询</span></h3>
+		<table>
+			<tr>
+        		<th>商品名称：</th>
+				<td>
+					<input type="text" id="parMap.goodsName" name="goodsName" value="$!{parMap.goodsName}" class="inp"/>
+                </td>
+				<th>物流方式：</th>
+				<td>
+					<select name="expressId" id="parMap.expressId" class="inp">
+            			<option value="" >-=请选择=-</option>
+                    #foreach($obj in $expressInfoList)
+                        <option value="$!{obj.id}" #if("$!{parMap.expressId}"=="$!{obj.id}") selected #end>$!{obj.expressName}</option>
+        			#end
+        			</select>
+                </td>
+				<th>状态：</th>
+				<td>
+					<select name="status" id="parMap.status" class="inp">
+            			<option value="" >-=请选择=-</option>
+            			<option value="y"   #if("$!{parMap.status}"=="y") selected #end>有效</option>
+            			<option value="n"  #if("$!{parMap.status}"=="n") selected #end>无效</option>
+					</select>
+                </td>
+				<th>
+					<input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/>
+                </th>
+			</tr>
+		</table>
+	</div>
+	</form>
+<div class="tool">
+	<span><a href="${appServer}/express/add_cast_weight.html?flag=true" hidefocus="true" class="bt_add">添加新商品</a></span>
+	<span><a href="${appServer}/express/add_cast_weight.html?flag=true&optType=edit" hidefocus="true" class="bt_wu">修改商品</a></span>
+</div>
+<!-- 物流信息列表 -->
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable">
+      <tr>
+        <th>商品编码</th>
+		<th>商品名称</th>
+        <th>物流公司</th>
+        <th>创建时间</th>
+        <th>修改时间</th>
+		<th>重量</th>
+		<th>计抛重量</th>
+        <th>状态</th>
+      </tr>
+   #if($query && $query.items.size()>0)
+	  #foreach($castWeight in $query.items)
+	  	<tr    #if($velocityCount%2==0) class="bg" #end>
+		   <td>$!castWeight.goodsSn</a></td>
+		   <td>$!castWeight.goodsName</td>
+		   <td>
+				#foreach($obj in $expressInfoList)
+					#if("$!{castWeight.expressId}"=="$!{obj.id}") $!{obj.expressName}#end
+				#end
+			</a></td>
+		   <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!castWeight.gmtCreate)</td>
+		   <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!castWeight.gmtModify)</td>
+		   <td>$!castWeight.goodsWeight</td>
+		   <td>$!castWeight.castWeight</td>
+		   <td>
+			#if($!castWeight.status=="y")有效#else 无效#end
+		   </td>
+		</tr>
+	  #end
+   #end
+    </table>
+    <!-- 分页 -->
+    #if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/express/list_cast_weight.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+		document.getElementById("parMap.goodsName").value=document.getElementById("parMap.goodsName").value.trim();
+    	document.forms[0].submit();
+	    }
+
+</script>
+</div>

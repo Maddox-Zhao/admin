@@ -1,0 +1,168 @@
+#set($layout = 'layout\default.vm')
+#set($title = "财务管理 - 支付流水查询")
+<script>
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+function formSubmit(){
+    var bankType=document.getElementById("bankType").value;
+	var isSucceed=document.getElementById("isSucceed").value;
+	var paymentType=document.getElementById("paymentType").value;
+    var flagCompare=document.getElementById("flagCompare").value;
+	var payDest=document.getElementById("payDest").value;
+	var bankBillNo=document.getElementById("bankBillNo").value;
+
+	var dateStart=document.getElementById("payDateStart").value.replace(/-/g, "/");
+	var dateEnd=document.getElementById("payDateEnd").value.replace(/-/g, "/");
+	var b_date=new Date(Date.parse(dateStart));
+	var e_date=new Date(Date.parse(dateEnd));
+
+    if(dateStart!=""&&dateEnd!=""&&e_date < b_date){
+    	alert("起始时间不能大于结束时间！");
+    	return false;
+    }
+
+    var s_date=e_date - b_date;
+	var day_date=(((s_date/1000)/24)/60)/60
+	if(day_date>30 ){
+    	alert("时间段不可大于30天！");
+    	return false;}
+
+	if(bankType=="" && isSucceed=="" && paymentType=="" && flagCompare=="" && payDest=="" && bankBillNo=="" &&  dateStart=="" && dateEnd=="")
+	{
+	     alert('请输入必要的查询条件!');
+		 return false;
+	}
+
+
+
+	document.getElementById("payDateStart").value=jQuery.trim(document.getElementById("payDateStart").value);
+	document.getElementById("payDateEnd").value=jQuery.trim(document.getElementById("payDateEnd").value);
+    document.filterPageForm.action="/counter/searchBankPayOnlineList.html";
+    document.forms.filterPageForm.submit();
+}
+</script>
+<form name="filterPageForm" action="/counter/searchBankPayOnlineList.html" method="post">
+	<div class="searchBox">
+		<h3><span>支付流水查询</span></h3>
+    银行名称：<select name="bankType" id="bankType">
+		     	<option value=""></option>
+		     	#set($bankEnumMap = $!accountUtil.getInstitutionMap())
+		     	#foreach($bankEnum in $bankEnumMap.entrySet())
+		     	    <option value="$!bankEnum.key" #if("$!payOnlineSearchQuery.bankType"=="$bankEnum.key") selected #end>$!bankEnum.value</option>
+	     		#end
+	         </select>
+	&nbsp;&nbsp;&nbsp;&nbsp;
+	         扣款状态：<select name="isSucceed" id="isSucceed">
+		     	<option value=""></option>
+		     	#set($isSucceedEnumArr = $!accountUtil.getPaymentIsSucceedEnum())
+		     	#foreach($isSucceedEnum in $isSucceedEnumArr)
+		     	    <option value="$!isSucceedEnum.code" #if("$!isSucceedEnum.code"=="$payOnlineSearchQuery.isSucceed") selected #end>$!isSucceedEnum.description</option>
+	     		#end
+	     	 </select>
+	 &nbsp;&nbsp;&nbsp;&nbsp;
+	         支付类型：<select name="paymentType"  id="paymentType">
+		     	<option value=""></option>
+		     	<option value="ENET" #if("$!payOnlineSearchQuery.paymentType"=="ENET") selected #end>网银支付</option>
+		     	<option value="TMO" #if("$!payOnlineSearchQuery.paymentType"=="TMO") selected #end>银行汇款</option>
+	     	 </select>
+	  &nbsp;&nbsp;&nbsp;&nbsp;
+	         对账状态：<select name="flagCompare" id="flagCompare">
+		     	<option value=""></option>
+		     	#set($flagCompareEnumArr = $!accountUtil.getPaymentFlagCompareEnum())
+		     	#foreach($flagCompareEnum in $flagCompareEnumArr)
+		     	    <option value="$!flagCompareEnum.code" #if("$!flagCompareEnum.code"=="$payOnlineSearchQuery.flagCompare") selected #end>$!flagCompareEnum.description</option>
+	     		#end
+	     	 </select>
+	 <br><br>
+	         支付目的：<select name="payDest" id="payDest">
+		     	<option value=""></option>
+		     	#set($destEnumArr = $!accountUtil.getPaymentDestEnum())
+		     	#foreach($destEnum in $destEnumArr)
+		     	    <option value="$!destEnum.value" #if("$!destEnum.value"=="$payOnlineSearchQuery.payDest") selected #end>$!destEnum.message</option>
+	     		#end
+	     	 </select>
+   &nbsp;&nbsp;&nbsp;&nbsp;<label>银行扣款时间：从</label><input type="text" name="payDateStart" id="payDateStart" value="$!payOnlineSearchQuery.payDateStart" size="10" theme="simple" readonly="true" />
+<label>到</label>
+<input type="text" name="payDateEnd" id="payDateEnd" value="$!payOnlineSearchQuery.payDateEnd" size="10" theme="simple" readonly="true" />
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "payDateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR",
+			          data       : "$!{payOnlineSearchQuery.payDateStart}"
+			      });
+			      Calendar.setup({
+			          inputField : "payDateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR",
+			          data       : "$!{payOnlineSearchQuery.payDateEnd}"
+			      });
+			</script>
+   &nbsp;&nbsp;&nbsp;&nbsp;
+          银行订单号：<input type="test" name="bankBillNo" id="bankBillNo"  size="20" value="$!payOnlineSearchQuery.bankBillNo"/>
+&nbsp;&nbsp;<input type="button" value="搜 索" class="btn"  onclick="formSubmit();"/>
+</div>
+<br><br>
+<div class="clearing"></div>
+  <div class="listBox">
+	<h3><span>账户列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+	  <th>用户名</th>
+      <th>账号</th>
+      <th>银行</th>
+      <th>支付类型</th>
+      <th>银行订单号</th>
+      <th>支付目的</th>
+      <th>扣款时间</th>
+      <th>实际金额</th>
+      <th>应付金额</th>
+      <th>扣款状态</th>
+      <th>对账状态</th>
+      <th>核对人</th>
+    </tr>
+  #foreach( $payOnline in $payOnlineListPage.items)
+  <tr align="center">
+	<td>
+    	$!{payOnline.account}&nbsp;
+    </td>
+    <td>
+    	$!{payOnline.accountNo} &nbsp;
+    </td>
+    <td>$!accountUtil.getInstitutionNameByCode("$!{payOnline.bankType}") &nbsp;</td>
+    <td>
+    	#if("$!{payOnline.paymentType}"=="ENET")
+    		网银支付
+	    #elseif("$!{payOnline.paymentType}"=="TMO")
+			银行汇款
+	    #else
+	        $!{payOnline.paymentType}
+	    #end
+    	</td>
+    <td>$!{payOnline.bankBillNo} &nbsp;</td>
+    <td>$!accountUtil.getPaymentDestMessageByCode($!{payOnline.payDest}) &nbsp;</td>
+
+    <td>$!date.format("yyyy-MM-dd HH:mm:ss",${payOnline.payDate})&nbsp;</td>
+	#set($divAmountYuan=$!{moneyUtil.div("$!{payOnline.realAmount}","100")})
+    <td>￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00') &nbsp;</td>
+    #set($divAmountYuan=$!{moneyUtil.div("$!{payOnline.payAmount}","100")})
+    <td>￥$!moneyUtil.getFormatMoney("$!divAmountYuan",'0.00') &nbsp;</td>
+    <td>$!accountUtil.getPaymentIsSucceedDescriptionByCode("$!payOnline.isSucceed") &nbsp;</td>
+    <td>$!accountUtil.getPaymentFlagCompareDescriptionByCode("$!payOnline.flagCompare") &nbsp;</td>
+    <td>$!payOnline.checkUser &nbsp;</td>
+  </tr>
+  #end
+  </tbody>
+</table>
+</form>
+ <!-- 分页 -->
+	#if($payOnlineListPage.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$payOnlineListPage).put('slider_target',"/counter/searchBankPayOnlineList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+
+

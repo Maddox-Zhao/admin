@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideOrderWaybillDetailYShang" type="com.huaixuan.network.biz.domain.provider.ProvideOrderWaybillDetailYShang"/>
+   
+	<resultMap id="provideOrderWaybillDetailYShangResult" class="com.huaixuan.network.biz.domain.provider.ProvideOrderWaybillDetailYShang" >
+		<result column="id" property="id"/>
+		<result column="out_order_id" property="outOrderId"/>
+		<result column="parent_order_id" property="parentOrderId"/>
+		<result column="receiver_city" property="receiverCity"/>
+		
+		<result column="receiver_area" property="receiverArea"/>
+		<result column="receiver_mobile" property="receiverMobile"/>
+		<result column="receiver_province" property="receiverProvince"/>
+		<result column="receiver_address" property="receiverAddress"/>
+		
+		<result column="receiver_name" property="receiverName"/>
+		<result column="total_pay" property="totalPay"/>
+		<result column="express_name" property="expressName"/>
+		<result column="express_num" property="expressNum"/>
+		
+		<result column="order_id" property="orderId"/>
+		<result column="total_pay_child" property="totalPayChild"/>
+		<result column="wms_status" property="wmsStatus"/>
+		<result column="warehouse_id" property="warehouseId"/>
+		
+		
+		<result column="quantity" property="quantity"/>
+		<result column="now_price" property="nowPrice"/>
+		<result column="product_id" property="productId"/>
+		<result column="product_name" property="productName"/>
+		
+		<result column="sale_price" property="salePrice"/>
+		<result column="insert_time" property="insertTime"/>
+		<result column="update_time" property="updateTime"/>
+		
+		
+	</resultMap>
+	<insert  id ="insertWayBillDetaiYShang"   parameterClass ="java.util.Map"> 
+     
+  insert into provide_order_waybill_detail_yshang(id,out_order_id,parent_order_id,receiver_city,receiver_area,receiver_mobile,receiver_province,receiver_address,receiver_name,total_pay,express_name,express_num,order_id,total_pay_child,wms_status,warehouse_id,quantity,now_price,product_id,product_name,sale_price,insert_time,update_time) values
+  (null,#outOrderId#,#parentOrderId#,#receiverCity#,#receiverArea#,#phone#,#receiverProvince#,#address#,#buyname#,#amount#,#shipname#,#waybillcode#,#orderChildId#,#paidamount#,#orderstatus#,#warehouseId#,#quantity#,#nowPrice#,#productId#,#productName#,#salePrice#,sysdate(),sysdate())
+         
+      
+  </insert>
+	
+	
+	
+	
+	<!-- <select id="selectOrderDetailByMap" resultMap="provideOrderDetailResult" parameterClass="java.util.Map">
+        SELECT *
+		FROM  provide_order_detail 
+		where 1=1
+		<isNotEmpty prepend="and" property="originalTradeId">
+			original_trade_id =#originalTradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			trade_id =#tradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="prodId">
+			ProdId =#prodId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="itemId">
+			item_id =#itemId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateStart" >
+			create_time >=#createDateStart#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateEnd" >
+		    <![CDATA[
+			create_time <='$createDateEnd$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sellPlatform">
+			sell_platform=#sellPlatform#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="provider">
+			provider=#provider#
+		</isNotEmpty>	
+		ORDER BY create_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select>
+	 -->
+	
+	<!-- <select id="selectOrderDetailCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+        SELECT count(*)
+		FROM  provide_order_detail where 1=1
+		<isNotEmpty prepend="and" property="prodId">
+			ProdId =#prodId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="originalTradeId">
+			original_trade_id =#originalTradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			trade_id =#tradeId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateStart" >
+			create_time >=#createDateStart#		
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDateEnd" >
+		    <![CDATA[
+			create_time <='$createDateEnd$ 23:59:59'	
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="sellPlatform">
+			sell_platform=#sellPlatform#
+		</isNotEmpty>		
+		<isNotEmpty prepend="and" property="provider">
+			provider=#provider#
+		</isNotEmpty>	
+		ORDER BY create_time DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+	</select> -->
+	
+	
+	
+	
+	
+	<!-- 
+	<insert  id ="insertOrderDetailList"   parameterClass ="java.util.List"> 
+     <![CDATA[
+insert into provide_order_detail(id,original_trade_id,trade_id,user_name,phone,province,city,region,location,total_price,pay_price,insert_time,create_time,pay_time,ProdId,item_id,title,sell_price,our_sell_price,tax,qty,freight,sell_platform,provider) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgList[].originalTradeId#,#pgList[].tradeId#,#pgList[].userName#,#pgList[].phone#,#pgList[].province#,#pgList[].city#,#pgList[].region#
+            ,#pgList[].location#,#pgList[].totalPrice#,#pgList[].payPrice#,sysdate(),#pgList[].createTime#,#pgList[].payTime#,
+            #pgList[].prodId#,#pgList[].itemId#,#pgList[].title#,#pgList[].sellPrice#,#pgList[].ourSellPrice#,#pgList[].tax#,#pgList[].qty#,#pgList[].freight#,#pgList[].sellPlatform#,#pgList[].provider#
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+ -->
+
+
+
+
+
+<!-- 
+<select id="selectProviderOrderId" resultMap="provideOrderDetailResult" >
+SELECT * from provide_order_detail where  1=1  
+	订单ID
+	and trade_id=#value#
+	order by  id 
+
+</select> -->
+
+	<!-- 修改 -->
+	<update id="updateOrderWaybillDetailYShang" parameterClass="java.util.Map">
+	  update provide_order_waybill_detail_yshang
+	   <dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="orderstatus">
+			,wms_status=#orderstatus#
+		</isNotNull>
+	
+		<isNotNull  property="shipname">
+			,express_name=#shipname#
+		</isNotNull>
+		
+		<isNotNull  property="waybillcode">
+			,express_num=#waybillcode#
+		</isNotNull>
+		<isNotNull  property="cancelstatus">
+			,cancelstatus=#cancelstatus#
+		</isNotNull>
+	 where out_order_id = #outOrderId#
+	</dynamic>
+	</update>	  		
+
+
+
+
+
+<select id="selectMiniuiOrderListDetailCount" resultClass="java.lang.Integer" >
+	SELECT COUNT(*) FROM provide_order_waybill_detail_yshang where  1=1
+	<isNotEmpty  prepend="and" property="outOrderId">
+		out_order_id=#outOrderId#
+	</isNotEmpty>
+ 	
+	<isNotEmpty prepend="and" property="wmsStatus">
+		wms_status=#wmsStatus#
+	</isNotEmpty>
+</select>
+
+<select id="selectWayBillDetailYShang" resultMap="provideOrderWaybillDetailYShangResult" >
+SELECT * from provide_order_waybill_detail_yshang where  1=1 
+	<!-- 订单号 -->
+	<isNotEmpty  prepend="and" property="tradeId">
+		out_order_id=#tradeId#
+	</isNotEmpty>
+ 	
+	<isNotEmpty prepend="and" property="wmsStatus">
+		wms_status=#wmsStatus#
+	</isNotEmpty>
+	order by id desc 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty> 	
+
+</select>
+
+
+
+</sqlMap>
+
+

@@ -1,0 +1,109 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 退货产品")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 退货产品</h2>
+
+	<form action="$!appServer.get("/goods/searchRefundGoods.html")" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索产品</span></h3>
+			<table>
+				<tr>
+					<th>产品名称：</th>
+					<td>
+						<input type="text" name="goodsInstanceName" id="goodsInstanceName" value="$!goodsInstanceName" onclick="javascript:modifyTo();" readonly="readonly"/>
+						<input type="hidden" name="goodsInstanceId"  id="goodsInstanceId" value="$!goodsInstanceId" />
+					</td>
+					<th>退货时间：</th>
+					<td>
+						<input type="text" id="parMap.dateStart" name="dateStart" value="$!{dateStart}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						<input type="text" id="parMap.dateEnd" name="dateEnd" value="$!{dateEnd}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "parMap.dateStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "parMap.dateEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+					<td>
+						<button type="submit" class="btn">查询</button>
+						<button type="button" class="btn" onclick="clearSearch();">重置</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+				<th>产品名称</th>
+				<th>编码</th>
+				<th>类目</th>
+				<th>属性</th>
+				<th>单位</th>
+				<th>退货数量</th>
+				<th>退货金额</th>
+				<th>退货人次</th>
+			</tr>
+			#foreach($refundGood in $page.items)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td>$!refundGood.goodsName</td>
+					<td>$!refundGood.goodsSn</td>
+					<td>$!refundGood.catName</td>
+					<td>
+						#foreach($pro in $!refundGood.properties.entrySet())
+							$!{attributeManager.getAttributeByAttrCode($pro.key).attrName}=$!{pro.value}
+						#end
+					</td>
+					<td >$!refundGood.unit</td>
+					<td >$!refundGood.refundSum</td>
+					<td >$!refundGood.refundPrice</td>
+					<td >$!refundGood.refundCustomer</td>
+				</tr>
+			#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/goods/searchRefundGoods.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+    function modifyTo(){
+        window.open("$!appServer.get("/instance/select_instance.html?muse=true")");
+    }
+	
+	function getInstanceInfo(ret) {
+		if(ret != null) {
+        	document.getElementById('goodsInstanceId').value = ret.id;
+        	document.getElementById('goodsInstanceName').value = ret.instanceName;
+        }
+	}
+
+    function clearSearch(){
+		document.getElementById('goodsInstanceId').value='';
+		document.getElementById('goodsInstanceName').value='';
+    }
+</script>

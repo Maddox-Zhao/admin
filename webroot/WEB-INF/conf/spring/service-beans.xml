@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:mvc="http://www.springframework.org/schema/mvc"
+   xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd" >
+
+	<context:component-scan base-package="com.huaixuan.network.biz" />
+
+<bean id="passwordEncoder" class="org.springframework.security.providers.encoding.ShaPasswordEncoder">
+</bean>
+
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+      <property name="basenames">
+         <list>
+            <value>messages/message_zh_CN</value>
+         </list>
+      </property>
+   </bean>
+
+	<bean id="accountTransManager" class="com.hundsun.itrans.biz.manager.impl.AccountTransManagerImpl">
+	</bean>
+	
+   <!-- 文件解析工厂 -->
+	<bean id="parseCompareFileFactory" class="com.huaixuan.network.biz.service.counter.impl.ParseCompareFileFactoryImpl">
+		<property name="transMap">
+			<map>
+				<entry key="ALIPAY"><value>aliPayParseCompareFileTrans</value></entry>
+				<entry key="TENPAY"><value>tenPayParseCompareFileTrans</value></entry>
+				<entry key="CHINABANK"><value>chinaBankParseCompareFileTrans</value></entry>
+				<entry key="ICBC"><value>icbcParseCompareFileTrans</value></entry>
+			</map>
+		</property>
+	</bean>
+	
+	 <!-- 文件解析抽象类 -->
+	<bean id="baseParseCompareFileTrans" class="com.huaixuan.network.biz.service.counter.impl.AbstractParseCompareFileTrans" abstract="true">
+		<property name="bankCompareItemDao">
+			<ref bean="bankCompareItemDao" />
+		</property>		
+		<property name="inputFileDao">
+			<ref bean="inputFileDao" />
+		</property>
+	</bean>
+	
+	<!-- 阿里特定文件解析接口 -->
+	<bean id="aliPayParseCompareFileTrans" class="com.huaixuan.network.biz.service.counter.impl.AliPayParseCompareFileTrans"  parent="baseParseCompareFileTrans"/>
+  
+    <!-- 财付通特定文件解析接口 -->
+	<bean id="tenPayParseCompareFileTrans" class="com.huaixuan.network.biz.service.counter.impl.TenPayParseCompareFileTrans"  parent="baseParseCompareFileTrans"/>
+    
+    <!-- 网银在线特定文件解析接口 -->
+	<bean id="chinaBankParseCompareFileTrans" class="com.huaixuan.network.biz.service.counter.impl.ChinaBankParseCompareFileTrans"  parent="baseParseCompareFileTrans"/>
+	
+    <!-- 工行特定文件解析接口 -->
+    <bean id="icbcParseCompareFileTrans" class="com.huaixuan.network.biz.service.counter.impl.IcbcParseCompareFileTrans"  parent="baseParseCompareFileTrans"/>
+</beans>

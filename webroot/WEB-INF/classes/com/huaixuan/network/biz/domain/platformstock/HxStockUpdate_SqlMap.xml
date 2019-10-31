@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="platformstock">	
+  <typeAlias alias="stockUpdate" type="com.huaixuan.network.biz.domain.platformstock.StockUpdate"/>
+   
+   <resultMap id="stockUpdateResultMap" class="com.huaixuan.network.biz.domain.platformstock.StockUpdate" >
+		<result column="id" property="id"/>
+		<result column="sku" property="sku"/>
+		<result column="now_stock" property="nowStockNum"/>
+		<result column="last_update_stock" property="lastUpdateStockNum"/>
+		<result column="order_stock" property="orderStockNum"/>
+		<result column="type" property="type"/>
+		<result column="shangpin_sku" property="shangpinSku"/>
+		<result column="kaola_sku" property="kaolaSku"/>
+		<result column="kaola_key" property="kaolaKey"/>
+		<result column="zhenpin_sku" property="zhenpinSku"/>
+		<result column="siku_sku" property="sikuSku"/>
+		<result column="yhd_sku" property="yhdSku"/>
+		<result column="tmall_sku" property="tmallSku"/>
+		<result column="higo_sku" property="higoSku"/>
+		<result column="fql_sku" property="fqlSku"/>
+		<result column="jd_sku" property="jdSku"/>
+		<result column="pdd_sku" property="pddSku"/>
+		<result column="Mlh_sku" property="MlhSku"/>
+		<result column="Mlhnew_sku" property="MlhnewSku"/>
+		<result column="xhs_sku" property="xhsSku"/>
+		<result column="ofashion_sku" property="ofashionsku"/>
+		<result column="weimob_sku" property="weimobsku"/>
+		<result column="yinTai_sku" property="yinTaiSku"/> 
+		<result column="shepin_sku" property="shepinSku"/>
+		
+		<result column="kaola_on_sale_status" property="kaola_on_sale_status"/>
+		<result column="tmall_on_sale_status" property="tmall_on_sale_status"/>
+		<result column="jd_on_sale_status" property="jd_on_sale_status"/>
+		<result column="xhs_on_sale_status" property="xhs_on_sale_status"/>
+		<result column="Mlh_on_sale_status" property="mlh_on_sale_status"/>
+		<result column="shepin_on_sale_status" property="shepin_on_sale_status"/>
+		<result column="siku_on_sale_status" property="siku_on_sale_status"/>
+		<result column="zhenpin_on_sale_status" property="zhenpin_on_sale_status"/>
+		
+		
+		<result column="shangpin_order_stock" property="shangpinOrderStock"/>
+		<result column="kaola_order_stock" property="kaolaOrderStock"/>
+		<result column="zhenpin_order_stock" property="zhenpinOrderStock"/>
+		<result column="siku_order_stock" property="sikuOrderStock"/>
+		<result column="yhd_order_stock" property="yhdOrderStock"/>
+		<result column="tmall_order_stock" property="tmallOrderStock"/>
+		<result column="higo_order_stock" property="higoOrderStock"/>
+		<result column="fql_order_stock" property="fqlOrderStock"/>
+		<result column="jd_order_stock" property="jdOrderStock"/>
+		<result column="pdd_order_stock" property="pddOrderStock"/>
+		<result column="shepin_order_stock" property="shepinOrderStock"/>
+		
+		
+		
+		<result column="ofashion_order_stock" property="ofashionOrderStock"/>
+		<result column="xhs_order_stock" property="xhsOrderStock"/>
+		<result column="weimob_order_stock" property="weiMobOrderStock"/>
+		<result column="yinTai_order_stock" property="yinTaiOrderStock"/>
+		<result column="Mlh_order_stock" property="MlhOrderStock"/>
+		
+        <result column="brandname" property="brandname"/>
+		<result column="seriesname" property="seriesname"/>
+		
+		<result column="types" property="typename"/>
+		<result column="material" property="materialname"/>
+		<result column="color" property="colorname"/>
+		<result column="size" property="sizename"/>
+		
+		
+		
+		
+		
+		<result column="generate_time" property="generate_time"/>
+		<result column="last_order_time" property="lastOrderTime"/>
+		<result column="update_time" property="updateTime"/>
+	</resultMap>
+
+   <!-- sku库存练习  -->
+    <select id="HxStockUpdateCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+      select count(id) from  hx_stock_update where 1=1
+     <isNotNull prepend="and" property="type">
+		type=#type#
+	 </isNotNull>
+     <isNotNull prepend="and" property="sku">
+         sku=#sku#
+     </isNotNull>
+     
+     
+     <!-- 型号 -->
+	<isNotEmpty prepend="and" property="typename">
+		types=#typename#
+	</isNotEmpty>
+	<!-- 材质 -->
+	<isNotEmpty prepend="and" property="materialname">
+		material=#materialname#
+	</isNotEmpty>
+	<!-- 颜色 -->
+	<isNotEmpty prepend="and" property="colorname">
+		color=#colorname#
+	</isNotEmpty>
+	<!-- 尺寸 -->
+	<isNotEmpty prepend="and" property="sizename">
+		size=#sizename#
+	</isNotEmpty>
+	<!-- 品牌 -->
+	<isNotEmpty prepend="and" property="idBrand">
+		idBrand in ( $idBrand$)
+	</isNotEmpty>
+	<!-- 品类 -->
+	<isNotEmpty prepend="and" property="idSeries">
+		idSeries in ( $idSeries$)
+	</isNotEmpty>
+     
+     <isNotEmpty prepend="and" property="lastUpdateStockNum">
+		last_update_stock >=#lastUpdateStockNum#
+	</isNotEmpty>
+     
+     <isNotEmpty prepend="and" property="platskuisnotnull">
+	 	$platskuisnotnull$ != ''
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="onsalestatus">
+	 	$onsalestatus$ = $statusValue$
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="platskuisnull">
+	 	$platskuisnull$ IS NULL
+	</isNotEmpty>
+	
+	
+	<isNotEmpty prepend="and" property="onsalestatusnever">
+	 	$onsalestatusnever$ is null
+	</isNotEmpty>
+	
+	
+     <isNotEmpty prepend="and" property="generateTimeStart">
+	   generate_time>=#generateTimeStart#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="generateTimeEnd">
+	   <![CDATA[
+	   generate_time<='$generateTimeEnd$ 23:59:59'
+	   ]]>
+	</isNotEmpty>
+	
+	
+	
+   </select>
+
+
+   <select id="SelectStockUpdateList" parameterClass="java.util.Map" resultMap="stockUpdateResultMap">
+	SELECT 
+     hsu.*,
+	 (SELECT NAME FROM brand WHERE idBrand = hsu.idBrand)brandname,
+	 (SELECT NAME FROM series WHERE idSeries = hsu.idSeries)seriesname
+	FROM hx_stock_update hsu
+	where 1=1
+	 <isNotEmpty prepend="and" property="sku">
+		sku=#sku#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		type=#type#
+	</isNotEmpty>
+	
+	<!-- 型号 -->
+	<isNotEmpty prepend="and" property="typename">
+		types=#typename#
+	</isNotEmpty>
+	<!-- 材质 -->
+	<isNotEmpty prepend="and" property="materialname">
+		material=#materialname#
+	</isNotEmpty>
+	<!-- 颜色 -->
+	<isNotEmpty prepend="and" property="colorname">
+		color=#colorname#
+	</isNotEmpty>
+	<!-- 尺寸 -->
+	<isNotEmpty prepend="and" property="sizename">
+		size=#sizename#
+	</isNotEmpty>
+	<!-- 品牌 -->
+	<isNotEmpty prepend="and" property="idBrand">
+		idBrand in ( $idBrand$)
+	</isNotEmpty>
+	<!-- 品类 -->
+	<isNotEmpty prepend="and" property="idSeries">
+		idSeries in ( $idSeries$)
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="lastUpdateStockNum">
+		last_update_stock >=#lastUpdateStockNum#
+	</isNotEmpty>
+
+	<isNotEmpty prepend="and" property="platskuisnotnull">
+	 	$platskuisnotnull$ != ''
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="platskuisnull">
+	 	$platskuisnull$ IS NULL
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="onsalestatus">
+	 	$onsalestatus$ = $statusValue$
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="onsalestatusnever">
+	 	$onsalestatusnever$ is null
+	</isNotEmpty>
+	
+	 <isNotEmpty prepend="and" property="generateTimeStart">
+	   generate_time>=#generateTimeStart#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="generateTimeEnd">
+	   <![CDATA[
+	   generate_time<='$generateTimeEnd$ 23:59:59'
+	   ]]>
+	</isNotEmpty>
+	
+	ORDER BY id DESC 
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+   </select>
+   
+ 
+</sqlMap>

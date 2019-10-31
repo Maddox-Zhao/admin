@@ -1,0 +1,569 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+	<div class="tool">
+        <span><a href="${appServer}/stock/stock_search.html" hidefocus="true" class="bt_wu">采购订单列表</a></span>
+		<div style="clear: both;"></div>
+		#if($message)
+			#if($message == "scsb")
+				<div class="warning_min" id="massage">采购订单不是新建状态，不能执行删除操作！</div>
+			#elseif($message == "notAdd")
+				<div class="warning_min" id="massage">采购订单不是新建状态，不能添加采购商品！</div>
+			#elseif($message == "otherCat")
+				<div class="warning_min" id="massage">存在不是自己负责采购类目内的商品，自动删除！</div>
+			#end
+		#end
+		<div class="success_min" id="modifySuccess" style="display:none">修改金额成功</div>
+		<div class="warning_min" id="modifyError" style="display:none">修改金额失败</div>
+		<div class="success_min" id="modifyAmountSuccess" style="display:none">修改数量成功</div>
+		<div class="warning_min" id="modifyAmountError" style="display:none">修改数量失败</div>
+		<div class="success_min" id="modifyUnitPriceSuccess" style="display:none">修改单价成功</div>
+		<div class="warning_min" id="modifyUnitPriceError" style="display:none">修改单价失败</div>
+		<div style="clear: both;"></div>
+    </div>
+
+    <form  name="form1"  action="" method="post">
+    	<input type="hidden" value="$!{shoppingList.id}" name="stockId" id="stockId"/>
+    	<input type="hidden" name="goodsIds" value="" id="goodsIds"/>
+		<div class="formBox" >
+    		<h3><i></i><span>采购订单信息</span></h3>
+        	<div class="content">
+        			<table class="c6">
+        				<tr>
+        				<th style="width:10%;">采购单号</th>
+        				<td style="width:40%;">$!{shoppingList.shoppingNum}
+        					<input type="hidden" name="id" value="$!{shoppingList.id}"/>
+        					<input type="hidden" name="shoppingNum" value="$!{shoppingList.shoppingNum}"/>
+        				</td>
+
+
+        				<th style="width:10%;">关联单号</th>
+        				<td style="width:40%;">
+        					<input  type="text" name="relationShoppingNum"   id="relationShoppingNum" value="$!{shoppingList.relationShoppingNum}" onchange="checkStockIsExist(this.value);"/>
+        				</td>
+
+        				</tr>
+
+        				<tr>
+        				<th style="width:10%;">供应商</th>
+        				<td>$!{shoppingList.supplierName}
+        					<input type="hidden" id="supplierId" name="supplierId" value="$!{shoppingList.supplierId}"/>
+        				</td>
+
+        				<th style="width:10%;">合同编号</th>
+        				<td>
+        					<input  type="text" id="primitiveNum" name="primitiveNum"  value="$!{shoppingList.primitiveNum}" />
+        				</td>
+        				</tr>
+
+        				<tr>
+        				<th style="width:10%;">状态</th>
+        				<td>$!enumStockStatusMap.get("${shoppingList.status}")</td>
+        					<input type="hidden" id="status" name="status" value="$!{shoppingList.status}"/>
+
+        				<th style="width:10%;"><span class="red">*</span>库存类型</th>
+        				<td>
+        					<select id="storType" name="storType" >
+        						#foreach($s in $storTypeMap.entrySet())
+        							<option value="$s.key" #if($s.key == $shoppingList.storType) selected="selected" #end >$s.value</option>
+        						#end
+                            </select>
+
+        				</td>
+        				</tr>
+
+        				<tr>
+        				<th style="width:10%;"><span class="red">*</span>采购时间</th>
+        				<td>
+        					<input value="$!shoppingList.shoppingTime_str" name="shoppingTime_str" id="shoppingTime_str" size="15" theme="simple" readonly="true" />
+        			    <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "shoppingTime_str",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        				</script>
+        				</td>
+
+        				<th style="width:10%;"><span class="red">*</span>预期到货时间</th>
+        				<td>
+        					<input value="$!shoppingList.arriveTime_str" name="arriveTime_str" id="arriveTime_str" size="15" theme="simple" readonly="true" />
+        			    <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "arriveTime_str",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        				</script>
+        				</td>
+        				</tr>
+
+        				<tr>
+        				<th style="width:10%;">创建人</th>
+        				<td>$!{shoppingList.creater}
+        					<input type="hidden" id="creater" name="creater" value="$!{shoppingList.creater}"/>
+        				</td>
+
+        				<th style="width:10%;">创建时间</th>
+        				<td>$!dateUtil.convertDateToString('yyyy-MM-dd',${shoppingList.gmtCreate})
+        					<input type="hidden" id="gmtCreate_str" name="gmtCreate_str" value="$!{shoppingList.gmtCreate_str}"/>
+        				</td>
+
+        				</tr>
+
+        				<tr>
+        				<th style="width:10%;">备注</th>
+        				<td colspan="3">
+        					<textarea cols="70" rows="3" id="remark"  name="remark" onKeyUp="textLimitCheck(this,280);">$!{shoppingList.remark}</textarea>
+        				</td>
+        				</tr>
+        		</table>
+    		</div>
+		</div>
+
+      <div class="listBox" id="listDiv">
+        <table width="100%" cellpadding="3" cellspacing="1">
+    		<tr>
+        		<th colspan="11"  scope="col">采购产品列表</th>
+    		</tr>
+          <tr>
+            <th>产品编码</th>
+            <th>产品名称</th>
+            <th>类目</th>
+            <th>属性</th>
+            <th>单位</th>
+    		<th>单价</th>
+    		<th>数量</th>
+    		<th>应付金额</th>
+    		<th>实付金额</th>
+    		<th>操作</th>
+          </tr>
+    #set( $sum_factFee =0)
+    #set( $sum_totalNum =0)
+    #set( $sum_dueFee =0)
+
+    	#if($shoppingMoreDetails)
+          #foreach($goods in $shoppingMoreDetails)
+    		#set( $sum_factFee = $moneyUtil.add( $sum_factFee,$!goods.factFee))
+    		#set( $sum_dueFee = $moneyUtil.add( $sum_dueFee,$!goods.dueFee))
+    		#set( $sum_totalNum = $moneyUtil.addNumber( $sum_totalNum,$!goods.amount))
+    	  <tr    #if($velocityCount%2==0) class="bg" #end>
+             <td>&nbsp;$!goods.goodsInstanceCode</td>
+             <td>&nbsp;$!goods.instanceName</td>
+             <td title="$!goods.catCode">&nbsp;
+    			#if ($!goods.catCode.length()<20)
+    				$!goods.catCode
+    			#else
+    				$!controlUtil.getNoticesTitle($!goods.catCode,20)
+    			#end
+    		 </td>
+             <td title="$!goods.attrs">&nbsp;
+    			#if ($!goods.attrs.length()<20)
+    				$!goods.attrs
+    			#else
+    				$!controlUtil.getNoticesTitle($!goods.attrs,20)
+    			#end
+    		 </td>
+    		 <td>&nbsp;$!goods.units</td>
+    		 <td  class="r" align="right">
+    			#if("$!{stockNew}"=="$!{shoppingList.status}")
+    				￥<span id='goods_unitprice_edit_$!goods.id'>
+    					<input type="text" name="newUnitPrice" id="newUnitPrice_$!goods.id" value="$!moneyUtil.getFormatMoney($!goods.unitPrice,'0.00')"  title="点击修改单价" onchange="editDwrUnitPrice('$!goods.id',$!goods.unitPrice);" size="6" maxLength="20"/>
+    				</span>
+    			#else
+        			<span id='goods_unitprice_edit_$!goods.id'>
+        				$!moneyUtil.getFormatMoney($!goods.unitPrice,'0.00')
+        			</span>
+    			#end
+    		 </td>
+    		 <td  class="r" align="right">
+            	#if("$!{stockNew}"=="$!{shoppingList.status}")
+    				<span id='goods_amount_edit_$!goods.id'>
+    					<input type="text" name="newAmount" #if($!{goods.amount}=="" || "$!{goods.amount}"=="0") value="" #else value="$!goods.amount" #end id="newAmount_$!goods.id"  title="点击修改购买数量" onchange="editDwrAmount('$!goods.id',$!goods.amount);" size="6" maxLength="20"/>
+    				</span>
+    			#else
+        			<span id='goods_amount_$!goods.id'>
+        				$!goods.amount
+        			</span>
+    			#end
+             </td>
+    		 <td align="right">￥<input type="text" name="newDueFee" id="newDueFee_$!goods.id" value="$!moneyUtil.getFormatMoney($!goods.dueFee,'0.00')" size="10" readonly=true/></td>
+             <td  class="r" align="right">
+            	#if("$!{stockNew}"=="$!{shoppingList.status}")
+    				￥<span id='goods_factfee_edit_$!goods.id'>
+    					<input type="text" name="newFactFee" value="$!moneyUtil.getFormatMoney($!goods.factFee,'0.00')" id="newFactFee_$!goods.id" size="10" maxLength="16" readonly=true/>
+    				</span>
+    			#else
+        			￥<span id='goods_factfee_$!goods.id'>
+        				$!moneyUtil.getFormatMoney($!goods.factFee,'0.00')
+        			</span>
+    			#end
+             </td>
+             <td  align="center">
+    			#if("$!{stockNew}"=="$!{shoppingList.status}")
+            	<a href="javascript:deleteGoods($!goods.id);">删除</a>&nbsp;
+    			#end
+             </td>
+          </tr>
+    	  #end
+    	#end
+        </table>
+        <!-- 分页 -->
+        #if($shoppingMoreDetails.size() == 0)
+    		没有结果！
+    	#else
+    	<table width="100%" cellpadding="3" cellspacing="1" class="list-div">
+        	<tr>
+    			<td align="right">采购数量总计：</td><td><span id="totalnum" class="red">$sum_totalNum</span></td>
+    			<td align="right">应付金额总计（￥）：</td><td><span id="sumduefee" class="red">$!moneyUtil.getFormatMoney($sum_dueFee,'0.00')</span></td>
+    			<td align="right">实付金额总计（￥）：</td><td><span id="sumfactfee" class="red">$!moneyUtil.getFormatMoney($sum_factFee,'0.00')</span></td>
+            </tr>
+        </table>
+        #end
+    	#if("$!{stockNew}"=="$!{shoppingList.status}")
+    	<h1 id="addGoodsH">
+    		<span class="action-span"><a href="javascript:addGoods();">新增采购产品</a></span>
+    	</h1>
+    	<h1 id="addGoodsHL" style="display:none">
+    		<span class="action-span"><img src="$imageServer/images/admin/loading.gif" /></span>
+    	</h1>
+    	#end
+     </div>
+     #if("$!{stockNew}"=="$!{shoppingList.status}")
+     <div align="center">
+        <input type="button" name="edit" value=" 编 辑 " onclick="javascript:finishEdit();"/>
+     </div>
+     #end
+     </form>
+  </div>
+</div>
+ <script language="javascript" type="text/javascript">
+ 		String.prototype.trim = function() {
+        	// 用正则表达式将前后空格
+        	// 用空字符串替代。
+        	return this.replace(/(^\s*)|(\s*$)/g, "");
+		}
+
+	function checkStatus(){
+		if("$!{stockNew}"=="$!{shoppingList.status}"){
+			return true;
+		}else{
+			alert("不能编辑非新建状态的采购订单！");
+			return false;
+		}
+	}
+
+	function addGoods(){
+		if(checkStatus()){
+			var sCount = 0;
+			#if($shoppingMoreDetails)
+				sCount = $shoppingMoreDetails.size();
+			#end
+			document.getElementById("addGoodsH").style.display="none";
+			document.getElementById("addGoodsHL").style.display="";
+			window.open('$!appServer/instance/select_suppliler_instance.html?sid=$!{shoppingList.supplierId}&muse=true&shoppingOriCount='+sCount,'','');
+		}
+	}
+
+	function backGoodsInstance(ret){
+			var goodsId_str = '';
+
+			if(ret!=null &&　ret.length>0){
+				for(var i=0;i<ret.length;i++) {
+　					goodsId_str += ret[i].id + ',';
+				}
+			}
+			document.getElementById('goodsIds').value=goodsId_str;
+
+			document.form1.action = "stock_goods_add.html?actionType=edit";
+			document.form1.submit();
+	}
+
+ 	function deleteGoods(goodsId){
+  		var	mymes=confirm("确定删除采购商品？");
+		if(checkStatus()){
+			if(true==mymes){
+	  			document.form1.action = "$appServer/stock/delete_stock_goods.html?goodsId="+goodsId+"&shopListId=$!{shoppingList.id}&actionType=edit";
+				document.form1.submit();
+	  		}
+		}
+	}
+
+	function finishEdit(){
+	    var date1str = document.getElementById("arriveTime_str").value;
+		var date2str = document.getElementById("shoppingTime_str").value;
+		var storTypestr = document.getElementById("storType").value;
+		var date1 = date1str.replace(/-/g, "/");
+		var date2 = date2str.replace(/-/g, "/");
+    	var b_date=new Date(Date.parse(date1));
+        var e_date=new Date(Date.parse(date2));
+		var amount;
+
+		if(!checkStatus()){
+			return false;
+		}
+		if(date2==""){
+			alert("采购时间必须填写！");
+    		return false;
+		}
+		if(date1==""){
+			alert("预期到货时间必须填写！");
+    		return false;
+		}
+
+    	if(e_date > b_date){
+    		alert("采购时间不能大于预期到货时间！");
+    		return false;
+    	}
+		if(storTypestr==""){
+			alert("库存类型必须选择！");
+			return false;
+		}
+
+		#if($shoppingMoreDetails)
+			#if($shoppingMoreDetails.size()>100)
+				alert("每张采购订单的产品数量不能超过100条！");
+				return false;
+			#end
+
+      		#foreach($goods in $shoppingMoreDetails)
+			amount = Number(document.getElementById("newAmount_$!goods.id").value);
+
+			if(amount == 0){
+				alert("采购的产品[#direct($!goods.instanceName)]中的采购数量为0！");
+				return false;
+			}
+			#end
+		#end
+
+		document.form1.action = "$appServer/stock/stock_edit.html";
+		document.form1.submit();
+	}
+
+	function addNum(){
+		var amount=0,factFee=0,duefee=0;
+		var totalnum = document.getElementById("totalnum");
+		var totalnumValue=0;
+		var sumduefee = document.getElementById("sumduefee");
+		var sumduefeeValue=0;
+		var sumfactfee = document.getElementById("sumfactfee");
+		var sumfactfeeValue=0;
+		#if($shoppingMoreDetails)
+      		#foreach($goods in $shoppingMoreDetails)
+			amount = Number(document.getElementById("newAmount_$!goods.id").value);
+			duefee = Number(document.getElementById("newDueFee_$!goods.id").value);
+			factFee = Number(document.getElementById("newFactFee_$!goods.id").value);
+
+			totalnumValue = Number(totalnumValue+amount);
+			sumduefeeValue = Number(sumduefeeValue+duefee);
+			sumfactfeeValue = Number(sumfactfeeValue+factFee);
+			#end
+			totalnum.innerHTML = totalnumValue+"";
+			sumduefee.innerHTML = formatAsMoney(sumduefeeValue)+"";
+			sumfactfee.innerHTML = formatAsMoney(sumfactfeeValue)+"";
+		#end
+	}
+
+
+	function editDwrAmount(goodsId,oldValue){
+		var newAmount=document.getElementById('newAmount_' + goodsId);
+		var newAmountValue=newAmount.value;
+		var msgDiv=document.getElementById("modifyAmountSuccess");
+		var msgDiv2=document.getElementById("modifyAmountError");
+		if(newAmountValue==null||newAmountValue.trim()==""){
+			alert("出错：您没有输入.");
+			newAmount.value=oldValue;
+			newAmount.select();
+            newAmount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isIntNumber(newAmountValue)){
+			alert("出错：您输入了不正确的数量.");
+			newAmount.value=oldValue;
+			newAmount.select();
+            newAmount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newAmountValue>100000000000){
+			alert("出错：您输入的数量太大.");
+			newAmount.value=oldValue;
+			newAmount.select();
+            newAmount.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newAmountValue=parseInt(newAmountValue);
+			jQuery.get('$appServer/stock/editDwrAmount.html',{param1:goodsId,param2:newAmountValue},function(message){
+			    var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifyAmountSuccess");
+		        var msgDiv2=document.getElementById("modifyAmountError");
+		        var unitPrice = document.getElementById('newUnitPrice_' + goodsId).value;
+		        var priceNum = Number(unitPrice);
+		        var amountNum = Number(newAmount.value);
+		        if (msgType == 'true') {
+			        msgDiv2.style.display="none";
+			        msgDiv.style.display="";
+			        document.getElementById('newDueFee_' + goodsId).value=(priceNum*amountNum).toFixed(2);
+			        document.getElementById('newFactFee_' + goodsId).value=(priceNum*amountNum).toFixed(2);
+					addNum();
+		        } else{
+			        alert("修改采购数量失败!");
+			        msgDiv2.style.display="";
+			        msgDiv.style.display="none";
+		        }
+		    },'');
+		}
+	}
+
+
+	function editDwrFactFee(goodsId,oldValue){
+		var newFactFee=document.getElementById('newFactFee_' + goodsId);
+		var newFactFeeValue=newFactFee.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newFactFeeValue==null||newFactFeeValue.trim()==""){
+			alert("出错：您没有输入.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newFactFeeValue)){
+			alert("出错：您输入了不正确的金额.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newFactFeeValue>10000000000){
+			alert("出错：您输入的金额太大.");
+			newFactFee.value=oldValue;
+			newFactFee.select();
+            newFactFee.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newFactFeeValue=parseFloat(newFactFeeValue);
+			jQuery.get('editDwrFactFee.html',{param1:goodsId,param2:newFactFeeValue},function(message){
+			    var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifySuccess");
+		        var msgDiv2=document.getElementById("modifyError");
+		        if (msgType == 'true') {
+			        msgDiv2.style.display="none";
+			        msgDiv.style.display="";
+					addNum();
+		         } else{
+			        alert("修改实付金额失败!");
+			        msgDiv2.style.display="";
+			        msgDiv.style.display="none";
+		         }
+		    },'');
+		}
+	}
+
+
+	function editDwrUnitPrice(goodsId,oldValue){
+		var newUnitPrice=document.getElementById('newUnitPrice_' + goodsId);
+		var newUnitPriceValue=newUnitPrice.value;
+		var msgDiv=document.getElementById("modifySuccess");
+		var msgDiv2=document.getElementById("modifyError");
+		if(newUnitPriceValue==null||newUnitPriceValue.trim()==""){
+			alert("出错：您没有输入.");
+			newUnitPrice.value=oldValue;
+			newUnitPrice.select();
+            newUnitPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else if(!isNumber(newUnitPriceValue)){
+			alert("出错：您输入了不正确的单价.");
+			newUnitPrice.value=oldValue;
+			newUnitPrice.select();
+            newUnitPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}else if(newUnitPriceValue>10000000000){
+			alert("出错：您输入的单价太大.");
+			newUnitPrice.value=oldValue;
+			newUnitPrice.select();
+            newUnitPrice.focus();
+            msgDiv2.style.display="";
+			msgDiv.style.display="none";
+		}
+		else{
+			newUnitPriceValue=parseFloat(newUnitPriceValue);
+			jQuery.get('editDwrUnitPrice.html',{param1:goodsId,param2:newUnitPriceValue},function(message){
+              	var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        var msgValue = message.substring(message.indexOf("\',\'") + 3, message.lastIndexOf("\']"));
+		        var msgDiv=document.getElementById("modifyUnitPriceSuccess");
+		        var msgDiv2=document.getElementById("modifyUnitPriceError");
+		        var amount = document.getElementById('newAmount_' + goodsId).value;
+		        var priceNum = Number(newUnitPrice.value);
+		        var amountNum = Number(amount);
+		        if (msgType == 'true') {
+			       msgDiv2.style.display="none";
+			       msgDiv.style.display="";
+			       document.getElementById('newDueFee_' + goodsId).value=(priceNum*amountNum).toFixed(2);
+			       document.getElementById('newFactFee_' + goodsId).value=(priceNum*amountNum).toFixed(2);
+				   addNum();
+		        } else{
+			       alert("修改单价失败!");
+			       msgDiv2.style.display="";
+			       msgDiv.style.display="none";
+		        }
+		    },'');
+		}
+	}
+
+
+	function checkStockIsExist(relationShoppingNum){
+		var shopNum=relationShoppingNum.replace(/-/g, "/");
+		var msgDiv=document.getElementById("error");
+		if(shopNum != ""){
+			jQuery.get('checkStockByDwr.html',{param:shopNum},function(message){
+		        var shoppingNum=document.getElementById("relationShoppingNum");
+		        var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        if (msgType == 'false') {
+			         alert("关联采购订单不存在！");
+			         shoppingNum.value="";
+		        }
+		    },'');
+		}
+	}
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+	function isIntNumber(val){
+		var reg = /^[1-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+
+	function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00'
+              : ( (mnt*10 == Math.floor(mnt*10)) ?
+                       mnt + '0' : mnt);
+	}
+</script>

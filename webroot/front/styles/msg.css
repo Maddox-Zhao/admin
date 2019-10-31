@@ -1,0 +1,66 @@
+@charset "utf-8";
+/* CSS Document */
+
+body, div, ul, ol, li, form, iframe, fieldset, input, p, dl, dt, dd, tr, td{
+	font: 12px Arial, Geneva, Helvetica, sans-serif, Tahoma;margin:0;padding:0;font-weight:400; font-size:12px;}
+input, select, textarea {font: 12px Geneva, Arial, Helvetica, sans-serif, Tahoma; color: #000;}
+li{list-style-type:none; }
+body{font-size:12px;color:#666;margin:0px;background-color: #fff; }
+img {border:0;vertical-align: middle;}
+a{color:#0044dd;text-decoration:none;}
+a:hover{color:#FF9900;text-decoration:none;}
+p{text-indent:24px; margin-top:10px;}
+.clear{clear: both;margin:0;padding:0;height:0px;overflow:hidden; border:0;}
+
+
+/*  站内信  */
+.msg{ width:730px; overflow:hidden;}
+
+.msg-tab{ margin:0px; background:#fff url(../images/tab_bg.gif) bottom repeat-x; display:block; line-height:25px; height:25px; }
+.msg-tab li{ line-height:25px; float:left; width:120px; text-align:center; background: url(../images/tab_bg2.gif) right no-repeat; }
+.msg-tab li a{color:#333;}
+.msg-tab li.currently{background: url(../images/tab_li_bg.gif) no-repeat; font-weight:bold;  }	
+.msg-tab li.currently a{color:#003366;}
+
+.msg-box{ border:1px solid #b5c9e1; border-top:0; margin:0px; clear:both; padding-top:10px; padding-bottom:10px;position:relative; }
+.msg-box h3{ font-size:14px; color:#333; margin-left:20px;}
+.msg-box h3 img{ margin-right:10px;}
+.msg .msg-list{ width:710px; display:block; margin:10px auto; border-collapse:collapse; border-top:1px solid #ccc;border-bottom:1px solid #ccc;}
+.msg .msg-list th{ line-height:35px; background-color:#eee; text-align:left; padding-left:3px;}
+.msg .msg-list td{ line-height:20px; padding:10px 3px; border-bottom:1px dotted #eee;}
+
+/* 小按钮工具组 */
+.tool{margin:0px; clear:both;}
+.tool a{margin: 0px 5px 0px 5px;text-decoration:none;padding:1px 12px 3px 16px;*padding:3px 12px 3px 16px;color:#24496F;}
+.tool span {padding-bottom:4px;background: url(../images/icn_bt_submit2.gif) top right no-repeat;}
+.tool span a{background: url(../images/icn_bt_submit.gif) top left no-repeat;}
+.tool span a.bt_add{background: url(../images/icn_bt_submit_add.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool span a.bt_del{background: url(../images/icn_bt_submit_del.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool span a.bt_par{background: url(../images/icn_bt_submit_par.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool span a.bt_edit{background: url(../images/icn_bt_submit_edit.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool span a.bt_ren{background: url(../images/icn_bt_submit_ren.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool span a.bt_all{background: url(../images/icn_bt_submit_all.gif) top left no-repeat;padding:0px 10px 4px 21px;*padding:3px 10px 3px 21px;}
+.tool a:hover{color:#FF6600;}
+
+/*分页*/
+.pages {margin:5px 10px 10px 5px; vertical-align:middle; text-align:right;}
+.pages a {text-align:center;text-decoration:none;	border:#AECAF4 1px solid;padding:0px 5px;margin-left:3px;}
+.pages a:hover {text-decoration:none;background-color:#E7FAFE;border:#7DC0F7 1px solid;color:#FF9900;}
+.pages input {color:#87a32e;border:#76bac2 solid 1px;padding:1px;margin-top:1px;height:13px;}
+.pages input:hover {border:#FF9900 solid 1px;}
+
+/* 表单 */
+.formbasic {color: #000;background: #f6f6f6;margin: 0px 10px;padding:15px; position:relative;}
+.formbasic table {width: 100%;}
+.formbasic td {padding: 5px 0;text-align: left;}
+.formbasic input, .formbasic select, .formbasic textarea { background: #fff;border: 1px solid #7b9ebd;padding: 2px 3px;}
+.formbasic input.inp{ width:400px;}
+.formbasic .fm-label {padding: 0px;width: 120px;text-align: right;padding-right: 10px; }
+.formbasic .fm-field {color:#1C4053; text-align:left; padding-left:10px;}
+.formbasic textarea {height:300px;}
+.formbts {background: #e6e6e6;margin: 0 10px 10px 10px;padding: 4px 10px;text-align: center;}
+.submitbt{border:0px; width:83px; height:20px;background: url(../images/bg_button.gif) top left no-repeat; cursor:pointer;margin: 0 10px; }
+.formbasic .checkbox {width: auto;margin-right: .5em;vertical-align: middle;border:0;background: #f6f6f6;}
+
+
+

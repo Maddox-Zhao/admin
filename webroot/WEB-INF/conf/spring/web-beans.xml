@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="GB2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="ResourceConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>/WEB-INF/conf/server.properties</value>
+				<value>/WEB-INF/conf/mail.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- START URLBrokers -->
+	<bean id="appServerBroker" class="com.hundsun.network.melody.common.web.url.URLBroker">
+		<property name="encoding" value="${web.encoding}"></property>
+		<property name="config">
+			<bean class="com.hundsun.network.melody.common.web.url.URLConfig">
+				<property name="host" value="${app.server.host}"></property>
+				<property name="port" value="${app.server.port}"></property>
+				<property name="followContextPath" value="true"></property>
+			<!-- <property name="path" value="igc"></property>  -->	
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.hundsun.network.melody.common.web.url.ServletContextInitHelper">
+		<property name="broker" ref="appServerBroker"></property>
+	</bean>
+	
+	<bean id="imageServerBroker" class="com.hundsun.network.melody.common.web.url.StampURLBroker">
+		<property name="encoding" value="${web.encoding}"></property>
+		<property name="config">
+			<bean class="com.hundsun.network.melody.common.web.url.URLConfig">
+				<property name="host" value="${image.server.host}"></property>
+				<property name="port" value="${image.server.port}"></property>
+				<property name="followContextPath" value="true"></property>
+			</bean>
+		</property>
+		<property name="stamp" value="${web.stamp}"></property>
+	</bean>
+	<bean class="com.hundsun.network.melody.common.web.url.ServletContextInitHelper">
+		<property name="broker" ref="imageServerBroker"></property>
+	</bean>
+	
+	<bean id="upServerBroker" class="com.hundsun.network.melody.common.web.url.URLBroker">
+		<property name="encoding" value="${web.encoding}"></property>
+		<property name="config">
+			<bean class="com.hundsun.network.melody.common.web.url.URLConfig">
+				<property name="host" value="${up.server.host}"></property>
+				<property name="port" value="${up.server.port}"></property>
+				<property name="followContextPath" value="true"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.hundsun.network.melody.common.web.url.CommonInitHelper">
+		<property name="broker" ref="upServerBroker"></property>
+	</bean>
+	
+	<bean id="liangpin99ServerBroker" class="com.hundsun.network.melody.common.web.url.URLBroker">
+		<property name="encoding" value="${web.encoding}"></property>
+		<property name="config">
+			<bean class="com.hundsun.network.melody.common.web.url.URLConfig">
+				<property name="host" value="${liangpin99.server.host}"></property>
+				<property name="port" value="${liangpin99.server.port}"></property>
+				<property name="followContextPath" value="true"></property>
+			</bean>
+		</property>
+	</bean>
+	<bean class="com.hundsun.network.melody.common.web.url.ServletContextInitHelper">
+		<property name="broker" ref="liangpin99ServerBroker"></property>
+	</bean>
+	<!-- END URLBrokers -->
+
+	<bean id="encodingFilterBean" class="org.springframework.web.filter.CharacterEncodingFilter">
+		<property name="encoding" value="${web.encoding}"></property>
+		<property name="forceEncoding" value="false"></property>
+	</bean>
+	
+	<!-- cookyjar 配置 -->
+	<bean id="cookieCrypto" class="com.hundsun.network.melody.common.util.crypto.impl.AESCryptoImpl">
+		<property name="key" value="${cookie.aes.key}"></property>
+		<property name="ivParameter" value="${cookie.aes.iv}"></property>
+	</bean>
+
+	<bean id="cookyjarConfigure" class="com.hundsun.network.melody.common.web.cookyjar.CookyjarConfigure">
+		<!-- cookie缺省配置 -->
+		<property name="defaultConfigure">
+			<bean class="com.hundsun.network.melody.common.web.cookyjar.CookieConfigure">
+				<property name="path" value="/" />
+				<property name="lifeTime" value="-1" />
+				<property name="domain" value=".${app.domain}" />
+			</bean>
+		</property>
+		<!-- 每个cookie的配置是 本身配置+缺省配置 -->
+		<property name="cookieConfigures">
+			<list>
+				<bean class="com.hundsun.network.melody.common.web.cookyjar.CookieConfigure">
+					<property name="name" value="adminAgent" />
+					<property name="clientName" value="_xlback_" />
+					<property name="crypto" ref="cookieCrypto" />
+					<property name="selfDependenceClass" value="com.huaixuan.network.biz.domain.admin.AdminAgent" />
+					<property name="randomChar" value="6" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cookyjarFilterBean" class="com.hundsun.network.melody.common.web.cookyjar.CookyjarFilter">
+		<property name="cookyjarConfigure" ref="cookyjarConfigure"></property>
+	</bean>
+	
+	<bean id="responseOutputBufferFilterBean" class="com.hundsun.network.melody.common.web.filter.ResponseOutputBufferFilter">
+		<property name="outCharset" value="${web.encoding}"></property>
+	</bean>	
+	<!-- 资源国际化测试 -->
+    <bean id="messageSource"        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">        
+       <property name="basenames">
+	      <list>
+	        <value>/WEB-INF/conf/spring/ApplicationResources.properties</value>	      
+	      </list>
+        </property>
+    </bean>
+	  
+
+</beans>

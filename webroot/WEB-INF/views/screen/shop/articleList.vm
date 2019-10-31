@@ -1,0 +1,122 @@
+#set($layout = 'layout\default.vm')
+
+<script type="text/javascript">
+
+	function deleteArticle(id){
+ 		var obj = document.getElementById("articleId");
+	  	obj.value = id;
+
+  		var	mymes=confirm("确定删除资讯？");
+		 if(true==mymes){
+	  		document.listForm.action = "/shop/deletear.html";
+			document.listForm.submit();
+	  	}else {
+
+	  	}
+
+	}
+
+	function updateArticlePage(id){
+ 		var obj = document.getElementById("articleId");
+	  	obj.value = id;
+
+  		document.listForm.action = "/shop/updatearp.html";
+		document.listForm.submit();
+	}
+
+	function updateTop(id){
+ 		var obj = document.getElementById("articleId");
+	  	obj.value = id;
+
+  		document.listForm.action = "/shop/top.html";
+		document.listForm.submit();
+	}
+
+	function updateShow(id){
+ 		var obj = document.getElementById("articleId");
+	  	obj.value = id;
+
+  		document.listForm.action = "/shop/ushow.html";
+		document.listForm.submit();
+	}
+
+</script>
+#set($title = "资讯管理 - 添加资讯")
+<form name="listForm" action="" method="post"><!-- start ads list -->
+	<input type="hidden" id="articleId" name="articleId" value="" />
+<div class="list-div" id="listDiv">
+	<div class="tool">
+
+            <span><a href="/shop/addarp.html" hidefocus="true" class="bt_add">添加资讯</a></span>
+    </div>
+	<div class="listBox">
+			<h3><span>资讯列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>资讯标题</th>
+	  <th>资讯类型</th>
+      <th>资讯关键字</th>
+      <th>资讯来源</th>
+      <th>资讯原链接</th>
+      <th>是否置顶</th>
+      <th>是否显示</th>
+      <th>操作</th>
+    </tr>
+	#foreach( $article in ${query.items})
+   <tr align="center">
+      <td><label>#if($!{article.catCode} && $!{article.catCode}=='help')
+    				<a href="$!{liangpin99Server}/l/view_$!{article.id}.htm" target="_blank">
+    				#if($!article.title.length()>12)
+                    <div title="$!article.title">$!article.title.substring(0,12)...</div>
+    				#else
+    					$!article.title
+    				#end
+    		        </a>
+				#elseif($!{article.catCode} && $!{article.catCode}=='kefu')
+    				<a href="${liangpin99Server}/l/kefu_$!{article.id}.htm" target="_blank">
+    				#if($!article.title.length()>12)
+                    <div title="$!article.title">$!article.title.substring(0,12)...</div>
+    				#else
+    					$!article.title
+    				#end
+    		        </a>
+				#elseif($!{article.catCode} && $!{article.catCode}=='aboutus')
+    				<a href="${liangpin99Server}/l/aboutus_$!{article.id}.htm" target="_blank">
+    				#if($!article.title.length()>12)
+                    <div title="$!article.title">$!article.title.substring(0,12)...</div>
+    				#else
+    					$!article.title
+    				#end
+    		        </a>
+				#else
+					<a href="${liangpin99Server}/l/info_$!{article.id}.htm" target="_blank">
+    				#if($!article.title.length()>12)
+                    <div title="$!article.title">$!article.title.substring(0,12)...</div>
+    				#else
+    					$!article.title
+    				#end
+    		        </a>
+	            #end
+	  </label></td>
+	  <td>$!{article.catName}</td>
+      <td>$!{article.keywords}</td>
+      <td>$!{article.source}</td>
+      <td><!-- #BeginDate format:IS1 --><a href="$!{article.sourceUrl}" target="_blank">$!{article.sourceUrl}</a><!-- #EndDate --></td>
+      <td><a href="javascript:updateTop('$!{article.id}')">#if($!{article.isTop} && $!{article.isTop} == 1)置顶 #else 普通 #end</a></td>
+      <td><a href="javascript:updateShow('$!{article.id}')">#if($!{article.isShow} && $!{article.isShow} == 1)显示 #else 不显示 #end</a></td>
+      <td align="left"> &nbsp;&nbsp;&nbsp; <a href="javascript:updateArticlePage('$!{article.id}')">修改</a> <a href="javascript:deleteArticle('$!{article.id}')">删除</a></td>
+    </tr>
+	#end
+  </table>
+  </div>
+  </form>
+  #if($!{query.items.size()} > 0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/arlist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+   #else
+		没有结果！
+   #end
+</div>
+  <p>&nbsp;</p>
+</div>
+<div id="div_add_note"></div>

@@ -1,0 +1,61 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>成本价历史</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+	<style type="text/css">
+    </style>
+   </head>
+<body>
+    <form id="excelForm"  action="/HxStockOrder/exportSaleGoodsInfo.html" method="post" target="excelIFrame">
+         <div style="width:100%;" id="form1">
+          <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+					 <td style="width:150px">
+						<input id="sedid" name="skuId" class="mini-textbox"  value="$!{id}" style="display:none"/>
+                    </td>
+				</tr>
+			</table>
+		  </div>
+		 </div>
+	</form>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:400px;" allowResize="false" multiSelect="true"  
+        url="providerYShanglogInfolist.html"  idField="id"  pageSize="50" allowAlternating="true" pageIndex="1" onCellbeginedit="cellbeginedit"
+		 showSummaryRow="true" onCellcommitedit="onCellcommitedit"  onCellendedit="setSalePriceFn">
+        <div property="columns">
+            <div type="indexcolumn"></div>
+			
+            <div field="skuId" width="80" headerAlign="center" align="center" allowSort="true">云尚的sku</div>
+            <div field="ourSku" width="100" headerAlign="center" align="center"  allowSort="true">我们的sku</div>
+            <div field="productName" width="180" headerAlign="center" align="center"  allowSort="true">商品标题</div>
+            <div field="stock" width="60" headerAlign="center" align="center"  allowSort="true">库存</div>
+			
+            <div field="oldCost" width="80" headerAlign="center" align="center"  allowSort="true">旧成本价</div>
+            <div field="newCost" width="80" headerAlign="center" align="center"  allowSort="true">新成本价</div>
+            <div field="oldOurPrice" width="80" headerAlign="center" align="center"  allowSort="true">旧销售价</div>
+			<div field="newOurPrice" width="80" headerAlign="center" align="center"  allowSort="true">新销售价</div>
+			
+            <div field="costChangeTime" width="150" headerAlign="center" align="center"  allowSort="true">成本价格变动时间</div>
+		    <div field="priceChangeTime" width="150" headerAlign="center" align="center"  allowSort="true">销售价格变动时间</div>
+			<div field="insertTime" width="150" headerAlign="center" align="center"  allowSort="true">数据生成时间</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+	mini.parse();
+	var grid = mini.get("datagrid1");
+	search();
+	function search() {
+	 var form = new mini.Form("#form1");
+	 var data = form.getData(); //获取表单多个控件的数据 
+		grid.load(data);
+	}
+</script>
+</body>
+</html>

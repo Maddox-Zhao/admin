@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideGoodsYShangImge" type="com.huaixuan.network.biz.domain.provider.ProvideGoodsYShangImge"/>
+   
+	<resultMap id="provideGoodsYShangImge" class="com.huaixuan.network.biz.domain.provider.ProvideGoodsYShangImge" >
+		<result column="id" property="id"/>
+		<result column="sku_id" property="skuId"/>
+		<result column="our_sku" property="ourSku"/>
+		<result column="yshang_Image" property="yshangImage"/>
+		
+		<result column="image_pic" property="imagePic"/>
+		<result column="type" property="type"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="type" property="type"/>
+		
+	</resultMap>
+	
+	<insert  id ="insertGoodsYShangImge"   parameterClass ="java.util.List"> 
+     <![CDATA[
+      insert into provide_goods_yshang_imge(id,sku_id,our_sku,yshang_Image,image_pic,type,gmt_create,gmt_modify) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgList[].skuId#,#pgList[].ourSku#,#pgList[].yshangImage#,#pgList[].imagePic#,#pgList[].type#,sysdate(),#pgList[].gmtModify#
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+
+
+<!-- 
+
+<select id="selectYShangGoodsImge" parameterClass="provideGoodsYShangImge" resultMap="provideGoodsYShangImgeResult">
+	select * from
+	provide_goods_yshang_imge
+	where 1=1
+	
+	<isNotNull prepend="and" property="skuId">
+		sku_id=#skuId#
+	</isNotNull>
+	<isNotNull prepend="and" property="ourSku">
+		our_sku=#ourSku#
+	</isNotNull>
+</select>
+ -->	
+ 
+<select id="selectOneGoodsImageYShang" parameterClass="java.lang.String" resultMap="provideGoodsYShangImge">
+	select * from
+	provide_goods_yshang_imge
+	where 1=1 and sku_id=#value#
+    order by id asc
+</select>
+ 
+ 
+ 
+<!--  更新 -->
+<update id="updatGoodsImageYShang" parameterClass="provideGoodsYShangImge">
+	update provide_goods_yshang_imge
+	<dynamic prepend="set">
+		gmt_modify= sysdate()
+		
+		<isNotNull  property="imagePic">
+			,image_pic=#imagePic#
+		</isNotNull>
+		<isNotNull  property="status">
+			,status=#status#
+		</isNotNull>
+	 where sku_id = #skuId# and yshang_Image = #yshangImage#
+	</dynamic>
+</update>
+ 
+ 
+ 
+ 
+ <select id="getProvideImgDaoYShang" resultMap="provideGoodsYShangImge">
+	<![CDATA[
+	  select  * from provide_goods_yshang_imge  where 1=1
+	]]>	
+	
+	<isNotNull prepend="and" property="prodIdList">  
+        sku_id in  
+        <iterate property="prodIdList" open="(" conjunction="," close=")">  
+            #prodIdList[]#  
+        </iterate>                      
+    </isNotNull>
+    order by id asc	
+</select>	  		
+ 
+
+
+</sqlMap>
+
+

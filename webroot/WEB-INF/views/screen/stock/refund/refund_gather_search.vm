@@ -1,0 +1,184 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购管理 - 退货产品汇总查询")
+
+<div class="main">
+    <h2>采购管理 - 退货产品汇总查询</h2>
+	<div class="searchBox">
+		<h3><span>搜索退货产品汇总</span></h3>
+		<form action="$appServer/stock/refund/refund_gather_search.html" name="searchForm" method="post">
+		<table >
+			<tr >
+            	<th>产品编码：</th>
+				<td >
+					<input type="text" name="instanceCode" id="instanceCode" value="$!{queryObject.instanceCode}" size="15" theme="simple" />
+                </td>
+				<th>产品名称：</th>
+				<td >
+					<input type="text" name="instanceName" id="instanceName" value="$!{queryObject.instanceName}" size="15" theme="simple" />
+                </td>
+			</tr>
+
+			<tr >
+            	<th>供应商：</th>
+				<td >
+					<select name="supplierId" id="supplierId" >
+						<option value="">请选择</option>
+						#foreach($s in $supplierList)
+							<option value="$!{s.id}" #if($!{queryObject.supplierId} == ${s.id}) selected="true" #end>$!{s.name}</option>
+						#end
+                    </select>
+                </td>
+				<th>仓库名称：</th>
+				<td >
+					<select name="depFirstId" id="depFirstId" >
+						<option value="">请选择</option>
+						#foreach($s in $depositoryNameMap.entrySet())
+							<option value="$!{s.key}" #if($!{queryObject.depFirstId} == ${s.key}) selected="true" #end>$!{s.value}</option>
+						#end
+                    </select>
+                </td>
+			</tr>
+			<tr >
+            	<th>退货时间：从</th>
+				<td >
+					<input type="text" name="startTime" id="startTime" value="$!queryObject.startTime" size="10" theme="simple" readonly="true" />
+                </td>
+				<th>到</th>
+				<td >
+					<input type="text" name="endTime" id="endTime" value="$!queryObject.endTime" size="10" theme="simple" readonly="true" />
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "startTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "endTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </td>
+			</tr>
+			<tr >
+            	<th></th>
+				<td >
+                </td>
+				<th></th>
+				<td >
+					<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+					<input type="button" value="Excel导出" class="button" onclick="doExport();"/>
+                </td>
+			</tr>
+		</table>
+		</form>
+    </div>
+
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>产品编码</th>
+        <th>仓库名称</th>
+        <th>产品名称</th>
+        <th>采购类型</th>
+        <th>类目</th>
+        <th>属性</th>
+        <th>单位</th>
+        <th>退货正品数量</th>
+        <th>退货残品数量</th>
+        <th>应付金额（￥）</th>
+        <th>实付金额（￥）</th>
+      </tr>
+      #foreach($refund in $query.items)
+      <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td  align="center">&nbsp;$!refund.goodsCode</td>
+        <td  align="center">&nbsp;$!depositoryNameMap.get($!refund.depFirstId)</td>
+        <td  align="left">&nbsp;$!refund.instanceName</td>
+        <td  align="left">&nbsp;$storTypeMap.get($!refund.storType)</td>
+    <td title="$!categoryManager.getCatFullNameByCatcode($!refund.catCode)">
+    #if ($!categoryManager.getCatFullNameByCatcode($!refund.catCode).length()<10)
+      $!categoryManager.getCatFullNameByCatcode($!refund.catCode)
+    #else
+     $!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($!refund.catCode),10)
+    #end
+    </td>
+    <td title="$!attributeManager.getFullAttributeStringByAttrs($!refund.attrs)">
+
+     #if ($!attributeManager.getFullAttributeStringByAttrs($!refund.attrs).length()<10)
+        $!attributeManager.getFullAttributeStringByAttrs($!refund.attrs)
+    #else
+        $!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($!refund.attrs),10)
+        #end
+
+    </td>
+
+        <td>&nbsp;$!refund.units</td>
+        <td align="right">$!refund.refNum</td>
+        <td align="right">$!refund.damagedNum</td>
+        <td align="right">$!moneyUtil.getFormatMoney($!refund.dueFee,'0.00')</td>
+        <td align="right">$!moneyUtil.getFormatMoney($!refund.factFee,'0.00')</td>
+      </tr>
+      #end
+    </table>
+
+	<!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/refund/refund_gather_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+    String.prototype.trim = function() {
+        // 用正则表达式将前后空格
+        // 用空字符串替代。
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+        function formSubmit(){
+            var dateStart1= document.getElementById("startTime").value.replace(/-/g, "/");
+            var dateEnd1= document.getElementById("endTime").value.replace(/-/g, "/");
+            var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+            if(e_date1 < b_date1){
+                alert("退货起始时间不能大于结束时间！");
+                return false;
+            }
+
+            document.getElementById("instanceCode").value=document.getElementById("instanceCode").value.trim();
+			document.getElementById("instanceName").value=document.getElementById("instanceName").value.trim();
+			document.getElementById("supplierId").value=document.getElementById("supplierId").value.trim();
+			document.getElementById("startTime").value=document.getElementById("startTime").value.trim();
+			document.getElementById("endTime").value=document.getElementById("endTime").value.trim();
+
+            document.forms[0].submit();
+        }
+
+    function doExport(){
+            var dateStart1=document.getElementById("startTime").value.replace(/-/g, "/");
+            var dateEnd1=document.getElementById("endTime").value.replace(/-/g, "/");
+            var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+            if(e_date1 < b_date1){
+                alert("退货起始时间不能大于结束时间！");
+                return false;
+            }
+
+            document.getElementById("instanceCode").value=document.getElementById("instanceCode").value.trim();
+			document.getElementById("instanceName").value=document.getElementById("instanceName").value.trim();
+			document.getElementById("supplierId").value=document.getElementById("supplierId").value.trim();
+			document.getElementById("startTime").value=document.getElementById("startTime").value.trim();
+			document.getElementById("endTime").value=document.getElementById("endTime").value.trim();
+
+        var form1=document.forms[0];
+        form1.action="$appServer/stock/refund/export_refund_detail.html";
+        form1.submit();
+        form1.action="$appServer/stock/refund/refund_gather_search.html";
+    }
+</script>

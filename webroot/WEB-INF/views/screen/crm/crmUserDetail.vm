@@ -1,0 +1,1291 @@
+#set($layout = "layout/default.vm")
+#set($title = "CRM系统 - 买家账户详情")
+
+
+<body>
+<div class="main">
+
+	<h2>CRM系统 - 买家账户详情</h2>
+
+	<div class="tool">
+		<input type="hidden" name="user.id" id="hidUserId" value="$!user.id"/>
+		<input type="hidden" name="user.type" id="hidUserType" value="$!user.type"/>
+		<span><a href="javascript:history.go(-1);" hidefocus="true" class="bt_ren">返回</a></span>
+		<span><a href="javascript:formSubmit();" hidefocus="true" class="bt_par">订单记录查询</a></span>
+	</div>
+
+	<!-- 表单模块 -->
+	<form action="$appServer.get("/crm/crmShowl.html")" name="searchForm" method="post" id="searchForm" enctype="multipart/form-data">
+		<input id="parMap.buyNick" name="buyNick" type="hidden" value="$!{user.account}" />
+	</form>
+
+	<div class="formBox">
+		<h3><i></i><span>注册信息</span></h3>
+		<div class="content">
+			<table class="c6">
+				<tr>
+					<th>客户账号：</th>
+					<td>$!{user.account}</td>
+					<th>客户E-mail：</th>
+					<td>$!{user.email}</td>
+					<th>状态：</th>
+					<td>$!enumUserStatusMap.get($user.stauts)</td>
+				</tr>
+				<tr>
+					<th>会员性质：</th>
+					<td>
+						$!enumUserTypeMap.get($user.type)
+						#if($adminAccess.has("A_CRM_USER_MODIFY_PASSWD"))
+							<input id="initPasswordBut" type="button" value="初始化登录密码" />
+						#end
+						#if($adminAccess.has("A_CRM_USER_MODIFY_PAY_PASSWD"))
+							<input id="initPayPasswordBut" type="button" value="初始化支付密码" />
+						#end
+					</td>
+					<th>客户级别：</th>
+					<td>
+						#if("${user.userRank}" != "0")
+							<img title="${user.userRank}级" src="$imageServer.get("/images/grade/grade_${user.userRank}.gif")">
+						#end
+					</td>
+					<th>代销数量限额：</th>
+					<td>
+						<input type="text" name="agentCount" id="agentCount" value="$!{user.agentCount}" onblur="javascript:isAgentCountNumber(this.value);" size="10" #if(!$adminAccess.has("A_CRM_USER_MODIFY_QUOTA_USER")) readonly #end)/>
+						#if($adminAccess.has("A_CRM_USER_MODIFY_QUOTA_USER"))
+							<input type="button" value="修改限额" onclick="javascript:modifyAgentCountNumber('$!{user.id}');"/>
+						#end
+					</td>
+				</tr>
+				<tr>
+					<th>自动索要发票:</th>
+					<td>
+						#if($adminAccess.has("A_CRM_INVOICEMODIFY_USER") || true)
+							<input name="invoice" id="invoice" type="checkbox" value="y" #if("$!user.invoice" == "y") checked="true" #end onclick="javascript:modifyInvoice('$!{user.id}');">
+						#else
+							<input name="invoice" id="invoice" type="checkbox" value="y" #if("$!user.invoice" == "y") checked="true" #end disabled="disabled">
+						#end
+					</td>
+	#if($!adminAccess.has('A_CRM_IMPORT_ORDER'))
+	<form action="$appServer.get("/crm/doUploadTrade.html")" name="searchForm1" method="post" id="searchForm1" enctype="multipart/form-data">
+
+					<th>EXCEL导入外部订单:</th>
+					<td>
+						<input type="file" id="tradeFile" name="tradeFile"/>
+						<input type="button" value="上传" class="button" onclick="doUpload();"/>
+					</td>
+    </form>
+					<td colspan="2">&nbsp;</td>
+	#end
+				</tr>
+			</table>
+		</div>
+		$!message
+  #if($user.type!='p')	
+	 <div class="content" style="margin-top:10px;">
+			<h3><i></i><span>分销信息</span></h3>
+			<table class="c6">
+				#if($agentInfo.taobaoUser && $agentInfo.taobaoUser.trim().length() > 0)
+					<tr>
+						<th>淘宝：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.taobaoUser" id="taobaoUser"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.taobaoShop" id="taobaoShop"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="taobaoMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if("$agentInfo.taobaoMainBusiness" == "$c.catCode") selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+						</td>
+						<th>店铺级别：</th>
+						<td>
+							<select name="agentInfo.taobaoPrestige" tabindex="23" id="taobaoPrestige" style="width:auto;">
+								#foreach($tb in $tbYoua.entrySet())
+									<option value="$tb.key" #if($tb.key == $agentInfo.taobaoPrestige) selected="selected" #end>
+										$tb.value
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('taobaoShop');"/>
+						</td>
+                    </tr>
+				#end
+				#if($agentInfo.paipaiUser && $agentInfo.paipaiUser.trim().length() > 0)
+					<tr>
+						<th>拍拍：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.paipaiUser" id="paipaiUser"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.paipaiShop" id="paipaiShop"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="paipaiMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if("$agentInfo.paipaiMainBusiness" == "$c.catCode") selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+						</td>
+						<th>店铺级别：</th>
+						<td>
+							<select name="agentInfo.paipaiPrestige" tabindex="23" id="paipaiPrestige" style="width:auto;">
+								#foreach($tb in $presgtige.entrySet())
+									<option value="$tb.key" #if($tb.key == $agentInfo.paipaiPrestige) selected="selected" #end>
+										$tb.value
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('paipaiShop');"/>
+						</td>
+					</tr>
+				#end
+				#if($agentInfo.ebayUser && $agentInfo.ebayUser.trim().length() > 0)
+					<tr>
+						<th>易趣：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.ebayUser" id="ebayUser"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.ebayShop" id="ebayShop"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="ebayMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if($agentInfo.ebayMainBusiness == $c.catCode) selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+						</td>
+						<th>店铺级别：</th>
+						<td>
+							<select name="agentInfo.ebayPrestige" tabindex="23" id="ebayPrestige" style="width:auto;">
+								#foreach($tb in $presgtige.entrySet())
+									<option value="$tb.key" #if($tb.key == $agentInfo.ebayPrestige) selected="selected" #end>
+										$tb.value
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('ebayShop');"/>
+						</td>
+                    </tr>
+				#end
+				#if($agentInfo.youaUser && $agentInfo.youaUser.trim().length() > 0)
+					<tr>
+						<th>有啊：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.youaUser" id="youaUser"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.youaShop" id="youaShop"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="youaMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if($agentInfo.youaMainBusiness == $c.catCode) selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+						</td>
+						<th>店铺级别：</th>
+						<td>
+							<select name="agentInfo.youaPrestige" tabindex="23" id="youaPrestige" style="width:auto;">
+								#foreach($tb in $tbYoua.entrySet())
+									<option value="$tb.key" #if($tb.key == $agentInfo.youaPrestige) selected="selected" #end>
+										$tb.value
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('youaShop');"/>
+						</td>
+					</tr>
+				#end
+				#if($agentInfo.selfshopName && $agentInfo.selfshopName.trim().length() > 0)
+					<tr>
+						<th>自建商城：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.selfshopName" id="selfshopName"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.selfshopAddress" id="selfshopAddress"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="selfshopMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if($agentInfo.selfshopMainBusiness == $c.catCode) selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('selfShop');"/>
+						</td>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+				#end
+				#if($agentInfo.otherUser && $agentInfo.otherUser.trim().length() > 0)
+					<tr>
+						<th>其他：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.otherUser" id="otherUser"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.otherShop" id="otherShop"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="otherMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if($agentInfo.otherMainBusiness == $c.catCode) selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改" onclick="updateDis('otherShop');"/>
+						</td>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+				#end
+				#if($agentInfo.entityName && $agentInfo.entityName.trim().length() > 0)
+					<tr>
+						<th>实体店铺：</th>
+						<td>
+							用户：<input name="textfield23" type="text" size="20" maxlength="33" value="$!agentInfo.entityName" id="entityName"/>
+							店铺：<input name="textfield23" type="text" size="25" maxlength="66" value="$!agentInfo.entityAddress" id="entityAddress"/>
+						</td>
+						<th>主营类别：</th>
+						<td>
+							<select name="select2" id="entityMainBusiness">
+								#foreach($c in $categorys)
+									<option value="$c.catCode" #if($agentInfo.entityMainBusiness == $c.catCode) selected="selected" #end>
+										#if($c.catName.length() > 12)
+											$c.catName.substring(0, 12)...
+										#else
+											$c.catName
+										#end
+									</option>
+								#end
+							</select>
+							<input type="button" name="Submit23" value="修改"  onclick="updateDis('entity');"/>
+						</td>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+				#end
+				<tr>
+					<th>新增地址：</th>
+					<td>
+						<textarea name="channelMemo" id="channelMemo" cols="25" rows="4">$!agentInfo.channelMemo</textarea>
+						<input type="button" name="addChannel" onclick="javascript:addChannelMemo('$!{user.id}');" value="新增" />
+					</td>
+					<td colspan="4">&nbsp;</td>
+				</tr>
+				<tr>
+					<th>收藏日期：</th>
+					<td colspan="6">
+						<input name="textfield4" type="text" value="$!dateUtil.convertDateToString('yyyy-MM-dd',$!{agentInfo.gmtDistribute})" size="15" readonly/>
+					</td>
+				</tr>
+				<tr>
+					<th>主营产品：</th>
+					<td colspan="6">
+						<input name="mainMemo" id="mainMemo" type="text" value="$!{agentInfo.mainMemo}" size="80" />
+						<input type="button" name="addMain" onclick="javascript:addMainMemo('$!{user.id}');" value="修改" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	#if($adminAccess.has("A_CRM_USER_MODIFY_PERIOD_USER"))
+    	<div class="formBox" style="margin-top:10px;">
+    		<h3><i></i><span>周期功能设置</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>周期结算:</th>
+    					<td>
+    						<label><input type="radio" name="isPeriodPay" id="isPeriodPay_1" #if("$!{user.isPeriodPay}"=="y") checked="true" #end value="y"/>可以</label>
+    						<label><input type="radio" name="isPeriodPay" id="isPeriodPay_2" #if("$!{user.isPeriodPay}"=="n") checked="true" #end value="n"/>不可以</label>
+    					</td>
+    					<th>最大金额：</th>
+    					<td><input size="12" type="text" name="user.periodAmountMax" id="user.periodAmountMax" value="$!moneyUtil.getFormatMoney($!{user.periodAmountMax},'0.00')"/> 元</td>
+    				</tr>
+    				<tr>
+    					<th>开始时间:</th>
+    					<td>
+							<input type="text" id="user.gmtPeriodPayStart_str" name="user.gmtPeriodPayStart_str" value="$!user.gmtPeriodPayStart_str" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    						<script type="text/javascript">
+								Calendar.setup({
+									inputField : "user.gmtPeriodPayStart_str",
+									ifFormat   : "%Y-%m-%d",
+									align      : "BR"
+								});
+    						</script>
+    					</td>
+    					<th>结束时间：</th>
+    					<td>
+    						$!dateUtil.convertDateToString('yyyy-MM-dd', ${user.gmtPeriodPayEnd})
+    					</td>
+    				</tr>
+    				<tr>
+    					<th>周期（天）:</th>
+    					<td><input type="text" name="user.period" id="user.period" value="$!{user.period}" size="12"/></td>
+    					<th>延迟（天）:</th>
+    					<td><input type="text" name="user.ycperiod" id="user.ycperiod" value="$!{user.ycperiod}" size="12"/></td>
+    				</tr>
+    				<tr>
+    					<td colspan="4" align="center">
+    						<input type="button" value="提交周期结算信息" onclick="javascript:submitPeriod('$!{user.id}');"/>
+    					</td>
+    				</tr>
+    				<tr>
+    					<td colspan="4" align="center">
+    						当前周期内未结算订单金额：
+    						<strong>$!moneyUtil.getFormatMoney($user.periodAmountNow, '0.00')</strong>元
+    					</td>
+    				</tr>
+    			</table>
+    		</div>
+		</div>
+	#end
+   #end
+	<form action="$appServer.get("/crm/crmIsallowApply.html")" id="formapply" method="post">
+		##springBind("agentInfo.id")
+		<input name="id" value="$!agentInfo.id" id="agentid" type="hidden"/>
+		##springBind("agentInfo.memo")
+		<input name="memo" value="$!agentInfo.memo" id="memo" type="hidden"/>
+		##springBind("agentInfo.userId")
+		<input name="userId" value="$!agentInfo.userId" id="userId" type="hidden"/>
+		##springBind("agentInfo.status")
+		<input name="status" value="$!agentInfo.status" id="agentstatus" type="hidden"/>
+		<input name="actionType" value="crm" id="actionType" type="hidden"/>
+		<input name="crmUserId" value="$!user.id" id="crmUserId" type="hidden"/>
+		#if($!agentInfo.status!="pre_init")
+		<div class="formBox" style="margin-top:10px;">
+    		<h3><i></i><span>代销审核</span></h3>
+    		<div class="content">
+    			<table class="c6">
+					<tr>
+						<th>审核说明：</th>
+						<td><textarea cols="35" rows="3" id="memotest" #if($agentInfo.status=="success" || $agentInfo.status=="fail") readonly #end onmouseover="this.bgColor='#ffffff'">$!agentInfo.memo</textarea></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="center">
+							#if($agentInfo.status == "success")
+								该会员是代销会员
+							#elseif($agentInfo.status == "fail")
+								代销会员申请失败
+							#else
+								#if($adminAccess.has("A_CRM_USER_MODIFY_AUDIT_USER"))
+									<input type="button" value="准许代销申请" onclick="allow()"/>
+									<input type="button" value="拒绝代销申请" onclick="deny()"/>
+								#end
+							#end
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		#end
+    </form>
+	#if($adminAccess.has("A_CRM_USER_MODIFY_VIP_USER"))
+		#if(${user.type} && (${user.type} == 'd'|| ${user.type} == 'w'))
+			<div class="formBox" style="margin-top:10px;">
+				<h3><i></i><span>VIP会员设置</span></h3>
+				<div class="content">
+					<table class="c6">
+						<tr>
+							<th>审核说明：</th>
+							<td align="center">
+								<textarea name="vipmemo" id="vipmemo" cols="35" rows="3">$!user.vipRemark</textarea>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" align="center">
+								<input type="button" id="upgradeToVip" #if(${user.type} && ${user.type}=='d') value="升级为VIP会员" #else value="降级为代销会员" #end/>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		#end
+	#end
+
+	<div class="formBox" style="margin-top:10px;">
+		<h3><i></i><span>客户信息</span></h3>
+		<div class="content">
+			<table class="c6">
+				<tr>
+					<th>真实姓名：</th>
+					<td>
+						<input name="textfield4233" type="text" value="$!agentInfo.realName" size="12" readonly/>
+						性别：
+						<select name="select6" disabled>
+							<option #if($agentInfo.sex==2) selected="selected" #end>男</option>
+							<option #if($agentInfo.sex==1) selected="selected" #end>女</option>
+						</select>
+					</td>
+				</tr>
+				## 如果电话号码存在，将区号和本地号码分开显示。
+				#if("$!{userInfo.homePhone}"!="")
+					#set($sign=$userInfo.homePhone.indexOf("-"))
+					#if($sign==-1)
+						#set($local=$!{userInfo.homePhone})
+					#else
+						#set($sign2=$sign+1)
+						#set($area=$!{userInfo.homePhone.substring(0,$sign)})
+						#set($local=$!{userInfo.homePhone.substring($sign2)})
+					#end
+				#end
+				<tr>
+					<th>固定电话：</th>
+					<td>
+						<input name="textfield423322" type="text" value="$!area" size="5" readonly/>
+						<input name="textfield423323" type="text" value="$!local" size="13" readonly/>
+					</td>
+				</tr>
+				<tr>
+					<th>手　　机：</th>
+					<td><input name="textfield4233232" type="text" value="$!userInfo.mobilePhone" size="15" readonly/></td>
+				</tr>
+				<tr>
+					<th>所属区域：</th>
+					<td>${province.regionName}
+						$!{city.regionName}
+						邮编：
+						<input name="textfield4233233" type="text" value="$!agentInfo.zip" size="10" readonly/>
+					</td>
+				</tr>
+				<tr>
+					<th>联系地址：</th>
+					<td><input name="textfield232" type="text" value="$!agentInfo.address" size="80" readonly/></td>
+				</tr>
+				<tr>
+					<th>即时通讯工具：</th>
+					<td>
+						#if($agentInfo.chatType=="0")
+							旺旺
+						#elseif($agentInfo.chatType=="1")
+							QQ
+						#elseif($agentInfo.chatType=="2")
+							msn
+						#end
+						<input name="textfield233" type="text" value="$!agentInfo.chatNumber" size="15" readonly/>
+					</td>
+				</tr>
+				<tr>
+					<th>联系方式备注：</th>
+					<td>
+						<textarea name="connectMemo" id="connectMemo" cols="35" rows="4">$!agentInfo.connectMemo</textarea>
+						<input type="button" name="addConnectMemo" onclick="javascript:addConnectMemo('$!{user.id}');" value="新增" />
+					</td>
+				</tr>
+				<tr>
+					<th>是否全职：</th>
+					<td>
+						<label><input type="radio" id="isFulltimeRadio1" name="isFulltimeRadio" #if($agentInfo.isFulltime && $agentInfo.isFulltime=='y') checked="true" #end value="y" />是</label>　
+						<label><input type="radio" id="isFulltimeRadio2" name="isFulltimeRadio" #if(!$agentInfo.isFulltime || $agentInfo.isFulltime=='n') checked="true" #end value="n"/>否</label>
+						<input type="button" name="addIsFulltime" onclick="javascript:addIsFulltime('$!{user.id}');" value="修改" />
+					</td>
+				</tr>
+				<tr>
+					<th>客户来源：</th>
+					#set($howKnowFrom='')
+					#foreach($resources in $resourceses)
+						#if($!{resources.name}==$!{userInfo.howKnow}) #set($howKnowFrom=$!{resources.value}) #end
+					#end
+					<td><input name="textfield2333" type="text" value="$!howKnowFrom" size="30" readonly/></td>
+				</tr>
+				<tr>
+					<th>注册日期：</th>
+					<td><input name="textfield4222" type="text" value="$!dateUtil.convertDateToString('yyyy-MM-dd',$!{user.gmtCreate})" size="12" readonly/></td>
+				</tr>
+				<tr>
+					<th>最后一次登录：</th>
+					<td>
+						<input name="textfield42222" type="text" value="$!dateUtil.convertDateToString('yyyy-MM-dd',${user.gmtLast})" size="12" readonly/>
+						IP:
+						<input name="textfield42223" type="text" value="$!{user.ipLast}" size="16" readonly/>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	#if($adminAccess.has("A_CRM_CONNECT_RECORD_SHOW"))
+		##沟通记录start
+		<div class="formBox" style="margin-top:10px;">
+			<h3><i></i><span>跟踪记录</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th rowspan="2" style="text-align:center;">
+							跟踪记录
+							</br>
+							<input type="button" name="subAddConnect" onclick="document.getElementById('connectTr').style.display='';" value="新增" />
+							</br>
+							注：会员跟踪记录可在当天修改
+						</th>
+						<td style="height:250px;vertical-align:top;">
+							<form action="$appServer.get("/crm/crmModifyConnectRecord.html")" id="formModifyConnect" name="formModifyConnect" method="post">
+								<input type="hidden" name="modifyConnectId" id="modifyConnectId" value="" />
+								<input type="hidden" name="modifyConnectUserId" id="modifyConnectUserId" value="$!{user.id}" />
+								<input type="hidden" name="modifyConnectContent" id="modifyConnectContent" />
+								<table width="98%" border="0" cellspacing="0" cellpadding="0">
+									#set($connectCount = 0)
+									#foreach($connectRecordConnectInfo in $connectRecordConnectList)
+										#set($connectCount = $connectCount + 1)
+										<tr bgcolor="#FFFFFF">
+											#if(($adminAccess.has("A_CRM_USER_MODIFY_ALL_RECORD_USER") || ($loginUser.username == $connectRecordConnectInfo.adminUser)) && $connectRecordConnectInfo.allowModify && $connectRecordConnectInfo.allowModify == 'y')
+												<td #if($velocityCount % 2 == 1) bgcolor="eef8f9" #end>
+													<span class="time_yy">
+														沟通时间：$!dateUtil.convertDateToString('yyyy-MM-dd',$!{connectRecordConnectInfo.gmtCreate})
+														&nbsp;&nbsp;
+														沟通人：$!connectRecordConnectInfo.adminUser
+														&nbsp;&nbsp;
+														<input type="button" onclick="initConnect(jQuery(this),'${connectRecordConnectInfo.id}','$connectCount');" value="修改" style="width:48px;"/>
+														<input type="button" name="modifyConnectRecordSub" onclick="submitModifyConnect(jQuery(this),'${connectRecordConnectInfo.id}','$connectCount','$!connectRecordConnectInfo.adminUser');" value="确认" style="width:48px;display:none;"/>
+													</span>
+													<br />
+													<div style="line-height:22px;" id="content$connectCount">$!connectRecordConnectInfo.content</div>
+													<textarea id="ConnectContent$connectCount" cols="70" rows="3" style="display:none;" onblur="changeShowState(jQuery(this),1);">$!connectRecordConnectInfo.content</textarea>
+												</td>
+											#else
+												<td #if($velocityCount % 2 == 1) bgcolor="eef8f9" #end>
+													<span class="fontcolor-999-title">
+														沟通时间：$!dateUtil.convertDateToString('yyyy-MM-dd',$!{connectRecordConnectInfo.gmtCreate})
+														&nbsp;&nbsp;
+														沟通人：$!connectRecordConnectInfo.adminUser
+														<br />
+													</span>
+													<span class="fontcolor-999">$!connectRecordConnectInfo.content</span>
+												</td>
+											#end
+										</tr>
+									#end
+								</table>
+							</form>
+						</td>
+					</tr>
+					<tr id="connectTr" style="display:none;">
+						<td>
+							<form action="$appServer.get("/crm/crmAddConnectRecord.html")" id="formConnect" name="formConnect" method="post">
+								##springBind("connectRecord.userId)
+								<input type="hidden" name="userId" id="connectRecord.userId" value="$!{user.id}" />
+								<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+									<tr>
+										<th>沟通内容：</th>
+										<td>
+											##springBind("connectRecord.connectContent)
+											<textarea cols="80" rows="3" id="connectRecord.connectContent" name="connectContent"></textarea>
+										</td>
+									</tr>
+									<tr>
+										<td>&nbsp;</td>
+										<td><input type="button" value="确定增加" onclick="javascript:submitConnect('$!{user.id}');"/></td>
+									</tr>
+								</table>
+							</form>
+						</td>
+					</tr>
+                </table>
+            </div>
+        </div>
+		##沟通记录end
+
+		##预约沟通start
+		<div class="formBox" style="margin-top:10px;">
+			<h3><i></i><span>跟踪记录</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th rowspan="2" style="text-align:center;">
+							预约记录
+							</br>
+							<input type="button" name="subAddOrder" onclick="document.getElementById('orderTr').style.display='';" value="新增" />
+							</br>
+							注：会员预约记录可在未超过预约时间内修改，并在“预约记录查询”中查询未来的预约记录
+						</th>
+						<td style="height:250px;vertical-align:top;">
+							<form action="$appServer.get("/crm/crmModifyOrderRecord.html")" id="formModifyOrder" name="formModifyOrder" method="post">
+    							<input type="hidden" name="modifyOrderId" id="modifyOrderId" value="" />
+    							<input type="hidden" name="modifyOrderUserId" id="modifyOrderUserId" value="$!{user.id}" />
+								<input type="hidden" name="modifyOrderContent" id="modifyOrderContent" value="" />
+    							<input type="hidden" name="modifyOrderTime" id="modifyOrderTime" value="" />
+								<table width="98%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+									#set($orderCount=0)
+									#foreach($connectRecordOrderInfo in $connectRecordOrderList)
+										#set($orderCount=$orderCount+1)
+										<tr bgcolor="#FFFFFF">
+											#if(($adminAccess.has("A_CRM_USER_MODIFY_ALL_RECORD_USER") || ($loginUser.username==$!connectRecordOrderInfo.adminUser)) && $connectRecordOrderInfo.allowModify && $connectRecordOrderInfo.allowModify=='y')
+												<td #if($orderCount%2 == 1) bgcolor="eef8f9" #end>
+													<span class="time_yy">
+														预约时间：<font style="line-height:22px;" id="timeOrder$orderCount">$!dateUtil.convertDateToString('yyyy-MM-dd',$!{connectRecordOrderInfo.gmtTime})</font>
+														<input type="text" "size=12" id="OrderTime$orderCount" value="$!dateUtil.convertDateToString('yyyy-MM-dd',$!{connectRecordOrderInfo.gmtTime})" style="display:none;"/>
+														<script type="text/javascript">
+        													Calendar.setup({
+            			          								inputField : "OrderTime$orderCount",
+            			          								ifFormat   : "%Y-%m-%d",
+                			      								align      : "BR"
+            			      								});
+            											</script>
+														预约人：$!{connectRecordOrderInfo.adminUser}
+														&nbsp;&nbsp;
+														<input type="button" onclick="initOrder(jQuery(this),'$connectRecordOrderInfo.id','$orderCount','$!dateUtil.convertDateToString('yyyy-MM-dd',$connectRecordOrderInfo.gmtTime)');" value="修改" style="width:48px;"/>
+														<input type="button" name="modifyConnectRecordSub" onclick="javaScript:submitModifyOrder(jQuery(this),'$connectRecordOrderInfo.id','$orderCount','$!{connectRecordOrderInfo.adminUser}');" value="确认" style="width:48px;display:none;"/>
+													</span>
+													<br />
+
+												<div style="line-height:22px;" id="contentOrder$orderCount">$!connectRecordOrderInfo.content</div>
+												<textarea id="OrderContent$orderCount" cols="70" rows="3" style="display:none;" onblur="changeShowState2(jQuery(this),1,3);">$!connectRecordOrderInfo.content</textarea></td>
+											#else
+												<td bgcolor="eef8f9"><span class="fontcolor-999-title">预约时间：$!dateUtil.convertDateToString('yyyy-MM-dd',$!{connectRecordOrderInfo.gmtTime})　预约人：$!{connectRecordOrderInfo.adminUser}<br />
+												</span><span class="fontcolor-999">$!connectRecordOrderInfo.content</span></td>
+											#end
+										</tr>
+									#end
+                                </table>
+                            </form>
+                        </td>
+                    </tr>
+					<tr id="orderTr" style="display:none;">
+						<td>
+							<form action="$appServer.get("/crm/crmAddOrderRecord.html")" id="formOrder" name="formOrder" method="post">
+								##springBind("connectRecord.userId)
+								<input type="hidden" name="userId" id="connectRecord.userId" value="$!{user.id}" />
+								<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+									<tr>
+										<td width="70">预约时间： </td>
+										<td>
+											##springBind("connectRecord.gmtOrderTimeStr)
+											<input type="text" id="connectRecord.gmtOrderTimeStr" name="gmtOrderTimeStr" value="$!{connectRecord.gmtOrderTimeStr}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+											<script type="text/javascript">
+                            			      Calendar.setup({
+                            			          inputField : "connectRecord.gmtOrderTimeStr",
+                            			          ifFormat   : "%Y-%m-%d",
+                            			          align      : "BR"
+                            			      });
+                            				</script>
+										</td>
+									</tr>
+									<tr>
+										<td>预约内容：</td>
+										<td>
+											##springBind("connectRecord.orderContent)
+											<textarea cols="80" rows="3" id="connectRecord.orderContent" name="orderContent"></textarea>
+										</td>
+									</tr>
+									<tr>
+										<td>&nbsp;</td>
+										<td><input type="button" value="确定增加" onclick="javascript:submitOrder('$!{user.id}');"/></td>
+									</tr>
+                                </table>
+							</form>
+						</td>
+					</tr>
+				</table>
+            </div>
+        </div>
+		##预约沟通end
+
+    </div>
+	#end
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function formSubmit(){
+    		document.forms['searchForm'].submit();
+	 }
+
+	function addChannelMemo(userId){
+		var channelMemo = document.getElementById("channelMemo").value;
+		if(confirm("您确定要添加修改内容吗")){
+			if (channelMemo.length > 250) {
+				alert("内容不能超过250个字");
+				return;
+			}
+			jQuery.get('$appServer.get("/crm/crmAddChannelJson.html")',{param1:userId,param2:channelMemo},function(message){
+            	alert(message);
+		    });
+		}
+	}
+
+	function addMainMemo(userId){
+		var mainMemo = document.getElementById("mainMemo").value;
+		if(confirm("您确定要添加修改内容吗")){
+			if (mainMemo.length > 50) {
+				alert("内容不能超过50个字");
+				return;
+			}
+			jQuery.get('$appServer.get("/crm/crmAddMainJson.html")',{param1:userId,param2:mainMemo},function(message){
+            	alert(message);
+		    });
+		}
+	}
+
+	function addConnectMemo(userId){
+		var connectMemo = document.getElementById("connectMemo").value;
+		if(confirm("您确定要添加修改内容吗")){
+			if (connectMemo.length > 25) {
+				alert("内容不能超过25个字");
+				return;
+			}
+			jQuery.get('$appServer.get("/crm/crmAddConnectJson.html")',{param1:userId,param2:connectMemo},function(message){
+            	alert(message);
+		    });
+		}
+	}
+
+	function addIsFulltime(userId){
+		var isFulltime;
+		var temp = document.getElementsByName("isFulltimeRadio");
+		for (i=0;i<temp.length;i++){  //遍历Radio
+    		if(temp[i].checked){
+				isFulltime=temp[i].value;  //获取Radio的值
+    		}
+		}
+		if(confirm("您确定要添加修改内容吗")){
+			jQuery.get('$appServer.get("/crm/crmAddIsFulltimeJson.html")',{param1:userId,param2:isFulltime},function(message){
+            	alert(message);
+		    });
+		}
+	}
+
+	function submitModifyConnect(obj,id,content,name){
+		jQuery("#modifyConnectId").val(id);
+		var connectRecordId=document.getElementById("modifyConnectId").value;
+		jQuery("#modifyConnectContent").val(jQuery("#ConnectContent"+content).val());
+		var connectContent=document.getElementById("modifyConnectContent").value;
+		connectContent = connectContent.trim();
+		if(connectRecordId.length==0){
+			alert("请先选择数据");
+		} else if(connectContent.length==0){
+			alert("沟通内容必须填写");
+		} else if (connectContent.length > 1000) {
+			alert("沟通内容不能超过1000个字");
+		} else {
+			var aut = !$adminAccess.has("A_CRM_USER_MODIFY_ALL_RECORD_USER");
+			var loginUser = '$loginUser.username';
+			if(aut && name == loginUser){
+				document.formModifyConnect.action='$appServer.get("/crm/crmModifyConnectRecordSelf.html")';
+				document.formModifyConnect.submit();
+				document.formModifyConnect.action='$appServer.get("/crm/crmModifyConnectRecord.html")';
+			}else{
+				document.formModifyConnect.submit();
+			}
+			jQuery("#content"+content).text(jQuery("#ConnectContent"+content).val());
+			jQuery("#ConnectContent"+content).hide();
+			jQuery("#content"+content).show();
+			obj.hide();
+			obj.prev('input').show();
+			alert("沟通内容修改成功");
+		}
+	}
+
+	function submitModifyOrder(obj,id,content,name){
+		jQuery("#modifyOrderId").val(id);
+		var connectRecordId=document.getElementById("modifyOrderId").value;
+		jQuery("#modifyOrderContent").val(jQuery("#OrderContent"+content).val());
+		jQuery("#modifyOrderTime").val(jQuery("#OrderTime"+content).val());
+		var gmtOrderTimeStr=document.getElementById("modifyOrderTime").value;
+		var orderContent=document.getElementById("modifyOrderContent").value;
+	    gmtOrderTimeStr = gmtOrderTimeStr.trim();
+		orderContent = orderContent.trim();
+		if(connectRecordId.length==0){
+			alert("请先选择数据");
+		} else if (gmtOrderTimeStr.length==0){
+			alert("预约时间必须选择");
+		} else if (orderContent.length==0){
+			alert("预约内容必须填写");
+		} else if (orderContent.length > 1000) {
+			alert("预约内容不能超过1000个字");
+		} else {
+			var today = new Date();
+			var todayStr = "yyyy-mm-dd";
+			todayStr = todayStr.replace("yyyy",today.getYear())
+						.replace("mm",(today.getMonth()+1<10?"0":"")+(today.getMonth()+1))
+						.replace("dd",(today.getDate()<10?"0":"")+today.getDate());
+			if(todayStr > gmtOrderTimeStr){
+				alert("预约时间不能在当前日期之前");
+			}else{
+			var aut = !$adminAccess.has("A_CRM_USER_MODIFY_ALL_RECORD_USER");
+			var loginUser = '$loginUser.username';
+			if(aut && name ==loginUser){
+				document.formModifyOrder.action='$appServer.get("/crm/crmModifyOrderRecordSelf.html")';
+				document.formModifyOrder.submit();
+				document.formModifyOrder.action='$appServer.get("/crm/crmModifyOrderRecord.html")';
+			}else{
+				document.formModifyOrder.submit();
+			}
+			jQuery("#contentOrder"+content).text(jQuery("#OrderContent"+content).val());
+			jQuery("#OrderContent"+content).hide();
+			jQuery("#contentOrder"+content).show();
+			jQuery("#timeOrder"+content).text(jQuery("#OrderTime"+content).val());
+			jQuery("#OrderTime"+content).hide();
+			jQuery("#timeOrder"+content).show();
+			obj.hide();
+			obj.prev('input').show();
+			alert("预约内容修改成功");
+
+			}
+		}
+	}
+
+	function initConnect(obj,id,content){
+		document.getElementById("modifyConnectId").value=id;
+		jQuery("#content"+content).hide();
+		jQuery("#ConnectContent"+content).show();
+		jQuery("#ConnectContent"+content).focus();
+		obj.hide();
+		obj.next('input').show();
+	}
+
+	function initOrder(obj,id,content,gmtTime){
+		document.getElementById("modifyOrderId").value = id;
+		//document.getElementById("modifyOrderTime").value = gmtTime;
+		//document.getElementById("modifyOrderContent").value = document.getElementById("order"+content).value;
+		jQuery("#contentOrder"+content).hide();
+		jQuery("#OrderContent"+content).show();
+		jQuery("#timeOrder"+content).hide();
+		jQuery("#OrderTime"+content).show();
+		obj.hide();
+		obj.next('input').show();
+	}
+
+	function submitConnect(userId){
+		var connectContent=document.getElementById("connectRecord.connectContent").value;
+		connectContent = connectContent.trim();
+		if(connectContent.length==0){
+			alert("沟通内容必须填写");
+		} else if (connectContent.length > 1000) {
+			alert("沟通内容不能超过1000个字");
+		} else {
+			document.formConnect.submit();
+			alert("沟通内容添加成功");
+		}
+	}
+
+	function submitOrder(userId){
+		var gmtOrderTimeStr=document.getElementById("connectRecord.gmtOrderTimeStr").value;
+		var orderContent=document.getElementById("connectRecord.orderContent").value;
+	    gmtOrderTimeStr = gmtOrderTimeStr.trim();
+		orderContent = orderContent.trim();
+		if (gmtOrderTimeStr.length==0){
+			alert("预约时间必须选择");
+		} else if (orderContent.length==0){
+			alert("预约内容必须填写");
+		} else if (orderContent.length > 1000) {
+			alert("预约内容不能超过1000个字");
+		} else {
+			var today = new Date();
+			var todayStr = "yyyy-mm-dd";
+			todayStr = todayStr.replace("yyyy",today.getYear())
+						.replace("mm",(today.getMonth()+1<10?"0":"")+(today.getMonth()+1))
+						.replace("dd",(today.getDate()<10?"0":"")+today.getDate());
+			if(todayStr>gmtOrderTimeStr){
+				alert("预约时间不能在当前日期之前");
+			}else{
+				document.formOrder.submit();
+				alert("预约内容添加成功");
+			}
+		}
+	}
+
+	function isAgentCountNumber(val){
+		var reg = /^\d+$/;
+		var errMsg = '数量出错，请核对后再输入';
+		if(!reg.test(val)){
+			alert(errMsg);
+		}
+	}
+
+	function modifyAgentCountNumber(userId){
+		var agentCountNumber = document.getElementById("agentCount").value;
+		var reg = /^\d+$/;
+		var errMsg = '数量出错，请核对后再输入';
+		if(confirm("您确定要修改代销数量限额？")){
+			if(!reg.test(agentCountNumber)){
+				alert(errMsg);
+				return;
+			} else if (agentCountNumber > 100000000) {
+				alert("您输入的代销数量限额过大，请核对后再修改");
+				return;
+			}
+			jQuery.get('$appServer.get("/crm/crmModifyAgentCountNumberJson.html")',{param1:userId,param2:agentCountNumber},function(message){
+            	alert(message);
+		    });
+		}
+	}
+
+	function modifyInvoice(userId){
+		var flag = document.getElementById("invoice").checked;
+		var invoiceValue;
+		if(flag){
+			invoiceValue="y";
+		}else{
+			invoiceValue="n";
+		}
+		if(confirm("您确定要修改自动索要发票？")){
+			jQuery.get('$appServer/crm/crmModifyInvoice.html?time='+new Date().getTime(),{param1:userId,param2:invoiceValue},function(message){
+            	alert(message);
+		    });
+		} else {
+			document.getElementById("invoice").checked = !document.getElementById("invoice").checked;
+		}
+	}
+
+	function allow(){
+		var memo=document.getElementById("memotest").value;
+		if(memo.length > 60){
+			alert("描述不能超过60个字符");
+		}else{
+    		document.getElementById("memo").value=memo;
+    		document.getElementById("agentstatus").value="success";
+        	document.getElementById("formapply").submit();
+		}
+	}
+
+	function deny(){
+		var memo=document.getElementById("memotest").value;
+	    memo = memo.trim();
+		if(memo.length == 0){
+			alert("拒绝理由必须填写");
+		} else if(memo.length > 60){
+			alert("描述不能超过60个字符");
+		}else{
+			document.getElementById("memo").value=memo;
+			document.getElementById("agentstatus").value="fail";
+			document.getElementById("formapply").submit();
+		}
+	}
+
+    var msg = {	"upgradeToVip":"确定要升级成VIP吗？",
+				"degradeVip":"确定要降级成代销会员吗？",
+				"vipmemoRequire":"请填写VIP审核说明",
+				"vipmemoToolong":"VIP审核说明不能超过200字节",
+				"initpassword":"确定初始化登录密码为123456吗？",
+				"initsucess":"初始化登录密码成功！",
+				"initPayPassword":"确定初始化支付密码为123456吗？",
+				"initPayPasswdSucess":"初始化支付密码成功！",
+				"editFail":"初始化登录密码失败",
+				"editPayPasswdFail":"初始化支付密码失败",
+				"userIdError":"用户ID有误，初始化密码失败"
+	}
+
+	jQuery("#upgradeToVip").click(function() {
+		var hidUserType = jQuery("#hidUserType").val();//用户类型
+		var userId = jQuery("#hidUserId").val();//用户ID
+		hidUserType = hidUserType.trim();
+		var confirmMsg = msg.upgradeToVip;
+		if(hidUserType=="w") {
+			confirmMsg = msg.degradeVip;
+		}
+
+		if(confirm(confirmMsg)){
+			var memo = jQuery("#vipmemo").val();
+			memo = memo.trim();
+			var maxLength = 200;
+			if(memo.length==0){
+				alert(msg.vipmemoRequire);
+				return false;
+			}
+			if(memo.length>maxLength){
+				alert(msg.vipmemoToolong);
+				return false;
+			}
+			jQuery.get('$appServer.get("/crm/crmModifyVIPPermission.html")',{vipuserId:userId,vipmemo:memo,vipusertype:hidUserType},
+				function(message){
+					alert(message);
+				});
+		}
+	});
+
+	//初始化登录密码
+	jQuery("#initPasswordBut").click(function(){
+		if(confirm(msg.initpassword)){
+			var userId = jQuery("#hidUserId").val();//用户ID
+			jQuery.get('$appServer.get("/crm/crmInitUserPassword.html")',{userId:userId},
+				function(message){
+					alert(message);
+				});
+		}
+	});
+
+	//初始化支付密码
+	jQuery("#initPayPasswordBut").click(function(){
+		if(confirm(msg.initPayPassword)){
+			var userId = jQuery("#hidUserId").val();//用户ID
+			jQuery.get('$appServer.get("/crm/crmInitUserPayPassword.html")',{userId:userId},
+    			function(message){
+    				alert(message);
+    			});
+		}
+	});
+
+	// 提交周期结算信息
+	function submitPeriod(userId){
+	    var isPeriodPay;
+		var gmtPeriodPayStart = document.getElementById("user.gmtPeriodPayStart_str").value;
+		var period = document.getElementById("user.period").value;
+		var ycperiod = document.getElementById("user.ycperiod").value;
+		var periodAmountMax = document.getElementById("user.periodAmountMax").value;
+		var reg = /^\d+$/;
+		var regTwo = /^[0-9]+.?[0-9]?[0-9]?$/;
+		var errMsg = '数量出错，请核对后再输入';
+		var nullErrMsg = '不能为空！';
+		var temp=document.getElementsByName("isPeriodPay");
+		for (i=0;i<temp.length;i++){  //遍历Radio
+    		if(temp[i].checked){
+				isPeriodPay=temp[i].value;  //获取Radio的值
+    		}
+		}
+		if(isPeriodPay==""){
+				alert("是否可以周期结算"+nullErrMsg);
+				return;
+			}
+			if(gmtPeriodPayStart==""){
+				alert("周期结算开始时间"+nullErrMsg);
+				return;
+			}
+			if(period==""){
+				alert("周期（天）"+nullErrMsg);
+				return;
+			} else if(!reg.test(period)||period<=0){
+				alert("周期（天）"+errMsg);
+				return;
+			} else if(period > 10000){
+			    alert("周期（天）最大不能超过10000天");
+				return;
+			}
+			if(ycperiod==""){
+				alert("延迟（天）"+nullErrMsg);
+				return;
+			} else if(!reg.test(ycperiod)){
+				alert("延迟（天）"+errMsg);
+				return;
+			} else if(ycperiod > 10000){
+			    alert("延迟（天）最大不能超过10000天");
+				return;
+			}
+			if(periodAmountMax==""){
+				alert("可周期结算的最大金额"+nullErrMsg);
+				return;
+			} else if(!regTwo.test(periodAmountMax)){
+				alert("可周期结算的最大金额"+errMsg);
+				return;
+			} else if (periodAmountMax > 100000000) {
+				alert("您输入的可周期结算的最大金额过大，请核对后再修改");
+				return;
+			}
+		if(confirm("您确定要修改周期结算信息？")){
+			jQuery.get('$appServer.get("/crm/crmModifyPeriodByJson.html")',{param1:userId,param2:isPeriodPay,param3:gmtPeriodPayStart,param4:period,param5:periodAmountMax,param6:ycperiod},function(message){
+            	alert(message);
+		    });
+		}
+	  }
+
+	  function updateDis(type){
+	  		var agentid = "$!agentInfo.id";//jQuery("#agentid").val();
+			var userId = "$!user.id"
+			if(!agentid || agentid.length<1){
+				alert("没有ID信息！");
+				return;
+			}
+			if(!userId || userId.length<1){
+				alert("没有用户ID信息！");
+				return;
+			}
+			var param = "id:"+agentid;
+			var flag = true;
+			switch(type){
+				case "taobaoShop":
+					if(jQuery("#taobaoShop").val().length<1||jQuery("#taobaoUser").val().length<1)flag=false;
+					if(!flag){
+						alert("网店信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						taobaoUser:jQuery("#taobaoUser").val(),
+						taobaoShop:jQuery("#taobaoShop").val(),
+						taobaoMainBusiness:jQuery("#taobaoMainBusiness").val(),
+						taobaoPrestige:jQuery("#taobaoPrestige").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "paipaiShop":
+					if(jQuery("#paipaiShop").val().length<1||jQuery("#paipaiUser").val().length<1)flag=false;
+					if(!flag){
+						alert("网店信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						paipaiUser:jQuery("#paipaiUser").val(),
+						paipaiShop:jQuery("#paipaiShop").val(),
+						paipaiMainBusiness:jQuery("#paipaiMainBusiness").val(),
+						paipaiPrestige:jQuery("#paipaiPrestige").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "ebayShop":
+					if(jQuery("#ebayShop").val().length<1||jQuery("#ebayUser").val().length<1)flag=false;
+					if(!flag){
+						alert("网店信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						ebayUser:jQuery("#ebayUser").val(),
+						ebayShop:jQuery("#ebayShop").val(),
+						ebayMainBusiness:jQuery("#ebayMainBusiness").val(),
+						ebayPrestige:jQuery("#ebayPrestige").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "youaShop":
+					if(jQuery("#youaShop").val().length<1||jQuery("#youaUser").val().length<1)flag=false;
+					if(!flag){
+						alert("信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						youaUser:jQuery("#youaUser").val(),
+						youaShop:jQuery("#youaShop").val(),
+						youaMainBusiness:jQuery("#youaMainBusiness").val(),
+						youaPrestige:jQuery("#youaPrestige").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "selfShop":
+					if(jQuery("#selfshopAddress").val().length<1||jQuery("#selfshopName").val().length<1)flag=false;
+					if(!flag){
+						alert("信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						selfshopName:jQuery("#selfshopName").val(),
+						selfshopAddress:jQuery("#selfshopAddress").val(),
+						selfshopMainBusiness:jQuery("#selfshopMainBusiness").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "otherShop":
+					if(jQuery("#otherShop").val().length<1||jQuery("#otherUser").val().length<1)flag=false;
+					if(!flag){
+						alert("信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						otherUser:jQuery("#otherUser").val(),
+						otherShop:jQuery("#otherShop").val(),
+						otherMainBusiness:jQuery("#otherMainBusiness").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+				case "entity":
+					if(jQuery("#entityAddress").val().length<1||jQuery("#entityName").val().length<1)flag=false;
+					if(!flag){
+						alert("信息不完整！");
+						return;
+					}
+					if(confirm("您确定要修改分销地址信息？")){
+						jQuery.get('$appServer.get("/crm/updateAgentDistributAddr.html")',{
+						id:agentid,
+						userId:userId,
+						entityName:jQuery("#entityName").val(),
+						entityAddress:jQuery("#entityAddress").val(),
+						entityMainBusiness:jQuery("#entityMainBusiness").val()},
+						function(message){
+            				alert(message);
+		    			});
+					}
+					break;
+			}
+	  }
+
+	function changeShowState(obj,n){
+		//obj.hide();
+		//obj.prev('div').show();
+		//obj.prev().prev().prev().children().show();
+		//obj.prev().prev().prev().children().eq(n).hide();
+
+	}
+
+	function changeShowState2(obj,n1,n2){
+		//obj.hide();
+		//obj.prev('div').show();
+		//obj.prev().prev().prev().prev().children().show();
+		//obj.prev().prev().prev().prev().children().eq(n1).hide();
+		//obj.prev().prev().prev().prev().children().eq(n2).hide();
+
+	}
+//修改了calendar.js , notfix == true 则不执行控件位置校正，防止在iframe中出错
+notfix = true;
+
+	function doUpload(){
+	var id=document.getElementById('hidUserId').value;
+		document.searchForm1.action="/crm/doUploadTrade.html?userId="+id;
+		document.searchForm1.submit();
+	}
+</script>
+</body>

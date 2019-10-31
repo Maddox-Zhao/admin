@@ -1,0 +1,175 @@
+ #set($layout = "layout/default.vm")
+ <div class="formBox">
+	  <h3><i></i><span>新增类目</span></h3>
+    <form  name="listForm"  action="/category/addc.html" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="parentCode" value="$!parentCode"/>
+	<div class="content">
+	 <div class="form">
+		<ol>
+
+		  <li>
+            <label>类目名称：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("category.catName")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" id="catNAme"/>
+              </li>
+              <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+		##  <li>
+        ##    <label>积分比例：</label>
+        ##    <span class="con">
+        ##    <ul>
+        ##      <li> 
+				#springBind("category.pointProportional")
+                <input type="hidden" name="${status.expression}" class="inp" value="1" id="pointProportional" onKeyUp="clearNoNum(this)"/>
+        ##      </li>
+        ##      <li><em>*</em></li>
+        ##      <li>
+        ##        <label class="red">${status.errorMessage}</label>
+       ##       </li>
+       ##     </ul>
+       ##     </span>
+	   ##	</li>
+
+		##  <li>
+        ##    <label>代销折扣：</label>
+        ##    <span class="con">
+        ##    <ul>
+        ##      <li> 
+				#springBind("category.commonAgentAgio")
+                <input type="hidden" name="${status.expression}" class="inp" value="0.5" id="commonAgentAgio" onKeyUp="clearNoNum(this)"/>
+        ##      </li>
+        ##      <li><em>*</em></li>
+        ##      <li>
+        ##        <label class="red">${status.errorMessage}</label>
+        ##      </li>
+        ##    </ul>
+        ##    </span>
+		##  </li>
+
+		##  <li>
+        ##    <label>是否显示：</label>
+        ##    <span class="con">
+        ##    <ul>
+        ##      <li> 
+				#springBind("category.isShow")
+				<input type="hidden" name="${status.expression}" class="inp" value="1"/>
+        ##          <select name="${status.expression}" id="isShow">
+        ##               <option  #if("$!{status.value}" == "1") selected #end value="1">是</option>
+        ##               <option  #if("$!{status.value}" == "0") selected #end value="0">否</option>
+		##		  </select>
+        ##      </li>
+        ##    </ul>
+        ##    </span>
+		##  </li>
+
+
+		  <li>
+            <label>类目图片：</label>
+            <span class="con">
+            <ul>
+              <li>
+                <input type="file" name="catImage"  id="imgFile" ></input>
+			  </li>
+              <li>
+				#springBind("category.picPath")
+				<input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+
+          <li>
+            <label>类目介绍：</label>
+            <span class="con">
+              <div class="skin-con">
+                <ul>
+                  <li> #springBind("category.catDesc")
+                    <textarea name="${status.expression}" rows="10" cols="40">
+						$!{status.value}
+					</textarea>
+                  </li>
+                  <li>
+                    <label class="red">${status.errorMessage}</label>
+                  </li>
+                </ul>
+            </div>
+            </span>
+		  </li>
+
+        </ol>
+     </div>
+    </div>
+</form>
+	<div class="form-but">
+		<button type="submit" class="button-s4" onclick="return check();">确定</button>
+		<button type="reset"  class="button-s4" onClick="resetForm();">重置</button>
+    </div>
+  </div>
+<script type="text/javascript">
+
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+      function clearNoNum(obj)
+      {
+            obj.value = obj.value.replace(/[^\d\.]/g,"");
+            obj.value = obj.value.replace(/^\./g,"");
+            obj.value = obj.value.replace(/\.{2,}/g,".");
+            obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+       }
+        function check()
+        {
+            var reg = new RegExp(/^\d+(\.\d{1,2})?$/g);
+
+			var obj=document.getElementById("pointProportional").value;
+            if(!isNumber(obj))
+            {
+            alert("请输入正确的积分比例");
+            return false;
+            }else if(!reg.test(obj))
+			{
+                  alert("请输入的积分比例，小数点后两位");
+				  document.getElementById("pointProportional").value = "";
+				  return false;
+			}else if( obj<0 || obj > 1000)
+			{
+				alert("积分比例范围为0.00～1000.00之间");
+				return false;
+			}
+
+            var obj=document.getElementById("commonAgentAgio").value;
+			var reg = new RegExp(/^\d+(\.\d{1,2})?$/g);
+			if(!isNumber(obj))
+            {
+            alert("请输入正确的代销折扣");
+            return false;
+            }else if(!reg.test(obj))
+			{
+                  alert("请输入的代销折扣，小数点后两位");
+				  document.getElementById("commonAgentAgio").value = "";
+				  return false;
+			}else if(obj<0.01||obj>1)
+			{
+				alert("代销折扣范围为0.01～1.00之间");
+				return false;
+			}
+
+			document.listForm.submit();
+        }
+		
+	function resetForm(){
+	  document.listForm.reset();
+	}
+</script>

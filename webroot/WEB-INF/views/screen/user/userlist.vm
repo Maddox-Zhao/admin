@@ -1,0 +1,207 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>会员管理</span></h3>
+    <form  id="form1" name="form1" action="/user/regusers.html" method="post" onsubmit="doSubmit();">
+    <table>
+    		<tr>
+				 <th>用户名：</th>
+			     <td>
+			       #springBind("user.account")
+			       <input type="text" name="${status.expression}" id="user_account" value="$!{status.value}" class="inp"/>
+    		     </td>
+				 <th>E-mail：</th>
+			     <td>
+			       #springBind("user.email")
+			       <input type="text" name="${status.expression}" id="user_email" value="$!{status.value}" class="inp"/>
+    		     </td>
+				 <th>状态：</th>
+				 <td>
+				   #springBind("user.stauts")
+				   <select name="${status.expression}" id="user_status">
+					<option value="">-=请选择=-</option>
+					<option value="1" #if("$status.value"=="1")  selected #end>正常使用</option>
+					<option value="2" #if("$status.value"=="2")  selected #end>冻结</option>
+					<option value="0" #if("$status.value"=="0")  selected #end>未激活</option>
+				   </select>
+    		     </td>
+				 
+				 <th>会员类型：</th>
+			     <td>
+					#springBind("user.type")
+				   <select name="${status.expression}" id="status">
+				       <option value="">-=请选择=-</option>
+    			       <option value="p" #if("$status.value"=="p")  selected #end>批发客户</option>
+    			       <option value="d" #if("$status.value"=="d")  selected #end>代销客户</option>
+				       <option value="w" #if("$status.value"=="w")  selected #end>批发兼代销</option>
+                  </select>
+			     </td>
+				 
+				 <th>会员等级：</th>
+			     <td>
+					#springBind("user.userRank")
+				   <select name="${status.expression}" id="status">
+				       <option value="">-=请选择=-</option>
+    			       <option value="p" #if("$status.value"=="p")  selected #end>普通VIP</option>
+    			       <option value="pk" #if("$status.value"=="pk")  selected #end>普通客户</option>
+    			       <option value="y" #if("$status.value"=="y")  selected #end>一级VIP</option>
+				       <option value="e" #if("$status.value"=="e")  selected #end>二级VIP</option>
+				       <option value="s" #if("$status.value"=="s")  selected #end>三级VIP</option>
+                  </select>
+			     </td>
+				 
+			</tr>
+			  <tr>
+				<td></td>
+            	  <td>
+					<button type="submit" class="btn">用户查询</button>
+				  </td>
+			  </tr>
+    </table>
+</form>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	$!message
+</div>
+ #end
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div  class="listBox">
+          <h3><span>会员列表</span></h3>
+            <table>
+			<tr>
+			  <th>ID</th>
+			  <th>用户名</th>
+			  <th>姓名</th>
+			  <th>性别</th>
+			  <th>会员类型</th>
+			  <th>手机号</th>
+			  <th>地址</th>
+			  <th>积分</th>
+			  <th>会员等级</th>
+			  <th>注册时间</th>
+			  <th>状态</th>
+			  <th>email</th>
+			## <th>最后登录时间</th>#
+			  <th>操作</th>
+			</tr>
+			#if($query && $query.items.size()>0)
+				#foreach($user in $query.items)
+			<tr>
+					<td >
+						$!user.id
+					</td>
+					<td >
+						$!user.account
+					</td>
+					<td>
+						$!user.name
+					</td>
+					<td>
+						#if($user.sex==0)
+							保密
+						#elseif($user.sex==1)
+							女
+						#else
+							男
+						#end
+					</td>
+					<td>
+					#if($user.type=="p")
+						批发客户
+					#elseif($user.type=="w")
+						批发兼代销
+				    #elseif($user.type=="d")
+						代销客户
+                    #else
+                                    无
+					#end
+					</td>
+					<td>
+						$!user.phone
+					</td>
+					<td>
+						$!user.useraddress
+					</td>
+					<td>
+						$!user.integral
+					</td>
+					<td>
+					#if($!user.userRank == "p")
+						普通VIP
+					#elseif($!user.userRank == "pk")
+						普通客户
+					#elseif($!user.userRank == "y")
+						一级VIP
+					#elseif($!user.userRank == "e")
+						二级VIP
+					#elseif($!user.userRank == "s")
+						三级VIP
+					#else
+						无
+					#end
+					</td>
+					<td>
+						$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtCreate)
+					</td>
+					<td>
+						<span>
+						#if(${user.stauts}==2)
+							冻结
+						#elseif(${user.stauts}==0)
+							未激活
+						#else
+							正常使用
+						#end
+						</span>
+					</td>
+					<td>
+						$!user.email
+					</td>
+					##<td>
+					##	$!dateUtil.convertDateToString("yyyy-MM-dd",$!user.gmtLast)
+					##</td>
+					<td>
+						<a href="/user/userDetail.html?userId=$!user.id">查看</a>&nbsp;&nbsp;
+						<a href="/user/editInput.html?userId=$!user.id">修改</a>
+					</td>
+			   </tr>
+				#end
+			#end
+            </table>
+			##分页
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/user/regusers.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+	#else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim=function()
+	{
+		return this.replace(/(^\s*)|(\s*$)/g, '');
+	}
+
+	function doSubmit(){
+		document.getElementById('user_account').value= document.getElementById('user_account').value.trim();
+        document.getElementById('user_email').value=document.getElementById('user_email').value.trim();
+	}
+
+	function resetAgentManager(){
+	    document.form1.action = "resetAgentManager.html";
+		document.form1.submit();
+		document.form1.action = "regusers.html";
+	}
+</script>

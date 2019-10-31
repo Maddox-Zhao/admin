@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="acquisitionpro" >
+	<typeAlias alias="AcquisitionPro" type="com.huaixuan.network.biz.domain.hx.AcquisitionPro"/>
+  <resultMap id="AcquisitionProResult" class="com.huaixuan.network.biz.domain.hx.AcquisitionPro" >
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="acq_id" property="acqId" jdbcType="BIGINT" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="paid_amount" property="paidAmount" jdbcType="DECIMAL" />
+    <result column="commission" property="commission" jdbcType="DECIMAL" />
+    <result column="brand_id" property="brandId" jdbcType="INTEGER" />
+    <result column="series_id" property="seriesId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="material" property="material" jdbcType="VARCHAR" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="UUID" property="uuid" jdbcType="VARCHAR" />
+    <result column="aUUID" property="auuid" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="acq_code" property="acqCode" jdbcType="VARCHAR" />
+    <result column="pic" property="pic" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
+    <result column="gmt_modify" property="gmtModify" jdbcType="TIMESTAMP" />
+  </resultMap>
+ 
+ <sql id="acquisitionProFileds">
+ 	id, acq_id, note, amount, paid_amount, commission, brand_id, series_id, type, material,color, UUID, aUUID, level, acq_code, pic, status, gmt_create, gmt_modify
+ </sql>
+  <select id="selectByPrimaryKey" resultMap="AcquisitionProResult" parameterClass="java.lang.Long" >
+    select <include refid="acquisitionProFileds"/>
+    from hx_acquisition_pro
+    where id = #id:BIGINT#
+  </select>
+  
+  <select id="selectProByAcqCode" parameterClass="java.lang.String" resultMap="AcquisitionProResult">
+  		select <include refid="acquisitionProFileds"/>
+  		from hx_acquisition_pro
+  		where 
+  		acq_code = #acpCode#  
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterClass="java.lang.Long" >
+    delete from hx_acquisition_pro
+    where id = #id:BIGINT#
+  </delete>
+
+  <insert id="insertAcquisitionPro" parameterClass="com.huaixuan.network.biz.domain.hx.AcquisitionPro" >
+    insert into hx_acquisition_pro (id, acq_id, note, amount, paid_amount, commission, brand_id,
+      series_id, type, material, color, UUID, aUUID, level, acq_code, pic, status, gmt_create,
+      gmt_modify)
+    values (null, #acqId:BIGINT#, #note:VARCHAR#, #amount:DECIMAL#, #paidAmount:DECIMAL#,
+      #commission:DECIMAL#, #brandId:INTEGER#, #seriesId:INTEGER#, #type:VARCHAR#,
+      #material:VARCHAR#, #color:VARCHAR#, #uuid:VARCHAR#, #auuid:VARCHAR#, #level:VARCHAR#,
+      #acqCode:VARCHAR#, #pic:VARCHAR#,default, sysdate(),sysdate())
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterClass="com.huaixuan.network.biz.domain.hx.AcquisitionPro" >
+    update hx_acquisition_pro
+    set acq_id = #acqId:BIGINT#,
+      note = #note:VARCHAR#,
+      amount = #amount:DECIMAL#,
+      paid_amount = #paidAmount:DECIMAL#,
+      commission = #commission:DECIMAL#,
+      brand_id = #brandId:INTEGER#,
+      series_id = #seriesId:INTEGER#,
+      type = #type:VARCHAR#,
+      material = #material:VARCHAR#,
+      color = #color:VARCHAR#,
+      UUID = #uuid:VARCHAR#,
+      aUUID = #auuid:VARCHAR#,
+      level = #level:VARCHAR#,
+      acq_code = #acqCode:VARCHAR#,
+      pic = #pic:VARCHAR#,
+      status = #status:VARCHAR#,
+      gmt_create = #gmtCreate:TIMESTAMP#,
+      gmt_modify = #gmtModify:TIMESTAMP#
+    where id = #id:BIGINT#
+  </update>
+  
+  <update id="updateByNotNull" parameterClass="com.huaixuan.network.biz.domain.hx.AcquisitionPro" >
+    update hx_acquisition_pro
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="acqId" >
+        acq_id = #acqId:BIGINT#
+      </isNotNull>
+      <isNotNull prepend="," property="note" >
+        note = #note:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="amount" >
+        amount = #amount:DECIMAL#
+      </isNotNull>
+      <isNotNull prepend="," property="paidAmount" >
+        paid_amount = #paidAmount:DECIMAL#
+      </isNotNull>
+      <isNotNull prepend="," property="commission" >
+        commission = #commission:DECIMAL#
+      </isNotNull>
+      <isNotNull prepend="," property="brandId" >
+        brand_id = #brandId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="seriesId" >
+        series_id = #seriesId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="type" >
+        type = #type:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="material" >
+        material = #material:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="color" >
+        color = #color:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="uuid" >
+        UUID = #uuid:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="auuid" >
+        aUUID = #auuid:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="level" >
+        level = #level:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="acqCode" >
+        acq_code = #acqCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="pic" >
+        pic = #pic:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="status" >
+        status = #status:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="gmtCreate" >
+        gmt_create = sysdate()
+      </isNotNull>
+      <isNotNull prepend="," property="gmtModify" >
+        gmt_modify = sysdate()
+      </isNotNull>
+    </dynamic>
+    where id = #id:BIGINT#
+  </update>
+  
+  <update id="updateAcquisitionProPic" parameterClass="java.util.Map">
+  	update hx_acquisition_pro set pic = #pic#
+  	where id = #id#
+  </update>
+  
+</sqlMap>

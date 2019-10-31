@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="OutDetailSQL">
+<typeAlias alias="outDetail" type="com.huaixuan.network.biz.domain.storage.OutDetail"/>
+<typeAlias alias="outDetailGoods" type="com.huaixuan.network.biz.domain.storage.OutDetailGoods"/>
+<typeAlias alias="outDetailBaseInfo" type="com.huaixuan.network.biz.domain.storage.OutDetailBaseInfo"/>
+<typeAlias alias="gatherOutDepository" type="com.huaixuan.network.biz.domain.storage.GatherOutDepository"/>
+	<resultMap class="outDetail" id="outDetailResult">
+		<result column="id" property="id"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="out_depository_id" property="outDepositoryId"/>
+		<result column="out_num" property="outNum"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="due_fee" property="dueFee"/>
+		<result column="fact_fee" property="factFee"/>
+		<result column="status" property="status"/>
+		<result column="left_num" property="leftNum" nullValue="0"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="out_virtual_num" property="outVirtualNum" nullValue="0"/>
+		<result column="left_dep_num" property="leftDepNum" nullValue="0"/>
+	</resultMap>
+	<resultMap class="outDetailGoods" id="outDetailGoodsResult">
+		<result column="id" property="id"/>
+		<result column="code" property="code"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="out_num" property="outNum"/>
+		<result column="status" property="status"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="out_virtual_num" property="outVirtualNum" nullValue="0"/>
+	</resultMap>
+	<resultMap class="gatherOutDepository" id="gatherOutDepositoryResult">
+		<result column="out_depository_id" property="outDepositoryId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="unit_price" property="unitPrice"/>
+		<result column="out_num" property="outNum"/>
+		<result column="sum_money" property="sumMoney"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="gmt_out_dep" property="gmtOutDep"/>
+		<result column="goods_instance_code" property="goodsInstanceCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap class="outDetailBaseInfo" id="outDetailSalesChangeBaseInfoResult">
+		<result column="unit_price" property="unitPrice"/>
+		<result column="id" property="outDetailId"/>
+		<result column="out_depository_id" property="outDepositoryId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="code" property="code"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="out_num" property="outNum"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap class="outDetailBaseInfo" id="outDetailShoppingBaseInfoResult">
+		<result column="unit_price" property="unitPrice"/>
+		<result column="id" property="outDetailId"/>
+		<result column="out_depository_id" property="outDepositoryId"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="code" property="code"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="out_num" property="outNum"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="name" property="supplierName"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap class="outDetailGoods" id="outDetailNotFinishInfo">
+		<result column="id" property="id"/>
+		<result column="instance_name" property="instanceName"/>
+	</resultMap>
+	<resultMap class="gatherOutDepository" id="gatherFinanceOutDepository">
+		<result column="id" property="outDepositoryId"/>
+		<result column="sum_money" property="sumMoney"/>
+		<result column="bill_num" property="billNum"/>
+		<result column="gmt_out_dep" property="gmtOutDep"/>
+		<result column="finance_status" property="financeStatus"/>
+	</resultMap>
+	<resultMap id="gatherFinanceOutDepositoryMap" class="gatherOutDepository" >
+	    <result column="count" property="count" nullValue="0"/>
+        <result column="totalSum" property="totalSum" nullValue="0.00"/>
+   </resultMap>
+<!-- create OutDetail object -->
+<insert id="addOutDetail" parameterClass="outDetail">
+<![CDATA[
+insert into ioss_out_detail
+  (id,
+   goods_instance_id,
+   goods_id,
+   out_depository_id,
+   out_num,
+   unit_price,
+   due_fee,
+   fact_fee,
+   gmt_create,
+   gmt_modify,
+   status,
+   left_num,
+   left_dep_num,
+   relation_num,
+   dep_first_id,
+   stor_type,
+   out_virtual_num)
+values
+  (null,
+   #goodsInstanceId#,
+   #goodsId#,
+   #outDepositoryId#,
+   #outNum#,
+   #unitPrice#,
+   #dueFee#,
+   #factFee#,
+   sysdate(),
+   sysdate(),
+   #status#,
+   #leftNum#,
+   #leftDepNum#,
+   #relationNum#,
+   #depFirstId#,
+   #storType#,
+   #outVirtualNum#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update OutDetail object -->
+<update id="editOutDetail" parameterClass="outDetail">
+<![CDATA[
+update ioss_out_detail
+   set gmt_modify = sysdate(),
+   	   goods_instance_id = #goodsInstanceId#,
+       goods_id          = #goodsId#,
+       out_depository_id = #outDepositoryId#,
+       out_num           = #outNum#,
+       left_num          = #leftNum#,
+       left_dep_num          = #leftDepNum#,
+       out_virtual_num = #outVirtualNum#
+ where id = #id#
+]]>
+</update>
+<!-- delete OutDetail object -->
+<delete id="removeOutDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_out_detail where ioss_out_detail.ID = #value#
+]]>
+</delete>
+<!-- search OutDetail object -->
+<select id="getOutDetail" parameterClass="java.lang.Long" resultMap="outDetailResult">
+<![CDATA[
+		select ioss_out_detail.* from ioss_out_detail where ioss_out_detail.ID = #value#
+]]>
+</select>
+<!-- searchAll OutDetail List -->
+<select id="getOutDetails" resultMap="outDetailResult">
+<![CDATA[
+		select ioss_out_detail.* from ioss_out_detail
+]]>
+</select>
+
+<select id="getOutDetailGoodsLists" resultMap="outDetailGoodsResult" parameterClass="java.lang.Long">
+<![CDATA[
+SELECT iid.id,
+       igi.code,
+       iid.goods_id,
+       iid.goods_instance_id,
+       igi.instance_name,
+       igi.cat_code,
+       igi.attrs,
+       igi.goods_unit,
+       iid.unit_price,
+       iid.out_num,
+       iid.relation_num,
+       iid.status,
+       iid.DEP_FIRST_ID,
+       iid.OUT_VIRTUAL_NUM
+  FROM ioss_out_detail iid, ioss_goods_instance igi
+ WHERE iid.goods_instance_id = igi.id
+   AND iid.out_depository_id = #id#
+]]>
+</select>
+
+<select id="getOutDetailSalesChangeBaseInfo" resultMap="outDetailSalesChangeBaseInfoResult" parameterClass="java.lang.Long">
+<![CDATA[
+SELECT iod.unit_price,
+       iod.id,
+       iod.goods_id,
+       iod.out_depository_id,
+       igi.code,
+       iod.goods_instance_id,
+       igi.instance_name,
+       iod.out_num,
+       relation_num,
+       iod.DEP_FIRST_ID
+  FROM ioss_out_detail iod, ioss_goods_instance igi
+ WHERE iod.id = #outDetailId#
+   AND iod.goods_instance_id = igi.id
+
+]]>
+</select>
+<select id="getOutDetailShoppingBaseInfo" resultMap="outDetailShoppingBaseInfoResult" parameterClass="java.util.Map">
+<![CDATA[
+SELECT iod.unit_price,
+	   iod.relation_num,
+       iod.id,
+       iod.goods_id,
+       iod.out_depository_id,
+       igi.code,
+       iod.goods_instance_id,
+       igi.instance_name,
+       iod.out_num,
+       isr.supplier_id,
+       name,
+       iod.DEP_FIRST_ID
+  FROM ioss_out_detail      iod,
+       ioss_out_depository  iodd,
+       ioss_goods_instance  igi,
+       ioss_shopping_refund isr,
+       ioss_supplier        ise
+ WHERE iod.id = #outDetailId#
+   AND iod.out_depository_id = iodd.id
+   AND iod.goods_instance_id = igi.id
+   AND iodd.relation_num = isr.ref_num
+   AND isr.supplier_id = ise.id
+   AND iodd.type = #type#
+
+]]>
+</select>
+
+<update id="updateOutDetailStorTypeById" parameterClass="java.util.Map">
+	<![CDATA[
+		UPDATE ioss_out_detail
+		SET gmt_modify = sysdate(),
+			stor_type=#storType#
+		WHERE id = #outDetailId#
+	]]>
+</update>
+
+<update id="updateOutDetailStatusById" parameterClass="java.util.Map">
+	<![CDATA[
+		UPDATE ioss_out_detail
+		SET gmt_modify = sysdate(),
+			status=#status#
+		WHERE id = #outDetailId#
+	]]>
+</update>
+
+<select id="listOutDetailNotFinish" parameterClass="java.util.Map" resultMap="outDetailNotFinishInfo">
+<![CDATA[
+		select a.id,b.instance_name
+		from ioss_out_detail a left join ioss_goods_instance b on a.goods_instance_id = b.id
+		where (a.status is null or a.status <>#status#)
+		and a.out_depository_id = #outDepId#
+]]>
+</select>
+
+<select id="gatherOutDepositoryListsCount" resultClass="int">
+<![CDATA[
+select count(1)
+  from (SELECT bb.out_depository_id,
+               SUM(bb.out_num) AS out_num,
+               SUM(aa.amount * aa.self_cost) / SUM(aa.amount) AS unit_price,
+               (SUM(aa.amount * aa.self_cost) / SUM(aa.amount)) *
+               (SUM(aa.amount)) AS sum_money,
+               bb.gmt_out_dep,
+               bb.bill_num,
+               bb.instance_name,
+               bb.attrs,
+               bb.goods_instance_code,
+               bb.dep_first_id
+          FROM ioss_prod_relation_out aa,
+               (select a.out_depository_id,
+                       a.id,
+                       a.out_num,
+                       b.gmt_out_dep,
+                       b.bill_num,
+                       b.dep_first_id,
+                       c.instance_name,
+                       c.attrs,
+                       c.code as goods_instance_code
+                  from ioss_out_detail     a,
+                       ioss_out_depository b,
+                       ioss_goods_instance c
+                 where a.out_depository_id = b.id
+                   and a.goods_instance_id = c.id
+                   and b.status = 'out_finished'
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			b.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			c.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceCode">
+			c.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			b.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			b.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			        b.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+) bb
+         WHERE bb.out_depository_id = aa.out_dep_id
+           and bb.id = aa.out_detail_id
+         GROUP BY bb.out_depository_id,
+                  bb.id,
+                  bb.gmt_out_dep,
+                  bb.bill_num,
+                  bb.instance_name,
+                  bb.attrs,
+                  bb.goods_instance_code,
+                  bb.dep_first_id) aaaa
+</select>
+
+<select id="gatherOutDepositoryLists" resultMap="gatherOutDepositoryResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+SELECT bb.out_depository_id,
+       SUM(bb.out_num) AS out_num,
+       SUM(aa.amount * aa.self_cost) / SUM(aa.amount) AS unit_price,
+       (SUM(aa.amount * aa.self_cost) / SUM(aa.amount)) * (SUM(aa.amount)) AS sum_money,
+       bb.gmt_out_dep,
+       bb.bill_num,
+       bb.instance_name,
+       bb.attrs,
+       bb.goods_instance_code,
+       bb.dep_first_id
+  FROM ioss_prod_relation_out aa,
+       (select a.out_depository_id,
+               a.id,
+               a.out_num,
+               b.gmt_out_dep,
+               b.bill_num,
+               b.dep_first_id,
+               c.instance_name,
+               c.attrs,
+               c.code as goods_instance_code
+          from ioss_out_detail     a,
+               ioss_out_depository b,
+               ioss_goods_instance c
+         where a.out_depository_id = b.id
+           and a.goods_instance_id = c.id
+           and b.status = 'out_finished'
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			b.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+			c.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceCode">
+			c.code like CONCAT('%',#goodsInstanceCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeStart">
+<![CDATA[			b.gmt_out_dep >= STR_TO_DATE(#outDepTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="outDepTimeEnd">
+<![CDATA[			b.gmt_out_dep < DATE_ADD(STR_TO_DATE(#outDepTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			        b.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+) bb
+ WHERE bb.out_depository_id = aa.out_dep_id
+   and bb.id = aa.out_detail_id
+ GROUP BY bb.out_depository_id,
+          bb.id,
+          bb.gmt_out_dep,
+          bb.bill_num,
+          bb.instance_name,
+          bb.attrs,
+          bb.goods_instance_code,
+          bb.dep_first_id
+ order by bb.bill_num desc, bb.id desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<update id="editOutOutDetailGoods" parameterClass="outDetailGoods">
+<![CDATA[
+		update ioss_out_detail set
+		gmt_modify = sysdate(),
+		left_num = #leftNum#,
+		left_dep_num = #leftDepNum#,
+       	out_virtual_num = #outVirtualNum#
+		 where id = #id#
+]]>
+</update>
+
+<select id="gatherFinanceOutDepositoryCount" resultMap="gatherFinanceOutDepositoryMap">
+<![CDATA[
+select count(1) as count, sum(sum_money) as totalSum
+  from (SELECT a.id,
+               SUM((b.out_num-b.out_virtual_num) * b.unit_price) AS sum_money,
+               a.gmt_out_dep,
+               a.bill_num
+          FROM ioss_out_depository a, ioss_out_detail b
+         where b.out_depository_id = a.id
+           and a.status = 'out_finished'
+           and b.stor_type in('f','h')
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_out_dep,a.bill_num ) c
+</select>
+
+
+
+<select id="gatherFinanceOutDepositoryLists" resultMap="gatherFinanceOutDepository">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+    SELECT a.id,
+           SUM((b.out_num-b.out_virtual_num) * b.unit_price) AS sum_money,
+           a.gmt_out_dep,
+           a.bill_num,
+           a.finance_status
+      FROM ioss_out_depository a, ioss_out_detail b
+     where b.out_depository_id = a.id
+       and a.status = 'out_finished'
+       and b.stor_type in('f','h')
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_out_dep,a.bill_num,a.finance_status
+		order by a.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="estimateFinanceOutDepositoryCount" resultMap="gatherFinanceOutDepositoryMap">
+<![CDATA[
+    select count(1) as count, sum(sum_money) as totalSum
+      from (SELECT a.id,
+                   SUM(b.out_virtual_num * b.unit_price) AS sum_money,
+                   a.gmt_out_dep,
+                   a.bill_num
+              FROM ioss_out_depository a, ioss_out_detail b
+             where b.out_depository_id = a.id
+               and a.status = 'out_finished'
+               and b.stor_type in('v','h')
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_out_dep,a.bill_num ) c
+</select>
+
+
+
+<select id="estimateFinanceOutDepositoryLists" resultMap="gatherFinanceOutDepository">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+    SELECT a.id,
+           SUM(b.out_virtual_num * b.unit_price) AS sum_money,
+           a.gmt_out_dep,
+           a.bill_num,
+           a.finance_status
+      FROM ioss_out_depository a, ioss_out_detail b
+     where b.out_depository_id = a.id
+       and a.status = 'out_finished'
+       and b.stor_type in('v','h')
+]]>
+		<isNotEmpty prepend="and" property="billNum">
+			a.bill_num like CONCAT('%',#billNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+<![CDATA[			a.finance_status =#financeStatus# ]]>
+		</isNotEmpty>
+		GROUP BY a.id,a.gmt_out_dep,a.bill_num,a.finance_status
+		order by a.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getOutDetailListByOutDepositoryId" resultMap="outDetailResult" parameterClass="java.lang.Long">
+     <![CDATA[
+        select ioss_out_detail.* from ioss_out_detail where ioss_out_detail.out_depository_id = #value#
+     ]]>
+</select>
+</sqlMap>

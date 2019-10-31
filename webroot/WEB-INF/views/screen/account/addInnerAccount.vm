@@ -1,0 +1,60 @@
+#set($layout = 'layout\default.vm')
+#set($title = "账户管理 - 添加内部账户")
+		<form  name="theForm"  action="addInnerAccount.html" method="post" >
+
+		<div class="listBox">
+			<h3><span>添加内部账户</span></h3>
+          <table cellpadding="0" cellspacing="0">
+	#if($!{accountInfoError})
+				<tr>
+				<td colspan="2" align="center" >
+					<font color="red"><B>$!{accountInfoError}</B></font>
+				</td>
+				</tr>
+	#end
+	#if($!{addInnerAccountSuccessInfo})
+				<tr>
+				<td colspan="2" align="center" >
+					<font color="red"><B>$!{addInnerAccountSuccessInfo}</B></font>
+				</td>
+				</tr>
+	#end
+	#if($!{addInnerAccountErrorInfo})
+				<tr>
+				<td colspan="2" align="center" >
+					<font color="red"><B>$!{addInnerAccountErrorInfo}</B></font>
+				</td>
+				</tr>
+	#end
+	<tr>
+		<td class="fm-label">子类型：</td>
+		<td class="fm-field">
+			#springBind("account.accountSubType")
+			<select name="${status.expression}" id="accountSubType">
+				  <option value="03">佣金账户</option>
+				  <option value="04">返点账户</option>
+				  </select>#set($titleMessage9=$fieldErrors.get("account.accountSubType"))
+					#if($titleMessage9.size()!=0)
+					  <font color="red"><B>$!{titleMessage9.get(0)}</B></font>
+                    #end</td>
+	</tr>
+	<tr>
+		<td class="fm-label">账户备注：</td>
+		<td class="fm-field">
+			#springBind("account.memo")
+			<textarea  id="memo" rows="5" cols="35" name="${status.expression}"></textarea>
+
+					#set($titleMessage8=$fieldErrors.get("account.memo"))
+					#if($titleMessage8.size()!=0)
+					 <br/> <font color="red"><B>$!{titleMessage8.get(0)}</B></font>
+                    #end</td>
+	</tr>
+
+</table>
+<div align="center">
+<input name="" value="确定" type="submit" class="btn">
+</div>
+</div>
+</form>
+
+

@@ -1,0 +1,113 @@
+<style>
+a:link, a:visited, a:hover, a:active {color:#0042ff;}
+</style>
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css"  href="${ctx}/styles/${appConfig.get('csstheme')}/std_notice.css" />
+
+<table width="580" align="center"  border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="http://www.igoldcane.com/images/mmtop.png" width="580" border="0" usemap="#Map"/></td>
+  </tr>
+    <tr>
+    <td>
+</td>
+  </tr>
+    <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:1px solid #d5d5d5;border-right:1px solid #d5d5d5;">
+  <tr>
+    <td bgcolor="#ede9fc" style="font-size:14px; padding:10px; line-height:20px;">亲爱的$!{userName}<br/>
+    您好！感谢您使用尚上网上商城。<br/>
+您所订购的商品已经发货。<br/>
+#if($expressName)
+物流公司：$!{expressName}。<br/>
+#end
+#if($expressCode)
+物流单号：$!{expressCode}。<br/>
+#end
+
+#if($expressUrl)
+详细物流状态请查看：$!{expressUrl}。<br/>
+#end
+	</td>
+  </tr>
+<tr>
+    <td bgcolor="#ede9fc" style="font-size:14px; padding:10px; line-height:20px;" style="border-left:1px solid #d5d5d5;border-right:1px solid #d5d5d5;">
+订单号：$!{relationNum}<br/>
+	<table width="100%" border="1" cellspacing="0" cellpadding="0" >
+		<tbody>
+			<tr>
+				<th width="" style="font-size:14px; padding:10px; line-height:20px;">
+					商品名称
+				</th>
+				<th width="" style="font-size:14px; padding:10px; line-height:20px;"> 
+					选购属性
+				</th>
+				<th width="" style="font-size:14px; padding:10px; line-height:20px;">
+					商品价格
+				</th>
+				<th width="" style="font-size:14px; padding:10px; line-height:20px;">
+					购买数量
+				</th>
+				<th width="" style="font-size:14px; padding:10px; line-height:20px;">
+					小    计
+				</th>
+			</tr>
+				#set($sum=0)
+				#set($count=0)
+				#set($partsum=0)
+					 #foreach($obj in $outDetailList)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td style="font-size:14px; padding:10px; line-height:20px;">&nbsp;
+								$!{obj.instanceName}
+							</td>
+							<td style="font-size:14px; padding:10px; line-height:20px;">&nbsp;$!obj.attributeName
+							</td>
+							<td style="font-size:14px; padding:10px; line-height:20px;">￥$!{obj.unitPrice}&nbsp;
+							</td>
+							<td style="font-size:14px; padding:10px; line-height:20px;">&nbsp;
+								$!{obj.outNum}
+							</td>
+							<td align="right" style="font-size:14px; padding:10px; line-height:20px;">
+								￥$!{obj.catCode} &nbsp;
+							</td>
+						</tr>
+					 #end
+			<tr>
+				<th align="center" style="font-size:14px; padding:10px; line-height:20px;">运 &nbsp; 费</th>
+				<td style="font-size:14px; padding:10px; line-height:20px;">￥$!expressAmount</td>
+				<th align="center" style="font-size:14px; padding:10px; line-height:20px;">合 &nbsp; 计</th>
+				<td align="center" style="font-size:14px; padding:10px; line-height:20px;">$!countOutNum</td>
+				<td align="right" style="font-size:14px; padding:10px; line-height:20px;">￥$!sumMoney</td>
+			</tr>
+		</tbody>
+    </table>
+	</td>
+  </tr>
+  
+  <tr>
+    <td style="font-size:14px; padding:10px; line-height:20px;">-------------------------------------------------------------------------------<br/>
+---------------------------此信由尚上系统发出，系统不接收回信，请勿直接回复。<br/>
+如有任何疑问，请联系尚上客服，或者访问尚上网 <a href="http://www.igoldcane.com">http://www.igoldcane.com</a><br/>
+与我们取得联系。<br/>
+客服电话：400-826-8200（长途免费）客服传真：87168211<br/>
+版权所有@尚上股份有限公司<br/>
+
+</td>
+  </tr>
+</table>
+
+
+</td>
+  </tr>
+    <tr>
+    <td><img src="http://www.igoldcane.com/images/mmtop_02.jpg" width="580" border="0"/></td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="1,3,145,76" href="http://www.igoldcane.com/" target="blank">
+  <area shape="rect" coords="309,43,363,66" href="http://www.igoldcane.com/u/home.html" target="blank">
+  <area shape="rect" coords="377,43,431,66" href="http://www.igoldcane.com/l/view.html" target="blank">
+  <area shape="rect" coords="441,43,500,66" href="http://www.igoldcane.com/u/show.html" target="blank">
+  <area shape="rect" coords="512,43,569,67" href="http://www.igoldcane.com/u/tlist.html" target="blank">
+</map>

@@ -1,0 +1,40 @@
+#set($layout = "layout/default.vm")
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<div class="searchBox">
+		<h3><span>库龄分析表导出</span></h3>
+		<form action="/storage/export_storage_analysis.html" name="searchForm" method="post">
+			<table>
+				<tr>
+					<th>开始日期(必须选择礼拜天)：</th>
+					<td>
+						<input type="text" id="queryDate" name="queryDate" value="$!{queryDate}" size="10" readonly="true"/>
+                    </td>
+                        <script type="text/javascript">
+            			      Calendar.setup({
+            			          inputField : "queryDate",
+            			          ifFormat   : "%Y-%m-%d",
+            			          align      : "BR"
+            			      });
+            			</script>
+        			  <th>产品编码：</th>
+					  <td>
+						<input type="text" name="code" value="$!{code}" onblur="javascript:this.value=this.value.trim()"/>
+                      </td>
+        			  <th>供应商：</th>
+					  <td>
+						<input type="text" name="supplierName" value="$!{supplierName}" onblur="javascript:this.value=this.value.trim()"/>
+                      </td>
+					  <th>
+						<input name="search" value="导出" class="btn" type="button" onclick="return sumbitForm();" />
+                      </th>
+                </tr>
+			</table>
+		</form>
+    </div>
+<script>
+function sumbitForm(){
+	document.searchForm.submit();
+}
+</script>
+</div>

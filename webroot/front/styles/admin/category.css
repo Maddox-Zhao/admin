@@ -1,0 +1,80 @@
+* {
+font-family:Arial,Helvetica,taho,verdana,sans-serif;
+font-style:normal;
+margin:0;
+padding:0;
+}
+ul, li {
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+}
+.container li.parent span, .container_list li{
+	background:url(http://assets.taobaocdn.com/app/ic/img/ic_bg.png) no-repeat 500px 500px;
+}
+
+.container, .container_list{
+background-color:#E5F0FF;
+border:1px solid #C7DEFF;
+padding-bottom:5px;
+margin-bottom:10px;
+}
+
+.container *{overflow:hidden;}
+.container ul{
+height:269px;
+width:180px;
+overflow-y:auto;
+margin:5px;
+
+}
+.container{width:100%;
+float:left;}
+.container li {
+background-color:#FFFFFF;
+border:1px solid #B2D1FF;
+float:left;
+height:279px;
+margin:5px;
+overflow-y:auto;
+}
+.container ul li, .container_list li li{background:none;float:none;border:none;overflow:hidden;}
+.container ul li{height:22px;}
+.container .root, .container li span {
+	display:block;
+}
+
+.container li li span{
+line-height:20px;
+	padding:0px 5px;
+	height:20px;
+	cursor:pointer;
+}
+.container li.parent span {
+	background-repeat: no-repeat;
+	background-position: 100% -78px;
+}
+.container li.selected span {
+	border: 1px solid #98BBD2;
+	background-color: #D6EDF4;
+	color: #1B4D91;
+}
+
+.container_list{
+height:30px;
+padding:0px;
+ clear:both;
+}
+.container_list li{
+float:left;
+line-height:20px;
+height:20px;
+background-position:-441px -63px;
+margin:5px;
+padding-left:11px;
+}
+.container_list .title, .container_list .root{
+background:none;}
+.container_list .title{
+margin-left:20px;
+}

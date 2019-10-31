@@ -1,0 +1,122 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 外借回调管理</h2>
+	<form name="searchform" id="searchform" action="/storage/list_return_storage.html" method="post">
+		<input type="hidden" name="count" id="count" value="$!count"/>
+		<input type="hidden" name="moveType" id="moveType" value="$!{storageMoveLog.type}"/>
+		<div class="searchBox">
+    	<h3><span>外借回调管理</span></h3>
+    		<table>
+        		<tr>
+                    <th> 移库/外借编号：</th>
+					<td >
+						#springBind("moveStorageQuery.moveCode")
+						<input type="text" id="moveCode" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                    </td>
+
+                    <th>操作类型：</th>
+					<td >
+    					#springBind("moveStorageQuery.type")
+    					<select name="${status.expression}" id="type" class="inp">
+                    		<option value="">-=请选择=-</option>
+                    		<option value="1" #if("1"=="$status.value") selected #end>移库</option>
+                			<option value="3" #if("3"=="$status.value") selected #end>外借</option>
+                    	</select>
+                    </td>
+        			<th >
+						<input type="button" value="查询" class="btn" onclick="document.searchform.submit();"/>
+                    </th>
+        		    <td >
+						<input type="reset" value="重置" class="btn"/>
+                    </td>
+					#if($query && $query.items.size()>0)
+						<th >
+							<input type="button" value="Excel导出详情" class="btn" onclick="doExport();"/>
+						</th>
+					#end
+				</tr>
+				<tr>
+    				#set($allShow = "1")
+					#set($back = "1")
+        			$contain.get('/storage/depSelect.html').put('back',$back).put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$queryObject)
+				</tr>
+            </table>
+        </div>
+	</form>
+
+		<div class="listBox" id="listDiv">
+			<h3><span>外借回调列表</span></h3>
+			<table  id="listTable" name="listTable">
+				<tbody>
+					   <tr>
+						<th width="">
+							移库/外借编号
+						</th>
+						<th width="">
+							调入一级仓库
+						</th>
+						<th width="">
+							调入仓库
+						</th>
+						<th width="">
+							调入库位
+						</th>
+						<th width="">
+							类型
+						</th>
+						<th width="">
+							操作人
+						</th>
+						<th width="">
+							操作时间
+						</th>
+					</tr>
+					#foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td>
+								<a href="moveLogReturn.html?moveCode=$!{gi.moveCode}">$!{gi.moveCode}</a>
+							</td>
+							<td>
+							    $!{gi.depFirstName}
+							</td>
+							<td>
+							    $!{gi.depositoryName}
+							</td>
+							<td>
+							    $!{gi.depLocationName}
+							</td>
+							<td>
+								#if($!gi.type =="1") 移库#elseif($!gi.type == "3") 外借 #else 空 #end
+							</td>
+							<td>
+								$!{gi.creater}
+							</td>
+							<td align="center">
+								$!dateUtil.convertDateToString('yyyy-MM-dd',$!{gi.gmtModify})
+							</td>
+						</tr>
+					#end
+                    </tbody>
+             </table>
+			 <!-- 分页 -->
+            #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_return_storage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+    </div>
+
+<script language="javascript" type="text/javascript">
+    String.prototype.trim= function()
+    {
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+	function doExport(){
+		document.searchform.action="$appServer/storage/exportReturnStockList.html";
+		document.searchform.submit();
+		document.searchform.action="$appServer/storage/list_return_storage.html";
+	}
+</script>
+</div>

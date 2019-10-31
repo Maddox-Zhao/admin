@@ -1,0 +1,12 @@
+#set($layout = 'layout\default.vm')
+<div class="r-error">
+   <h3>对不起 ,请登录后再进行操作，谢谢！</h3><a href="#" onclick="log();"><h3>点击登录</h3></a>
+</div>
+<script language=JavaScript>
+function log(){
+	top.location = "$appServer/login.html";
+}
+
+top.location="$appServer/login.html"; 
+
+</script>

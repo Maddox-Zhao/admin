@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="ProdRelationOutGbSQL">
+<typeAlias alias="prodRelationOutGb" type="com.huaixuan.network.biz.domain.storage.ProdRelationOutGb"/>
+	<resultMap class="prodRelationOutGb" id="prodRelationOutGbResult">
+		<result column="id" property="id"/>
+		<result column="relation_id" property="relationId"/>
+		<result column="out_dep_id" property="outDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="amount" property="amount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="out_detail_id" property="outDetailId"/>
+		<result column="storage_id" property="storageId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="self_cost" property="selfCost"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+		<result column="bill_id" property="billId"/>
+	</resultMap>
+
+<insert id="addProdRelationOutGb" parameterClass="prodRelationOutGb">
+<![CDATA[
+		insert into ioss_prod_relation_out_gb
+		(id,relation_id,out_dep_id,goods_instance_id,amount,gmt_create,gmt_modify,goods_id,out_detail_id,storage_id,loc_id,self_cost,is_wholesale,tid,bill_id )values(
+		null,
+		#relationId#,
+		#outDepId#,
+		#goodsInstanceId#,
+		#amount#,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#outDetailId#,
+		#storageId#,
+		#locId#,
+		#selfCost#,
+		#isWholesale#,
+		#tid#,
+		#billId#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+</sqlMap>

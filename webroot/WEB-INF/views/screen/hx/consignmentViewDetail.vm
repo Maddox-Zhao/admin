@@ -1,0 +1,281 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>寄卖凭证详情</h2>
+		 
+		 <script type="text/javascript">
+		 	function check()
+			{
+				document.updateConsignment.submit();
+			};
+			
+			function resetForm()
+			{
+				document.updateConsignment.reset();
+			};
+			
+
+			function deleteById(id,status)
+			{
+				if(status == "sold")
+				{
+					alert("已售产品不能删除");
+					return false;
+				}
+				if(confirm('确定删除？'))
+				{
+				  	location.href = '/consignmentPro/delete.html?proId='+ id + '&conId=$!{consignmentView.id}';
+			    }
+				  return false;
+			};
+			function qukuan(id)
+			{
+				
+				var kequMoney = document.getElementById("kequMoney_" + id).value;
+				/*
+				var shuruMoney = document.getElementById("shuruMoney" + id).value;
+				
+				if(shuruMoney == "")
+				{
+					alert("输入金额不能为空");
+					return false;
+				}
+				if(parseInt(shuruMoney) > parseInt(kequMoney))
+				{
+					alert("输入金额不能大于可取金额");
+					return false;
+				}
+				
+				else
+				{
+					location.href="/consignmentPro/drawInput.html?id=" + id + "&money=" + shuruMoney + "&conId=$!{consignmentView.id}" + "&kequ=" + kequMoney;
+				}
+			*/
+				location.href="/consignmentPro/drawInput.html?id=" + id  + "&conId=$!{consignmentView.id}" + "&kequ=" + kequMoney;
+			}
+			
+			function  updateStatusById(proId,id,type)
+			{
+			
+					var status = 1; //1.已售 0.客户取回 
+					if(type.innerHTML == "客户取回")
+						status = 0;
+					if(type.innerHTML == "已售")
+						status = 1;
+					if(status == 1)
+					{
+    					if(confirm("确认已售？"))
+            			{
+    						location.href="/consignmentPro/updateProStatus.html?proId="+proId + "&id=" + id + "&type=" + status;
+            			}
+					}
+					if(status == 0)
+					{
+						if(confirm("确认已取回？"))
+						{
+							location.href="/consignmentPro/updateProStatus.html?proId="+proId + "&id=" + id + "&type=" + status;
+						}
+					}
+			}
+		 </script>		
+		 
+		  #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "drawsuccess")
+					取款成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+				#if($!message == "updatesuccess")
+					更新成功！
+				#end
+				#if($!message == "qukuansuccess")
+					取款成功！
+				#end
+				#if($!message == "uploadFile")
+					图片文件格式不正确或者大于了200K
+				#end
+				
+				
+		</div>
+		 #end
+    </div>
+
+	##寄卖凭证信息
+	<form name="form1" id="form1" method="post" action="update.html" enctype="multipart/form-data">
+		<span id="print">
+    	<div class="formBox">
+    		<h3><i></i><span>寄卖凭证信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>寄卖号：</th>
+        			    <td style="width:240px;">$!{consignmentView.conCode}</td>
+        			    <th>总计金额：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{consignmentView.amount}</span></td>
+    				</tr>
+    				<tr>
+    					<th>货款状态：</th>
+        			    <td>$!{consignmentView.status}</td>
+        			    <th>已取金额：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{consignmentView.paidAmount}</span></td>
+    				</tr>
+    				<tr>
+						<th>寄卖时间：</th>
+    					<td>$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{consignmentView.gmtCreate})</td>
+    					<th>修改时间：</th>
+    					<td>$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{consignmentView.gmtModify})</td>
+    				</tr>
+					<tr>
+    					<th>客户ID：</th>
+    					<td>$!{consignmentView.customerId}</td>
+    					<th>操作者ID：</th>
+    					<td>$!{consignmentView.operatorId}</td>
+    				</tr>
+					<tr>
+						<th>客户身份证图片：</th>
+    					<td>
+								<a href="/daigou/showimg.html?url=$!{consignmentView.idcardsImage}"/>
+								<img src='${upServer}$imgUtil.changeLargeImgToSmal($!{consignmentView.idcardsImage})' width="80"/>
+								</a>
+								 <input type="file" name="cardid"/>
+					  </td>
+    					<th>寄卖凭证图片：</th>
+    					<td>
+							<a href="/daigou/showimg.html?url=$!{consignmentView.conImage}"/>
+							<img src='${upServer}$imgUtil.changeLargeImgToSmal($!{consignmentView.conImage})' width="80"/>
+							</a>
+							 <input type="file" name="con"/>
+						</td>
+					</tr>
+					<tr colspan="4"> <div class="mag-t3"><span>图片应小于200k,格式为jpg,jpeg,bmp,gif中的一种</span></div></tr>
+					<tr>
+						<th >
+							备注：
+						</th>
+						#springBind("consignmentView.id")
+						<input type="hidden" name="id" value="$!{consignmentView.id}"/>
+						<td colspan="3">
+							#springBind("consignmentView.note")
+							<textarea cols="70" rows="5" name="note" id="note">$!{consignmentView.note}</textarea>
+						</td>
+					</tr>
+					#if(!$!consignmentView.status.equals("以结清"))
+					<tr>
+						<td colspan="4">
+							<div class="form-but">
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.form1.submit()">保存</button>
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/consignmentPro/addInput.html?conId=$!{consignmentView.id}&conCode=$!{consignmentView.conCode}'">添加产品</button>
+   							</div>
+							
+
+						</td>
+	
+					</tr>
+					#end
+					
+    			</table>
+    		</div>					
+			
+			</div>
+		</div>
+		</span>
+	</form>
+	<br/>
+	
+
+##寄卖单的产品信息
+	<div class="formBox">
+	<h4><span>产品信息</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+					<tr> 
+    					<th style="text-align:center;">品牌</th>
+    					<th style="text-align:center;">品名</th>
+    					<th style="text-align:center;">材质</th>
+    					<th style="text-align:center;" >型号</th>
+    					<th  style="text-align:center;">颜色</th>
+    					<th style="text-align:center;">产品图片</th>
+    					<th style="text-align:center;">产品价格</th>
+    					<th style="text-align:center;">产品状态</th>
+						<th style="text-align:center;">可取金额</th>
+    					<th style="text-align:center;">操作</th>
+					</tr>
+					#set($String = 'a')
+				#if($proList)   
+				 #foreach($consignmentPro in $proList)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$brandMap.get($String.valueOf($!consignmentPro.brandId))</td>
+					<td style="text-align:center;">$seriesMap.get($String.valueOf($!consignmentPro.idSeries))</td>
+					<td style="text-align:center;">$!consignmentPro.material</td>
+					<td style="text-align:center;">$!consignmentPro.type</td>
+					<td style="text-align:center;">$!consignmentPro.color</td>
+					<td style="text-align:center;">
+					#if($!consignmentPro.pic)
+							<a href="/daigou/showimg.html?url=$!consignmentPro.pic">
+								<img src='${upServer}$imgUtil.changeLargeImgToSmal($!consignmentPro.pic)' width="50" />
+							</a>
+					#end
+					</td>
+					<td style="text-align:center;">$!consignmentPro.price</td>
+					<td style="text-align:center;">
+						#if($!consignmentPro.status.equals("wait_sell"))
+							未售
+						#elseif($!consignmentPro.status.equals("sold"))
+							确认出售
+						#elseif($!consignmentPro.status.equals("back"))
+							客户取回
+						#end
+					</td>
+					<td style="text-align:center;">
+						#set($result = $!consignmentPro.price - $!consignmentPro.paidPrice) 
+						<input type="hidden" value="$!result" id="kequMoney_$!consignmentPro.proId"/> $!result
+					</td>
+					#*
+					<td   style="text-align:center;">
+						#if($!consignmentPro.status.equals("sold"))
+							输入取款金额:<input type="text" name="money" id="shuruMoney$!consignmentPro.proId"  onKeyPress="javascript:if(event.keyCode==13) qukuan($!consignmentPro.proId); "  size="10" theme="simple" class="inp inp-w105" onkeyup="value=value.replace(/[^\d]/g,'')"  />
+						#else
+							不能取
+						#end
+					</td>
+					*#
+					<td style="text-align:center;">
+						#if($!consignmentPro.status.equals("sold") && $!result > 0)
+							<a href="#" onclick="return qukuan($!consignmentPro.proId)">取款</a>
+							##<a href="#" onclick="return qukuan($!consignmentPro.proId)">转账取款</a>
+						#elseif($!consignmentPro.status.equals("wait_sell"))
+						##<a href="#" onclick="return deleteById($!consignmentPro.proId,'$!consignmentPro.status')">删除</a> 
+						<a href="#" onclick="return updateStatusById($!consignmentPro.proId,$consignmentView.id,this)">已售</a>&nbsp
+						<a href="#" onclick="return updateStatusById($!consignmentPro.proId,$consignmentView.id,this)">客户取回</a>&nbsp<br/>							
+						#end
+						<a href="/consignmentPro/updateInput.html?id=$!consignmentPro.proId">查看</a>
+					</td>
+                 </tr>
+				 #end
+				#end
+				</table>
+				
+			#if($!proList.size() == 0)
+				没有结果
+			#end
+			
+			</div>
+
+	</div>
+
+##产品查询完毕

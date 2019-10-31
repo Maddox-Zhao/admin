@@ -1,0 +1,78 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>产品修改</h2>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>商品名称:</th>
+           <td>$!{goods.title}</td>
+		   <th>编码:</th>
+           <td>$!{goods.goodsSn}</td>
+		   <th>品牌:</th>
+           <td>$!{goods.brandName}</td>
+		   <th>单位:</th>
+           <td>$!{goods.goodsUnit}</td>
+           <th>类目:</th>
+           <td>$!{goods.catName}</td>
+        </tr>
+    </table>
+  </div>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>产品名称:</th>
+           <td>$!{instance.instanceName}</td>
+		   <th>产品编码:</th>
+           <td>$!{instance.code}</td>
+        </tr>
+    </table>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "editdepsuccess")
+		产品库位编辑成功！
+	#end
+</div>
+ #end
+        <div class="clear"></div>
+<form name="form1" id="form1" action="/instance/update_instance_location.html" method="post">
+	<input type="hidden" name="id" value="$!{instance.id}" />
+	<input type="hidden" name="gid" value="$!{goods.id}" />
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品库位列表</span></h3>
+            <table >
+                <tr>
+			      <th>选择</th>
+                  <th>库位</th>
+			      <th>仓库</th>
+                  <th>大小</th>
+			      <th>描述</th>
+                </tr>
+				 #foreach($lo in $locations)
+					#if("$lo.status" == "1")
+                <tr>
+                    <td align="center"><input type="checkbox" name="loid" value="${lo.id}" #if($existLoc.contains($lo.id)) checked #end /></td>
+                    <td align="center">$!{lo.locName}</td>
+                	<td align="center">$!{lo.depName}</td>
+                    <td align="center">$!{lo.locSize}</td>
+					<td align="center">$!{lo.locDescription}</td>
+                </tr>
+				  #end
+				 #end
+            </table>
+      </div>
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onclick="check();">保存</button>
+    </div>
+</form>
+</div>
+<script language="javascript" type="text/javascript">
+     function check(){
+	   	  document.form1.submit();
+	 }
+</script>

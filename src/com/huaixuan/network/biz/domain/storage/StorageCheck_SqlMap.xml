@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="StorageCheckSQL">
+<typeAlias alias="storageCheck" type="com.huaixuan.network.biz.domain.storage.StorageCheck"/>
+	<resultMap class="storageCheck" id="storageCheckResult">
+		<result column="id" property="id"/>
+		<result column="loc_id" property="locId"/>
+		<result column="dep_id" property="depId"/>
+		<result column="status" property="status"/>
+		<result column="creater" property="creater"/>
+		<result column="check_type" property="checkType"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+	<resultMap class="storageCheck" id="storageCheckResult2" extends="storageCheckResult">
+		<result column="loc_name" property="locName"/>
+		<result column="dep_name" property="depName"/>
+		<result column="dep_first_name" property="depFirstName"/>
+	</resultMap>
+<!-- create StorageCheck object -->
+<insert id="addStorageCheck" parameterClass="storageCheck">
+<![CDATA[
+		insert into ioss_storage_check
+		(id,loc_id,dep_id,status,creater,check_type,gmt_create,gmt_modify )values( null,
+		#locId#,
+		#depId#,
+		#status#,
+		#creater#,
+		#checkType#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update StorageCheck object -->
+<update id="editStorageCheck" parameterClass="storageCheck">
+<![CDATA[
+		update ioss_storage_check set loc_id = #locId#,
+		dep_id = #depId#,
+		status = #status#,
+		check_type = #checkType#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete StorageCheck object -->
+<delete id="removeStorageCheck" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_storage_check where ioss_storage_check.ID = #value#
+]]>
+</delete>
+<!-- search StorageCheck object -->
+<select id="getStorageCheck" parameterClass="java.lang.Long" resultMap="storageCheckResult">
+<![CDATA[
+		select ioss_storage_check.* from ioss_storage_check where ioss_storage_check.ID = #value#
+]]>
+</select>
+<!-- searchAll StorageCheck List -->
+<select id="getStorageChecks" resultMap="storageCheckResult">
+<![CDATA[
+		select ioss_storage_check.* from ioss_storage_check
+]]>
+</select>
+
+<select id="getStorageChecksByCountParameterMap" resultClass="java.lang.Integer">
+      <![CDATA[
+		select count(ioss_storage_check.id) from ioss_storage_check
+      ]]>
+	<isNotEmpty prepend="" property="depfirstId">
+	,ioss_depository
+     </isNotEmpty>
+     <isEmpty prepend="" property="depfirstId">
+	        <isNotEmpty prepend="" property="depfirstIds">
+	         ,ioss_depository
+            </isNotEmpty>
+     </isEmpty>
+	where 1=1
+		<isNotEmpty prepend="and" property="locId">
+			ioss_storage_check.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			ioss_storage_check.dep_id = #depId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			ioss_storage_check.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			ioss_storage_check.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			ioss_storage_check.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			ioss_depository.DEP_FIRST_ID = #depfirstId# and ioss_depository.id=ioss_storage_check.dep_id
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            ioss_depository.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) and ioss_depository.id=ioss_storage_check.dep_id
+        </isNotEmpty>
+</select>
+
+
+   <select id="getStorageChecksByParameterMap" resultMap="storageCheckResult2">
+   	<include refid="pageSQLHead"/>
+      <![CDATA[
+		select ioss_storage_check.*,
+	       (select t.loc_name
+	          from ioss_dep_location t
+	         where t.id = ioss_storage_check.loc_id) loc_name,
+	       (select t.name
+	          from ioss_depository t
+	         where t.id = ioss_storage_check.dep_id) dep_name,
+	       (select f.dep_first_name
+	          from ioss_depository d, ioss_depository_first f
+	         where d.dep_first_id = f.id
+	           and d.id = ioss_storage_check.dep_id) dep_first_name
+	  from ioss_storage_check
+       ]]>
+	   <isNotEmpty prepend="" property="depfirstId">
+	,ioss_depository
+     </isNotEmpty>
+     <isEmpty prepend="" property="depfirstId">
+	        <isNotEmpty prepend="" property="depfirstIds">
+	         ,ioss_depository
+            </isNotEmpty>
+     </isEmpty>
+	where 1=1
+		<isNotEmpty prepend="and" property="locId">
+			ioss_storage_check.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			ioss_storage_check.dep_id = #depId#
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="status">
+			ioss_storage_check.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			ioss_storage_check.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			ioss_storage_check.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+			ioss_depository.DEP_FIRST_ID = #depfirstId# and ioss_depository.id=ioss_storage_check.dep_id
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            ioss_depository.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            ) and ioss_depository.id=ioss_storage_check.dep_id
+        </isNotEmpty>
+		order by ioss_storage_check.gmt_create desc
+		<include refid="pageSQLFoot"/>
+    </select>
+
+    <select id="getDepFirstIdByCheckId" resultClass="java.lang.Long">
+    	select b.dep_first_id from ioss_storage_check a, ioss_depository b
+		where a.dep_id = b.id
+		and a.id=#checkId#
+    </select>
+</sqlMap>

@@ -1,0 +1,8 @@
+#set($layout = "")
+
+<frameset cols="15%,*">
+    <frame name="index" src="tree.html" frameborder="0" scrolling="yes" ></frame>
+	
+   <frame name="content" src="getci.html" frameborder="0" scrolling="yes"></frame>
+</frameset>
+

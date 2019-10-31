@@ -1,0 +1,86 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>寄卖凭证详情</h2>
+		 #springBind("consignmentView.fileMsg")
+			<label class="red">${status.errorMessage}</label>
+			
+		 <center>
+		 <form action="updateConsignment.html" name="updateConsignment" method="post" enctype="multipart/form-data">
+			#springBind("consignmentView.id")
+			<input type="hidden" name="${status.expression}" value="${status.value}"/>
+			
+				寄卖编号:
+				#springBind("consignmentView.conCode")
+			  <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			   状态:
+			   #springBind("consignmentView.status")
+			  <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			  总计金额:
+			  #springBind("consignmentView.amount")
+			  <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			  
+			  已还金额:
+			  #springBind("consignmentView.paidAmount")
+			  <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			  
+			  客户ID:
+			  #springBind("consignmentView.customerId") 
+			  <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			  
+			  客户身份证图片:
+			  #springBind("consignmentView.idcardsIimage")
+			 <input type="file" name="img" value="${status.value}"/>
+			 <img src="${imageServer}/images/upload/${status.value}" width="50"/><br/><br/>
+				
+			 寄卖凭证图片:
+			  #springBind("consignmentView.conImage")
+			 <input type="file" name="img"  value="${status.value}"/> 
+			 <img src='${imageServer}/images/upload/${status.value}' width="50"/><br/><br/>
+			 <div class="mag-t3"><span>图片应小于200k，jpg或gif或gif格式</span></div>
+			 
+			 开单时间:
+			  #springBind("consignmentView.gmtCreate")
+			 <input type="text" name="${status.expression}" value="$date.format(${status.value})" readonly="true" /> <br/><br/>
+			 
+			 
+			 修改时间:
+			 #springBind("consignmentView.gmtModify")
+			 <input type="text" name="${status.expression}" value="$date.format(${status.value})" readonly="true" /><br/><br/>
+			
+			 操作者ID:
+			  #springBind("consignmentView.operatorId")
+			 <input type="text" name="${status.expression}" value="${status.value}" readonly="true" /><br/><br/>
+			 备注:
+			  #springBind("consignmentView.note")
+			  <textarea name="${status.expression}">${status.value}</textarea><br/><br/>
+		 </form>
+
+		 
+		 <br/>
+
+		 </center>
+		 
+		 <div class="form-but">
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="check();">确定</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="resetForm();">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1);">返回 </button>
+		 </div>
+		 <script type="text/javascript">
+		 	function check()
+			{
+				document.updateConsignment.submit();
+			}
+			function resetForm()
+			{
+				document.updateConsignment.reset();
+			}
+		 </script>
+    </div>
+			 

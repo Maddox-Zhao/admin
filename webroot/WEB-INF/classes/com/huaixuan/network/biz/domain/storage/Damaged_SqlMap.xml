@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DamagedSQL">
+<typeAlias alias="damaged" type="com.huaixuan.network.biz.domain.storage.Damaged"/>
+	<resultMap class="damaged" id="damagedResult">
+		<result column="id" property="id"/>
+		<result column="damaged_code" property="damagedCode"/>
+		<result column="status" property="status"/>
+		<result column="creater" property="creater"/>
+		<result column="agent" property="agent"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="remark" property="remark"/>
+		<result column="dep_id" property="depId"/>
+		<result column="dep_name" property="depName"/>
+		<result column="gmt_damaged" property="gmtDamaged"/>
+		<result column="DEP_FIRST_ID" property="depfirstId"/>
+	</resultMap>
+
+<!-- create Damaged object -->
+<insert id="addDamaged" parameterClass="damaged">
+<![CDATA[
+insert into ioss_damaged
+  (id,
+   damaged_code,
+   status,
+   creater,
+   agent,
+   gmt_create,
+   gmt_modify,
+   remark,
+   gmt_damaged,
+   dep_id,
+   DEP_FIRST_ID)
+values
+  (null,
+   #damagedCode#,
+   #status#,
+   #creater#,
+   #agent#,
+   sysdate(),
+   sysdate(),
+   #remark#,
+   #gmtDamaged#,
+   #depId#,
+   #depfirstId#)
+
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Damaged object -->
+<update id="editDamaged" parameterClass="damaged">
+<![CDATA[
+update ioss_damaged
+   set damaged_code = #damagedCode#,
+       status       = #status#,
+       creater      = #creater#,
+       agent        = #agent#,
+       gmt_create   = #gmtCreate#,
+       gmt_modify   = #gmtModify#,
+       gmt_damaged  = #gmtDamaged#,
+       dep_id       = #depId#,
+       remark       = #remark#
+ where id = #id#
+
+]]>
+</update>
+<!-- delete Damaged object -->
+<delete id="removeDamaged" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_damaged where ioss_damaged.ID = #value#
+]]>
+</delete>
+
+<!-- search Damaged object -->
+<select id="getDamaged" parameterClass="java.util.Map" resultMap="damagedResult">
+<![CDATA[
+select a.id,
+       a.damaged_code,
+       a.status,
+       a.creater,
+       a.agent,
+       a.gmt_create,
+       a.gmt_modify,
+       a.remark,
+       a.dep_id,
+       (select t.name from ioss_depository t where t.id = a.dep_id) as dep_name,
+       a.gmt_damaged,
+       a.DEP_FIRST_ID
+  from ioss_damaged a
+ where 1 = 1
+
+]]>
+ 
+ <isNotEmpty prepend="and" property="damagedId">
+        a.ID = #damagedId#
+ </isNotEmpty>
+ <isNotEmpty prepend="and" property="depfirstIds" >
+            a.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="damagedCode">
+        a.damaged_code = #damagedCode# LIMIT 1
+ 		</isNotEmpty>
+</select>
+<!-- searchAll Damaged List -->
+<select id="getDamageds" resultMap="damagedResult">
+<![CDATA[
+		select ioss_damaged.* from ioss_damaged
+]]>
+</select>
+
+
+<select id="getDamagedListsByParameterMap" resultMap="damagedResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+select a.id,
+       a.damaged_code,
+       a.status,
+       a.creater,
+       a.agent,
+       a.gmt_create,
+       a.gmt_modify,
+       a.remark,
+       a.dep_id,
+       (select t.name from ioss_depository t where t.id = a.dep_id) as dep_name,
+       a.gmt_damaged,
+       a.DEP_FIRST_ID
+  from ioss_damaged a
+ where 1 = 1
+
+]]>
+		<isNotEmpty prepend="and" property="damagedCode">
+			a.damaged_code like CONCAT('%',#damagedCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reason">
+			a.reason = #reason#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agent">
+			a.agent = #agent#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeStart">
+<![CDATA[			a.gmt_damaged >= STR_TO_DATE(#damagedTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeEnd">
+<![CDATA[			a.gmt_damaged < DATE_ADD(STR_TO_DATE(#damagedTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="depfirstIds" >
+            a.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId" >
+            a.dep_first_id = #depFirstId#
+        </isNotEmpty>
+	   order by a.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getDamagedCountByParameterMap" resultClass="java.lang.Integer">
+<![CDATA[
+select count(DISTINCT(a.id)) from ioss_damaged a where 1 = 1
+]]>
+		<isNotEmpty prepend="and" property="damagedCode">
+			a.damaged_code like CONCAT('%',#damagedCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reason">
+			a.reason = #reason#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			a.creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agent">
+			a.agent = #agent#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeStart">
+<![CDATA[			a.gmt_damaged >= STR_TO_DATE(#damagedTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeEnd">
+<![CDATA[			a.gmt_damaged < DATE_ADD(STR_TO_DATE(#damagedTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            a.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId" >
+            a.dep_first_id = #depFirstId#
+        </isNotEmpty>
+</select>
+</sqlMap>

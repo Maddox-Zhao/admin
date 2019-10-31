@@ -1,0 +1,74 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+        <!-- 表单模块 -->
+      <div class="formBox">
+		 <form action="$appServer.get('/admin/modifyUserShoppingTeam.html')" name="form1" id="form1" method="post">
+			<input type="hidden" name="id" value="$!{adminId}" />
+        	<h3><i></i><span>用户分组管理</span></h3>
+
+        	<div class="listBox">
+			   <table>
+				<tr>
+    			    <th colspan="4"  scope="col">用户信息</th>
+    			</tr>
+           		<tr>
+				<th>用户名</th>
+				<td>$!{admin.userName}</td>
+
+				<th>E-mail地址</th>
+				<td>$!{admin.email}</td>
+				</tr>
+
+				<tr>
+				<th>真实姓名</th>
+				<td>$!{admin.name}</td>
+
+				<th>电话</th>
+				<td>$!{admin.tel}</td>
+				</tr>
+
+				<tr>
+				<th>手机</th>
+				<td>$!{admin.mobile}</td>
+
+				<th>是否冻结</th>
+				<td>#if($!{admin.isFreezing()}) 已冻结 #end 正常使用</td>
+				</tr>
+				<tr>
+    				<th>用户角色</th>
+    				<td>
+						#set($roleIds = $userRoleIds)
+                    	#foreach($r in $allRoleList)
+                            #if($roleIds.contains($r.id)) 
+								&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="userRole" value="" disabled checked/>$!{r.name} 
+							#end
+        				#end 
+					</td>
+					
+				</tr>
+				
+				<tr>
+					<th>选择用户所在组</th>
+                    <td colspan="3">
+            			#set($ids = $!teamValue)
+            			#foreach($r in $shoppingTeamResourcesList)
+            				&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="teamValues" value="$!{r.value}"  #if(${teamValue} && ${teamValue.contains($r.value)}) checked #end/>$!{r.nameCn}
+							#if($velocityCount%5==0) </br> #end
+						#end
+            		</td>
+                </tr>
+               </table>
+			</div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="submit" class="button-s4">保存</button>
+                <button type="button" class="button-s4" onclick="#if(!$!{url})history.go(-1)#else javascript:location.href= '$!{appServer}/$!{url}' #end">取消</button>
+
+          	</div>
+
+         </form>
+        </div> 
+    </div>

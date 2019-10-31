@@ -1,0 +1,135 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+  <form action="/storage/gather_in_depository.html" name="searchForm" id="searchForm" method="post">
+	<div class="searchBox">
+    <h3><span>入库单成本汇总统计</span></h3>
+		<table>
+        	<tr>
+                <th>单据编号：</th>
+				<td >
+					#springBind("gatherQuery.billNum")
+					<input type="text" id="billNum" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+            	<th>产品名称：</th>
+				<td >
+					#springBind("gatherQuery.instanceName")
+					<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+            	<th>产品编码：</th>
+				<td >
+					#springBind("gatherQuery.goodsInstanceCode")
+					<input type="text" id="goodsInstanceCode" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+			</tr>
+			<tr>
+            	<th>类型：</th>
+				<td >
+					#springBind("gatherQuery.storType")
+					<select name="${status.expression}" id="storType" class="inp">
+                		<option value="">-=请选择=-</option>
+                		<option value="v" #if("$status.value"=="v") selected #end>暂估</option>
+            			<option value="f" #if("$status.value"=="f") selected #end>实际</option>
+                	</select>
+                </td>
+            	<th>入库时间：</th>
+				<td>
+					#springBind("gatherQuery.inDepTimeStart")
+					<input type="text" id="inDepTimeStart" name="${status.expression}" value="$!{status.value}" size="10" readonly="true"/>
+					-
+					#springBind("gatherQuery.inDepTimeEnd")
+					<input type="text" id="inDepTimeEnd" name="${status.expression}" value="$!{status.value}" size="10" readonly="true"/>
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "inDepTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "inDepTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+				</td>
+                <th >
+					 <input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/>
+                </th>
+
+				<td >
+					<input type="button" value="Excel导出" class="btn" onclick="doExport();"/>
+                </td>
+            </tr>
+        </table>
+	</div>
+  </form>
+<!-- 入库单列表 -->
+<div class="listBox" id="listDiv">
+	<h3><span>入库单成本汇总列表</span></h3>
+	<table  id="listTable" name="listTable">
+      <tr>
+        <th>单据编号</th>
+        <th>产品名称</th>
+		<th>产品编码</th>
+		<th>产品属性</th>
+		<th>类型</th>
+        <th>入库时间</th>
+		<th>单价（￥）</th>
+		<th>数量</th>
+		<th>金额（￥）</th>
+      </tr>
+   #if($query && $query.items.size()>0)
+		#foreach($obj in $query.items)
+	  <tr #if($velocityCount%2==0) class="bg" #end>
+           <td><a href="showInDetail.html?iId=$!obj.inDepositoryId" target="_blank">$!obj.billNum</a></td>
+		   <td>$obj.instanceName</td>
+		   <td>$obj.goodsInstanceCode</td>
+		   <td title="$!attributeManager.getFullAttributeStringByAttrs($obj.attrs)">
+				$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attrs),20)
+		   </td>
+		   <td>#if("$!{obj.storType}" == "v")  暂估 #else  实际 #end
+		   </td>
+		   <td>$!dateUtil.convertDateToString("yyyy-MM-dd",$!obj.gmtInDep)</td>
+		   <td>$!moneyUtil.getFormatMoney($!obj.unitPrice,'0.00')</td>
+           <td>$!obj.amount</td>
+           <td>$!moneyUtil.getFormatMoney($!obj.sumMoney,'0.00')</td>
+      </tr>
+	  #end
+   #end
+    </table>
+    <!-- 分页 -->
+           #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/gather_in_depository.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function doExport(){
+		var form1=document.getElementById('searchForm');
+		form1.action="/storage/exportGetherInDep.html";
+		form1.submit();
+		form1.action="/storage/gather_in_depository.html";
+	}
+
+		function formSubmit(){
+		    var inDepDateStart1=document.getElementById("inDepTimeStart").value.replace(/-/g, "/");
+    		var inDepDateEnd1=document.getElementById("inDepTimeEnd").value.replace(/-/g, "/");
+    		var bb_date1=new Date(Date.parse(inDepDateStart1));
+    		var ee_date1=new Date(Date.parse(inDepDateEnd1));
+
+    		if(ee_date1 < bb_date1){
+    				   alert("入库起始时间不能大于结束时间！");
+    			   return false;
+    		}
+        	document.forms[0].submit();
+	    }
+</script>

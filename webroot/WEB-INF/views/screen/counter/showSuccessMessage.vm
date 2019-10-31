@@ -1,0 +1,50 @@
+#set($layout = "layout/default.vm")
+<div class="main">
+	<div class="formBox">
+		<h3><i></i><span>对账文件导入消息回馈</span></h3>
+		<div class="content">
+			<table class="c4">
+				<tr>
+                    <th>批次号:</th>
+                    <td>$!counterOutPintMessage.batchId</td>
+					<th>文件名:</th>
+                    <td>$!counterOutPintMessage.accountFileName</td>
+                </tr>
+				<tr>
+                    <th>对账类型:</th>
+                    <td>
+						#if($!counterOutPintMessage.blankName=="TENPAY")
+							财付通
+						#elseif($!counterOutPintMessage.blankName=="CHINABANK")
+							网银在线        
+						#elseif($!counterOutPintMessage.blankName=="ALIPAY")
+							支付宝
+						#elseif($!counterOutPintMessage.blankName=="ICBC")
+							中国工商银行
+						#end    
+					</td>
+					<th></th>
+                    <td></td>
+                </tr>
+				<tr>
+                    <th>导入成功条数:</th>
+                    <td>$!counterOutPintMessage.importSuccessCount</td>
+					<th>导入失败条数:</th>
+                    <td>$!counterOutPintMessage.importFailCount</td>
+                </tr>
+				<tr>
+                    <th>导入失败明细:</th>
+                    <td colspan="3">
+						#foreach($failDescription in $counterOutPintMessage.failDescriptionListu)
+							$!failDescription<br>
+						#end 
+					</td>
+                </tr>
+            </table>
+			
+            <div class="form-but">
+                <button type="button" class="button-s4" onclick="window.location.href='/counter/addImportCounterFilePage.html'">返回</button>              
+          	</div>
+        </div>
+    </div>
+</div>

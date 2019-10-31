@@ -1,0 +1,296 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>sku库存对应表</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	 <form target="iframeName"  action="/HxStockUpdate/exportStockUpdate.html" enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:100px;">平台sku是否为空:</td>
+					  <td style="width:110px">
+                        <input  name="platskuisnotnull" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="platskuData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                    <td class="form-label" style="width:40px;">sku：</td>
+                    <td style="width:150px">
+                        <input name="sku" class="mini-textbox" onenter="search()"/>
+                    </td>
+					
+					<td class="form-label" style="width:40px;">渠道:</td>
+					  <td style="width:150px">
+                        <input  name="type" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+					<td class="form-label" style="width:70px;">sku生成时间：</td>
+                    <td style="width:150px" colspan="3">
+                        <input id="generateTimeStart" name="generateTimeStart" class="mini-datepicker"    format="yyyy-MM-dd"  />
+                        ~
+                        <input id="generateTimeEnd"  name="generateTimeEnd" class="mini-datepicker"    format="yyyy-MM-dd" />
+                    </td>   
+					
+                    
+					
+                </tr>
+				
+                <tr>
+				<td class="form-label" style="width:100px;" colspan="1">平台商品上架状态:</td>
+					<td style="width:130px">
+                        <input  name="onsalestatus" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="upperGoodsData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                </td>
+				
+				<td class="form-label" style="width:40px;">品牌：</td>
+                    <td style="width:150px">
+                        <input name="idBrand" onenter="search()" class="mini-combobox"   textField="brandName" valueField="id" emptyText="请选择..." multiSelect="true" 
+                            url="/brand/getListByBrandName.html"   allowInput="true" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                    <td class="form-label" style="width:40px;">品名：</td>
+                    <td style="width:150px">					
+                        <input name="idSeries" onenter="search()"  class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..." multiSelect="true" 
+                            url="/series/getAllSeries.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/>  
+                    </td>
+					
+					<td class="form-label" style="width:90px;">库存大于等于：</td>
+                    <td style="width:150px">
+                        <input name="lastUpdateStockNum" class="mini-textbox" onenter="search()"/>
+                    </td>
+					 
+                   
+					
+				</tr>
+				<tr >
+					<td class="form-label" style="width:60px;">型号：</td>
+                    <td style="width:130px">
+                        <input name="typename" class="mini-textbox" onenter="search()"/>
+                    </td>
+					 <td class="form-label" style="width:40px;">材质：</td>
+                    <td style="width:100px">
+                        <input name="materialname" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:40px;">颜色：</td>
+                    <td style="width:150px">
+                        <input name="colorname" class="mini-textbox" onenter="search()"/>
+                    </td>
+					 <td class="form-label" style="width:60px;">尺寸：</td>
+                    <td style="width:150px">
+                        <input name="sizename" class="mini-textbox" onenter="search()"/>
+                    </td>
+					<td rowspan="1">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>
+						<a class="mini-button"   iconCls="icon-download" onclick="exportStockUpdate()">导出</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+ </form> 
+<iframe id="iframeName" name="iframeName" style="display:none;"></iframe>
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:455px;" allowResize="true" multiSelect="false"    allowCellEdit="true" allowCellSelect="true"
+        url="/HxStockUpdate/hxSearchStockUpdate.html"  idField="id"  onRowdblclick="edit()"  pageSize="50" allowAlternating="true" pageIndex="1"  oncellendedit="cellendedit">
+        <div property="columns">
+            <div type="indexcolumn"></div>
+            <div field="sku" width="120" headerAlign="center" align="center" allowSort="true">sku</div>
+			<div field="brandname" width="100" headerAlign="center" align="center"  allowSort="true">品牌</div>
+			<div field="seriesname" width="100" headerAlign="center" align="center"  allowSort="true">品名</div>
+			
+			<div field="typename" width="100" headerAlign="center" align="center"  allowSort="true">型号</div>
+			<div field="materialname" width="100" headerAlign="center" align="center"  allowSort="true">材质</div>
+			<div field="colorname" width="100" headerAlign="center" align="center"  allowSort="true">颜色</div>
+			<div field="sizename" width="100" headerAlign="center" align="center"  allowSort="true">尺寸</div>
+			
+			<div field="type" width="60" headerAlign="center" align="center" allowSort="true" renderer="channel">渠道</div>
+            <div field="nowStockNum" width="60" headerAlign="center" align="center"  allowSort="true">可售库存
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="lastUpdateStockNum" width="80" headerAlign="center" align="center"  allowSort="true">更新库存数量</div>
+            <div field="orderStockNum" width="70" headerAlign="center" align="center"  allowSort="true">平台订单数</div>
+			
+            
+			##<div field="shangpinSku" width="100" headerAlign="center" align="center"  allowSort="true">尚品sku</div>
+			<div field="kaolaSku" width="100" headerAlign="center" align="center"  allowSort="true">考拉sku</div>
+			<div field="sikuSku" width="100" headerAlign="center" align="center"  allowSort="true">寺库sku</div>
+			<div field="tmallSku" width="100" headerAlign="center" align="center"  allowSort="true">天猫sku</div>
+			<div field="jdSku" width="100" headerAlign="center" align="center"  allowSort="true">京東sku</div>
+			<div field="xhsSku" width="100" headerAlign="center" align="center"  allowSort="true">小红书sku</div>
+			<div field="mlhSku" width="100" headerAlign="center" align="center"  allowSort="true">魅力惠sku</div>
+			
+			<div field="shepinSku" width="100" headerAlign="center" align="center"  allowSort="true">奢品sku</div>
+			<div field="zhenpinSku" width="100" headerAlign="center" align="center"  allowSort="true">珍品sku</div>
+			##<div field="yhdSku" width="100" headerAlign="center" align="center"  allowSort="true">一號店sku</div>
+			##<div field="higoSku" width="100" headerAlign="center" align="center"  allowSort="true">higosku</div>
+			<div field="fqlSku" width="100" headerAlign="center" align="center"  allowSort="true">分期乐sku</div>
+			<div field="pddSku" width="100" headerAlign="center" align="center"  allowSort="true">拼多多sku</div>
+			<div field="ofashionsku" width="100" headerAlign="center" align="center"  allowSort="true">Ofashion的sku</div>
+			##<div field="weimobsku" width="100" headerAlign="center" align="center"  allowSort="true">微盟sku</div>
+			<div field="yinTaiSku" width="100" headerAlign="center" align="center"  allowSort="true">银泰sku</div>
+			<div field="mlhnewSku" width="100" headerAlign="center" align="center"  allowSort="true">魅力惠大于5000的sku</div>
+			<div field="kaola_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">考拉平台商品状态</div>
+			<div field="siku_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">寺库平台商品状态</div>
+			<div field="tmall_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">天猫平台商品状态</div>
+			<div field="jd_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true"renderer="renderCurrency"> 京东平台商品状态</div>
+			<div field="xhs_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">小红书平台商品状态</div>
+			<div field="mlh_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">魅力惠平台商品状态</div>
+			<div field="shepin_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">天猫奢品平台商品状态</div>
+			<div field="zhenpin_on_sale_status" width="110" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">珍品平台商品状态</div>
+			
+			##<div field="shangpinOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">尚品订单数</div>
+			
+			<div field="kaolaOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">考拉订单数</div>
+			<div field="sikuOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">寺库订单数</div>
+			##<div field="higoOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">higo订单数</div>
+			<div field="tmallOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">天猫订单数</div>
+			##<div field="yhdOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">1号店订单数</div>
+			<div field="xhsOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">小红书订单数</div>
+			<div field="mlhOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">魅力惠订单数</div>
+			<div field="shepinOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">天猫奢品订单数</div>
+			<div field="zhenpinOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">珍品订单数</div>
+			<div field="fqlOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">分期乐订单数</div>
+			<div field="pddOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">拼多多订单数</div>
+			
+			<div field="ofashionOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">ofashion订单数</div>
+			##<div field="weiMobOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">微盟订单数</div>
+			<div field="yinTaiOrderStock" width="100" headerAlign="center" align="center"  allowSort="true">银泰订单数</div>
+			
+			
+			<div field="generate_time" width="140" headerAlign="center" align="center"  allowSort="true" renderer="generatetime">数据生成时间</div>
+            <div field="lastOrderTime" width="140" headerAlign="center" align="center"  allowSort="true">平台最后下单时间</div>
+			<div field="updateTime" width="140" headerAlign="center" align="center"  allowSort="true">数据最后更新时间</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+	    
+		var statusData = [{id:1,value:"香港"},{id:2, value:"上海"}];
+
+		var platskuData = [{id:"kaola_sku=yes",value:"考拉sku不为空"},{id:"kaola_sku=no",value:"考拉sku为空"},
+		                   {id:"siku_sku=yes",value:"寺库sku不为空"}, {id:"siku_sku=no",value:"寺库sku为空"},
+						   {id:"tmall_sku=yes",value:"天猫sku不为空"},{id:"tmall_sku=no",value:"天猫sku为空"},
+						   {id:"jd_sku=yes",value:"京东sku不为空"},{id:"jd_sku=no",value:"京东sku为空"},
+						   {id:"xhs_sku=yes",value:"小红书sku不为空"},{id:"xhs_sku=no",value:"小红书sku为空"},
+						   {id:"Mlh_sku=yes",value:"魅力惠sku不为空"},{id:"Mlh_sku=no",value:"魅力惠sku为空"},
+						   {id:"shepin_sku=yes",value:"奢品sku不为空"},{id:"shepin_sku=no",value:"奢品sku为空"},
+						   {id:"zhenpin_sku=yes",value:"珍品sku不为空"},{id:"zhenpin_sku=no",value:"珍品sku为空"},
+						    {id:"Mlhnew_sku=yes",value:"魅力惠大于5000的sku不为空"},{id:"Mlhnew_sku=no",value:"魅力惠大于5000的sku为空"}];
+						   
+	     var upperGoodsData = [{id:"kaola_on_sale_status=0",value:"考拉商品已下架"},{id:"kaola_on_sale_status=1",value:"考拉商品已上架"},
+		                       {id:"siku_on_sale_status=0",value:"寺库商品已下架"},{id:"siku_on_sale_status=1",value:"寺库商品已上架"},
+		                       {id:"tmall_on_sale_status=0",value:"天猫商品已下架"},{id:"tmall_on_sale_status=1",value:"天猫商品已上架"},
+							   {id:"jd_on_sale_status=0",value:"京东商品已下架"},{id:"jd_on_sale_status=1",value:"京东商品已上架"},
+							   {id:"xhs_on_sale_status=0",value:"小红书商品已下架"},{id:"xhs_on_sale_status=1",value:"小红书商品已上架"},
+							   {id:"Mlh_on_sale_status=0",value:"魅力惠商品已下架"},{id:"Mlh_on_sale_status=1",value:"魅力惠商品已上架"},
+							   {id:"shepin_on_sale_status=0",value:"天猫奢品城商品已下架"},{id:"shepin_on_sale_status=1",value:"天猫奢品城商品已上架"},
+							   {id:"zhenpin_on_sale_status=0",value:"珍品商品已下架"},{id:"zhenpin_on_sale_status=1",value:"珍品商品已上架"}];
+		 
+		 
+		//将html标签解析为miniui控件
+		mini.parse();
+		var grid = mini.get("datagrid1");
+		 //查询
+        function search() {
+		     //根据id获取控件对象
+		   
+            var form = new mini.Form("#form1");
+            var data = form.getData();//获取表单多个控件的数据
+			if(!data.sku)
+				delete data.sku;
+			if(!data.type)
+				delete data.type;
+			
+		    if(!data.platskuisnotnull)
+				delete data.platskuisnotnull;
+			if(!data.onsalestatus)
+				delete data.onsalestatus;
+			 var date = mini.get("generateTimeStart").getValue();
+			
+            if (date instanceof Date) {
+                data.generateTimeStart = formatDate(date);
+            }
+			var date = mini.get("generateTimeEnd").getValue();
+            if (date instanceof Date) {
+                data.generateTimeEnd = formatDate(date);
+            }
+            grid.load(data);
+        }
+		
+		
+		 function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		function renderCurrency(row){
+		if (row.value == '0') return "已下架";
+		else if (row.value == '1') return "已上架";
+		else if (row.value == '2') return "审核通过/已上架";
+		else return "未上架";
+		}
+		
+		function channel(row){
+		if (row.value == 'hk') return "香港";
+		else if (row.value == 'sh') return "上海";
+		else return "";
+		}
+		
+		
+		
+		//function generatetime(row){
+		// if(row.value != null){
+		//return row.value
+		//}else{
+		//return "00-00-00 00:00:00";
+		//}
+		//}
+		
+		
+		//导出
+        function exportStockUpdate() {
+		    var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据   
+			if(!data.sku)
+				delete data.sku;
+			if(!data.type)
+				delete data.type;
+			
+		    if(!data.platskuisnotnull)
+				delete data.platskuisnotnull;
+			if(!data.onsalestatus)
+				delete data.onsalestatus;
+				
+			
+			//处理日期
+            var date = mini.get("generateTimeStart").getValue();
+			
+            if (date instanceof Date) {
+                data.generateTimeStart = formatDate(date);
+            }
+			var date = mini.get("generateTimeEnd").getValue();
+            if (date instanceof Date) {
+                data.generateTimeEnd = formatDate(date);
+            }
+			var uploadForm = document.getElementById("uploadForm");
+	  		uploadForm.submit();
+			
+        }
+		
+	</script>
+</body>
+</html>

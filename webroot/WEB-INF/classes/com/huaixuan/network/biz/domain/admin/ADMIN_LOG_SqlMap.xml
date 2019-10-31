@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AdminLogSQL">
+<typeAlias alias="adminLog" type="com.huaixuan.network.biz.domain.admin.AdminLog"/>
+	<resultMap class="adminLog" id="adminLogResult">
+		<result column="id" property="id"/>
+		<result column="operation_type" property="operationType"/>
+		<result column="content" property="content"/>
+		<result column="account" property="account"/>
+		<result column="ip" property="ip"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+
+<!-- create AdminLog object -->
+<insert id="addAdminLog" parameterClass="adminLog">
+  
+<![CDATA[
+	insert into emall_log
+   (id, 
+   	operation_type, 
+   	content, 
+   	account, 
+   	ip, 
+   	gmt_create, 
+   	gmt_modify)
+  values
+   (null, #operationType#, #content#, #account#, #ip#, sysdate(), sysdate())
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update AdminLog object -->
+<update id="editAdminLog" parameterClass="adminLog">
+<![CDATA[
+		update emall_log set gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete AdminLog object -->
+<delete id="removeAdminLog" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_log where emall_log.ID = #value#
+]]>
+</delete>
+<!-- search AdminLog object -->
+<select id="getAdminLog" parameterClass="java.lang.Long" resultMap="adminLogResult">
+<![CDATA[
+		select emall_log.* from emall_log where emall_log.ID = #value#
+]]>
+</select>
+<!-- searchAll AdminLog List -->
+<select id="getAdminLogs" resultMap="adminLogResult">
+<![CDATA[
+		select emall_log.* from emall_log
+]]>
+</select>
+
+<!-- 根据条件获取 -->
+<select id="getAdminLogsByCondition" resultMap="adminLogResult" parameterClass="java.util.Map">
+	
+ <![CDATA[
+       select el.* from emall_log el
+       where 1=1
+ ]]>
+  <isNotEmpty prepend="and" property="account">
+        el.account like concat('%',#account#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="operationType">
+        el.operation_type like concat('%',#operationType#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtCreateStart">
+      <![CDATA[ el.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s')]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtCreateEnd">
+      <![CDATA[ el.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+  </isNotEmpty>
+  order by el.gmt_create DESC
+
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getAdminLogsCountByCondition" resultClass="int">
+
+ <![CDATA[
+       select count(el.id) from emall_log el
+       where 1=1
+ ]]>
+  <isNotEmpty prepend="and" property="account">
+        el.account like concat('%',#account#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="operationType">
+        el.operation_type like concat('%',#operationType#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtCreateStart">
+      <![CDATA[ el.gmt_create >=  STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtCreateEnd">
+      <![CDATA[ el.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+  </isNotEmpty>
+</select>
+</sqlMap>

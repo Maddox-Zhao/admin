@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RuleSQL">
+<typeAlias alias="rule" type="com.huaixuan.network.biz.domain.goods.Rule"/>
+	<resultMap class="rule" id="ruleResult">
+		<result column="id" property="id"/>
+		<result column="promation_id" property="promationId"/>
+		<result column="rule_code" property="ruleCode"/>
+		<result column="condition_value" property="conditionValue"/>
+		<result column="result_value" property="resultValue"/>
+		<result column="exrta_info" property="exrtaInfo"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="rule_type" property="ruleType"/>
+	</resultMap>
+<!-- create Rule object -->
+<insert id="addRule" parameterClass="rule">
+<![CDATA[
+insert into emall_rule
+  (id,
+   promation_id,
+   rule_code,
+   condition_value,
+   result_value,
+   exrta_info,
+   gmt_create,
+   gmt_modify,
+   rule_type)
+values
+  (null,
+   #promationId#,
+   #ruleCode#,
+   #conditionValue#,
+   #resultValue#,
+   #exrtaInfo#,
+   sysdate(),
+   sysdate(),
+   #ruleType#)
+
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Rule object -->
+<update id="editRule" parameterClass="rule">
+<![CDATA[
+		update emall_rule set promation_id = #promationId#,
+		rule_code = #ruleCode#,
+		condition_value = #conditionValue#,
+		result_value = #resultValue#,
+		exrta_info = #exrtaInfo#,
+		gmt_modify = sysdate(),
+		rule_type = #ruleType#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Rule object -->
+<delete id="removeRule" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_rule where emall_rule.ID = #value#
+]]>
+</delete>
+<!-- search Rule object -->
+<select id="getRule" parameterClass="java.lang.Long" resultMap="ruleResult">
+<![CDATA[
+		select emall_rule.* from emall_rule where emall_rule.ID = #value#
+]]>
+</select>
+<!-- searchAll Rule List -->
+<select id="getRules" resultMap="ruleResult">
+<![CDATA[
+		select emall_rule.* from emall_rule
+]]>
+</select>
+<select id="getRulesByPromationId" resultMap="ruleResult">
+<![CDATA[
+		select emall_rule.* from emall_rule where emall_rule.promation_id = #value# order by emall_rule.id
+]]>
+</select>
+<!-- delete Rule object -->
+<delete id="removeRuleByPromationId" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_rule where emall_rule.promation_id = #value#
+]]>
+</delete>
+
+<select id="getGiveRule" parameterClass="java.util.Map" resultMap="ruleResult">
+<![CDATA[
+		select emall_rule.* from emall_rule where emall_rule.rule_type = 1
+]]>
+<isNotEmpty prepend="and" property="promationId">
+       emall_rule.promation_id = #promationId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="goodsId">
+       emall_rule.condition_value like concat('%',#goodsId#,'%')
+</isNotEmpty>
+</select>
+
+<select id="getSaleGiveRuleList" parameterClass="java.lang.Long" resultMap="ruleResult">
+<![CDATA[
+       select emall_rule.* from emall_rule where emall_rule.promation_id =#value# and emall_rule.rule_type = 2
+]]>
+</select>
+</sqlMap>

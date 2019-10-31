@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 表名:supplier_file_source -->
+<sqlMap namespace="supplierFileSource">
+	<typeAlias alias="FileSource" type="com.huaixuan.network.biz.domain.supplier.SupplierFileSource"/>
+	<typeAlias alias="supplierGoods" type="com.huaixuan.network.biz.domain.supplier.SupplierGoods"/>
+	<typeAlias alias="supplierGoodsSize" type="com.huaixuan.network.biz.domain.supplier.SupplierGoodsSize"/>
+	
+	<resultMap id="supplierFileResult" class="FileSource">
+		<result property="id" column="id"/>
+		<result property="idSupplier" column="id_supply"/>
+		<result property="path" column="path"/>
+		<result property="sourceName" column="source_name"/>
+		<result property="fileName" column="file_name"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="isDeal" column="is_deal"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	
+	
+	
+	
+	
+	<resultMap id="supplierGoodsResult" class="supplierGoods">
+		<result property="id" column="id"/>
+		<result property="idFile" column="id_file"/>
+		<result property="idSupply" column="id_supply"/>
+		<result property="title" column="title"/>
+		<result property="brandName" column="brand_name"/>
+		<result property="series" column="series"/>
+		<result property="type" column="type"/>
+		<result property="material" column="material"/>
+		<result property="color" column="color"/>
+		<result property="style" column="style"/>
+		<result property="cost" column="cost"/>
+		<result property="retail" column="retail"/>
+		<result property="percent" column="percent"/>
+		<result property="price" column="price"/>
+		<result property="currency" column="currency"/>
+		<result property="totalNum" column="total_num"/>
+		<result property="imgOriginal" column="img_original"/>
+		<result property="imgLarge" column="img_large"/>
+		<result property="imgMiddle" column="img_middle"/>
+		<result property="imgSmall" column="img_small"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	
+	<resultMap extends="supplierGoodsResult" id="supplierGoodsResult1" class="supplierGoods">
+		<result property="supplierName" column="supplierName"/>
+	</resultMap>
+	
+	
+	
+	<resultMap id="supplierGoodsSizeResult" class="supplierGoodsSize">
+		<result property="id" column="id"/>
+		<result property="goodsId" column="goods_id"/>
+		<result property="size" column="size"/>
+		<result property="num" column="num"/>
+		<result property="gmtCreate" column="gmt_create"/>
+		<result property="gmtModify" column="gmt_modify"/>
+	</resultMap>
+	
+	<resultMap extends="supplierFileResult" id="supplierFileResult1" class="FileSource">
+		<result property="supplierName" column="name"/>
+	</resultMap>
+
+	
+	
+	<sql id="FileFields">
+			id,id_supply,path,source_name,file_name,is_delete,is_deal,gmt_create,gmt_modify
+	</sql>
+	
+	<!-- 根据ID获取 -->
+	<select id="selectFileById" parameterClass="java.lang.Long" resultMap="supplierFileResult">
+		select <include refid="FileFields"/>
+		  from supplier_file_source
+		 where id = #id#
+	</select>
+	<!-- 添加 -->
+	<insert id="insertFile" parameterClass="FileSource">
+		insert into File(
+ 			id,
+			id_supply,
+			path,
+			source_name,
+			file_name,
+			is_delete,
+			is_deal,
+			gmt_create,
+			gmt_modify
+		) values (
+ 			#id#,
+			#idSupplier#,
+			#path#,
+			#sourceName#,
+			#fileName#,
+			#isDelete#,
+			#isDeal#,
+			sysdate(),
+			sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<!-- 更新 -->
+	<update id="updateFileByNotNull" parameterClass="FileSource">
+		update supplier_file_source set gmt_modify=sysdate()
+			<isNotNull prepend="," property="idSupplier">
+				id_supply=#idSupplier#
+			</isNotNull>
+			<isNotNull prepend="," property="path">
+				path=#path#
+			</isNotNull>
+			<isNotNull prepend="," property="sourceName">
+				source_name=#sourceName#
+			</isNotNull>
+			<isNotNull prepend="," property="fileName">
+				file_name=#fileName#
+			</isNotNull>
+			<isNotNull prepend="," property="isDelete">
+				is_delete=#isDelete#
+			</isNotNull>
+			<isNotNull prepend="," property="isDeal">
+				is_deal=#isDeal#
+			</isNotNull>
+		where id = #id#
+	</update>
+	
+	
+	<!-- 删除 -->
+	<delete id="deleteFileById" parameterClass="java.lang.Long">
+		delete from supplier_file_source
+		where id = #id#
+	</delete>
+	
+	
+	<!--  查询 -->
+	<select id="searchSupplierFileSourceList" parameterClass="java.util.Map"  resultMap="supplierFileResult1">
+      <![CDATA[
+		SELECT source.*,s.name FROM supplier_file_source  source LEFT JOIN supply s ON source.id_supply = s.idSupply where 1=1
+       ]]>
+		<isNotEmpty prepend="and" property="sourceName">
+		     source_name like '%$sourceName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDelete">
+		    is_delete = #isDelete#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDeal">
+			is_deal = #isDeal#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDeal">
+			is_deal = #isDeal#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierName">
+			s.name like '%$supplierName$%'
+		</isNotEmpty>
+		order by gmt_create desc
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+			<![CDATA[ limit #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+    </select>
+    
+    
+    
+    <select id="searchSupplierFileSourceListCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		SELECT count(source.id) FROM supplier_file_source  source LEFT JOIN supply s ON source.id_supply = s.idSupply where 1=1
+		<isNotEmpty prepend="and" property="sourceName">
+		     source_name like '%$sourceName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDelete">
+		    is_delete = #isDelete#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDeal">
+			is_deal = #isDeal#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierName">
+			s.name like '%$supplierName$%'
+		</isNotEmpty>
+		
+	</select>
+    
+    
+    
+	
+	
+	<!--  处理后Excel 文件 -->
+	<insert id="insertSupplierFile" parameterClass="com.huaixuan.network.biz.domain.supplier.SupplierFile">
+		insert into supplier_file(
+ 			id,
+			source_file_id,
+			path,
+			source_name,
+			file_name,
+			is_delete,
+			gmt_create,
+			gmt_modify
+		) values (
+ 			null,
+			#sourceFile#,
+			#path#,
+			#sourceName#,
+			#fileName#,
+			0,
+			sysdate(),
+			sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	
+	
+	
+	  <!--  supplierGoods 以及size  添加 删除 修改 -->
+	  
+	  <!-- 查询supplierGoods -->
+	   <select id="selectSupplierGoodsByNotNull" resultMap="supplierGoodsResult1" parameterClass="java.util.Map">
+		SELECT g.*,s.name supplierName
+		FROM supplier_goods g,supply s
+		WHERE g.id_supply = s.idSupply
+		<isNotEmpty prepend="and" property="type">
+		     type  like '%$type$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="material">
+		    material like '%$material$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="color">
+			color  like '%$color$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="brandName">
+			 brand_name like '$brandName$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="series">
+			 series like '$series$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="style">
+			 style like '$style$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierName">
+		    s.name like '%$supplierName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDelete">
+		    is_delete = $isDelete$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idFile">
+		    id_file = $idFile$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsId">
+		   g.id = $goodsId$
+		</isNotEmpty>
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+			<![CDATA[ limit #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+	
+	   <!-- 查询supplierGoodsCount -->
+	   <select id="selectSupplierCountGoodsByNotNull" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		SELECT count(g.id)
+		FROM supplier_goods g,supply s
+		WHERE g.id_supply = s.idSupply
+		<isNotEmpty prepend="and" property="type">
+		     type  like '%$type$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="material">
+		    material like '%$material$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="color">
+			color  like '%$color$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="brandName">
+			 brand_name like '$brandName$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="series">
+			 series like '$series$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="style">
+			 style like '$style$'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierName">
+		    s.name like '%$supplierName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDelete">
+		    is_delete = $isDelete$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idFile">
+		    id_file  = #idFile#
+		</isNotEmpty>
+		
+	</select>
+	
+	
+		<!-- 添加 -->
+		<insert id="insertSupplierGoods" parameterClass="supplierGoods">
+			insert into supplier_goods(
+	 			id,
+				id_file,
+				id_supply,
+				title,
+				brand_name,
+				series,
+				type,
+				material,
+				color,
+				style,
+				cost,
+				retail,
+				percent,
+				price,
+				currency,
+				total_num,
+				img_original,
+				img_large,
+				img_middle,
+				img_small,
+				is_delete,
+				gmt_create,
+				gmt_modify
+			) values (
+	 			null,
+				#idFile#,
+				#idSupply#,
+				#title#,
+				#brandName#,
+				#series#,
+				#type#,
+				#material#,
+				#color#,
+				#style#,
+				#cost#,
+				#retail#,
+				#percent#,
+				#price#,
+				#currency#,
+				#totalNum#,
+				#imgOriginal#,
+				#imgLarge#,
+				#imgMiddle#,
+				#imgSmall#,
+				0,
+				sysdate(),
+				sysdate()
+			)
+			<selectKey keyProperty="id" resultClass="Long">
+				select LAST_INSERT_ID()
+			</selectKey>
+		</insert>
+		
+		<!-- 更新 -->
+	<update id="updateSupplierGoodsByNotNull" parameterClass="supplierGoods">
+		update supplier_goods
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="idFile">
+				id_file=#idFile#
+			</isNotNull>
+			<isNotNull prepend="," property="idSupply">
+				id_supply=#idSupply#
+			</isNotNull>
+			<isNotNull prepend="," property="title">
+				title=#title#
+			</isNotNull>
+			<isNotNull prepend="," property="brandName">
+				brand_name=#brandName#
+			</isNotNull>
+			<isNotNull prepend="," property="series">
+				series=#series#
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				type=#type#
+			</isNotNull>
+			<isNotNull prepend="," property="material">
+				material=#material#
+			</isNotNull>
+			<isNotNull prepend="," property="color">
+				color=#color#
+			</isNotNull>
+			<isNotNull prepend="," property="style">
+				style=#style#
+			</isNotNull>
+			<isNotNull prepend="," property="cost">
+				cost=#cost#
+			</isNotNull>
+			<isNotNull prepend="," property="retail">
+				retail=#retail#
+			</isNotNull>
+			<isNotNull prepend="," property="percent">
+				percent=#percent#
+			</isNotNull>
+			<isNotNull prepend="," property="price">
+				price=#price#
+			</isNotNull>
+			<isNotNull prepend="," property="currency">
+				currency=#currency#
+			</isNotNull>
+			<isNotNull prepend="," property="totalNum">
+				total_num=#totalNum#
+			</isNotNull>
+			<isNotNull prepend="," property="imgOriginal">
+				img_original=#imgOriginal#
+			</isNotNull>
+			<isNotNull prepend="," property="imgLarge">
+				img_large=#imgLarge#
+			</isNotNull>
+			<isNotNull prepend="," property="imgMiddle">
+				img_middle=#imgMiddle#
+			</isNotNull>
+			<isNotNull prepend="," property="imgSmall">
+				img_small=#imgSmall#
+			</isNotNull>
+			<isNotNull prepend="," property="isDelete">
+				is_delete=#isDelete#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify= sysdate()
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	
+	    <!-- 查询supplierGoods的size -->
+	   <select id="selectSupplierGoodsSizeByNotNull" resultMap="supplierGoodsSizeResult" parameterClass="java.util.Map">
+		select * from supplier_goods_instance where 1=1
+		<isNotEmpty prepend="and" property="goodsId">
+		     goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="size">
+		    size = #size#
+		</isNotEmpty>
+		order by size
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertSupplierGoodsSize" parameterClass="supplierGoodsSize">
+		insert into supplier_goods_instance(
+ 			id,
+			goods_id,
+			size,
+			num,
+			gmt_create,
+			gmt_modify
+		) values (
+ 			#id#,
+			#goodsId#,
+			#size#,
+			#num#,
+			sysdate(),
+			sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="updateSupplierGoodsSizeByNotNull" parameterClass="supplierGoodsSize">
+		update supplier_goods_instance
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="goodsId">
+				goods_id=#goodsId#
+			</isNotNull>
+			<isNotNull prepend="," property="size">
+				size=#size#
+			</isNotNull>
+			<isNotNull prepend="," property="num">
+				num=#num#
+			</isNotNull>
+			
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify= sysdate()
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	
+	<!--  通过goodsid查询该产品大小 -->
+	<select id="selectGoodsSizeByGoodsId" parameterClass="java.lang.Long" resultClass="java.lang.String" >
+		SELECT GROUP_CONCAT(size) size
+		FROM
+		(
+			SELECT CONCAT(size,'-',num) size FROM supplier_goods_instance WHERE goods_id = #goodsId# and num > 0
+		) s
+	</select>
+	
+	
+	
+	
+	
+</sqlMap>
+
+

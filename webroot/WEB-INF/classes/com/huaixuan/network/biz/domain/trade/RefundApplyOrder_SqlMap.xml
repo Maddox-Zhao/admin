@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RefundApplyOrderSQL">
+<typeAlias alias="refundApplyOrder" type="com.huaixuan.network.biz.domain.trade.RefundApplyOrder"/>
+	<resultMap class="refundApplyOrder" id="refundApplyOrderResult">
+		<result column="ID" property="id"/>
+		<result column="APPLY_ID" property="applyId"/>
+		<result column="ORDER_ID" property="orderId"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GOODS_ID" property="goodsId"/>
+		<result column="GOODS_INSTANCE_ID" property="goodsInstanceId"/>
+		<result column="REF_AMOUNT" property="refAmount"/>
+		<result column="REASON" property="reason"/>
+		<result column="TYPE" property="type"/>
+	</resultMap>
+<!-- create RefundApplyOrder object -->
+<insert id="addRefundApplyOrder" parameterClass="refundApplyOrder">
+<![CDATA[
+		insert into emall_refund_apply_order
+		(ID,APPLY_ID,ORDER_ID,GMT_MODIFY,GMT_CREATE,GOODS_ID,GOODS_INSTANCE_ID,REF_AMOUNT,REASON,TYPE )values( null,
+		#applyId#,
+		#orderId#,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#goodsInstanceId#,
+		#refAmount#,
+		#reason#,
+		#type#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update RefundApplyOrder object -->
+<update id="editRefundApplyOrder" parameterClass="refundApplyOrder">
+<![CDATA[
+		update emall_refund_apply_order set APPLY_ID = #applyId#,
+		ORDER_ID = #orderId#,
+		GMT_MODIFY = #gmtModify#,
+		GMT_CREATE = #gmtCreate#,
+		GOODS_ID = #goodsId#,
+		GOODS_INSTANCE_ID = #goodsInstanceId#,
+		REF_AMOUNT = #refAmount#,
+		REASON = #reason#,
+		TYPE = #type#
+		 where ID = #id#
+		
+]]>
+</update>
+<!-- delete RefundApplyOrder object -->
+<delete id="removeRefundApplyOrder" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_refund_apply_order where emall_refund_apply_order.ID = #value# 
+]]>
+</delete>
+<!-- search RefundApplyOrder object -->
+<select id="getRefundApplyOrder" parameterClass="java.lang.Long" resultMap="refundApplyOrderResult">
+<![CDATA[
+		select emall_refund_apply_order.* from emall_refund_apply_order where emall_refund_apply_order.ID = #value# 
+]]>
+</select>
+<!-- searchAll RefundApplyOrder List -->
+<select id="getRefundApplyOrders" resultMap="refundApplyOrderResult">
+<![CDATA[
+		select emall_refund_apply_order.* from emall_refund_apply_order
+]]>
+</select>
+<select id="getRefundApplyOrdersByApplyId" parameterClass="java.lang.Long" resultMap="refundApplyOrderResult">
+<![CDATA[
+		select emall_refund_apply_order.* from emall_refund_apply_order where APPLY_ID= #value#
+]]>
+</select>
+</sqlMap>

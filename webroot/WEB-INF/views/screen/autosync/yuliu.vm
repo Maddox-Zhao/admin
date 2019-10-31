@@ -1,0 +1,133 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>库存更新日志</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	  
+    <form id="form1" method="post">
+        <input name="id" class="mini-hidden" />
+        <div style="padding-left:11px;padding-bottom:5px;">
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td style="width:70px;">sku：</td>
+                    <td style="width:150px;">    
+                        <input name="sku" class="mini-textbox" required="true" readonly="readonly" />
+                    </td>
+                </tr>
+                <tr></tr>
+				<tr></tr>
+				<tr></tr>
+				<tr >
+             
+                    <td style="width:70px;">类型：</td>
+                    <td style="width:150px;">    
+                         <input name="type" class="mini-textbox" required="true" readonly="readonly"/>
+                    </td>
+				   </tr>
+				   <tr >
+             
+                    <td style="width:70px;">当前库存数量：</td>
+                    <td style="width:150px;">    
+                         <input name="nowStockNum" class="mini-textbox" required="true" readonly="readonly"/>
+                    </td>
+				   </tr>
+				   <tr >
+             
+                    <td style="width:70px;">当前平台总订单数：</td>
+                    <td style="width:150px;">    
+                         <input name="orderStockNum" class="mini-textbox" required="true" readonly="readonly"/>
+                    </td>
+				   </tr>
+				   
+				   <tr></tr>
+				   <tr></tr>
+				   <tr></tr>
+				   <tr >
+                   
+					<td >所在平台:</td>
+                    <td >
+						<input name="ptype" class="mini-combobox" textField="value" valueField="id" emptyText="请选择..."
+						data="ptypeData" allowInput="false" showNullItem="true" nullItemText="请选择..."/>
+                    </td>  
+                                
+                </tr> 
+				<tr >
+					<td style="width:70px;">数量：</td>
+                    <td style="width:150px;">    
+                         <input name="num" class="mini-textbox" required="true" />
+                    </td>
+                </tr>
+            </table>
+        </div>     
+        <div style="text-align:padding:10px;">               
+            <a class="mini-button" id="submit" onclick="update" style="width:60px;margin-right:20px;">修改</a>      
+            <a class="mini-button" onclick="CloseWindow('close')" style="width:60px;">取消</a>       
+        </div>        
+    </form>
+    <script type="text/javascript">
+		var ptypeData=[{id:"Mlh_order_stock",value:"魅力惠"},{id:"xhs_order_stock",value:"小红书"},
+		{id:"ofashion_order_stock",value:"Ofashion"},{id:"weimob_order_stock",value:"weimob"},
+		{id:"zhenpin_order_stock",value:"珍品"},{id:"kaola_order_stock",value:"考拉"},
+		{id:"tmall_order_stock",value:"天猫"},{id:"fql_order_stock",value:"分期乐"},
+		{id:"pdd_order_stock",value:"拼多多"},{id:"siku_order_stock",value:"寺库"},
+		{id:"yinTai_order_stock",value:"银泰"},{id:"shepin_order_stock",value:"天猫奢品"},
+		{id:"sikunew_order_stock",value:"新寺库"},{id:"ofashionMc_order_stock",value:"OFashionB2B"}]
+      	mini.parse();
+        var form = new mini.Form("form1");
+        function SetData(data) {
+            if (data.action == "yuliu") {
+                //跨页面传递的数据对象，克隆后才可以安全使用
+                data = mini.clone(data);
+				;
+               jQuery.ajax({
+                    url: "/stockupdate/yuliuchanpin.html?sku=" + data.sku+"&type="+data.type,
+                    cache: false,
+                    success: function (text) {
+                        var o = mini.decode(text);
+                        form.setData(o);
+                    }
+                });
+            }
+        }
+		 function update(e) {
+		       var data = form.getData();
+				mini.confirm("确认预留？", "提示", function(action){
+				if('ok' == action){
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,请勿关闭...'
+                });
+                jQuery.post("/stockupdate/updateStock.html",data,function(text){
+					mini.unmask(document.body);
+				
+					if(text=="ok")
+    				{
+						mini.alert("提交成功");
+						CloseWindow('close');
+    				}else if(text=="no"){
+						mini.alert("订单数大于可售库存，请验证后重新输入");
+					}else if(text=="numNo"){
+					   mini.alert("请填入数量");
+					}else{
+						mini.alert("提交失败，请联系管理员");
+					}
+				});
+				}
+			});
+           }
+		function CloseWindow(action){            
+        	if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        	else window.close();            
+		}	
+    </script>
+</body>
+</html>

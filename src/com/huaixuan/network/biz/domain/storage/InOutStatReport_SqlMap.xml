@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="InOutStatReportSQL">
+<typeAlias alias="inOutStatReport" type="com.huaixuan.network.biz.domain.storage.InOutStatReport"/>
+	<resultMap class="inOutStatReport" id="inOutStatReportResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="CREATOR" property="creator"/>
+		<result column="GMT_REPORT" property="gmtReport"/>
+		<result column="goods_Id" property="goodsId"/>
+		<result column="goods_Instance_Id" property="goodsInstanceId"/>
+		<result column="GOODS_NAME" property="goodsName"/>
+		<result column="GOODS_CODE" property="goodsCode"/>
+		<result column="LAST_REMAIN_AMOUNT" property="lastRemainAmount"/>
+		<result column="LAST_REMAIN_MONEY" property="lastRemainMoney"/>
+		<result column="THIS_IN_AMOUNT" property="thisInAmount"/>
+		<result column="THIS_IN_MONEY" property="thisInMoney"/>
+		<result column="THIS_OUT_AMOUNT" property="thisOutAmount"/>
+		<result column="THIS_OUT_MONEY" property="thisOutMoney"/>
+		<result column="THIS_REMAIN_AMOUNT" property="thisRemainAmount"/>
+		<result column="THIS_REMAIN_MONEY" property="thisRemainMoney"/>
+		<result column="DEP_FIRST_ID" property="depFirstId"/>
+		<result column="DEP_ID" property="depId"/>
+		<result column="LOC_ID" property="locId"/>
+	</resultMap>
+
+	<resultMap class="inOutStatReport" id="inOutStatReportResult_2">
+		<result column="GOODS_NAME" property="goodsName"/>
+		<result column="GOODS_CODE" property="goodsCode"/>
+		<result column="LAST_REMAIN_AMOUNT" property="lastRemainAmount" nullValue="0"/>
+		<result column="LAST_REMAIN_MONEY" property="lastRemainMoney" nullValue="0"/>
+		<result column="THIS_IN_AMOUNT" property="thisInAmount" nullValue="0"/>
+		<result column="THIS_IN_MONEY" property="thisInMoney" nullValue="0"/>
+		<result column="THIS_OUT_AMOUNT" property="thisOutAmount" nullValue="0"/>
+		<result column="THIS_OUT_MONEY" property="thisOutMoney" nullValue="0"/>
+		<result column="THIS_REMAIN_AMOUNT" property="thisRemainAmount" nullValue="0"/>
+		<result column="THIS_REMAIN_MONEY" property="thisRemainMoney" nullValue="0"/>
+	</resultMap>
+<!-- create InOutStatReport object -->
+<insert id="addInOutStatReport" parameterClass="inOutStatReport">
+<![CDATA[
+insert into ioss_in_out_stat_report
+    (ID,GMT_CREATE,CREATOR,GMT_REPORT,goods_Id,goods_Instance_Id,GOODS_NAME,GOODS_CODE,LAST_REMAIN_AMOUNT,LAST_REMAIN_MONEY,THIS_IN_AMOUNT,THIS_IN_MONEY,THIS_OUT_AMOUNT,THIS_OUT_MONEY,THIS_REMAIN_AMOUNT,THIS_REMAIN_MONEY,DEP_FIRST_ID,DEP_ID,LOC_ID )
+      null,
+         sysdate(),
+         'admin',
+         DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH), '%Y-%m'),
+         g.goods_id as goods_id,
+         aa.goods_instance_id,
+         g.instance_name as goods_name,
+         g.code as goods_code,
+         IFNULL((select THIS_REMAIN_AMOUNT from ioss_in_out_stat_report re
+                     where re.loc_id=aa.loc_id and aa.goods_instance_id=re.goods_instance_id
+                     and re.gmt_report=DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 3 MONTH), '%Y-%m')
+                     ),0) as LAST_REMAIN_AMOUNT,
+         IFNULL((select THIS_REMAIN_MONEY from ioss_in_out_stat_report re
+                     where re.loc_id=aa.loc_id and aa.goods_instance_id=re.goods_instance_id
+                     and re.gmt_report=DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 3 MONTH), '%Y-%m')
+                     ),0) as LAST_REMAIN_MONEY,
+         IFNULL((select sum(i.amount) from ioss_in_detail i,ioss_prod_relation_in pi
+                     where i.goods_instance_id=aa.goods_instance_id
+                     	   and pi.in_detail_id = i.id
+                     	   and pi.loc_id = aa.loc_id
+                           and i.status='in_finished'
+                           and i.gmt_modify >= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           and i.gmt_modify <= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 1 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           ),0) as THIS_IN_AMOUNT,
+         IFNULL((select sum(i.fact_fee) from ioss_in_detail i,ioss_prod_relation_in pi
+                     where i.goods_instance_id=aa.goods_instance_id
+                     	   and pi.in_detail_id = i.id
+                     	   and pi.loc_id = aa.loc_id
+                           and i.status='in_finished'
+                           and i.gmt_modify >= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           and i.gmt_modify <= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 1 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           ),0) as THIS_IN_MONEY,
+         IFNULL((select sum(o.out_num) from ioss_out_detail o,ioss_prod_relation_out po
+                     where o.goods_instance_id=aa.goods_instance_id
+                           and po.out_detail_id = o.id
+                     	   and po.loc_id = aa.loc_id
+                           and o.status='out_finished'
+                           and o.gmt_modify >= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           and o.gmt_modify <= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 1 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           ),0) as THIS_OUT_AMOUNT,
+         IFNULL((select sum(o.fact_fee) from ioss_out_detail o,ioss_prod_relation_out po
+                     where o.goods_instance_id=aa.goods_instance_id
+                           and po.out_detail_id = o.id
+                     	   and po.loc_id = aa.loc_id
+                           and o.status='out_finished'
+                           and o.gmt_modify >= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           and o.gmt_modify <= STR_TO_DATE(DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 1 MONTH),'%Y-%m-%e') ,'%Y-%m-%d %H:%i:%s')
+                           ),0) as THIS_OUT_MONEY,
+         aa.this_remain_amount,
+         aa.this_remain_money,
+         (select d.dep_first_id from ioss_dep_location l,ioss_depository d where d.id=l.dep_id and l.id=aa.loc_id) as dep_first_id,
+         (select l.dep_id from ioss_dep_location l where l.id=aa.loc_id) as dep_id,
+         aa.loc_id
+    from (select t.loc_id as loc_id,
+                 t.goods_instance_id as goods_instance_id,
+                 sum(t.storage_num) as this_remain_amount,
+                 sum(t.storage_num * t.price) as this_remain_money
+            from ioss_storage t
+           where t.gmt_create <= last_day(add_months(sysdate(),-1))
+           group by t.goods_instance_id,t.loc_id) aa left join ioss_goods_instance g on (g.id=aa.goods_instance_id)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update InOutStatReport object -->
+<update id="editInOutStatReport" parameterClass="inOutStatReport">
+<![CDATA[
+		update ioss_in_out_stat_report set
+		CREATOR = #creator#,
+		GMT_REPORT = #gmtReport#,
+		goods_Id = #goodsId#
+		GOODS_NAME = #goodsName#,
+		GOODS_CODE = #goodsCode#,
+		LAST_REMAIN_AMOUNT = #lastRemainAmount#,
+		LAST_REMAIN_MONEY = #lastRemainMoney#,
+		THIS_IN_AMOUNT = #thisInAmount#,
+		THIS_IN_MONEY = #thisInMoney#,
+		THIS_OUT_AMOUNT = #thisOutAmount#,
+		THIS_OUT_MONEY = #thisOutMoney#,
+		THIS_REMAIN_AMOUNT = #thisRemainAmount#,
+		THIS_REMAIN_MONEY = #thisRemainMoney#,
+		DEP_FIRST_ID = #depFirstId#,
+		DEP_ID = #depId#
+		 where ID = #id#
+
+]]>
+</update>
+<!-- delete InOutStatReport object -->
+<delete id="removeInOutStatReport" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_in_out_stat_report where GMT_REPORT=DATE_FORMAT(DATE_SUB(DATE_ADD(LAST_DAY(SYSDATE()),INTERVAL 1 DAY),INTERVAL 2 MONTH), '%Y-%m')
+]]>
+</delete>
+<!-- search InOutStatReport object -->
+<select id="getInOutStatReport" parameterClass="java.lang.Long" resultMap="inOutStatReportResult">
+<![CDATA[
+		select ioss_in_out_stat_report.* from ioss_in_out_stat_report where ioss_in_out_stat_report.ID = #value#
+]]>
+</select>
+<!-- searchAll InOutStatReport List -->
+<select id="getInOutStatReports" resultMap="inOutStatReportResult">
+<![CDATA[
+		select ioss_in_out_stat_report.* from ioss_in_out_stat_report
+]]>
+</select>
+
+<select id="getInOutStatReportListByMap" resultMap="inOutStatReportResult_2">
+<![CDATA[
+		select
+			t.goods_name,
+			t.goods_code,
+	       sum(t.last_remain_amount) last_remain_amount,
+	       sum(t.last_remain_money) last_remain_money,
+	       sum(t.this_in_amount) this_in_amount,
+	       sum(t.this_in_money) this_in_money,
+	       sum(t.this_out_amount) this_out_amount,
+	       sum(t.this_out_money) this_out_money,
+	       sum(t.this_remain_amount) this_remain_amount,
+	       sum(t.this_remain_money) this_remain_money,
+	       sum(t.this_out_money) this_out_money
+		from ioss_in_out_stat_report t
+		where GMT_REPORT=concat(#year#,'-',#month#)
+]]>
+	<isNotEmpty prepend="and" property="depId">
+		dep_Id = #depId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depFirstId">
+		DEP_FIRST_ID = #depFirstId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="locId">
+		loc_Id = #locId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsName">
+		goods_name like concat('%',#goodsName#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsCode">
+		goods_code like concat('%',#goodsCode#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByLocId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.loc_Id
+		]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByDepId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.dep_Id
+		]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByDepFirstId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.depFirstId
+		]]>
+	</isNotEmpty>
+	order by goods_code
+</select>
+
+<select id="getInOutStatReportCountByMap" resultClass="int">
+<![CDATA[select count(1)
+  		from
+			(select count(1) from ioss_in_out_stat_report t
+			where GMT_REPORT=concat(#year#,'-',#month#)
+]]>
+	<isNotEmpty prepend="and" property="depId">
+		dep_Id = #depId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depFirstId">
+		DEP_FIRST_ID = #depFirstId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="locId">
+		loc_Id = #locId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsName">
+		goods_name like concat('%',#goodsName#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsCode">
+		goods_code like concat('%',#goodsCode#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByLocId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.loc_Id
+		]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByDepId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.dep_Id
+		]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="" property="groupByDepFirstId">
+		<![CDATA[
+		group by t.goods_name,t.goods_code,t.depFirstId
+		]]>
+	</isNotEmpty>
+	) d
+</select>
+</sqlMap>

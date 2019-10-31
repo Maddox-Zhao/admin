@@ -1,0 +1,147 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+    <h2>售后管理 - 留言管理</h2>
+	<div class="searchBox">
+		<h3><span>搜索留言</span></h3>
+	<form  name="searchForm"  action="$appServer/feedback/showfb.html" method="post">
+		
+		<table >
+			<tr>
+				<th>用户名：</th>
+                <td>
+					<input type="text"  name="name" value="$!queryObject.name"  />
+				</td>
+				<th>手机号码：</th>
+                <td>
+					<input type="text"  name="phone" value="$!queryObject.phone"  />
+				</td>
+				<th>留言时间：</th>
+                <td>
+					<input value="$!queryObject.startTime" type="text" name="startTime" size="10" theme="simple" id="startTime" />
+				到
+					<input value="$!queryObject.endTime" type="text" name="endTime" size="10" theme="simple" id="endTime" />
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "startTime",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "endTime",
+        			          ifFormat   :"%Y-%m-%d",
+        			          align      : "Tl"
+        			      });
+        			</script>
+					</td>
+					<th>&nbsp;</th>
+					<td >
+					<input class="button" value=" 查询" type="submit" onClick="return doCheck(searchForm);"/>
+                </td>
+            </tr>
+			#*
+			<tr>
+				<th>留言类型：</th>
+                <td>
+					<select name="msgType">
+								<option value="">请选择</option>
+								<option value="leaveWord" #if($!{queryObject.msgType}== "leaveWord") selected #end>留言</option>
+								<option value="complaint" #if($!{queryObject.msgType}== "complaint") selected #end>投诉</option>
+								<option value="ask" #if($!{queryObject.msgType}== "ask") selected #end>询问</option>
+								<option value="afterService" #if($!{queryObject.msgType}== "afterService") selected #end>售后</option>
+								<option value="wantBuy" #if($!{queryObject.msgType}== "wantBuy") selected #end>求购</option>
+					</select>
+				</td>
+				<th>是否回复：</th>
+				<td >
+					<select name="replyFlag">
+								<option value="">请选择</option>
+								<option value="yes" #if($!{queryObject.replyFlag}== "yes") selected #end>已回复</option>
+								<option value="no" #if($!{queryObject.replyFlag}== "no") selected #end>未回复</option>
+					</select>
+                </td>
+            </tr>
+			
+			<tr>
+				<th></th>
+                <td>
+
+				</td>
+				<th></th>
+				<td >
+					<input class="button" value=" 查询" type="submit" onClick="return doCheck(searchForm);"/>
+                </td>
+            </tr>
+			*#
+        </table>
+    </form>
+    </div>
+
+	<div id="tabbar-div">
+        <p>
+			<ul class="form-tab">
+    			<li #if($toUserType=="shop" || $queryObject.toUserType=="shop") class="c" #end>
+    				<span id="general-tab" onclick="javascript:document.location='$appServer/feedback/showfb.html'">收到的留言</span>
+                </li>
+    		##	<li #if($toUserType=="user" || $queryObject.toUserType=="user") class="c" #end>
+    		##		<span id="goods-tab" onclick="javascript:document.location='$appServer/feedback/showfb.html?toUserType=user'">发出的留言</span>
+            ##    </li>
+            </ul>
+        </p>
+    </div>
+
+
+    <div class="listBox" id="listDiv" >
+    	<table>
+    		<th width="6%">序号</th>
+			<th width="15%">姓名</th>
+			<th width="15%">手机号码</th>
+    		<th  width="30%">标题</th>
+    		<th width="20%">留言时间</th>
+    		##<th>回复状态</th>
+    		<th>操作</th>
+
+	#foreach($leaveword in $query.items)
+			<tr>
+				#set ($value=($!query.currentPage - 1)*$!query.pageSize+$velocityCount)
+				<td  style="text-align:center;">$!leaveword.id</td>
+				<td  style="text-align:center;">
+					$!leaveword.name
+				</td>
+				<td  style="text-align:center;">
+					$!leaveword.phone
+				</td>
+				<td  style="text-align:center;">#direct($!leaveword.title)</td>
+				<td  style="text-align:center;">$!dateUtilHX.convertDateToString("yyyy-MM-dd",${leaveword.leaveTime})</td>
+				
+				<td  style="text-align:center;">
+						<a href="$appServer/feedback/fbdetail.html?feedbackId=$leaveword.id">详情</a>
+				</td>
+			</tr>
+	#end
+        </table>
+
+<!-- 分页 -->
+#if($query.items.size()>0)
+	$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/feedback/showfb.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+#else
+	没有结果！
+#end
+
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+	function doCheck(searchForm){
+		var s_date=new Date(Date.parse($('startTime').value));
+    	var e_date=new Date(Date.parse($('endTime').value));
+		if(e_date < s_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		return true;
+	}
+</script>

@@ -1,0 +1,229 @@
+#set($layout = 'layout\default.vm')
+#set($title = '对账管理  - 文件对账 ')
+
+<script src="$imageServer.get("/scripts/jquery.blockUI.js")"></script>
+
+<div class="main">
+
+<h2>文件对账</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>文件对账</span></h3>
+		    <form name="filterPageForm" action="showImportCounterFilePage.html"  method="post">
+<script>
+function doCompare(bankType,batchId,operateType) {
+	var batchIdd = "$!inputFileSearchBean.batchId";
+	var operateTypee = "$!inputFileSearchBean.operateType";
+	var bankTypee = "$!inputFileSearchBean.bankType";
+	var dateStart = "$!inputFileSearchBean.datestart";
+	var dateEnd = "$!inputFileSearchBean.dateend";
+	var page = jQuery('input[name="page"]').val();
+	if( confirm("真的要对账吗？")){
+          window.location.href = "doCompareFile.html?batchId="+batchId+"&bankType="+bankType+"&operateType="+operateType+"&datestart="+dateStart+"&dateend="+dateEnd+"&batchIdd="+batchIdd+"&operateTypee="+operateTypee+"&bankTypee="+bankTypee + "&page=" + page;
+           //document.forms.filterPageForm.submit();
+	}
+}
+
+
+
+String.prototype.trim = function() {
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+function formSubmit(){
+
+	var dateStart=document.getElementById('datestart').value.replace(/-/g, "/");
+	var dateEnd=document.getElementById('dateend').value.replace(/-/g, "/");
+	var b_date=new Date(Date.parse(dateStart));
+	var e_date=new Date(Date.parse(dateEnd));
+	var batchId=document.getElementById('batchId').value.trim();
+
+
+
+   if(batchId!="")
+   {
+
+     if(isNaN(batchId))
+       {
+        alert('文件批次号输入错误，要求是数字类型');
+	    document.getElementById('batchId').value="";
+	    document.getElementById('batchId').focus();
+	    return false;
+	    }
+
+   }
+
+
+
+    if(dateStart!="")
+    {
+     var r = dateStart.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+	     alert('导入开始日期格式不正确');
+         document.getElementById('datestart').value="";
+         document.getElementById('datestart').value.focus();
+	     return false;
+	  }
+    }
+
+    if(dateEnd!="")
+    {
+        var r = dateEnd.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
+	  if(r==null)
+	  {
+	     alert('导入结束日期格式不正确');
+         document.getElementById('dateEnd').value="";
+         document.getElementById('dateEnd').value.focus();
+	     return false;
+	  }
+    }
+
+    if(dateStart!=""&&dateEnd!=""&&e_date < b_date){
+    	alert("起始时间不能大于结束时间！");
+    	return false;
+    }
+
+
+	document.getElementById('datestart').value=document.getElementById('datestart').value.trim();
+	document.getElementById('dateend').value=document.getElementById('dateend').value.trim();
+
+        document.forms.filterPageForm.action="showImportCounterFilePage.html";
+	document.forms.filterPageForm.submit();
+}
+</script>
+ <table>
+      <tr>
+                    		<td class="sb-label">批次号：</td>
+                    		<td class="sb-field">
+                    			<input type="text" name="batchId" id="batchId" maxlength="8" value="$!inputFileSearchBean.batchId" /> &nbsp;
+                    		</td>
+                    		<td class="sb-label">导入日期：</td>
+                    		<td class="sb-field">
+                    			从<input type="text" name="datestart" id="datestart" maxlength="8" value="$!inputFileSearchBean.datestart" "readonly=false" /> &nbsp;
+                    		</td>
+        					<td class="sb-field">
+                    			到<input type="text" name="dateend" id="dateend" maxlength="8" value="$!inputFileSearchBean.dateend" "readonly=false" /> &nbsp;
+                    		</td>
+                    		<script type="text/javascript">
+                                Calendar.setup({
+                                    inputField : "datestart",
+                                    ifFormat   : "%Y-%m-%d",
+                                    align      : "Tl"
+                                });
+                                Calendar.setup({
+                                    inputField : "dateend",
+                                    ifFormat   : "%Y-%m-%d",
+                                    align      : "Tl"
+                                });
+                            </script>
+                    		<td class="sb-label">银行：</td>
+                    		<td class="sb-field">
+                    			<select name="bankType" id="bankType">
+                    				 <option value=""  #if($!inputFileSearchBean.bankType=="") selected="selected" #end>请选择</option>
+				                     <option value="ICBC" #if($!inputFileSearchBean.bankType=="ICBC") selected="selected" #end>中国工商银行</option>
+				                     <option value="CCB" #if($!inputFileSearchBean.bankType=="CCB") selected="selected" #end>中国建设银行</option>
+				                     <option value="CMB" #if($!inputFileSearchBean.bankType=="CMB") selected="selected" #end>招商银行</option>
+				                     <option value="ABC" #if($!inputFileSearchBean.bankType=="ABC") selected="selected" #end>中国农业银行</option>
+				                     <option value="CIB" #if($!inputFileSearchBean.bankType=="CIB") selected="selected" #end>兴业银行</option>
+				                     <option value="SPDB" #if($!inputFileSearchBean.bankType=="SPDB") selected="selected" #end>上海浦东发展银行</option>
+				                     <option value="GDB" #if($!inputFileSearchBean.bankType=="GDB") selected="selected" #end>广东发展银行</option>
+				                     <option value="SDB" #if($!inputFileSearchBean.bankType=="SDB") selected="selected" #end>深圳发展银行</option>
+				                     <option value="CITIC" #if($!inputFileSearchBean.bankType=="CITIC") selected="selected" #end>中信银行</option>
+				                     <option value="ALIPAY" #if($!inputFileSearchBean.bankType=="ALIPAY") selected="selected" #end>支付宝</option>
+				                     <option value="POST" #if($!inputFileSearchBean.bankType=="POST") selected="selected" #end>中国邮政</option>
+				                     <option value="TENPAY" #if($!inputFileSearchBean.bankType=="TENPAY") selected="selected" #end>财付通</option>
+				                     <option value="CHINABANK" #if($!inputFileSearchBean.bankType=="CHINABANK") selected="selected" #end>网银在线</option>
+                    			</select>
+                    		</td>
+                    		<td class="sb-label">&nbsp;</td>
+                    		<td class="sb-button"><input type="button" class="button" value="查找" onClick="formSubmit();" /></td>
+                    	</tr>
+                    </table>
+                    <input type="hidden" name="operateType" id="operateType" value="$!inputFileSearchBean.operateType">
+				</div>
+   		</form>
+
+                <div class="clear"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+
+<!-- 订单列表 -->
+<div class="listBox">
+          <h3><span>导入文件批次列表</span></h3>
+    <table>
+      <tr>
+                            		<th>文件批次号</th>
+                            		<th>银行</th>
+                            		<th>文件名</th>
+                            		<th>文件待处理条数</th>
+					                <th>对账状态</th>
+                            		<th>导入日期</th>
+					                <th>对账日期</th>
+					                <th>操作</th>
+                            	</tr>
+                            	</thead>
+                            	<tbody>
+                           #foreach($inputFile in $query.items)
+    				       <tr align="center" #if($velocityCount % 2 == 0) class="bg" #end>
+                               <td>$!{inputFile.batchId}</td>
+                               <td>
+						         #if($!inputFile.bankType=="ALIPAY")
+						               支付宝
+                                #elseif($!inputFile.bankType=="TENPAY")
+						               财付通
+						        #elseif($!inputFile.bankType=="CHINABANK")
+						               网银在线
+							    #elseif($!inputFile.bankType=="ICBC")
+						               工商银行
+                                #end
+						       </td>
+                               <td>$!{inputFile.fileName}</td>
+                               <td>$!{inputFile.waitDealCount}</td>
+					           <td >
+						           #if("$!inputFile.status"=="1")
+						              未对帐
+                                   #elseif("$!inputFile.status"=="2")
+						              处理中
+                                   #elseif("$!inputFile.status"=="3")
+						              已对帐
+                                   #end
+						        </td>
+                               <td>$date.format("yyyy-MM-dd HH:mm:ss",$!{inputFile.gmtCreate})</td>
+						       <td>$date.format("yyyy-MM-dd HH:mm:ss",$!{inputFile.gmtDealDate})</td>
+						       <td><a href="javascript:doCompare('$!{inputFile.bankType}','$!{inputFile.batchId}','${inputFile.operateType}');">对账</a>
+						       </td>
+                              </tr>
+									#end
+                            	</tbody>
+                            </table>
+
+<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/counter/showImportCounterFilePage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+
+#if($!duizhang)
+	<div id="operationResult" class="tab-div" style="display:none; cursor:default;">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td>
+					成功条数:$!inputFileSearchBean.compareSuccessCount  <br>
+					<!-- 待处理和金额不等条数:$!inputFileSearchBean.compareNotSuccessCount  <br>-->
+					待处理条数:$!inputFileSearchBean.waiteDealCount  <br>
+					金额不等条数:$!inputFileSearchBean.sumNotEqualCount  <br>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<script>
+        jQuery.blockUI({ message: jQuery('#operationResult')});
+
+        jQuery('.blockOverlay').attr('title','Click to unblock').click(jQuery.unblockUI);
+	</script>
+#end
+
+</div>
+</div>
+

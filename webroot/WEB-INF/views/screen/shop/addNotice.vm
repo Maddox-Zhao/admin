@@ -1,0 +1,113 @@
+#set($layout = "layout/default.vm")
+<script src="${imageServer}/scripts/ckeditor/ckeditor.js" type="text/javascript">
+</script><script language="javascript" type="text/javascript">
+
+
+function isNull( str ){
+    if ( str == "" ) return true;
+    var regu = "^[ ]+$";
+    var re = new RegExp(regu);
+    return re.test(str);
+}
+
+
+
+function addnotice(){
+
+//	var title = document.getElementById("noticetitle");
+//	var content = document.getElementById("noticecontent");
+
+//	if(isNull(title.value) || isNull(content.value)){
+//	 	alert("请输入公告的标题和内容");
+//	 	return false;
+//	}
+
+//	var numTitle = title.value.length;
+//	var numContent = content.value.length;
+
+
+//	if(numTitle>250 || numContent>2500){
+//		alert("公告的标题必须在250字以内，内容必须在2500字以内！");
+//		return false;
+//	}
+
+	document.theForm.submit();
+}
+
+function grest(){
+//var myeditor=CKEDITOR.replace('noticecontent');
+//myeditor.setData("aaaaa");
+	var form1=document.getElementById('theForm');
+		form1.action="/shop/anp.html";
+		form1.submit();
+		form1.action="/shop/addn.html";
+}
+
+</script>
+#set($title = "公告管理 - 新增公告")
+	<div class="main">
+		<div class="formBox">
+				<h2>新增公告</h2>
+		<form  name="theForm" id="theForm" action="/shop/addn.html" method="post" enctype="multipart/form-data">
+			<input type="hidden"  id="noticecontentstr" name="noticecontentstr" value="$!stringEscapeUtil.escapeHtml($!{notice.content})" />
+	   <div class="content">
+		<div class="form">
+						#if($!{shopInfoError})
+				<tr>
+				<td colspan="2" align="center" >
+					<span class="red">$!{shopInfoError}</span>
+				</td>
+				</tr>
+				#end
+		 <ol>
+
+          <li>
+    					<label>公告类型：</label>
+    				<span class="con">
+					<ul>
+              <li> #springBind("notice.noticeType")
+						<select id="noticeType" name="${status.expression}" >
+							#foreach($noticeType in $enumNoticeTypeMap.entrySet())
+								<option value="$noticeType.key" #if($noticeType.key == 1) selected #end>$noticeType.value</option>
+							#end
+						</select> </li>
+            </ul>
+            </span>
+          </li>
+<li>
+            <label>公告标题：</label>
+            <span class="con">
+            <ul>
+				<li>#springBind("notice.title")
+					<input id="title" size="35" name="${status.expression}"  value="$!{status.value}" >
+				</li>
+				<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+				</ul>
+				   </span>
+          </li>
+<li>
+				<label>公告内容：</label>
+				<span class="con">
+				<ul>
+					<li>#springBind("notice.content")
+					<textarea  id="noticecontent" rows="5" cols="35" name="${status.expression}">$!{status.value}</textarea>
+					<script type="text/javascript">
+            				CKEDITOR.replace( 'noticecontent' );
+                        </script>
+					</li>
+					<li><em>*</em></li>
+					<li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+				</ul>
+				</span>
+	</li>
+	</ol>
+       </div></div>
+   </form></div>
+	<div class="form-but">
+    <input class="btn" value="确定" type="button" onClick="javascript:addnotice();"> <input class="btn" value="重置 "  onclick="location.href='/shop/anp.html'" type="submit" > <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+				</div></tbody></div>

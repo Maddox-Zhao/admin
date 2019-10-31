@@ -1,0 +1,46 @@
+#set($layout = "layout/default.vm")
+#set($title = "增物流范围")
+<div class="main">
+
+	<h2>管理中心 - 物流管理</h2>
+
+	#if($message)
+		<div class="mag-t1">${message}</div>
+	#end
+
+	<form name="addForm" action="select_express.html" method="post">
+		<div class="formBox">
+    		<h3><i></i><span>新增物流范围</span></h3>
+    		<div class="content">
+    			<table class="c2">
+    				<tr>
+						<th>物流公司：</th>
+						<td>
+							<select id="selExpressId" name="selExpressId">
+								<option value="">-=请选择=-</option>
+								#foreach($expressInfo in $expressInfoList)
+									<option value="$!{expressInfo.id}">$!{expressInfo.expressName}</option>
+								#end
+							</select>
+						</td>
+					</tr>
+				</table>
+			</div>
+        </div>
+	</form>
+
+	<div class="form-but">
+		<button type="button" class="button-s4" onclick="javascript:selExpress();">确定</button>
+	</div>
+
+</div>
+
+<script language="javascript" type="text/javascript">
+	function selExpress(){
+		if(jQuery("#selExpressId").val().length == 0) {
+			alert("请首先选择物流公司");
+			return false;
+		}
+		document.forms[0].submit();
+	}
+</script>

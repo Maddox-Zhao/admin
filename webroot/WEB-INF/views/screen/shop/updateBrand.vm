@@ -1,0 +1,136 @@
+#set($layout = "layout/default.vm")
+#set($title = "品牌管理 - 新增品牌")
+		<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>新增品牌</span></h3>
+	<div class="content">
+		<form __unmht_action="#" name="theForm" action="/shop/updatebr.html" method="post" enctype="multipart/form-data">
+			#springBind("brand.id")
+			<input type="hidden" id="${status.expression}" name="${status.expression}" value="$!{status.value}" />
+			<table class="c2" id="general-table" width="100%">
+			<tbody>
+				<div class="form">
+				<ol>
+          <li>
+			<label>是否显示：</label>
+					<span class="con">
+					<ul>
+              <li>
+							#springBind("brand.isShow")
+							<select name="${status.expression}"  id="isShow" >
+						<option  #if($brand.isShow == 1) selected #end value="1">是</option>
+                       <option  #if($brand.isShow== 0) selected #end  value="0">否</option>
+                        </select></li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+          <li>
+			<label>品牌名称：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("brand.brandName")
+					<input  type="text"  id="brandName" name="${status.expression}"  value="$!{brand.brandName}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				#if($message=="y")
+						<label class="red">该品牌名称已经存在！</label>
+				#end
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>URL：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("brand.link")
+					<input  type="text"  id="link" name="${status.expression}" size="30" value="$!{brand.link}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>品牌Logo：</label>
+				<span class="con">
+					<ul>
+              <li>#if($!{brand.brandLogo})<img src="${upServer}/$!{brand.brandLogo}" width="95" height="100" /> #end<input type="file" name="images" id="images" size="35" />
+				</li>
+						<li><em>*</em></li>
+														  	<li>
+							#springBind("brand.brandTemp")
+                <label class="red">$!{errormessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>描述：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("brand.brandDesc")
+					<textarea size="30" name="${status.expression}" id="brandDesc" cols="35" rows="5" value="$!{brand.brandDesc}">$!{brand.brandDesc}</textarea>
+				</li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  </table></form></div>
+  <div class="form-but">
+    <td><input class="btn" value="确定" type="submit" onClick="javascript:addbrand();"> <input class="btn" value="重置" type="reset" onClick="javascript:resetbrand()"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>
+<script language="javascript" type="text/javascript">
+
+
+	function addbrand(){
+
+	 var obj = document.getElementById("images");
+    	var sUrl = getFullPath(obj);
+            var myImage = new Image();
+            myImage.src = sUrl;
+			if(myImage.file>0){
+    	if(myImage.fileSize>200*1024){
+    	    alert("图片不大于200KB。");
+            return false;
+    	}
+		}
+		document.theForm.submit();
+	}
+
+	   //获取图片全路径（不同的浏览器
+    function getFullPath(obj) {
+        if(obj){
+            //ie
+            if (window.navigator.userAgent.indexOf("MSIE")>=1)
+            {
+                obj.select();
+                return document.selection.createRange().text;
+            }
+            //firefox
+            else if(window.navigator.userAgent.indexOf("Firefox")>=1)
+            {
+                if(obj.files)
+                {
+                    return obj.files.item(0).getAsDataURL();
+                }
+                return obj.value;
+            }
+            return obj.value;
+        }
+    }
+
+		function resetbrand(){
+	document.theForm.reset();
+	}
+</script>

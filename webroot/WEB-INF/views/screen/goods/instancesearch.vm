@@ -1,0 +1,158 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>产品查询</span></h3>
+<form id="form1" action="/instance/instance_search.html" method="post" name="form1">
+    <table>
+      <tr>
+		<th>产品名称：</th>
+       <td>
+	     #springBind("instance.goodsTitle")
+		 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+	   </td>
+	   <th>商品编号：</th>
+       <td>
+	     #springBind("instance.goodsId")
+         <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+       </td>
+	   <th>品牌:</th>
+        <td>
+	        #springBind("instance.brandId")
+            <select class="select" name="${status.expression}" value ="$!{status.value}" >
+               <option value="">-=请选择=-</option>
+               #foreach($brandTemp in $brandList)
+			      <option #if("$!{status.value}"=="$!brandTemp.id") selected #end value="$!brandTemp.id">$!brandTemp.brandName</option>
+               #end
+            </select>
+		</td>
+		
+      </tr>
+	  
+	  <tr>
+    	   <th>产品型号：</th>
+           <td>
+    	     #springBind("instance.type")
+    		 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+    	   </td>
+    	   <th>产品材质：</th>
+           <td>
+    	     #springBind("instance.material")
+             <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+           </td>
+    	   <th>产品颜色:</th>
+            <td>
+    	        #springBind("instance.color")
+                <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+    		</td>
+    	</tr>
+    	<tr>
+    	   <th>总库存大于：</th>
+           <td>
+    	     #springBind("instance.existNum")
+    		 <input type="text" name="${status.expression}"  value ="$!{status.value}"  class="inp" />
+    	   </td>
+    	   <th>香港库存大于：</th>
+           <td>
+    	     #springBind("instance.hkExistNum")
+             <input type="text" name="${status.expression}"  value ="$!{status.value}" class="inp" />
+           </td>
+    	   <th>产品尺寸:</th>
+            <td>
+    	        #springBind("instance.size")
+                <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+    		</td>
+    	</tr>
+	  
+	  
+      <tr>
+         <th></th>
+         <td><button type="submit" class="btn">查询产品</button></td>
+		 <td><button type="button" class="btn" onclick="doExport();">excel导出</button></td>
+	  </tr>
+    </table>
+</form>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	$!message
+</div>
+ #end
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品列表</span></h3>
+            <table >
+                <tr>
+                    <th>商品编码</th>
+					<th>商品图片</th>
+					<th>商品名称</th>
+					<th>可用库存</th>
+					<th>香港库存</th>
+					##<th>商品重量</th>
+					<th>已售数量</th>
+    				  
+					<th style="text-align:center;">尚上价(RMB)</th>
+					#if($!adminAccess.has("A_GOODS_MODIFY_USER"))
+					<th>lusso&moda价(HKD)</th>
+					#end
+					<th style="text-align:center;">欧洲价(EU)</th>
+					<th style="text-align:center;">大陆价(RMB)</th>
+                    <th>属性</th>
+                    ##<th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($gi in $query.items)
+                <tr>
+                    <td align="center">$!{gi.goodsId}</td>
+                    <td><img alt="$gi.goodsTitle" src="$upServer/$gi.imgMiddle" title="$gi.goodsTitle" style="width:80px;height:80px;"/></td>
+                	<td align="center">$!{gi.goodsTitle}</td>
+                    <td style="text-align:center;">$!{gi.existNum}</td>
+					<td style="text-align:center;">$!{gi.hkExistNum}</td>
+					<td style="text-align:center;">$!{gi.sellNum}</td>
+					<td style="text-align:center;color:red;">$!{gi.sellPrice}</td>
+					#if($!adminAccess.has("A_GOODS_MODIFY_USER"))
+					<td style="text-align:center;color:red;">$!{gi.hkhxPrice}</td>
+					#end
+					<td style="text-align:center;">$!{gi.euPrice}</td>
+					<td style="text-align:center;">$!{gi.marketPrice}</td>
+					<td style="text-align:center;">
+                                    #foreach($pro in $gi.properties.entrySet())
+                                        $!{attributeManager.getAttributeByAttrCode($pro.key).attrName}=$!{pro.value}
+                                    #end
+					</td>
+					##<td align="center">
+						##if($!adminAccess.has("A_GOODS_INSTANCE_MODIFY_USER"))
+							##<a href="$appServer.get('/instance/load_instance.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">信息修改</a>
+						##end
+							##<a href="$appServer.get('/instance/instance_location.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">库位编辑</a><br/>
+							##<a href="$appServer.get('/instance/instance_supplier.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">供应商编辑</a>
+							##<a href="$appServer.get('/instance/instance_available_stock.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">可用库存查看</a>
+                    ##</td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/instance/instance_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+<script language="javascript" type="text/javascript">
+function doExport(){
+    var form1=document.getElementById('form1');
+    form1.action="/instance/do_export_instance.html";
+    form1.submit();
+    form1.action="/instance/instance_search.html";
+}
+</script>

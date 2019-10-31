@@ -1,0 +1,1881 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AnalysisSQL">
+<typeAlias alias="fCSet" type="com.huaixuan.network.biz.domain.report.FCSet"/>
+
+	<resultMap class="fCSet" id="fCSetResult">
+		<result column="label" property="label" />
+		<result column="value" property="value" />
+	</resultMap>
+
+	<resultMap id="saleAnalysisOut" class="com.huaixuan.network.biz.domain.statistics.SaleAnalysisTwo" >
+	    <result column="goods_id" property="goodsId"/>
+        <result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="salePrice" property="salePrice" nullValue="0.00"/>
+		<result column="goodsInPrice" property="goodsInPrice" nullValue="0.00"/>
+   </resultMap>
+   
+   <resultMap id="saleAnalysisOutDepository" class="com.huaixuan.network.biz.domain.statistics.SaleAnalysisTwo" >
+	    <result column="goods_id" property="goodsId"/>
+	    <result column="dep_first_id" property="depFirstId"/>
+	    <result column="dep_id" property="depId"/>
+	    <result column="loc_id" property="locId"/>
+        <result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="salePrice" property="salePrice" nullValue="0.00"/>
+		<result column="goodsInPrice" property="goodsInPrice" nullValue="0.00"/>
+   </resultMap>
+   
+   <resultMap id="saleAnalysisDetail" class="com.huaixuan.network.biz.domain.statistics.SaleAnalysis" >
+		<result column="buy_nick" property="buyNick"/>
+		<result column="tid" property="tid"/>
+	    <result column="goods_id" property="goodsId"/>
+        <result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="salePrice" property="salePrice" nullValue="0.00"/>
+		<result column="goodsInPrice" property="goodsInPrice" nullValue="0.00"/>
+   </resultMap>
+
+	<resultMap id="saleAnalysisIn"
+		class="com.huaixuan.network.biz.domain.statistics.SaleAnalysis">
+		<result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="goodsInPrice" property="goodsInPrice" nullValue="0.00"/>
+	</resultMap>
+
+	<resultMap id="saleAnalysisOutMap" class="java.util.HashMap" >
+	    <result column="goods_id" property="goodsId"/>
+        <result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="salePrice" property="salePrice" nullValue="0.00"/>
+		<result column="goodsInPrice" property="goodsInPrice" nullValue="0.00"/>
+   </resultMap>
+
+   <resultMap id="GoodsInStorage" class="com.huaixuan.network.biz.domain.statistics.SaleAnalysis">
+        <result column="code" property="code"/>
+        <result column="instance_name" property="instanceName"/>
+        <result column="cat_code" property="catCode"/>
+        <result column="attrs" property="attrs"/>
+        <result column="goods_unit" property="goodsUnit"/>
+        <result column="storage_num_sum" property="storageNumSum"/>
+        <result column="average_price" property="averagePrice"/>
+        <result column="storage_cost" property="storageCost"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="loc_id" property="locId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+   </resultMap>
+   
+   <resultMap id="storeDayResult" class="com.huaixuan.network.biz.domain.StoreDay">
+        <result column="id" property="id"/>
+        <result column="store_amount" property="storeAmount"/>
+        <result column="store_rmbamount" property="storeRmbAmount"/>
+        <result column="store_euamount" property="storeEuAmount"/>
+        <result column="store_hkamount" property="storeHkAmount"/>
+        <result column="store_number" property="storeNumber"/>
+        <result column="hk_store_amount" property="hkStoreAmount"/>
+        <result column="hk_store_rmbamount" property="hkStoreRmbAmount"/>
+        <result column="hk_store_euamount" property="hkStoreEuAmount"/>
+        <result column="hk_store_hkamount" property="hkStoreHkAmount"/>
+		<result column="hk_store_number" property="hkStoreNnumber"/>
+		<result column="datemonthday" property="datemonthday"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="sell_amount" property="sellAmount"/>
+		<result column="hk_sell_amount" property="hkSellAmount"/>
+   </resultMap>
+   
+   <sql id="GOODS.COMMON_CONDITION">
+		<isNotEmpty property="noPicture">
+			and img_large is null
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and ">
+		   id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSn" prepend="and">
+			goods_sn like concat('%',#goodsSn#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsMachSn" prepend="and">
+			goods_sn = #goodsMachSn#
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="title" prepend="and">
+			title like concat('%',#title#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			goods_sn like concat('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsStatus" prepend="and">
+			goods_status = #goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty property="isCutprice" prepend="and">
+			is_cutprice = #isCutprice#
+		</isNotEmpty>
+		<isNotEmpty property="isAgent" prepend="and">
+			is_agent = #isAgent#
+		</isNotEmpty>
+        <isNotEmpty property="isWholesale" prepend="and">
+			emall_goods.is_wholesale = #isWholesale#
+        </isNotEmpty>
+		<isNotEmpty property="brandId" prepend="and">
+			brand_id = #brandId#
+		</isNotEmpty>
+        <isNotEmpty property="isPaipai" prepend="and">
+            is_paipai = #isPaipai#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 start for 是否淘宝-->
+		 <isNotEmpty property="isTaobao" prepend="and">
+            is_taobao = #isTaobao#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 end for 是否淘宝-->
+		<isNotEmpty property="zeroStock">
+			<isEqual property="goodsStatus" compareValue="on_sale" prepend="">
+				group by ioss_storage.goods_id HAVING sum(ioss_storage.storage_num) = 0
+			</isEqual>
+			<isEqual property="goodsStatus" compareValue="on_depot" prepend="">
+				group by ioss_storage.goods_id HAVING sum(ioss_storage.storage_num) > 0
+			</isEqual>
+		</isNotEmpty>
+	</sql>
+   
+   
+   <sql id="GOODS_INSTANCE.COMMON_CONDITION">
+   		<isNotEmpty prepend="and" property="title">
+	         <![CDATA[instr(INSTANCE_NAME,#title#)>0]]>
+	    </isNotEmpty>
+	    <isNotEmpty property="goodsSn" prepend="and">
+			<![CDATA[instr(code,#goodsSn#)>0]]>
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			<![CDATA[instr(cat_code,#catCode#)>0]]>
+		</isNotEmpty>
+	</sql>
+	
+	<select id="getSingleOrderAnalysis" resultMap="fCSetResult"  parameterClass="java.util.Map">
+		select count(*) as value,
+			status as label
+		from emall_trade
+		where 1=1
+		<isNotEmpty property="dateStart">
+<![CDATA[
+			and emall_trade.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')
+	]]>
+		</isNotEmpty>
+		<isNotEmpty property="dateEnd">
+<![CDATA[
+			and emall_trade.gmt_create <= DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+	]]>
+		</isNotEmpty>
+		<isNotEmpty property="yearMonth">
+<![CDATA[
+			and emall_trade.gmt_create >= STR_TO_DATE(#yearMonth#,'%Y-%m-%d %H:%i:%s')
+			and emall_trade.gmt_create < DATE_ADD(STR_TO_DATE(#yearMonth#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 MONTH )
+	]]>
+		</isNotEmpty>
+		group by status
+	</select>
+
+<select id="getSaleAnalysisTradeOutPriceCount" resultClass="java.lang.Integer">
+select count(*)
+  from (select 
+  	<isEqual property="actionType" compareValue ="goods">
+		t.goods_id
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+		t.goods_instance_id
+	</isEqual>
+          from emall_order            t,
+               emall_trade            s,
+               emall_trade_package    p,
+               ioss_out_depository    a,
+               ioss_prod_relation_out b,
+               ioss_storage           c
+         where t.tid = s.tid
+           and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+           and a.relation_num = p.merge_tid
+           and s.tid = p.tid
+           and a.status = 'out_finished'
+           and b.out_dep_id = a.id
+           and c.id = b.storage_id
+           and a.type = 'out_sales'
+           and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	    <isEqual property="actionType" compareValue ="goods">
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_id 
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             t.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_instance_id 
+		</isEqual>
+		) tt
+   </select>
+<!--  閿鍞粺璁″垪琛 -->
+<select id="getSaleAnalysisTradeOutPrice" resultMap="saleAnalysisOut">
+select 
+	<isEqual property="actionType" compareValue ="goods">
+		t.goods_id,
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+		t.goods_instance_id as goods_id,
+	</isEqual>
+       sum(b.amount) as saleNum,
+       sum(b.amount * t.goods_price) as salePrice,
+       sum(b.amount * c.price) as goodsInPrice
+  from emall_order            t,
+       emall_trade            s,
+       emall_trade_package    p,
+       ioss_out_depository    a,
+       ioss_prod_relation_out b,
+       ioss_storage           c
+ where t.tid = s.tid
+   and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+   and a.relation_num = p.merge_tid
+   and s.tid = p.tid
+   and a.status = 'out_finished'
+   and b.out_dep_id = a.id
+   and c.id = b.storage_id
+   and a.type = 'out_sales'
+   and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isEqual property="actionType" compareValue ="goods">
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+	group by t.goods_id
+	order by t.goods_id desc
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             t.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+	group by t.goods_instance_id
+	order by t.goods_instance_id desc
+		</isEqual>
+</select>
+
+
+<select id="getSaleAnalysisTradeOutPriceSum" resultMap="saleAnalysisOutMap">
+select 
+	<isEqual property="actionType" compareValue ="goods">
+		count(goods_id) as goods_id,
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+		count(goods_instance_id) as goods_id,
+	</isEqual>
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select 
+		  	<isEqual property="actionType" compareValue ="goods">
+				t.goods_id,
+			</isEqual>
+			<isEqual property="actionType" compareValue ="products">
+				t.goods_instance_id,
+			</isEqual>
+               sum(b.amount) as saleNum,
+               sum(b.amount * t.goods_price) as salePrice,
+               sum(b.amount * c.price) as goodsInPrice
+          from emall_order            t,
+               emall_trade            s,
+               emall_trade_package    p,
+               ioss_out_depository    a,
+               ioss_prod_relation_out b,
+               ioss_storage           c
+         where t.tid = s.tid
+           and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+           and a.relation_num = p.merge_tid
+           and s.tid = p.tid
+           and a.status = 'out_finished'
+           and b.out_dep_id = a.id
+           and c.id = b.storage_id
+           and a.type = 'out_sales'
+           and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		
+		<isEqual property="actionType" compareValue ="goods">
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_id ) cc
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             t.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_instance_id ) cc
+		</isEqual>
+</select>
+
+
+<select id="getSaleAnalysisTradeDetailCount" resultClass="java.lang.Integer">
+
+select count(*) from (
+      select t.goods_id
+from emall_order t,
+	emall_trade s,
+	emall_trade_package    p,
+	ioss_out_depository a,
+	ioss_prod_relation_out b,
+	ioss_storage c
+where t.tid=s.tid 
+	and s.status in ('trade_finish','wait_buyer_confirm_goods') 
+	and a.relation_num=p.merge_tid
+    and s.tid = p.tid
+	and a.status='out_finished' 
+	and b.out_dep_id=a.id 
+	and c.id=b.storage_id
+	and a.type='out_sales' 
+	and t.goods_instance_id=c.goods_instance_id
+	<isNotEmpty prepend="and" property="buyNick">
+		    s.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     t.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+group by t.goods_id,s.tid,s.buy_nick  ) cc
+   </select>
+
+<select id="getSaleAnalysisTradeDetail" resultMap="saleAnalysisDetail">
+<include refid="pageSQLHead"/>
+select t.goods_id,
+       s.buy_nick,
+       s.tid,
+       sum(b.amount) as saleNum,
+       sum(b.amount * t.goods_price) as salePrice,
+       sum(b.amount * c.price) as goodsInPrice
+  from emall_order            t,
+       emall_trade            s,
+       emall_trade_package    p,
+       ioss_out_depository    a,
+       ioss_prod_relation_out b,
+       ioss_storage           c
+ where t.tid = s.tid
+   and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+   and a.relation_num = p.merge_tid
+   and s.tid = p.tid
+   and a.status = 'out_finished'
+   and b.out_dep_id = a.id
+   and c.id = b.storage_id
+   and a.type = 'out_sales'
+   and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="buyNick">
+		    s.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     t.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+ group by t.goods_id, s.tid, s.buy_nick
+ order by s.buy_nick asc
+<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getSaleAnalysisDetailSum" resultMap="saleAnalysisOutMap">
+select count(goods_id) as goods_id,sum(saleNum) as saleNum,sum(salePrice) as salePrice,sum(goodsInPrice) as goodsInPrice  from (
+select t.goods_id,s.buy_nick,s.tid,sum(b.amount) as saleNum,sum(b.amount*t.goods_price) as salePrice,sum(b.amount*c.price) as goodsInPrice
+from emall_order t,
+	emall_trade s,
+	emall_trade_package p,
+	ioss_out_depository a,
+	ioss_prod_relation_out b,
+	ioss_storage c
+where t.tid=s.tid and s.status in ('trade_finish','wait_buyer_confirm_goods') 
+	and a.relation_num=p.merge_tid
+    and s.tid = p.tid  
+	and a.status='out_finished' 
+	and b.out_dep_id=a.id 
+	and c.id=b.storage_id
+	and a.type='out_sales' 
+	and t.goods_instance_id=c.goods_instance_id
+	<isNotEmpty prepend="and" property="buyNick">
+		    s.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     t.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+group by t.goods_id,s.tid,s.buy_nick order by s.buy_nick asc )cc
+</select>
+
+
+<select id="getSaleAnalysisTradeInPrice" resultMap="saleAnalysisIn">
+
+	select sum(b.amount) as saleNum,sum(b.amount*c.price) as goodsInPrice from ioss_storage c ,ioss_prod_relation_out b where c.id=b.storage_id and b.out_dep_id
+in (
+	select a.id 
+	from emall_order t,
+		 emall_trade s,
+		 emall_trade_package p,
+		 ioss_out_depository a
+	where t.tid=s.tid 
+	and s.status='trade_finish' 
+	and a.relation_num= p.merge_tid
+    and s.tid = p.tid 
+	and a.status='on'
+
+			<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			s.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			s.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsId">
+			t.goods_id = #goodsId#
+		</isNotEmpty>
+	)
+</select>
+
+
+
+<resultMap id="saleSlowAnalysisGoods" class="com.huaixuan.network.biz.domain.statistics.GoodsAnalysis" >
+        <result column="goods_id" property="goodsId"/>
+	    <result column="saleSum" property="saleSum" nullValue="0.00"/>
+	     <result column="inPrice" property="inPrice" nullValue="0.00"/>
+	    <result column="outPrice" property="outPrice" nullValue="0.00"/>
+	   <result column="storage_num" property="storageNum"/>
+	    <result column="price" property="price" nullValue="0.00"/>
+</resultMap>
+
+<resultMap id="saleAnalysisGoods" class="com.huaixuan.network.biz.domain.statistics.GoodsAnalysis" >
+        <result column="goods_id" property="goodsId"/>
+	    <result column="saleSum" property="saleSum" nullValue="0.00"/>
+	     <result column="inPrice" property="inPrice" nullValue="0.00"/>
+	    <result column="outPrice" property="outPrice" nullValue="0.00"/>
+	    <result column="storage_num" property="storageNum" nullValue="0"/>
+	    <result column="available_num" property="availableNum" nullValue="0"/>
+</resultMap>
+
+<resultMap id="saleCatAnalysisGoods" class="com.huaixuan.network.biz.domain.statistics.GoodsAnalysis" >
+    <result column="cat_code" property="catCode"/>
+	<result column="saleSum" property="saleSum" nullValue="0.00"/>
+	<result column="inPrice" property="inPrice" nullValue="0.00"/>
+	<result column="outPrice" property="outPrice" nullValue="0.00"/>
+</resultMap>
+
+<resultMap id="refundAnalysisGoods" class="com.huaixuan.network.biz.domain.statistics.GoodsAnalysis" >
+        <result column="goods_id" property="goodsId"/>
+	<result column="refundSum" property="refundSum" nullValue="0.00"/>
+	<result column="refundPrice" property="refundPrice" nullValue="0.00"/>
+	<result column="refundCustomer" property="refundCustomer" />
+</resultMap>
+
+<!--  鐑攢鍟嗗搧缁熻 -->
+<select id="getHotSalesGoods" resultMap="saleAnalysisGoods">
+<include refid="pageSQLHead"/>
+	select * from (
+		select  b.goods_id,
+				(select sum(eg.goods_number) from emall_goods eg where eg.id = b.goods_id) as available_num,
+				(select sum(st.storage_num) from ioss_storage st where st.goods_id = b.goods_id) as storage_num,
+                 sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,
+				 ioss_prod_relation_out n,
+			 	 ioss_storage p,
+    		     emall_trade a,
+    		     emall_trade_package tp,
+    		     emall_order b,
+    		     emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id 
+				and n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="brandId">
+				   c.brand_id = #brandId#
+				</isNotEmpty>
+			group by b.goods_id
+		order by saleSum desc
+		<isNotEmpty property="goodsNum">
+		   <![CDATA[  LIMIT  #goodsNum# ]]>
+		</isNotEmpty>
+		) t 
+<include refid="pageSQLFoot"/>
+</select>
+
+
+	<select id="getHotSalesGoodsCount" resultClass="java.lang.Integer">
+select count(*) from (
+	select * from (
+		select  b.goods_id,sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,
+				 ioss_prod_relation_out n,
+				 ioss_storage p,
+    		 	 emall_trade a,
+    		 	 emall_trade_package tp,
+    		 	 emall_order b,
+    		 	 emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="brandId">
+				   c.brand_id = #brandId#
+				</isNotEmpty>
+			group by b.goods_id) t where 1=1
+		<isNotEmpty property="goodsNum">
+		   <![CDATA[  LIMIT   #goodsNum# ]]>
+		</isNotEmpty>
+		)s
+</select>
+
+<select id="getHotSalesGoodsSum" resultMap="saleAnalysisOutMap">
+	select count(goods_id) as goods_id,sum(saleSum) as saleNum,sum(outPrice) as salePrice,sum(inPrice) as goodsInPrice  from (
+		select * from (
+		select  b.goods_id,sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,
+				ioss_prod_relation_out n,
+				ioss_storage p,
+    		 	emall_trade a,
+    		 	emall_trade_package tp,
+    		 	emall_order b,
+    		 	emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id 
+				and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="brandId">
+				   c.brand_id = #brandId#
+				</isNotEmpty>
+			group by b.goods_id
+		order by saleSum desc) t where 1=1
+		<isNotEmpty property="goodsNum">
+		   <![CDATA[  LIMIT #goodsNum# ]]>
+		</isNotEmpty>
+		)k
+
+</select>
+
+
+
+	<select id="getSlowSalesGoodsCount" resultClass="java.lang.Integer">
+	     select count(*) from
+     (
+          select aa.id,k.goods_number,k.sale_amount,k.cost_amount,k.available_num
+          from (select f.goods_id,sum(i.goods_number) as available_num ,0 as goods_number,0 as sale_amount,0 as cost_amount
+          from ioss_storage f ,emall_goods i
+          where f.goods_id not in
+          (select distinct j.goods_id
+          from emall_trade h,emall_order j,emall_goods k
+          where h.tid = j.tid and k.id=j.goods_id
+          and h.status in ('trade_finish','wait_buyer_confirm_goods')
+		<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			h.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			h.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+          ) and f.goods_id=i.id
+          <isNotEmpty prepend="and" property="catCode">
+               i.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       i.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          group by  f.goods_id
+          HAVING sum(f.storage_num) >0) k,emall_goods aa
+          where k.goods_id = aa.id
+
+          UNION
+
+          select  b.goods_id,sum(n.amount) goods_number,sum(n.amount*b.goods_price) sale_amount,sum(n.amount * p.price) cost_amount,
+          (select sum(eg.goods_number) from emall_goods eg where eg.id = b.goods_id) as available_num
+          from ioss_out_depository m,
+          	   ioss_prod_relation_out n,
+          	   ioss_storage p,
+               emall_trade a,
+               emall_trade_package tp,
+               emall_order b,
+               emall_goods c
+          where a.tid = b.tid 
+          	and b.goods_id = c.id 
+          	and m.relation_num = tp.merge_tid
+    		and a.tid = tp.tid 
+          	and m.id = n.out_dep_id 
+          	and  n.storage_id = p.id
+          	and b.goods_instance_id = n.goods_instance_id
+          	and m.type ='out_sales'
+          	and a.status in ('trade_finish','wait_buyer_confirm_goods')
+          <isNotEmpty prepend="and" property="catCode">
+               c.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       c.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          <isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			a.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+          group by b.goods_id
+          having
+          <isNotEmpty prepend="" property="goodsNum">
+         <![CDATA[      sum(n.amount) <= #goodsNum#             ]]>
+		</isNotEmpty>
+
+     ) bb
+	</select>
+
+	<select id="getSlowSalesGoods" resultMap="saleAnalysisGoods">
+	<include refid="pageSQLHead"/>
+		select id as goods_id,goods_number as saleSum,cost_amount as inPrice,sale_amount as outPrice,available_num,0 as storage_num from
+     (
+          select aa.id,k.goods_number,k.sale_amount,k.cost_amount,k.available_num
+          from (select f.goods_id,sum(i.goods_number) as available_num,0 as goods_number,0 as sale_amount,0 as cost_amount
+          from ioss_storage f,emall_goods i
+          where f.goods_id not in
+          (select distinct j.goods_id
+          from emall_trade h,emall_order j,emall_goods k
+          where h.tid = j.tid and k.id=j.goods_id
+          and h.status in ('trade_finish','wait_buyer_confirm_goods')
+
+		<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			h.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			h.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+          ) and f.goods_id=i.id
+          <isNotEmpty prepend="and" property="catCode">
+               i.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       i.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          group by  f.goods_id
+          HAVING sum(f.storage_num) >0) k,emall_goods aa
+          where k.goods_id = aa.id
+
+          UNION
+
+          select b.goods_id,sum(n.amount) goods_number,sum(n.amount*b.goods_price) sale_amount,sum(n.amount * p.price) cost_amount,
+          (select sum(eg.goods_number) from emall_goods eg where eg.id = b.goods_id) as available_num
+          from ioss_out_depository m,
+          	   ioss_prod_relation_out n,
+          	   ioss_storage p,
+               emall_trade a,
+               emall_trade_package tp,
+               emall_order b,
+               emall_goods c
+          where a.tid = b.tid 
+          	and b.goods_id = c.id 
+          	and m.relation_num = tp.merge_tid
+    		and a.tid = tp.tid 
+          	and m.id = n.out_dep_id 
+          	and  n.storage_id = p.id
+			and b.goods_instance_id = n.goods_instance_id
+          	and m.type ='out_sales'
+	      	and a.status in ('trade_finish','wait_buyer_confirm_goods')
+          <isNotEmpty prepend="and" property="catCode">
+               c.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       c.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          <isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			a.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+          group by b.goods_id
+          having
+          <isNotEmpty prepend="" property="goodsNum">
+         <![CDATA[       sum(n.amount) <= #goodsNum#             ]]>
+		</isNotEmpty>
+
+     ) bb order by saleSum desc
+     <include refid="pageSQLFoot"/>
+	</select>
+
+
+	<select id="getSlowSalesGoodsSum" resultMap="saleAnalysisOutMap">
+	select count(goods_id) as goods_id,sum(saleSum) as saleNum,sum(outPrice) as salePrice,sum(inPrice) as goodsInPrice  from (
+		select id as goods_id,goods_number as saleSum,cost_amount as inPrice,sale_amount as outPrice from
+     (
+          select aa.id,k.goods_number,k.sale_amount,k.cost_amount,k.available_num
+          from (select f.goods_id,sum(i.goods_number) as available_num,0 as goods_number,0 as sale_amount,0 as cost_amount
+          from ioss_storage f,emall_goods i
+          where f.goods_id not in
+          (select distinct j.goods_id
+          from emall_trade h,emall_order j,emall_goods k
+          where h.tid = j.tid and k.id=j.goods_id
+          and h.status in ('trade_finish','wait_buyer_confirm_goods')
+
+		<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			h.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			h.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+          ) and f.goods_id=i.id
+          <isNotEmpty prepend="and" property="catCode">
+               i.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       i.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          group by  f.goods_id
+          HAVING sum(f.storage_num) >0) k,emall_goods aa
+          where k.goods_id = aa.id
+
+          UNION
+
+          select  b.goods_id,sum(n.amount) goods_number,sum(n.amount*b.goods_price) sale_amount,sum(n.amount * p.price) cost_amount,
+          (select sum(eg.goods_number) from emall_goods eg where eg.id = b.goods_id) as available_num
+          from ioss_out_depository m,
+          	   ioss_prod_relation_out n,
+          	   ioss_storage p,
+               emall_trade a,
+               emall_trade_package tp,
+               emall_order b,
+               emall_goods c
+          where a.tid = b.tid 
+          	and b.goods_id = c.id 
+          	and m.relation_num = tp.merge_tid
+    		and a.tid = tp.tid 
+          	and m.id = n.out_dep_id 
+          	and n.storage_id = p.id
+			and b.goods_instance_id = n.goods_instance_id
+          	and m.type ='out_sales'
+          	and a.status in ('trade_finish','wait_buyer_confirm_goods')
+          <isNotEmpty prepend="and" property="catCode">
+               c.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsCode">
+		       c.goods_sn like concat('%',#goodsCode#,'%')
+		</isNotEmpty>
+          <isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[			a.gmt_create >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[			a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+          group by b.goods_id
+          having
+          <isNotEmpty prepend="" property="goodsNum">
+         <![CDATA[      sum(n.amount) <= #goodsNum#             ]]>
+		</isNotEmpty>
+
+     ) bb )cc
+	</select>
+
+
+
+
+		<select id="getCatSalesGoodsSum" resultMap="saleAnalysisOutMap">
+	select count(cat_code) as goods_id,sum(saleSum) as saleNum,sum(outPrice) as salePrice,sum(inPrice) as goodsInPrice  from (
+		select  c.cat_code,sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,
+				ioss_prod_relation_out n,
+				ioss_storage p,
+    		 	emall_trade a,
+    		 	emall_trade_package tp,
+    		 	emall_order b,
+    		 	emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id 
+				and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+				</isNotEmpty>
+
+			group by c.cat_code) t
+
+</select>
+
+
+<select id="getCatSalesGoods" resultMap="saleCatAnalysisGoods">
+<include refid="pageSQLHead"/>
+	select cat_code,saleSum,outPrice,inPrice from (
+			select  c.cat_code,
+			sum(n.amount) as saleSum,
+			sum(n.amount*b.goods_price) as outPrice,
+			sum(n.amount * p.price) as inPrice
+			<!-- ,
+			row_number() over(partition by substr(c.cat_code, 1, 3) order by sum(n.amount) desc) as tmp   -->
+	from
+			ioss_out_depository m,
+			ioss_prod_relation_out n,
+			ioss_storage p,
+    		emall_trade a,
+    		emall_trade_package tp,
+    		emall_order b,
+    		emall_goods c
+	where
+			a.tid = b.tid
+			and b.goods_id = c.id
+			and m.relation_num = tp.merge_tid
+    		and a.tid = tp.tid 
+		    and m.id = n.out_dep_id and  n.storage_id = p.id
+			and b.goods_instance_id = n.goods_instance_id
+			and m.type ='out_sales'
+			and a.status in ('trade_finish','wait_buyer_confirm_goods')
+			<isNotEmpty prepend="and" property="catCode">
+		           c.cat_code like concat(#catCode#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[	a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+			</isNotEmpty>
+			group by c.cat_code) t
+<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 鍙互閰嶅悎绋嬪簭瀹炵幇
+<select id="getCatSalesGoods" resultMap="saleCatAnalysisGoods">
+<include refid="pageSQLHead"/>
+	select * from (
+		select  c.cat_code,sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,ioss_prod_relation_out n,ioss_storage p,
+    		 emall_trade a,emall_order b,emall_goods c
+				where a.tid = b.tid and b.goods_id = c.id and m.relation_num = a.tid
+				and m.id = n.out_dep_id and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+				</isNotEmpty>
+			group by c.cat_code) t  order by
+			<isEmpty property="catCode" prepend=" ">
+				cat_code asc,
+			</isEmpty>
+			 saleSum desc
+<include refid="pageSQLFoot"/>
+</select>
+ -->
+
+		<select id="getCatSalesGoodsCount" resultClass="java.lang.Integer">
+
+	select count(*) from (
+		select  c.cat_code,sum(n.amount) as saleSum,sum(n.amount*b.goods_price) as outPrice,sum(n.amount * p.price) as inPrice
+			from ioss_out_depository m,
+				ioss_prod_relation_out n,
+				ioss_storage p,
+    		 	emall_trade a,
+    		 	emall_trade_package tp,
+    		 	emall_order b,
+    		 	emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id 
+				and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create >  STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create <   DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+				</isNotEmpty>
+
+			group by c.cat_code) t
+</select>
+
+
+	<select id="getAnalysisRefundGoods" resultMap="refundAnalysisGoods">
+	<include refid="pageSQLHead"/>
+		select emall_refund_order.goods_instance_id as goods_id,sum(emall_refund_order.ref_amount) as refundSum ,sum(emall_refund_order.ref_amount*emall_refund_order.price) as refundPrice,count(distinct emall_refund_order.customer_id) as refundCustomer
+		from emall_refund_order ,emall_refund where emall_refund.refund_id=emall_refund_order.refund_id
+		and emall_refund.type!='f'
+
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+               emall_refund_order.goods_instance_id =#goodsInstanceId#
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			emall_refund_order.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			emall_refund_order.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+		</isNotEmpty>
+		group by goods_instance_id
+<include refid="pageSQLFoot"/>
+</select>
+
+	<select id="getAnalysisRefundGoodsCount" resultClass="java.lang.Integer">
+		select count(*) from (
+		select emall_refund_order.goods_instance_id
+		from emall_refund_order ,emall_refund where emall_refund.refund_id=emall_refund_order.refund_id
+		and emall_refund.type!='f'
+
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+               emall_refund_order.goods_instance_id =#goodsInstanceId#
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			emall_refund_order.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			emall_refund_order.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		group by goods_instance_id) t
+
+</select>
+
+<select id="getGoodsInStorage" resultMap="GoodsInStorage" parameterClass="java.util.Map">
+  <include refid="pageSQLHead"/>
+     <![CDATA[
+      select
+		 gi.code as code,
+		 gi.instance_name as instance_name,
+		 gi.cat_code as cat_code,
+		 gi.attrs as attrs,
+         gi.goods_unit as goods_unit,
+         st.loc_id,
+         sum(st.storage_num) as storage_num_sum,
+      	 sum(st.price*st.storage_num)/sum(st.storage_num) as average_price,
+		 sum(st.price*st.storage_num) as storage_cost,
+		 eg.goods_price as goods_price,
+		 st.dep_first_id,
+		 st.stor_type
+       from
+       ioss_goods_instance gi, ioss_storage st, emall_goods eg
+       where st.goods_instance_id = gi.id and eg.id = gi.goods_id
+		]]>
+     	<isNotEmpty prepend="and" property="code">
+     	  gi.code like concat('%',#code#,'%')
+     	</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+		  gi.instance_name like concat('%',#instanceName#,'%')
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="depId">
+          st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode">
+		  gi.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		  st.dep_first_id = #depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+		  st.stor_type = #storType#
+		</isNotEmpty>
+        group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,eg.goods_price,st.loc_id,st.dep_first_id,st.stor_type
+		HAVING sum(st.storage_num) > 0
+		order by gi.code
+	<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getGoodsInStorageCount" parameterClass="java.util.Map" resultClass="int">
+<![CDATA[
+   select count(1) from(
+      select
+		 gi.code as code,
+		 gi.instance_name as instance_name,
+		 gi.cat_code as cat_code,
+		 gi.attrs as attrs,
+         gi.goods_unit as goods_unit,
+         st.loc_id,
+         sum(st.storage_num) as storage_num_sum,
+      	 sum(st.price*st.storage_num)/sum(st.storage_num) as average_price,
+		 sum(st.price*st.storage_num) as storage_cost,
+		 eg.goods_price as goods_price,
+		 st.dep_first_id,
+		 st.stor_type
+       from
+       ioss_goods_instance gi, ioss_storage st, emall_goods eg
+       where st.goods_instance_id = gi.id and eg.id = gi.goods_id
+		]]>
+     	<isNotEmpty prepend="and" property="code">
+     	  gi.code like concat('%',#code#,'%')
+     	</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName">
+		  gi.instance_name like concat('%',#instanceName#,'%')
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="depId">
+          st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode">
+		  gi.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+		  st.dep_first_id = #depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+		  st.stor_type = #storType#
+		</isNotEmpty>
+        group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,eg.goods_price,st.loc_id,st.dep_first_id,st.stor_type
+		HAVING sum(st.storage_num) > 0
+		) aa
+</select>
+
+<select id="getRefundAnalysisDetailCount" resultClass="java.lang.Integer">
+select count(*) from (
+ select aa.goods_id,
+       aa.buy_nick,
+       aa.refund_id as tid,
+       sum(saleNum),
+       sum(salePrice),
+       sum(goodsInPrice)
+  from (select er.goods_id,
+               r.buy_nick,
+               r.refund_id,
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="buyNick">
+		    r.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     er.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+         group by er.goods_id, r.refund_id, r.buy_nick, a.id) aa
+   group by aa.goods_id, aa.refund_id, aa.buy_nick
+ order by aa.buy_nick asc) cc
+   </select>
+
+<select id="getRefundAnalysisDetail" resultMap="saleAnalysisDetail">
+<include refid="pageSQLHead"/>
+select aa.goods_id,
+       aa.buy_nick,
+       aa.refund_id as tid,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select er.goods_id,
+               r.buy_nick,
+               r.refund_id,
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="buyNick">
+		    r.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     er.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+         group by er.goods_id, r.refund_id, r.buy_nick, a.id) aa
+ group by aa.goods_id, aa.refund_id, aa.buy_nick
+ order by aa.buy_nick asc
+<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getRefundAnalysisDetailSum" resultMap="saleAnalysisOutMap">
+select count(goods_id) as goods_id,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select aa.goods_id as goods_id,
+       aa.buy_nick,
+       aa.tid,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select er.goods_id,
+               r.buy_nick,
+               r.tid,
+               sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="buyNick">
+		    r.buy_nick like CONCAT('%',#buyNick#,'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotNull prepend="and" property="goodsIds">
+		     er.goods_id in (
+                select emall_goods.ID from emall_goods where 1=1
+             <include refid="GOODS.COMMON_CONDITION" />
+             )
+        </isNotNull>
+         group by er.goods_id, r.tid, r.buy_nick, a.id) aa
+   group by aa.goods_id, aa.tid, aa.buy_nick
+ order by aa.buy_nick asc) cc
+</select>
+
+<select id="getRefundAnalysisCount" resultClass="java.lang.Integer">
+select count(*)
+  from (select
+  	<isEqual property="actionType" compareValue ="goods">
+		aa.goods_id,
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+		aa.goods_instance_id,
+	</isEqual>
+  sum(saleNum), sum(salePrice), sum(goodsInPrice)
+    from (select 
+		    <isEqual property="actionType" compareValue ="goods">
+				er.goods_id,
+			</isEqual>
+			<isEqual property="actionType" compareValue ="products">
+				er.goods_instance_id,
+			</isEqual>
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="dateStart">
+         <![CDATA[	a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+    </isNotEmpty>
+	<isNotEmpty prepend="and" property="dateEnd">
+         <![CDATA[	a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+	</isNotEmpty>
+	
+    <isEqual property="actionType" compareValue ="goods">
+	    <isNotNull prepend="and" property="goodsIds">
+	         er.goods_id in (
+	             select emall_goods.ID from emall_goods where 1=1
+	         <include refid="GOODS.COMMON_CONDITION" />
+	         )
+	    </isNotNull>
+		 group by er.goods_id, a.id) aa
+      group by aa.goods_id
+      order by aa.goods_id desc
+ ) cc
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             er.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+		group by er.goods_instance_id, a.id) aa
+      group by aa.goods_instance_id
+      order by aa.goods_instance_id desc
+ ) cc
+	</isEqual>
+</select>
+
+<select id="getRefundAnalysisTradeOutPrice" resultMap="saleAnalysisOut">
+select aa.goods_id, sum(saleNum) as saleNum, sum(salePrice) as salePrice, sum(goodsInPrice) as goodsInPrice
+  from (select 
+  		<isEqual property="actionType" compareValue ="goods">
+			er.goods_id,
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			er.goods_instance_id as goods_id,
+		</isEqual>
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+        <isEqual property="actionType" compareValue ="goods">
+		    <isNotNull prepend="and" property="goodsIds">
+	             er.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_id, a.id) aa
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             er.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_instance_id, a.id) aa
+		</isEqual> 
+ 	group by aa.goods_id
+ order by aa.goods_id desc
+</select>
+
+<select id="getRefundAnalysisTradeOutPriceSum" resultMap="saleAnalysisOutMap">
+select count(goods_id) as goods_id,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select 
+  	<isEqual property="actionType" compareValue ="goods">
+		aa.goods_id as goods_id,
+	</isEqual>
+	<isEqual property="actionType" compareValue ="products">
+		aa.goods_instance_id as goods_id,
+	</isEqual>
+  	sum(saleNum) as saleNum, 
+  	sum(salePrice) as salePrice, 
+  	sum(goodsInPrice) as goodsInPrice
+    from (select 
+    	<isEqual property="actionType" compareValue ="goods">
+			er.goods_id,
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			er.goods_instance_id,
+		</isEqual>
+               sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		
+		<isEqual property="actionType" compareValue ="goods">
+		    <isNotNull prepend="and" property="goodsIds">
+	             er.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_id, a.id) aa
+		group by aa.goods_id
+ order by aa.goods_id desc
+		</isEqual>
+		<isEqual property="actionType" compareValue ="products">
+			<isNotNull prepend="and" property="goodsIds">
+	             er.goods_instance_id in (
+	                select ioss_goods_instance.ID from ioss_goods_instance 
+	                where 1=1
+	                <include refid="GOODS_INSTANCE.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_instance_id, a.id) aa
+		group by aa.goods_instance_id
+ order by aa.goods_instance_id desc
+		</isEqual>
+ )cc
+</select>
+
+<resultMap id="catSaleAnalysisOutMap" class="java.util.HashMap" >
+		<result column="saleNum" property="saleNum" nullValue="0"/>
+		<result column="salePrice" property="salePrice" nullValue="0.00"/>
+</resultMap>
+
+<select id="getCatalogAnalysis" resultMap="catSaleAnalysisOutMap">
+	select sum(saleNum) as saleNum,sum(salePrice) as salePrice from (
+		select  sum(n.amount) as saleNum,sum(n.amount*b.goods_price) as salePrice
+			from ioss_out_depository m,
+				ioss_prod_relation_out n,
+				ioss_storage p,
+    		 	emall_trade a,
+    		 	emall_trade_package tp,
+    		 	emall_order b,
+    		 	emall_goods c
+			where a.tid = b.tid 
+				and b.goods_id = c.id 
+				and m.relation_num = tp.merge_tid
+    			and a.tid = tp.tid 
+				and m.id = n.out_dep_id 
+				and  n.storage_id = p.id
+				and b.goods_instance_id = n.goods_instance_id
+				and m.type ='out_sales'
+				and a.status in ('trade_finish','wait_buyer_confirm_goods')
+				<isNotEmpty prepend="and" property="catCode">
+               		c.cat_code like concat(#catCode#,'%')
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateStart">
+				<![CDATA[	a.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+				</isNotEmpty>
+				<isNotEmpty prepend="and" property="dateEnd">
+				<![CDATA[	a.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+				</isNotEmpty>
+			) as k
+</select>
+
+<resultMap id="catalogOrderAnalysisMap" class="com.huaixuan.network.biz.domain.statistics.CatalogOrderAnalysis" >
+		<result column="catCode" property="catCode"/>
+        <result column="customerNum" property="customerNum" nullValue="0"/>
+		<result column="orderNum" property="orderNum" nullValue="0"/>
+		<result column="orderAmount" property="orderAmount" nullValue="0.00"/>
+</resultMap>
+
+<select id="getCatalogOrderAnalysis" resultMap="catalogOrderAnalysisMap">
+	<include refid="pageSQLHead"/>
+	select x.catCode,
+       count(distinct y.buy_nick) as customerNum,
+       count(y.tid) as orderNum,
+       sum(x.amount) as orderAmount
+	   from(
+	   <!-- 鍏堝幓鎺夊悓涓洰褰曚腑鐩稿悓鐨勮鍗 -->
+		   select g.cat_code as catCode,t.tid as tid,sum(t.goods_number*t.goods_price) as amount
+	       from emall_order             t,
+	             emall_trade            s,
+	             emall_trade_package    tp,
+	             emall_goods            g,
+	             ioss_out_depository    a
+	       where t.tid = s.tid
+	       and t.goods_id = g.id
+	       and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+	       and a.relation_num = tp.merge_tid
+    	   and s.tid = tp.tid 
+	       and a.status = 'out_finished'
+	       and a.type = 'out_sales'
+		   <isNotEmpty prepend="and" property="catCode">
+			           		g.cat_code like concat(#catCode#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[	t.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[	t.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+			</isNotEmpty>
+			group by g.cat_code,t.tid
+		) x left join emall_trade y on x.tid = y.tid
+		group by x.catCode
+	<include refid="pageSQLFoot"/>
+</select>
+
+
+
+<select id="getCatalogOrderAnalysisCount" resultClass="java.lang.Integer">
+select count(*) from (
+	select x.catCode,
+       count(distinct y.buy_nick) as customerNum,
+       count(y.tid) as orderNum,
+       sum(x.amount) as orderAmount
+	   from(
+	   <!-- 鍏堝幓鎺夊悓涓洰褰曚腑鐩稿悓鐨勮鍗 -->
+		   select g.cat_code as catCode,t.tid as tid,sum(t.goods_number*t.goods_price) as amount
+	       from emall_order             t,
+	             emall_trade            s,
+	             emall_trade_package    tp,
+	             emall_goods            g,
+	             ioss_out_depository    a
+	       where t.tid = s.tid
+	       and t.goods_id = g.id
+	       and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+	       and a.relation_num = tp.merge_tid
+    	   and s.tid = tp.tid 
+	       and a.status = 'out_finished'
+	       and a.type = 'out_sales'
+		   <isNotEmpty prepend="and" property="catCode">
+			           		g.cat_code like concat(#catCode#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[	t.gmt_create > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateEnd">
+			<![CDATA[	t.gmt_create <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+			</isNotEmpty>
+			group by g.cat_code,t.tid
+		) x left join emall_trade y on x.tid = y.tid
+		group by x.catCode) tt
+</select>
+<!-- added by chenyan 2011/03/03 start -->
+<select id="getSaleAnalysisDepositoryCount" resultClass="java.lang.Integer">
+select count(*)
+  from (select t.goods_id
+          from emall_order            t,
+               emall_trade            s,
+               emall_trade_package    p,
+               ioss_out_depository    a,
+               ioss_prod_relation_out b,
+               ioss_storage           c,
+               ioss_dep_location      dl
+         where t.tid = s.tid
+           and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+           and a.relation_num = p.merge_tid
+           and s.tid = p.tid
+           and a.status = 'out_finished'
+           and b.out_dep_id = a.id
+           and c.id = b.storage_id
+           and a.type = 'out_sales'
+           and c.loc_id = dl.id
+           and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep > STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			c.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			c.loc_id=#locId# ]]>
+		</isNotEmpty>
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_id ) cc
+   </select>
+   
+   <select id="getRefundAnalysisDepositoryCount" resultClass="java.lang.Integer">
+select count(*)
+  from (select aa.goods_id,
+  sum(saleNum), sum(salePrice), sum(goodsInPrice)
+    from (select er.goods_id,
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er,
+          		ioss_prod_relation_in b,
+                ioss_dep_location dl
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+           and b.in_dep_id = a.id
+           and b.loc_id = dl.id
+	<isNotEmpty prepend="and" property="dateStart">
+         <![CDATA[	a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s')]]>
+    </isNotEmpty>
+	<isNotEmpty prepend="and" property="dateEnd">
+         <![CDATA[	a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			b.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			b.loc_id=#locId# ]]>
+		</isNotEmpty>
+		
+    
+	    <isNotNull prepend="and" property="goodsIds">
+	         er.goods_id in (
+	             select emall_goods.ID from emall_goods where 1=1
+	         <include refid="GOODS.COMMON_CONDITION" />
+	         )
+	    </isNotNull>
+		 group by er.goods_id, a.id) aa
+      group by aa.goods_id
+      order by aa.goods_id desc
+ ) cc
+</select>
+
+<select id="getSaleAnalysisDepositoryTradeOutPriceSum" resultMap="saleAnalysisOutMap">
+select count(goods_id) as goods_id,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select t.goods_id,
+               sum(b.amount) as saleNum,
+               sum(b.amount * t.goods_price) as salePrice,
+               sum(b.amount * c.price) as goodsInPrice
+          from emall_order            t,
+               emall_trade            s,
+               emall_trade_package    p,
+               ioss_out_depository    a,
+               ioss_prod_relation_out b,
+               ioss_storage           c,
+               ioss_dep_location      dl
+         where t.tid = s.tid
+           and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+           and a.relation_num = p.merge_tid
+           and s.tid = p.tid
+           and a.status = 'out_finished'
+           and b.out_dep_id = a.id
+           and c.id = b.storage_id
+           and a.type = 'out_sales'
+           and c.loc_id = dl.id
+           and t.goods_instance_id = c.goods_instance_id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			c.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			c.loc_id=#locId# ]]>
+		</isNotEmpty>
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by t.goods_id ) cc
+</select>
+
+<select id="getSaleAnalysisDepository" resultMap="saleAnalysisOutDepository">
+select t.goods_id,
+	   c.dep_first_id,
+       dl.dep_id,
+       c.loc_id,
+       sum(b.amount) as saleNum,
+       sum(b.amount * t.goods_price) as salePrice,
+       sum(b.amount * c.price) as goodsInPrice
+  from emall_order            t,
+       emall_trade            s,
+       emall_trade_package    p,
+       ioss_out_depository    a,
+       ioss_prod_relation_out b,
+       ioss_storage           c,
+       ioss_dep_location      dl
+ where t.tid = s.tid
+   and s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+   and a.relation_num = p.merge_tid
+   and s.tid = p.tid
+   and a.status = 'out_finished'
+   and b.out_dep_id = a.id
+   and c.id = b.storage_id
+   and a.type = 'out_sales'
+   and c.loc_id = dl.id
+   and t.goods_instance_id = c.goods_instance_id
+   		<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			c.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			c.loc_id=#locId# ]]>
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_out_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		    <isNotNull prepend="and" property="goodsIds">
+	             t.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+	group by t.goods_id,c.dep_first_id,dl.dep_id,c.loc_id
+	order by t.goods_id desc
+
+</select>
+
+<select id="getRefundAnalysisDepositoryTradeOutPriceSum" resultMap="saleAnalysisOutMap">
+select count(goods_id) as goods_id,
+       sum(saleNum) as saleNum,
+       sum(salePrice) as salePrice,
+       sum(goodsInPrice) as goodsInPrice
+  from (select aa.goods_id as goods_id,
+  	sum(saleNum) as saleNum, 
+  	sum(salePrice) as salePrice, 
+  	sum(goodsInPrice) as goodsInPrice
+    from (select er.goods_id,
+               sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er,
+          		ioss_prod_relation_in b,
+                ioss_dep_location dl
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+           and b.in_dep_id = a.id
+           and b.loc_id = dl.id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			b.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			b.loc_id=#locId# ]]>
+		</isNotEmpty>
+		    <isNotNull prepend="and" property="goodsIds">
+	             er.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_id, a.id) aa
+		group by aa.goods_id
+ order by aa.goods_id desc
+
+ )cc
+</select>
+
+<select id="getRefundAnalysisDepository" resultMap="saleAnalysisOutDepository">
+select aa.goods_id,aa.dep_first_id,aa.dep_id,aa.loc_id, sum(saleNum) as saleNum, sum(salePrice) as salePrice, sum(goodsInPrice) as goodsInPrice
+  from (select er.goods_id,
+		b.dep_first_id,dl.dep_id,b.loc_id,
+               -sum(er.ref_amount) as saleNum,
+               sum(er.fact_fee) as salePrice,
+               sum(er.ref_amount) *
+               (select avg(p.self_cost)
+                  from ioss_prod_relation_in p
+                 where p.in_dep_id = a.id) as goodsInPrice
+          from ioss_in_depository a, emall_refund r, emall_refund_order er,ioss_prod_relation_in b,ioss_dep_location dl
+         where r.refund_id = er.refund_id
+           and r.status = 'success'
+           and a.relation_num = r.refund_id
+           and a.status = 'in_finished'
+           and a.type = 'in_sales_refund'
+           and b.in_dep_id = a.id
+           and b.loc_id = dl.id
+	<isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			a.gmt_in_dep >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="depfirstId">
+<![CDATA[			b.dep_first_id=#depfirstId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+<![CDATA[			dl.dep_id=#depId# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+<![CDATA[			b.loc_id=#locId# ]]>
+		</isNotEmpty>
+		    <isNotNull prepend="and" property="goodsIds">
+	             er.goods_id in (
+	                select emall_goods.ID from emall_goods where 1=1
+	             <include refid="GOODS.COMMON_CONDITION" />
+	             )
+	        </isNotNull>
+			group by er.goods_id, a.id,b.dep_first_id,
+       dl.dep_id,
+       b.loc_id) aa
+
+ 	group by aa.goods_id,aa.dep_first_id,
+       aa.dep_id,
+       aa.loc_id
+ order by aa.goods_id desc
+</select>
+
+
+<select id="getStoreDay" resultMap="storeDayResult">
+	SELECT * FROM hx_store_day t WHERE t.datemonthday=#datemonthday# LIMIT 0,1
+</select>
+
+
+</sqlMap>

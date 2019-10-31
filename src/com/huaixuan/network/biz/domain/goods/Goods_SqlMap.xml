@@ -1,0 +1,1698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Goods">
+	<cacheModel id="goods-cache" type="LRU">
+		<flushInterval hours="24"/>
+	   <flushOnExecute statement="addGoods"/>
+	   <flushOnExecute statement="editGoods"/>
+	   <flushOnExecute statement="removeGoods"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+	<typeAlias alias="goods"
+		type="com.huaixuan.network.biz.domain.goods.Goods" />
+	<resultMap class="goods" id="goodsResult">
+		<result column="id" property="id" />
+		<result column="cat_code" property="catCode" />
+		<result column="goods_sn" property="goodsSn" />
+		<result column="title" property="title" />
+		<result column="brand_id" property="brandId"/>	
+		<result column="sale_number" property="saleNumber" />
+		<result column="market_price" property="marketPrice" />
+		<result column="goods_price" property="goodsPrice" />
+		<result column="goods_number" property="goodsNumber" nullValue="0"/>
+		<result column="hk_goods_number" property="hkGoodsNumber" nullValue="0"/>
+		<result column="goods_desc" property="goodsDesc" />
+		<result column="img_large" property="imgLarge" />
+		<result column="img_middle" property="imgMiddle" />
+		<result column="img_small" property="imgSmall" />
+		<result column="attr_value" property="attrValue" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="goods_status" property="goodsStatus" />
+		<result column="gmt_listing" property="gmtListing" />
+		<result column="gmt_delisting" property="gmtDelisting" />
+		<result column="click_count" property="clickCount" />
+		<result column="goods_weight" property="goodsWeight" nullValue="0.000" />
+		<result column="warn_number" property="warnNumber" />
+		<result column="original_img" property="originalImg" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="goods_rank" property="goodsRank" />
+		<result column="is_cutprice" property="isCutprice" />
+		<result column="gmt_cutprice" property="gmtCutprice" />
+		<result column="sales_pro_price" property="salesProPrice" nullValue="0.00"/>
+		<result column="goods_unit" property="goodsUnit" />
+	    <result column="agent_price" property="agentPrice" nullValue="0.00"/>
+		<result column="is_agent" property="isAgent"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="goods_item" property="goodsItem"/>
+		<result column="is_paipai" property="isPaipai"/>
+		<result column="paipai_class_id" property="paipaiClassId" />
+		<result column="paipai_attr" property="paipaiAttr" />
+		<!-- add by jinxx 2010/10/22 start for 是否淘宝-->
+		<result column="is_taobao" property="isTaobao"/>
+		<!-- add by jinxx 2010/10/22 end  for 是否淘宝-->
+		<result column="express_Ids" property="expressIds"/>
+		
+	</resultMap>
+	<resultMap id="goodsResultEXT" class="goods" extends="goodsResult">
+		<result column="cat_Name" property="catName" />
+	</resultMap>
+	<resultMap id="goodsResultEXT2" class="goods"
+		extends="goodsResult">
+		<result column="is_taobao" property="isTaobao"/>
+		<result column="taobao_class_id" property="taobaoClassId" />
+		<result column="taobao_attr" property="taobaoAttr" />
+		<result column="taobao_sku_prop" property="taobaoSkuProp" />
+		<result column="taobao_input_str" property="taobaoInputStr" />
+		<result column="taobao_input_pids" property="taobaoInputPids" />
+		<result column="taobao_sku_prop_name" property="taobaoSkuPropName" />
+		<result column="hkhx_price" property="hkhxPrice" />
+		<result column="hk_price" property="hkPrice" />
+		<result column="eu_price" property="euPrice" />
+		<result column="idSeries" property="idSeries"/>
+		<result column="Type" property="type" />
+		<result column="Material" property="material" />
+		<result column="Color" property="color" />		
+		<result column="targetCustomers" property="targetCustomers" />	
+
+	</resultMap>
+	
+	<resultMap id="goodsResultshoping" class="goods" extends="goodsResultEXT2">
+		<result column="account" property="account" />
+		<result column="brand_name" property="brandName" />
+		<result column="gaattrValue" property="gaattrValue" />
+		<result column="shoppingCartNumber" property="shoppingCartNumber" />
+		<result column="isshgoods" property="isshgoods" />
+	</resultMap>
+
+	<resultMap id="goodsResultEXT3" class="goods" extends="goodsResultEXT2">
+		<result column="brand_name" property="brandName"/>
+		<result column="name" property="seriesName"/>		
+		<result column="hk_th_number" property="hkthNumber"/>
+		<result column="cat_Name" property="catName" />
+		
+		<result column="SecurityTC" property="securityTC" />	
+		<result column="material_des" property="materialdes" />
+		<result column="color_des" property="colordes" />
+		<result column="Origin" property="origin" />
+		<result column="ImplementationS" property="implementationS" />
+		
+	</resultMap>
+
+	<resultMap class="goods" id="goodsResultForCab"
+		extends="goodsResult">
+		<result column="cab_id" property="cabinet.id" />
+		<result column="cab_name" property="cabinet.cabinetName" />
+		<result column="cab_Url" property="cabinet.cabinetUrl" />
+		<result column="sortOrder" property="sortOrder" />
+		<result column="vice_name" property="viceName"/>
+	</resultMap>
+
+	<resultMap id="goodsDelistingResult" class="goods">
+		<result column="id" property="id" />
+	</resultMap>
+	<resultMap id="goodsAgentResult" class="goods" extends="goodsResult">
+	    <result column="brand_name" property="brandName"/>
+	</resultMap>
+
+	<resultMap id="goodsAgentResult" class="goods" extends="goodsResult">
+	    <result column="brand_name" property="brandName"/>
+	</resultMap>
+
+<!-- begin add by shenzh Oct 25, 2010 增加同步失败原因查询-->
+	<resultMap id="goodsSyncResult" class="goods" extends="goodsAgentResult">
+	    <result column="reason" property="reason"/>
+	</resultMap>
+<!-- end by shenzh Oct 25, 2010-->
+
+	<!-- added by lizhensi at 2011/05/05 关联开票公司ID -->
+	<resultMap id="goodsBillExtResult" class="goods" extends="goodsResult">
+		<result column="BILL_ID" property="billId"/>
+	</resultMap>
+
+<!-- select -->
+
+  <sql id="GOODS.COMMON_CONDITION_WAHH">
+		<isNotEmpty property="noPicture">
+			and img_large IS NULL
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and ">
+		   emall_goods.id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSn" prepend="and">
+			goods_sn like concat('%',#goodsSn#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsMachSn" prepend="and">
+			goods_sn = #goodsMachSn#
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="title" prepend="and">
+			title like concat('%',upper(#title#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			goods_sn like concat('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsStatus" prepend="and">
+			goods_status = #goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty property="type" prepend="and">
+			type = upper(#type#)
+		</isNotEmpty>
+		<isNotEmpty property="material" prepend="and">
+			material = upper(#material#)
+		</isNotEmpty>
+		<isNotEmpty property="color" prepend="and">
+			color = upper(#color#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsNumberStr" prepend="and">
+			goods_number >= #goodsNumberStr#
+		</isNotEmpty>
+		<isNotEmpty property="hkGoodsNumberStr" prepend="and">
+			hk_Goods_Number >= #hkGoodsNumberStr#
+		</isNotEmpty>
+		<isNotEmpty property="isCutprice" prepend="and">
+			is_cutprice = #isCutprice#
+		</isNotEmpty>
+		<isNotEmpty property="isAgent" prepend="and">
+			is_agent = #isAgent#
+		</isNotEmpty>
+        <isNotEmpty property="isWholesale" prepend="and">
+			emall_goods.is_wholesale = #isWholesale#
+        </isNotEmpty>
+		<isNotEmpty property="brandId" prepend="and">
+			brand_id = #brandId#
+		</isNotEmpty>
+		<isNotEmpty property="idSeries" prepend="and">
+			emall_goods.idSeries = #idSeries#
+		</isNotEmpty>
+        <isNotEmpty property="isPaipai" prepend="and">
+            is_paipai = #isPaipai#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 start for 是否淘宝-->
+		 <isNotEmpty property="isTaobao" prepend="and">
+            is_taobao = #isTaobao#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 end for 是否淘宝-->
+		<isNotEmpty property="zeroStock" prepend="and">
+			<isEqual property="goodsStatus" compareValue="on_sale" prepend="">
+				goods_number = 0
+			</isEqual>
+			<isEqual property="goodsStatus" compareValue="on_depot" prepend="">
+				goods_number > 0
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="ishavegoodsnumber" prepend="and">
+				goods_number > 0
+		</isNotEmpty>
+		<!-- 	 -->
+		<isNotEmpty prepend="and" property="gmtListingStart">
+			<![CDATA[	gmt_listing >= STR_TO_DATE(#gmtListingStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtListingEnd">
+			<![CDATA[	gmt_listing < DATE_ADD(STR_TO_DATE(#gmtListingEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>		
+		
+		<isNotEmpty prepend="and" property="goodsPriceStart">
+			<![CDATA[	goods_price >= #goodsPriceStart#	]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsPriceEnd">	
+			<![CDATA[	goods_price < #goodsPriceEnd#	]]>
+		</isNotEmpty>	
+		<isNotEmpty property="salesProPrice" prepend="and ">
+		   sales_pro_price = #salesProPrice#
+		</isNotEmpty>
+		<isNotEmpty  property="salePriceStart">
+				<![CDATA[ and sales_pro_price >= #salePriceStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty  property="salePriceEnd">
+					<![CDATA[ and sales_pro_price < #salePriceEnd#  ]]>
+		</isNotEmpty>
+		
+	</sql>
+
+
+
+
+
+
+	<sql id="GOODS.COMMON_CONDITION_ALL">
+		<isNotEmpty property="noPicture">
+			and img_large IS NULL
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and ">
+		   id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSn" prepend="and">
+			goods_sn like concat('%',#goodsSn#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsMachSn" prepend="and">
+			goods_sn = #goodsMachSn#
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="title" prepend="and">
+			title like concat('%',upper(#title#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			goods_sn like concat('%',#code#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsStatus" prepend="and">
+			goods_status = #goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty property="type" prepend="and">
+			type = upper(#type#)
+		</isNotEmpty>
+		<isNotEmpty property="material" prepend="and">
+			material = upper(#material#)
+		</isNotEmpty>
+		<isNotEmpty property="color" prepend="and">
+			color = upper(#color#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsNumberStr" prepend="and">
+			goods_number >= #goodsNumberStr#
+		</isNotEmpty>
+		<isNotEmpty property="hkGoodsNumberStr" prepend="and">
+			hk_Goods_Number >= #hkGoodsNumberStr#
+		</isNotEmpty>
+		<isNotEmpty property="isCutprice" prepend="and">
+			is_cutprice = #isCutprice#
+		</isNotEmpty>
+		<isNotEmpty property="isAgent" prepend="and">
+			is_agent = #isAgent#
+		</isNotEmpty>
+        <isNotEmpty property="isWholesale" prepend="and">
+			emall_goods.is_wholesale = #isWholesale#
+        </isNotEmpty>
+		<isNotEmpty property="brandId" prepend="and">
+			brand_id = #brandId#
+		</isNotEmpty>
+		<isNotEmpty property="idSeries" prepend="and">
+			emall_goods.idSeries = #idSeries#
+		</isNotEmpty>
+        <isNotEmpty property="isPaipai" prepend="and">
+            is_paipai = #isPaipai#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 start for 是否淘宝-->
+		 <isNotEmpty property="isTaobao" prepend="and">
+            is_taobao = #isTaobao#
+        </isNotEmpty>
+		<!-- add by jinxx 2010/10/22 end for 是否淘宝-->
+		<isNotEmpty property="zeroStock" prepend="and">
+			<isEqual property="goodsStatus" compareValue="on_sale" prepend="">
+				goods_number = 0
+			</isEqual>
+			<isEqual property="goodsStatus" compareValue="on_depot" prepend="">
+				goods_number > 0
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="ishavegoodsnumber" prepend="and">
+				goods_number > 0
+		</isNotEmpty>
+		<!-- 	 -->
+		<isNotEmpty prepend="and" property="gmtListingStart">
+			<![CDATA[	gmt_listing >= STR_TO_DATE(#gmtListingStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtListingEnd">
+			<![CDATA[	gmt_listing < DATE_ADD(STR_TO_DATE(#gmtListingEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+		</isNotEmpty>		
+		
+		<isNotEmpty prepend="and" property="goodsPriceStart">
+			<![CDATA[	goods_price >= #goodsPriceStart#	]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsPriceEnd">	
+			<![CDATA[	goods_price < #goodsPriceEnd#	]]>
+		</isNotEmpty>	
+		<isNotEmpty property="salesProPrice" prepend="and ">
+		   sales_pro_price = #salesProPrice#
+		</isNotEmpty>
+		<isNotEmpty  property="salePriceStart">
+				<![CDATA[ and sales_pro_price >= #salePriceStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty  property="salePriceEnd">
+					<![CDATA[ and sales_pro_price < #salePriceEnd#  ]]>
+		</isNotEmpty>
+		
+	</sql>
+
+	<sql id="GOODS.COMMON_CONDITION_SEARCH">
+		<isNotEmpty property="catCode" prepend="and">
+			g.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="title">
+			<iterate prepend="AND" property="titles" open="(" close=")"
+				conjunction="or">
+				g.title like concat('%',#titles[]#,'%')
+			</iterate>
+		</isNotEmpty>
+		<isNotEmpty property="priceMin" prepend="and">
+			g.goods_price &gt;= #priceMin#
+		</isNotEmpty>
+		<isNotEmpty property="priceMax" prepend="and">
+			g.goods_price &lt;= #priceMax#
+		</isNotEmpty>
+	</sql>
+	
+	<select id="Goods.searchGoodsDynamic" parameterClass="goods"
+		resultMap="goodsResultEXT">
+		<include refid="pageSQLHead"/>
+		<![CDATA[ select g.*,c.cat_name as cat_name  from emall_goods  g,emall_category c   where  g.goods_status='on_sale' and g.cat_code=c.cat_code ]]>
+		<include refid="GOODS.COMMON_CONDITION_SEARCH" />
+		<![CDATA[  order by  ]]>
+		<isEqual property="sortOrder" compareValue="time" prepend="">
+			g.gmt_listing desc,
+		</isEqual>
+		<isEqual property="sortOrder" compareValue="asc" prepend="">
+			g.goods_price asc,
+		</isEqual>
+		<isEqual property="sortOrder" compareValue="desc" prepend="">
+			g.goods_price desc,
+		</isEqual>
+		<isEmpty property="sortOrder">g.gmt_listing desc,</isEmpty>
+		<![CDATA[
+ 			g.id desc]]>
+ 		<include refid="pageSQLFoot"/>
+	</select>
+	<!-- 分页map -->
+	<select id="Goods.searchGoodsDynamics" resultMap="goodsResultEXT">
+		<!-- <include refid="pageSQLHead"/> -->
+		<![CDATA[ select g.*,c.cat_name as cat_name  
+					from emall_goods  g,emall_category c   
+				  where  g.goods_status='on_sale' and g.cat_code=c.cat_code ]]>
+		<include refid="GOODS.COMMON_CONDITION_ALL" />
+		<!-- <![CDATA[  ]]> -->
+		order by  g.id desc
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow#]]>
+			</isNotEmpty>
+		</isNotEmpty> 		
+ 		<!-- <include refid="pageSQLFoot"/> -->
+	</select>
+	<!-- miniui分页 -->
+	<select id="Goods.searchMiniGoodsDynamics" parameterClass="java.util.Map" resultMap="goodsResultEXT">
+		<!-- <include refid="pageSQLHead"/> -->
+		<![CDATA[ select g.*,c.cat_name as cat_name  
+					from emall_goods  g,emall_category c   
+				  where  g.goods_status='on_sale' and g.cat_code=c.cat_code ]]>
+		<include refid="GOODS.COMMON_CONDITION_ALL" />
+		<!-- 查询市场价格 -->
+		<isNotEmpty prepend="and" property="marketPrice">
+		  market_price=#marketPrice#
+		</isNotEmpty>
+		<!-- 查询进价 -->
+		<isNotEmpty prepend="and" property="goodsPrice">
+		  goods_price=#goodsPrice#
+		</isNotEmpty>
+		<!-- 查询进价价格区间 -->
+		<isNotEmpty property="goodsPriceStart">
+				<![CDATA[ and goods_price >= #goodsPriceStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="goodsPriceEnd">
+					<![CDATA[ and goods_price <= $goodsPriceEnd$  ]]>
+		</isNotEmpty>
+		<!-- <![CDATA[  ]]> -->
+		order by  g.id 
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT $startRow$,$endRow$]]>
+			</isNotEmpty>
+		</isNotEmpty> 		
+ 		<!-- <include refid="pageSQLFoot"/> -->
+	</select>
+
+	<select id="Goods.searchGoodsDynamicCount" parameterClass="goods"
+		resultClass="int">
+		<![CDATA[ select count(*) from emall_goods  g,emall_category c
+				where  g.goods_status='on_sale' and g.cat_code=c.cat_code
+ ]]>
+		<include refid="GOODS.COMMON_CONDITION_SEARCH" />
+	</select>
+	<!-- 分页统计 -->
+	<select id="Goods.searchGoodsDynamicCounts" parameterClass="goods" resultClass="int">
+		<![CDATA[ select count(*) from emall_goods  g,emall_category c
+				where  g.goods_status='on_sale' and g.cat_code=c.cat_code ]]>
+		<include refid="GOODS.COMMON_CONDITION_SEARCH" />
+	</select>
+	<!-- mini分页统计 -->
+	<select id="Goods.searchMiniGoodsDynamicCounts" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[ select count(*) from emall_goods  g,emall_category c
+				where  g.goods_status='on_sale' and g.cat_code=c.cat_code]]>
+		<include refid="GOODS.COMMON_CONDITION_SEARCH" />
+	</select>		
+	<!-- create Goods object -->
+	<insert id="Goods.addGoods" parameterClass="goods">
+<![CDATA[
+		insert into emall_goods
+  (id,
+   cat_code,
+   goods_sn,
+   title,
+   brand_id,
+   sale_number,
+   market_price,
+   goods_price,
+   goods_number,
+   hk_goods_number,
+   goods_desc,
+   img_large,
+   img_middle,
+   img_small,
+   attr_value,
+   attr_desc,
+   goods_status,
+   gmt_listing,
+   gmt_delisting,
+   click_count,
+   goods_weight,
+   warn_number,
+   original_img,
+   gmt_create,
+   gmt_modify,
+   goods_rank,
+   is_cutprice,
+   gmt_cutprice,
+   sales_pro_price,
+   goods_unit,
+   is_agent,
+   agent_price,
+   is_wholesale,
+   goods_item,
+   IS_TAOBAO,
+   TAOBAO_CLASS_ID,
+   TAOBAO_ATTR,
+   TAOBAO_SKU_PROP,
+   TAOBAO_INPUT_STR,
+   TAOBAO_INPUT_PIDS,
+   is_paipai,
+   paipai_class_id,
+   paipai_attr,
+   TAOBAO_SKU_PROP_NAME,
+   hkhx_price,
+   hk_price,
+   eu_price,
+   idSeries,
+   Type,
+   Material,
+   Color,
+   targetCustomers)
+values
+  (null,
+   #catCode#,
+   #goodsSn#,
+   #title#,
+   #brandId#,
+   #saleNumber#,
+   #marketPrice#,
+   #goodsPrice#,
+   #goodsNumber#,
+   #hkGoodsNumber#,
+   #goodsDesc#,
+   #imgLarge#,
+   #imgMiddle#,
+   #imgSmall#,
+   #attrValue#,
+   #attrDesc#,
+   #goodsStatus#,
+   #gmtListing#,
+   #gmtDelisting#,
+   #clickCount#,
+   #goodsWeight#,
+   #warnNumber#,
+   #originalImg#,
+   sysdate(),
+   sysdate(),
+   #goodsRank#,
+   #isCutprice#,
+   DATE_SUB(SYSDATE(),INTERVAL 2 YEAR),
+   #salesProPrice#,
+   #goodsUnit#,
+   #isAgent#,
+   #agentPrice#,
+   #isWholesale#,
+   #goodsItem#,
+   #isTaobao#,
+   #taobaoClassId#,
+   #taobaoAttr#,
+   #taobaoSkuProp#,
+   #taobaoInputStr#,
+   #taobaoInputPids#,
+   #isPaipai#,
+   #paipaiClassId#,
+   #paipaiAttr#,
+   #taobaoSkuPropName#,
+   #hkhxPrice#,
+   #hkPrice#,
+   #euPrice#,
+   #idSeries#,
+   #type#,
+   #material#,
+   #color#,
+   #targetCustomers#
+   )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+	<!-- update Goods object -->
+	<update id="Goods.editGoods" parameterClass="goods">
+		<![CDATA[
+		update emall_goods set cat_code = #catCode#,
+		goods_sn = #goodsSn#,
+		title = #title#,
+		brand_id = #brandId#,
+		sale_number = #saleNumber#,
+		market_price = #marketPrice#,
+		goods_price = #goodsPrice#,
+		hkhx_price = #hkhxPrice#,
+		hk_price = #hkPrice#,
+		eu_price = #euPrice#,
+		goods_desc = #goodsDesc#,
+		img_large = #imgLarge#,
+		img_middle = #imgMiddle#,
+		img_small = #imgSmall#,
+		attr_value = #attrValue#,
+		attr_desc = #attrDesc#,
+		goods_status = #goodsStatus#,
+		gmt_listing = #gmtListing#,
+		gmt_delisting = #gmtDelisting#,
+		click_count = #clickCount#,
+		goods_weight = #goodsWeight#,
+		warn_number = #warnNumber#,
+		original_img = #originalImg#,
+		gmt_modify = sysdate(),
+		]]>
+		<isNotEmpty property="isGmtCutprice" >
+		<![CDATA[ gmt_cutprice = sysdate(), ]]>
+		</isNotEmpty>
+		<![CDATA[
+		goods_rank = #goodsRank#,
+		is_cutprice = #isCutprice#,
+		sales_pro_price = #salesProPrice#,
+		goods_unit = #goodsUnit#,
+		is_agent=#isAgent#,
+		agent_price=#agentPrice#,
+		is_wholesale=#isWholesale#,
+		goods_item=#goodsItem#,
+		is_paipai=#isPaipai#,
+		paipai_class_id=#paipaiClassId#,
+		paipai_attr=#paipaiAttr#,
+        IS_TAOBAO=#isTaobao#,
+        TAOBAO_CLASS_ID=#taobaoClassId#,
+        TAOBAO_ATTR=#taobaoAttr#,
+        TAOBAO_SKU_PROP=#taobaoSkuProp#,
+        TAOBAO_SKU_PROP_NAME=#taobaoSkuPropName#,
+        TAOBAO_INPUT_STR=#taobaoInputStr#,
+        TAOBAO_INPUT_PIDS=#taobaoInputPids#,
+        express_Ids=#expressIds#
+		where id = #id#
+]]>
+	</update>
+
+	<update id="Goods.updateAgentPrice" parameterClass="java.util.Map">
+        <![CDATA[
+        update emall_goods set agent_price =goods_price * #agio#
+        where cat_code=#catCode# and is_agent='y'
+]]>
+    </update>
+
+	<!-- delete Goods object -->
+	<delete id="Goods.removeGoods" parameterClass="java.lang.Long">
+		<![CDATA[
+		delete from emall_goods where emall_goods.ID = #value#
+]]>
+	</delete>
+	<!-- search Goods object -->
+	<select id="Goods.getGoods" parameterClass="java.lang.Long"
+		resultMap="goodsResultEXT2">
+		<![CDATA[
+		select emall_goods.* from emall_goods where emall_goods.ID = #value#
+]]>
+	</select>
+	
+	<select id="Goods.getClientGoodsExist" 
+		resultMap="goodsResultEXT2">
+		<![CDATA[
+		select t.* from emall_goods t 
+		]]>
+		<dynamic prepend="where">
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        </dynamic>
+        limit 1
+	</select>
+	
+	
+	<!-- searchAll Goods List -->
+	<select id="Goods.getGoodss" resultMap="goodsResult">
+		<![CDATA[
+	select emall_goods.* from emall_goods where goods_status<>'delete'
+        ]]>
+	</select>
+
+
+	<select id="Goods.getGoodsByIds" resultMap="goodsBillExtResult">
+		select t.* from emall_goods t
+		<dynamic prepend=" where ">
+			<iterate prepend="AND" property="ids" open="(" close=")"
+				conjunction="or">
+				t.id =#ids[]#
+			</iterate>
+		</dynamic>
+		order by t.id desc
+	</select>
+
+	<select id="Goods.getGoodsByTitle" resultMap="goodsResult">
+		<![CDATA[
+		select emall_goods.* from emall_goods where emall_goods.title= #value#
+]]>
+	</select>
+
+	<!--added by chenhang 2011/02/17 started -->
+	<select id="Goods.getGoodsByGoodsSn" resultMap="goodsResult">
+		<![CDATA[
+		select emall_goods.* from emall_goods where emall_goods.goods_sn= #value#
+		]]>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<!--added by chenhang 2011/02/17 ended -->
+	<!-- searchAll Goods List -->
+	<select id="Goods.getGoodsByCondition" resultMap="goodsResultEXT3">
+		<![CDATA[
+				  select  *
+				  from emall_goods,emall_brand,series,emall_category
+				  where 1=1
+				  and emall_goods.brand_id = emall_brand.id
+				  and emall_goods.idSeries=series.idSeries
+				  AND emall_goods.cat_code = emall_category.cat_code		  
+		]]>		
+<!-- 		 -->
+<isNotNull prepend="and" property="hasListGoodsId">
+
+      emall_goods.id in
+      <iterate conjunction="," open="(" close=")"  property="list">  		
+	  		#list[]#
+	  </iterate>
+</isNotNull>  
+ 
+ <isNotNull prepend="and" property="hasListcode">
+
+      emall_goods.cat_code in
+      <iterate conjunction="," open="(" close=")"  property="codeList">  		
+	  		#codeList[]#
+	  </iterate>
+</isNotNull> 
+  
+        
+		<isNotEmpty property="brandId" prepend="and">
+			emall_goods.brand_id = #brandId#
+		</isNotEmpty>		
+		<isNotEmpty property="idSeries" prepend="and">
+			emall_goods.idSeries = #idSeries#
+		</isNotEmpty>
+		
+		<!-- 促销价价格区间 salesProPrice -->
+		<isNotEmpty  property="salePriceStart">
+				<![CDATA[ and sales_pro_price >= #salePriceStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty  property="salePriceEnd">
+					<![CDATA[ and sales_pro_price < #salePriceEnd#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="returnPointId">
+			 ,emall_goods_rel_rule  
+		</isNotEmpty>
+		
+		<include refid="GOODS.COMMON_CONDITION_WAHH" />
+		<!-- 月销售量  -->
+		<isNotEmpty property="saleNumber" prepend="and">
+			 emall_goods.sale_number >= #saleNumber# 
+		</isNotEmpty>
+		<isNotEmpty property="returnPointId">
+			and emall_goods_rel_rule.goods_id = emall_goods.id
+			and emall_goods_rel_rule.status = 'y'
+			and emall_goods_rel_rule.return_id = #returnPointId#
+        </isNotEmpty>
+		<isNull property="order">
+			order by emall_goods.type,emall_goods.Material,emall_goods.color,emall_goods.id desc
+		</isNull>
+		<isNotNull property="order">
+			order by #order#
+		</isNotNull>
+		<include refid="pageSQLFoot"/>
+	</select>
+	<!-- 购物车商品搜索测试 -->
+	<!-- select emall_goods.* 
+			  from emall_goods -->
+	<select id="Goods.getGoodsByConditions" resultMap="goodsResultshoping" >
+	<![CDATA[
+	SELECT g.*,
+		ga.attr_value gaattrValue,
+		u.account,
+		b.brand_name,
+		sc.goods_number shoppingCartNumber,
+		sc.isshgoods	
+		from 
+			emall_goods g,emall_brand b,
+			emall_shopping_cart sc,emall_users u,
+			emall_goods_attr ga
+				  ]]>
+		<![CDATA[where 1=1 
+			AND	g.brand_id = b.id
+			AND sc.goods_id = g.id
+			AND sc.user_id = u.id
+			AND ga.id=sc.goods_attr_ids
+		]]>
+		<!-- INNER JOIN emall_goods_attr ga on sc.goods_attr_ids=ga.id -->
+		<!-- 尚上价格区间 -->
+		<isNotEmpty  property="goodsPriceStart">
+				<![CDATA[ and goods_price >= $goodsPriceStart$  ]]>
+		</isNotEmpty>
+		<isNotEmpty  property="goodsPriceEnd">
+					<![CDATA[ and goods_price < $goodsPriceEnd$  ]]>
+		</isNotEmpty>
+		<!-- 尺寸 -->
+		<isNotEmpty  property="gaattrValue">
+					<![CDATA[ and ga.attr_value = #gaattrValue#  ]]>
+		</isNotEmpty>
+		<!-- id编号 -->
+		<isNotEmpty  property="id">
+					<![CDATA[ and g.id = #id#  ]]>
+		</isNotEmpty>
+		<!-- 名称 -->
+		<isNotEmpty  property="title">
+					<![CDATA[ and g.title  like concat('%',upper(#title#),'%') ]]>
+		</isNotEmpty>
+		<!-- 总库存大于 -->
+		<isNotEmpty  property="goodsNumberStr">
+					<![CDATA[ and g.goods_Number  >#goodsNumberStr# ]]>
+		</isNotEmpty>
+		<!-- 香港库存大于 -->
+		<isNotEmpty  property="hkGoodsNumberStr">
+					<![CDATA[ and g.hk_Goods_Number = #hkGoodsNumberStr# ]]>
+		</isNotEmpty>
+		<!-- 用户账号 -->
+		<isNotEmpty  property="account">
+					<![CDATA[ and u.account = #account# ]]>
+		</isNotEmpty>
+		<!-- 尚上价 -->
+		<isNotEmpty  property="account">
+					<![CDATA[ and g.goods_price = #goodsPrice# ]]>
+		</isNotEmpty>
+		<!-- 香港价 -->
+		<isNotEmpty  property="account">
+					<![CDATA[ and g.hk_price = #hkPrice# ]]>
+		</isNotEmpty>
+		<!-- 欧洲价 -->
+		<isNotEmpty  property="account">
+					<![CDATA[ and g.eu_price = #euPrice# ]]>
+		</isNotEmpty>
+		<!-- 颜色 -->
+		<isNotEmpty  property="color">
+					<![CDATA[ and g.Color = #color# ]]>
+		</isNotEmpty>
+		<isNotNull property="order">
+			order by #order#
+		</isNotNull>
+		<include refid="pageSQLFoot"/>
+	</select>
+	<select id="Goods.getGoodsByConditionCount" resultClass="java.lang.Integer">
+	<![CDATA[
+		select count(emall_goods.id) from emall_goods
+	]]>
+			<isNotEmpty property="returnPointId">
+				,emall_goods_rel_rule
+			</isNotEmpty>
+	<![CDATA[
+			where 1=1
+	]]>
+	
+<isNotNull prepend="and" property="hasListGoodsId">
+
+      emall_goods.id in
+      <iterate conjunction="," open="(" close=")"  property="list">  		
+	  		#list[]#
+	  </iterate>
+</isNotNull>  
+
+ <isNotNull prepend="and" property="hasListcode">
+
+      emall_goods.cat_code in
+      <iterate conjunction="," open="(" close=")"  property="codeList">  		
+	  		#codeList[]#
+	  </iterate>
+</isNotNull>
+		<include refid="GOODS.COMMON_CONDITION_WAHH" />
+
+		<isNotEmpty property="returnPointId">
+			and emall_goods_rel_rule.goods_id = emall_goods.id
+			and emall_goods_rel_rule.status = 'y'
+			and emall_goods_rel_rule.return_id = #returnPointId#
+        </isNotEmpty>
+	</select>
+	<!-- 购物车商品查询测试 -->
+	<select id="Goods.getGoodsByConditionCounts" resultClass="java.lang.Integer">
+	<![CDATA[
+		SELECT	
+			COUNT(sc.goods_id=g.id)
+		 from 
+			emall_shopping_cart sc
+		LEFT JOIN emall_users u on sc.user_id=u.id
+		LEFT JOIN emall_goods g on sc.goods_id=g.id
+		INNER JOIN emall_goods_attr ga on sc.goods_attr_ids=ga.id
+		LEFT JOIN emall_brand b on g.brand_id=b.id
+	]]>
+	</select>
+	<select id="Goods.showcaseGoods" parameterClass="java.util.Map"
+		resultMap="goodsResult">
+		<include refid="pageSQLHead"/>
+		select a.* from emall_goods a where a.id=a.id and
+		a.goods_status='on_sale'
+		<isNotEmpty property="goodsName">
+			and a.title like #goodsNamelike#
+		</isNotEmpty>
+		<isNotEmpty property="priceHighstr">
+			and a.goods_price &lt;= #priceHigh#
+		</isNotEmpty>
+		<isNotEmpty property="priceLowstr">
+			and a.goods_price &gt;= #priceLow#
+		</isNotEmpty>
+		<isNotEmpty property="catCode">
+			and a.cat_code like #catCode#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSn">
+		    and a.goods_sn like #goodsSnlike#
+		</isNotEmpty>
+		<isNotEmpty property="isCutprice">
+			and a.is_cutprice like #isCutprice#
+		</isNotEmpty>
+		<!--added by chenhang 2010/12/07 started -->
+		<isNotEmpty property="goodsNumber">
+			and a.goods_number >= #goodsNumber#
+		</isNotEmpty>
+		<!--added by chenhang 2010/12/07 ended   -->
+		<isNotEmpty property="selectSort">
+		<isEqual property="selectSort" compareValue="1">
+		order by a.gmt_create desc
+		</isEqual>
+		<isEqual property="selectSort" compareValue="2">
+		order by sale_number desc
+		</isEqual>
+		</isNotEmpty>
+		<isEmpty>
+		order by a.id
+		</isEmpty>
+		<include refid="pageSQLFoot"/>
+	</select>
+
+<!-- 首页橱窗延时取消延时 -->
+	<select id="Goods.getCabInfo" resultMap="goodsResultForCab">
+		<![CDATA[
+				select a.id as cab_id ,a.cabinet_name as cab_name ,a.cabinet_url as cab_Url, b.sort as sortOrder ,b.vice_name,c.*  from emall_cabinet a,  emall_showcase b, emall_goods c
+	where  a.id=b.cabinet_id and c.id=b.goods_id and a.is_show=1 and  c.goods_status='on_sale' order by sortOrder asc
+		]]>
+	</select>
+
+
+	<select id="Goods.getshowcaseGoodsCount" parameterClass="java.util.Map"
+		resultClass="java.lang.Integer">
+		select count(1) from emall_goods a where a.id=a.id and
+		a.goods_status='on_sale'
+		<isNotEmpty property="goodsName">
+			and a.title like #goodsNamelike#
+		</isNotEmpty>
+		<isNotEmpty property="goodsSn">
+		    and a.goods_sn like #goodsSnlike#
+		</isNotEmpty>
+		<isNotEmpty property="priceHighstr">
+			and a.goods_price &lt;= #priceHigh#
+		</isNotEmpty>
+		<isNotEmpty property="priceLowstr">
+			and a.goods_price &gt;= #priceLow#
+		</isNotEmpty>
+		<isNotEmpty property="catCode">
+			and a.cat_code like #catCode#
+		</isNotEmpty>
+		<isNotEmpty property="isCutprice">
+			and a.is_cutprice like #isCutprice#
+		</isNotEmpty>
+		<!--added by chenhang 2010/12/07 started -->
+		<isNotEmpty property="goodsNumber">
+			and a.goods_number >= #goodsNumber#
+		</isNotEmpty>
+		<!--added by chenhang 2010/12/07 ended   -->
+		<isNotEmpty property="selectSort">
+		<isEqual property="selectSort" compareValue="1">
+		order by a.gmt_create desc
+		</isEqual>
+		<isEqual property="selectSort" compareValue="2">
+		order by sale_number desc
+		</isEqual>
+		</isNotEmpty>
+		<isEmpty>
+		order by a.id
+		</isEmpty>
+	</select>
+
+	<select id="Goods.getNeedDelisting" resultMap="goodsResult">
+		<![CDATA[
+		select a.* from emall_goods a where a.goods_status='on_sale' and
+		a.gmt_delisting < sysdate() order by a.id
+		]]>
+	</select>
+
+	<select id="Goods.countAllGoodsClickNum" resultClass="java.lang.Long">
+		<![CDATA[
+			select coalesce(sum(emall_goods.click_count),0) from emall_goods
+	]]>
+	</select>
+
+	<select id="Goods.findGoodsByModify" resultMap="goodsResult">
+	<include refid="pageSQLHead"/>
+			<![CDATA[
+			select emall_goods.* from emall_goods where emall_goods.gmt_modify >= #lastModify# order by emall_goods.gmt_modify asc
+	]]>
+	<include refid="pageSQLFoot"/>
+	</select>
+	<select id="Goods.findGoodsByCutPrice" parameterClass="java.util.Map" resultMap="goodsResult">
+			select g.* from  (select g.* from emall_goods g where g.is_cutprice = 1
+			<isNotEmpty property="code">
+			and ( g.cat_code like concat(#code#,'%'))
+		    </isNotEmpty>
+		     and g.goods_status='on_sale'
+		   <![CDATA[ and g.gmt_delisting > sysdate() ]]>
+		   and  g.goods_number != 0
+		    order by g.gmt_cutprice desc LIMIT #amountAll#) g order by RAND() LIMIT #amount#
+    </select>
+    <select id="Goods.findTradeGoods" resultMap="goodsResult">
+    	select
+    		g.*
+    	from
+    		emall_goods g , emall_order o
+    	where
+    		g.id = o.goods_id and o.tid = #tradeId#
+    </select>
+
+     <select id="Goods.findOtherTradeGoods" resultMap="goodsResult">
+     <![CDATA[
+     	select
+    		g.*
+    	from
+    		emall_goods g , emall_order o
+     	where
+     		g.id = o.goods_id
+     		and o.tid in(
+     			select tid
+     			from emall_trade
+     			where
+     				tid in (select DISTINCT(tid) from emall_order where goods_id = #goodsId# )
+     				and pay_status = 'paid'
+     				and buy_id not in (select buy_id from emall_trade where tid = #tradeId#)
+     		)
+     		and g.id not in ( select goods_id from emall_order where tid = #tradeId#)
+     		and g.goods_status = 'on_sale'
+     		and g.goods_number > 0
+     		and g.cat_code like concat(#catCode#,'%')
+     	]]>
+    </select>
+
+    <!-- 根据goods_id查询买了此商品的人还买过哪些类似的商品 -->
+    <select id="Goods.findBoughtGoods" resultMap="goodsResult">
+     <![CDATA[
+     	select
+    		g.*
+    	from
+    		emall_goods g , emall_order o
+     	where
+     		g.id = o.goods_id
+     		and o.tid in(
+     			select tid
+     			from emall_trade
+     			where
+     				tid in (select DISTINCT(tid) from emall_order where goods_id = #goodsId# )
+     				and pay_status = 'paid'
+     		)
+     		and g.id <> #goodsId#
+     		and g.goods_status = 'on_sale'
+     		and g.goods_number > 0
+     		and g.cat_code like concat(#catCode#,'%')
+     	]]>
+    </select>
+
+	<select id="Goods.findGoodsByCode" resultMap="goodsResult">
+    	select
+    		g.*
+    	from
+    		emall_goods g
+    	where
+    		g.goods_sn = #value#
+    </select>
+
+    <update id="Goods.updateGoodsGoodsNumberById" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET 
+		gmt_modify = sysdate(),
+		<isNotEmpty property="tag">
+		gmt_cutprice = sysdate(),
+		</isNotEmpty>
+		goods_number = IFNULL(goods_number, 0) + #amount#
+		WHERE id = #goodsId#
+	</update>
+	
+	<update id="Goods.updateGoodsHKGoodsNumberById" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET 
+		gmt_modify = sysdate(),
+		<isNotEmpty property="tag">
+		gmt_cutprice = sysdate(),
+		</isNotEmpty>
+		hk_goods_number = IFNULL(hk_goods_number, 0) + #amount#
+		WHERE id = #goodsId#
+	</update>
+	
+	<update id="Goods.updateGoodsNumberZero" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET gmt_modify = sysdate(), hk_goods_number = 0 , goods_number = 0 
+	</update>
+	
+	<update id="Goods.updateSalNumberZero" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET sale_number = 0 , hk_th_number = 0 
+	</update>
+	
+	
+	<update id="Goods.updateSaleNumberById" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET gmt_modify = sysdate(),
+		sale_number = IFNULL(sale_number, 0) + #amount#
+		WHERE id = #goodsId#
+	</update>
+	
+	<!-- 某个goodsId一个月的销售总额，和三个月的销售总额  -->
+	<update id="updateSaleNumberOneOrThree" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		SET gmt_modify = sysdate(),
+		sale_number = #onenum#,
+		hk_th_number= #threenum#
+		WHERE id = #goodsId#
+	</update>
+
+	<update id="Goods.doagent" parameterClass="java.util.Map">
+	update emall_goods set is_agent='y' where id=#id#
+	</update>
+
+	<update id="Goods.dodisagent" parameterClass="long">
+	update emall_goods set is_agent='n',agent_price=0 where id=#id#
+	</update>
+
+	<select id="Goods.listAgentGoodsId" resultClass="java.lang.Long">
+		select id from emall_goods where is_agent ='y'
+	</select>
+
+	<select id="Goods.getAgentGoodsByData" parameterClass="java.util.Map" resultMap="goodsAgentResult">
+     <include refid="pageSQLHead"/>
+	  <![CDATA[
+        select g.* , b.brand_name
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from emall_agent_goods ga
+        where ga.status = 'y'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="" property="orderBy">
+		  $orderBy$
+	  </isNotEmpty>
+	  <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="Goods.getAgentGoodsByDataCount" parameterClass="java.util.Map" resultClass="int">
+	  <![CDATA[
+	  select count(1) from
+       (select g.* , b.brand_name
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from emall_agent_goods ga
+        where ga.status = 'y'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  ) aa
+	</select>
+
+	<select id="Goods.getGoodsAllForCabinetByWholeSale" resultMap="goodsResultForCab">
+		<![CDATA[
+    select a.id as cab_id,
+       a.cabinet_name as cab_name,
+       a.cabinet_url as cab_Url,
+       b.sort as sortOrder,
+       b.vice_name,
+       c.*
+  from emall_cabinet a, emall_showcase b, emall_goods c
+ where a.id = b.cabinet_id
+   and c.id = b.goods_id
+   and a.is_show = 1
+   and c.goods_status = 'on_sale'
+   and c.is_wholesale = 'y'
+ order by sortOrder asc
+		]]>
+	</select>
+
+	<select id="Goods.getPaipaiGoodsByData" parameterClass="java.util.Map" resultMap="goodsAgentResult">
+     <include refid="pageSQLHead"/>
+	  <![CDATA[
+        select g.* , b.brand_name
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from interface_user_goods ga
+        where ga.status in('y','z') and ga.type = 'paipai'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isPaipai">
+	      g.is_paipai = #isPaipai#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="" property="orderBy">
+		  $orderBy$
+	  </isNotEmpty>
+	  <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="Goods.getPaipaiGoodsByDataCount" parameterClass="java.util.Map" resultClass="int">
+	  <![CDATA[
+	  select count(1) from
+       (select g.* , b.brand_name
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from interface_user_goods ga
+        where ga.status in('y','z') and ga.type = 'paipai'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isPaipai">
+	      g.is_paipai = #isPaipai#
+	  </isNotEmpty>
+	  ) aa
+	</select>
+
+<!-- begin add by shenzh Oct 25, 2010 增加可关联淘宝的商品查询-->
+	<select id="Goods.getTaobaoGoodsByData" parameterClass="java.util.Map" resultMap="goodsSyncResult">
+     <include refid="pageSQLHead"/>
+	  <![CDATA[
+        select g.* , b.brand_name ,
+       (select tt.reason
+          from (select t.goods_id,t.reason
+                  from interface_sync t
+                 where t.user_id = #userId#
+                   and t.status = 'f'
+                   and t.interface_type = 'taobao_publishgoods'
+                 order by t.gmt_create desc) tt
+         where tt.goods_id = g.id
+           LIMIT 1 ) as reason
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from interface_user_goods ga
+        where ga.status in('y','z') and ga.type = 'taobao'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isTaobao">
+	      g.is_taobao = #isTaobao#
+	  </isNotEmpty>
+	  <!-- 判断库存 必须有件产品库存大于0 -->
+      <!--<![CDATA[
+      and g.id in(select t.goods_id from emall_available_stock t where t.dep_first_id=#depfirstId# and t.goods_number>0)
+      ]]>-->
+	  <!--add by jinxx 2010/10/28 start for 执行效率更快些-->
+	  <![CDATA[
+      and exists (select 1 from emall_available_stock t where t.dep_first_id=#depfirstId# and g.id=t.goods_id and t.goods_number>0)
+      ]]>
+	  <!--add by jinxx 2010/10/28 end for 执行效率更快些-->
+	  <isNotEmpty prepend="" property="orderBy">
+		  $orderBy$
+	  </isNotEmpty>
+	  <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="Goods.getTaobaoGoodsByDataCount" parameterClass="java.util.Map" resultClass="int">
+	  <![CDATA[
+	  select count(1) from
+       (select g.* , b.brand_name
+        from emall_goods g, emall_brand b
+        where not exists (select 1
+        from (select ga.goods_id from interface_user_goods ga
+        where ga.status in('y','z') and ga.type = 'taobao'
+     ]]>
+        <isNotEmpty prepend="and" property="userId">
+            ga.user_id = #userId#
+        </isNotEmpty>
+     <![CDATA[
+        ) a
+        where a.goods_id = g.id)
+        and b.id = g.brand_id and g.goods_number > 0
+	  ]]>
+	  <isNotEmpty prepend="and" property="searchGoodsKey">
+	      (g.title like concat('%',#searchGoodsKey#, '%') or g.goods_sn like concat('%',#searchGoodsKey#, '%'))
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="catCode">
+	      g.cat_code like concat(#catCode#, '%')
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="brandId">
+	      g.brand_id = #brandId#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isAgent">
+	      g.is_agent = #isAgent#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="goodsStatus">
+	      g.goods_status = #goodsStatus#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMin">
+	      g.goods_price &gt;= #priceMin#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="priceMax">
+	      g.goods_price &lt;= #priceMax#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="isTaobao">
+	      g.is_taobao = #isTaobao#
+	  </isNotEmpty>
+	  <!-- 判断库存 必须有件产品库存大于0 -->
+      <!--<![CDATA[
+       and g.id in(select t.goods_id from emall_available_stock t where t.dep_first_id=#depfirstId# and t.goods_number>0)
+      ]]>-->
+	  <!--add by jinxx 2010/10/28 start for 执行效率更快些-->
+	  <![CDATA[
+      and exists (select 1 from emall_available_stock t where t.dep_first_id=#depfirstId# and g.id=t.goods_id and t.goods_number>0)
+      ]]>
+	  <!--add by jinxx 2010/10/28 end for 执行效率更快些-->
+	  ) aa
+	</select>
+<!-- end by shenzh Oct 25, 2010-->
+
+    <select id="Goods.getExpressGoods" parameterClass="java.lang.Long" resultMap="goodsResultEXT2">
+        <![CDATA[
+            select emall_goods.* from emall_goods where emall_goods.ID = #value#
+        ]]>
+    </select>
+    
+    <update id="Goods.updateGoodsBill" parameterClass="java.util.Map">
+    	update emall_goods set bill_id = #bid:NUMERIC# where id in
+    	<iterate property="gids" open="(" close=")" conjunction=",">
+    		#gids[]:NUMERIC#
+    	</iterate>
+    </update>
+    
+    <select id="Goods.getBillId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+         select bill_id from emall_goods where id = #value#
+    </select>
+    
+    <update id="autoListing">
+    	<![CDATA[
+    	UPDATE emall_goods
+		SET goods_status = 'on_sale'
+		    , gmt_listing = SYSDATE()
+		    , gmt_delisting = DATE_ADD(SYSDATE(),INTERVAL 36500 DAY)
+		    , gmt_modify = SYSDATE()
+		    WHERE goods_number>0
+		]]>
+    </update>
+    
+    
+    
+    <update id="updateHxMoveFrameGoodsNumZoro">
+    	<![CDATA[
+    	UPDATE hx_moveframe_goods m
+		SET m.goods_num = 0
+		    , m.gmt_modify = SYSDATE()
+		]]>
+    </update>
+    
+    <update id="updateHxMoveFrameGoodsNum">
+    	<![CDATA[
+    	UPDATE hx_moveframe_product t,hx_moveframe_goods m
+		SET m.goods_num = IFNULL(m.goods_num, 0) + #goodsNumber#
+		    , m.gmt_modify = SYSDATE()
+		    WHERE t.product_id = #productId# and t.moveframe_id = m.moveframe_id
+		    and t.goods_id = m.goods_id
+		]]>
+    </update>
+    
+    <update id="updateHxMoveFrameGoodsSellNum">
+    	<![CDATA[
+    	UPDATE hx_moveframe_product t,hx_moveframe_goods m
+		SET m.sold_num = IFNULL(m.sold_num, 0) + #goodsSaleNumber#
+		    , m.gmt_modify = SYSDATE()
+		    WHERE t.product_id = #productId# and t.moveframe_id = m.moveframe_id
+		    and t.goods_id = m.goods_id
+		]]>
+    </update>
+    
+    <update id="updateHxMoveFrameInstanceNumZero">
+    	<![CDATA[
+    	UPDATE hx_moveframe_instance m
+		SET m.instance_num = 0
+		    , m.gmt_modify = SYSDATE()
+		]]>
+    </update>
+    
+    <update id="updateHxMoveFrameInstanceNum">
+    	<![CDATA[
+    	UPDATE hx_moveframe_product t,hx_moveframe_instance m
+		SET m.instance_num = IFNULL(m.instance_num, 0) + #goodsNumber#
+		    , m.gmt_modify = SYSDATE()
+		    WHERE t.product_id = #productId# and t.moveframe_id = m.moveframe_id
+		    and t.instance_id = m.instance_id
+		]]>
+    </update>
+    
+    <update id="updateHxMoveFrameInstanceSellNum">
+    	<![CDATA[
+    	UPDATE hx_moveframe_product t,hx_moveframe_instance m
+		SET m.sold_num = IFNULL(m.sold_num, 0) + #goodsSaleNumber#
+		    , m.gmt_modify = SYSDATE()
+		    WHERE t.product_id = #productId# and t.moveframe_id = m.moveframe_id
+		    and t.instance_id = m.instance_id
+		]]>
+    </update>
+    
+    <!-- 根据型号，材质，颜色得到产品中图 -->
+    <select id="getGooodsMiddleImage" parameterClass="java.util.Map" resultClass="java.lang.String">
+	    SELECT g.img_middle
+		FROM 
+		emall_goods g
+		WHERE 
+		<isNotNull property="type" prepend="AND">
+			g.Type = #type#
+		</isNotNull>
+		<isNotNull property="material" prepend="AND">
+		g.Material = #material#
+		</isNotNull>
+		<isNotNull property="color" prepend="AND">
+			g.Color = #color#
+		</isNotNull>
+		LIMIT 1
+    </select>
+    
+    
+    <!-- 根据型号,材质,颜色得到产品 -->
+    <select id="getGooodsByTypeMaterialColor" parameterClass="java.util.Map" resultMap="goodsResultEXT2">
+	    SELECT g.*
+		FROM 
+		emall_goods g
+		WHERE  1=1
+		<isNotNull property="type" prepend="AND">
+			g.type = #type#
+		</isNotNull>
+		<isNotNull property="material" prepend="AND">
+			g.material = #material#
+		</isNotNull>
+		<isNotNull property="color" prepend="AND">
+			g.color = #color#
+		</isNotNull>
+		LIMIT 1
+    </select>
+    
+    <!-- add by：Hu Hongfei date：2018/04/28-->
+    <!-- 根据活动（专场）ID，查询活动产品 -->
+    <select id="getGoodsByActivityId">
+    	SELECT g.*
+    	FROM
+    	emall_goods g,emall_activity a,emall_activity_goods ag
+    	WHERE g.id = ag.goods_id
+    	AND
+    	a.id = #id#
+    </select>
+    
+    <update id="updatesalesproprice" parameterClass="goods">
+    UPDATE emall_goods SET sales_pro_price = #salesProPrice#
+	WHERE id = #id#
+    </update>
+    
+    <select id="Goods.getGoodsByActivityConditionCount" resultClass="java.lang.Integer">
+	<![CDATA[
+		SELECT COUNT(eg.id) FROM
+			emall_activity ea,
+			emall_activity_goods eag,
+			emall_goods eg
+	]]>
+	<![CDATA[
+		WHERE 1=1		
+			AND ea.id = eag.activity_id
+			AND eag.goods_id = eg.id
+	]]>
+	<isNotEmpty property="id">
+			AND ea.id = #id#;
+	</isNotEmpty>	
+		<!-- <include refid="GOODS.COMMON_CONDITION_ALL" /> -->
+	</select>
+ 	<select id="Goods.getGoodsByActivityCondition" resultMap="goodsResult" >
+	<![CDATA[
+		SELECT 	
+			eg.*
+			FROM 
+			emall_activity ea,
+			emall_activity_goods eag,
+			emall_goods eg
+				  ]]>
+		<![CDATA[
+		WHERE 1=1 
+			AND ea.id = eag.activity_id
+			AND eag.goods_id = eg.id
+		]]>
+		<isNotEmpty  property="id">
+			<![CDATA[ AND ea.id = #id# ]]>
+		</isNotEmpty>
+		<![CDATA[
+		ORDER BY eag.gmt_create DESC
+		]]>
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow#]]>
+			</isNotEmpty>
+		</isNotEmpty> 
+	</select>   
+	
+	<!-- 1代表可售,3预定,4代表已售  -->
+	<!--取得某个goodsID在一个月内的已售数量  -->
+	<select id="getOnMonthNum" parameterClass="goods" resultClass="int">
+	   <![CDATA[
+	    
+		SELECT 
+		  COUNT(*) 
+		FROM
+		  (SELECT 
+		    p.`idProduct` 
+		  FROM
+		    product p,
+		    emall_goods eg 
+		  WHERE p.goods_id = eg.id 
+		    AND eg.id = #id#
+		  ) pe,
+		  lifecycle l,
+		  customerorder co 
+		WHERE pe.idProduct = l.idProduct 
+		  AND l.idOrder = co.idOrder 
+		  AND co.`date` <= SYSDATE() 
+		  AND co.`date` >=#gmtModify#
+		  AND l.idStatus IN ('3', '4')
+              ]]>
+	</select>
+	<!-- 修改catCode  -->
+	<update id="updateGoodsCatcod" parameterClass="java.util.Map">
+		UPDATE emall_goods
+		set cat_code = #catCode#
+		WHERE id = #goodsId#
+	</update>
+	
+	
+	<update id="updateEmallGoodsWeight" parameterClass="goods">
+		update emall_goods set 
+	     
+	      <isNotNull property="goodsWeightStr">
+	     goods_weight=#goodsWeightStr#
+	     </isNotNull>
+	     <isNotNull prepend="," property="securityTC">
+	     SecurityTC=#securityTC#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="implementationS">
+	     ImplementationS=#implementationS#
+	     </isNotNull>
+	     
+	      <isNotNull prepend="," property="title">
+	        title=#title#
+	      </isNotNull>
+	     
+	     <isNotNull prepend="," property="materialdes">
+	       material_des=#materialdes#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="colordes">
+	       color_des=#colordes#
+	     </isNotNull>
+	     
+	     <isNotNull prepend="," property="origin">
+	       Origin=#origin#
+	     </isNotNull>
+	      where 
+	      <isNotNull property="type">
+	      Type=#type#
+	      </isNotNull>
+	       <isNotNull prepend="and" property="material">
+	      Material=#material#
+	      </isNotNull>
+	       <isNotNull prepend="and" property="color">
+	      Color =#color#
+	      </isNotNull>
+	</update>
+</sqlMap>

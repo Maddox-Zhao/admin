@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="goodsStock">
+	 
+	
+	<!-- 开单后更新emall_goods库存 -->
+	<update id="updateEmallGoodsStock" parameterClass="java.util.Map" >
+			UPDATE emall_goods SET goods_number = goods_number - 1 
+			<isNotEmpty property="hk_goods_number" prepend=",">
+			   	hk_goods_number = hk_goods_number -1
+			</isNotEmpty>
+			where id = #goodsId#
+			 
+	</update>
+	
+	
+	<!-- 开单后更新ioss_goods_instance库存 -->
+	<update id="updateIossGoodInstanceStock" parameterClass="java.util.Map" >
+			UPDATE ioss_goods_instance SET exist_num = exist_num - 1,sell_num =  sell_num + 1 
+			 
+			<isNotEmpty property="hk_goods_number" prepend=",">
+			   	hk_exist_num = hk_exist_num -1
+			</isNotEmpty>
+			where goods_id = #goodsId# 
+			<isNotEmpty property="size" prepend="and">
+			   	size = #size#
+			</isNotEmpty>
+	</update>
+	  
+	  
+	 <!-- 开单后更新hx_available_stock库存 -->
+	<update id="updateHxAvaliableStock" parameterClass="java.util.Map" >
+			UPDATE hx_available_stock SET goods_number = goods_number - 1,goods_sale_number =  IFNULL(goods_sale_number,0) + 1
+			where goods_id = #goodsId#  and goods_instance_id = #goodsInstanceId#  and site_id = #siteId#
+	</update>
+	  
+	  
+	  
+	  <!--减少库存 -->
+	
+	<!-- 入库后增加emall_goods库存 -->
+	<update id="addEmallGoodsStock" parameterClass="java.util.Map" >
+			UPDATE emall_goods SET goods_number = goods_number + 1 
+			<isNotEmpty property="hk_goods_number" prepend=",">
+			   	hk_goods_number = hk_goods_number +1
+			</isNotEmpty>
+			where id = #goodsId#
+			 
+	</update>
+	
+	
+	<!-- 入库后增加ioss_goods_instance库存 -->
+	<update id="addIossGoodInstanceStock" parameterClass="java.util.Map" >
+			UPDATE ioss_goods_instance SET exist_num = exist_num + 1 
+			<isNotEmpty property="hk_goods_number" prepend=",">
+			   	hk_exist_num = hk_exist_num + 1
+			</isNotEmpty>
+			<isNotEmpty property="sell_num" prepend=",">
+			   	sell_num =  IFNULL(sell_num,0) - 1
+			</isNotEmpty>
+			where goods_id = #goodsId#
+			<isNotEmpty property="size" prepend="and">
+			   	size = #size#
+			</isNotEmpty>
+			 
+	</update>
+	  
+	  
+	 <!-- 入库后增加hx_available_stock库存 -->
+	<update id="addHxAvaliableStock" parameterClass="java.util.Map" >
+			UPDATE hx_available_stock SET goods_number = goods_number + 1
+			<isNotEmpty prepend="," property="goods_sale_number">
+				goods_sale_number =  IFNULL(goods_sale_number,0) - 1
+			</isNotEmpty>
+			where goods_id = #goodsId#  and goods_instance_id = #goodsInstanceId#  and site_id = #siteId#
+	</update>
+	
+	
+</sqlMap>
+
+

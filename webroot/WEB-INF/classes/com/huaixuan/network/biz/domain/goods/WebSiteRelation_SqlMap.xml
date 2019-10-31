@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap >
+
+<typeAlias alias="webSiteRelation" type="com.huaixuan.network.biz.domain.goods.WebSiteRelation"/>
+
+<!-- create webSiteEmail object -->
+<insert id="addWebSiteRelation" parameterClass="webSiteRelation">
+<![CDATA[
+       INSERT INTO emall_web_site_relation (id,status,web_site_id,gmt_create,gmt_modify,from_user,to_user)values( null,
+        #status#,
+        #webSiteId#,
+        sysdate(),
+        sysdate(),
+        #fromUser#,
+        #toUser#
+         )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<insert id="insertWebSiteRelation" parameterClass="webSiteRelation">
+<![CDATA[
+INSERT INTO emall_web_site_relation
+  (status, web_site_id, gmt_create, gmt_modify, from_user, to_user)
+  SELECT #status# as status,
+         #webSiteId# as web_site_id,
+         sysdate() as gmt_create,
+         sysdate() as gmt_modify,
+         #fromUser# as from_user,
+         temp2.account as to_user
+    from (select distinct u.account,temp.user_id
+          from emall_agent_goods temp, emall_users u where temp.user_id = u.id) temp2
+]]>
+</insert>
+
+
+
+<update id="editWebSiteRelationStatus" parameterClass="webSiteRelation">
+<![CDATA[
+        update emall_web_site_relation set status = #status#,
+        gmt_modify= sysdate()
+        where id=#id#
+]]>
+</update>
+
+
+
+<update id="removeWebSiteRelation" parameterClass="webSiteRelation">
+<![CDATA[
+        update emall_web_site_relation set status = #status#,
+        gmt_modify= sysdate()
+        where id=#id#
+]]>
+</update>
+
+
+    <sql id="COMMON_RELATION_CONDITION">
+        <isNotEmpty property="id" prepend="and ">
+            id = #id#
+        </isNotEmpty>
+        <isNotEmpty property="status" prepend="and">
+            status=#status#
+        </isNotEmpty>
+        <isNotEmpty property="fromUser" prepend="and">
+            from_user = #fromUser#
+        </isNotEmpty>
+        <isNotEmpty property="toUser" prepend="and">
+            to_user = #toUser#
+        </isNotEmpty>
+
+        <isNotEmpty property="gmtCreate" prepend="and">
+            gmt_create <![CDATA[ < ]]> #gmtCreate#
+        </isNotEmpty>
+    </sql>
+<!-- search WebSiteEmai object -->
+<select id="getWebSiteRelation" parameterClass="webSiteRelation" resultClass="webSiteRelation">
+<![CDATA[
+select id,
+       status,
+       web_site_id as webSiteId,
+       from_user as fromUser,
+       to_user as toUser,
+       gmt_create as gmtCreate,
+       gmt_modify gmtModify
+  from emall_web_site_relation
+ where status != 'delete'
+
+]]>
+<include refid="COMMON_RELATION_CONDITION" />
+</select>
+
+
+</sqlMap>

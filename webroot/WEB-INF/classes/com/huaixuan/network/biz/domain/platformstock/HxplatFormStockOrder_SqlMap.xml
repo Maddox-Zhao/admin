@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="platformstock">	
+   <typeAlias alias="platFormOrderRecord" type="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord"/>
+  	 <resultMap id="stockOrderResultMap" class="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderRecord" >
+		<result column="id" property="id"/>
+		<result column="order_id" property="orderId"/>
+		<result column="idPlartform" property="idPlartform"/>
+		<result column="idStatus" property="idStatus"/>
+		<result column="create_time" property="createDate"/>
+		<result column="status" property="status"/>
+		<result column="emsCode" property="emsCode"/>
+		<result column="emsCompany" property="emsCompany"/>
+		<result column="type"     property="type"/>
+		<result column="order_time" property="orderTime"/>
+	</resultMap>
+	
+   <!-- 正式  -->
+    <select id="hxStockOrderCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+      select count(*) from  hx_stock_update_platform_order 
+      where idPlartform='9'    
+	 <isNotEmpty prepend="and" property="orderId">
+		order_id=#orderId#
+	</isNotEmpty>	
+	
+	<isNotEmpty prepend="and" property="type">
+	   type=#type#
+	</isNotEmpty>
+	
+     <isNotEmpty property="createDateStarts" prepend="and">
+			<![CDATA[  create_time >= #createDateStarts# ]]>
+	 </isNotEmpty>
+	 <isNotEmpty property="createDateEnds" prepend="and">
+			<![CDATA[  create_time <= '$createDateEnds$ 23:59:59'  ]]>
+     </isNotEmpty>
+     
+    <isNotEmpty property="orderTimeStart" prepend="and">
+     <![CDATA[ order_time >= #orderTimeStart# ]]>
+    </isNotEmpty>
+    <isNotEmpty property="orderTimeEnd" prepend="and">
+			<![CDATA[  order_time <= '$orderTimeEnd$ 23:59:59'  ]]>
+    </isNotEmpty>
+  
+   </select>
+   
+   
+   <select id="searchStockOrderProduct" parameterClass="java.util.Map" resultMap="stockOrderResultMap">
+	select * from
+	hx_stock_update_platform_order 
+     where idPlartform='9' 
+	<isNotEmpty prepend="and" property="orderId">
+		order_id=#orderId#
+	</isNotEmpty>
+	
+	<isNotEmpty prepend="and" property="type">
+	   type=#type#
+	</isNotEmpty>
+	
+	<isNotEmpty property="createDateStarts" prepend="and">
+				<![CDATA[  create_time >= #createDateStarts# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="createDateEnds" prepend="and">
+				<![CDATA[   create_time <= '$createDateEnds$ 23:59:59'  ]]>
+  </isNotEmpty>
+  
+  <isNotEmpty property="orderTimeStart" prepend="and">
+     <![CDATA[ order_time >= #orderTimeStart# ]]>
+  </isNotEmpty>
+  
+  <isNotEmpty property="orderTimeEnd" prepend="and">
+			<![CDATA[  order_time <= '$orderTimeEnd$ 23:59:59'  ]]>
+  </isNotEmpty>
+  
+	ORDER BY create_time Desc
+	 <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+   </select>
+</sqlMap>

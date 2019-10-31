@@ -1,0 +1,170 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+    <form action="/statistics/saleAnalysisDetail.html" id="singleForm" name="singleForm" method="post">
+		#springBind("saleAnalysis.dosearch")
+		<input type="hidden" id="dosearch" name="${status.expression}" value ="$!{status.value}" />
+	<div class="searchBox">
+     <h3><span>销售明细</span></h3>
+     <table>
+      <tr>
+		<th>用户名：</th>
+		<td>
+		#springBind("saleAnalysis.buyNick")
+		<input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" id="buyNick" />
+        </td>
+		<th>商品名称：</th>
+		<td>
+		#springBind("saleAnalysis.title")
+		<input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" id="title" />
+        </td>
+		<th>类目：</th>
+		<td>
+			#springBind("saleAnalysis.catId")
+			<select name="${status.expression}" id="catCodeSearch" style="select">
+				<option value="">-=请选择=-</option>
+				#foreach($cat in $catList)
+				<option value="$cat.catCode" #if("$cat.catCode"=="$!{status.value}") selected #end>$cat.catName</option>
+				#end
+			</select>
+		</td>
+	  </tr>
+	  <tr>
+		<th>商品编码：</th>
+		<td>
+		#springBind("saleAnalysis.goodsSn")
+		<input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" id="goodsSn" />
+        </td>
+		<th>日期：</th>
+		<td>
+			#springBind("saleAnalysis.dateStart")
+			<input name="${status.expression}" id="dateStart" size="15" readonly="true" value="$!{status.value}"/>到
+			#springBind("saleAnalysis.dateEnd")
+			<input name="${status.expression}" id="dateEnd" size="15" readonly="true" value="$!{status.value}"/>
+		</td>
+		<script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "dateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "dateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+	    </script>
+      </tr>
+      <tr>
+        <td></td>
+		<td><button type="button" onclick="formSubmit();" class="btn">查询</button></td>
+		<td><button type="button" onclick="doExport();" class="btn">excel导出</button></td>
+	  </tr>
+     </table>
+    </div>
+ </form>
+	 
+ <div class="tool">
+     #foreach($member in $sumMap.entrySet())
+		<div align="right">
+			<font size='4'><strong><label>【 商品种类: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.goodsId}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总量: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.saleNum}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总金额: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${member.value.salePrice})</label></strong></font>
+			<font size='4'><strong><label>元 </label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;销售总成本: </label></strong></font>
+			<font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney($member.value.goodsInPrice)</label></strong></font>
+			<font size='4'><strong><label>元 】</label></strong></font>
+		</div>
+	 #end
+     #foreach($member in $refundMap.entrySet())
+		<div align="right">
+			<font size='4'><strong><label>【 商品种类: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.goodsId}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;退货总量: </label></strong></font>
+			<font size='4' color='red'><strong><label>${member.value.saleNum}</label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;退货总金额: </label></strong></font>
+			<font size='4' color='red'><strong><label>$!moneyUtil.getFormatMoney(${member.value.salePrice})</label></strong></font>
+			<font size='4'><strong><label>元 </label></strong></font>
+			<font size='4'><strong><label>&nbsp;&nbsp;&nbsp;退货总成本: </label></strong></font>
+			<font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney($member.value.goodsInPrice)</label></strong></font>
+			<font size='4'><strong><label>元 】</label></strong></font>
+		</div>
+     #end
+ </div>
+	 
+   <div class="listBox">
+	 <h3><span>销售明细</span></h3>
+     <table>
+      <tr>
+        <th>用户名</th>
+		<th>编码</th>
+		<th>商品名称</th>
+        <th>类目</th>
+        <th>单位</th>
+        <th>销售数量</th>
+		<th>销售成本</th>
+        <th>销售金额</th>
+		<th>毛利</th>
+		<th>毛利率</th>
+      </tr>
+	  #foreach($saleAnaly in $query.items)
+		<tr>
+			    <td  align="left">$!saleAnaly.buyNick</td>
+				<td  align="left">$!saleAnaly.goodsSn</td>
+				<td  align="left">
+					#if($!saleAnaly.saleNum>0)
+					  <a href="$appServer.get('/trade/detail.html').addQueryData('tradeId', $saleAnaly.tid)">$!saleAnaly.title</a>
+                    #else
+                      <a href="$appServer.get('/trade/confirmRefund.html').addQueryData('refundId',$!saleAnaly.tid)">$!saleAnaly.title</a>
+				    #end
+				</td>
+				<td  align="left">$!saleAnaly.catName</td>
+				<td  align="center">$!saleAnaly.unit</td>
+				<td  align="center">$!saleAnaly.saleNum</td>
+				<td  align="center">$!saleAnaly.goodsInPrice</td>
+				<td  align="center">$!saleAnaly.salePrice</td>
+				<td  align="center">$!saleAnaly.saleProfit</td>
+				<td  align="center">$!saleAnaly.saleProfitPer%</td>
+		</tr>
+	  #end
+		</table>
+   </div>
+   <div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/statistics/saleAnalysisDetail.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+<script language="javascript" type="text/javascript">		
+		function formSubmit(){
+			var dateStart=jQuery.trim(document.getElementById("dateStart").value);
+			var dateEnd=jQuery.trim(document.getElementById("dateEnd").value);
+    		var b_date=new Date(Date.parse(dateStart));
+            var e_date=new Date(Date.parse(dateEnd));
+    		if(e_date < b_date){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}
+			document.getElementById("buyNick").value=jQuery.trim(document.getElementById("buyNick").value);
+	    	document.getElementById("title").value=jQuery.trim(document.getElementById("title").value);
+	        document.getElementById("goodsSn").value=jQuery.trim(document.getElementById("goodsSn").value);
+	    	document.getElementById("dateStart").value=jQuery.trim(document.getElementById("dateStart").value);
+	    	document.getElementById("dateEnd").value=jQuery.trim(document.getElementById("dateEnd").value);
+			document.getElementById("dosearch").value='';
+            document.getElementById('singleForm').submit();
+	    }
+		
+		function doExport(){
+		    var form1=document.getElementById('singleForm');
+			form1.action="/statistics/saleAnalysisDetailExport.html";
+			form1.submit();
+			form1.action="/statistics/saleAnalysisDetail.html";
+		}
+</script>

@@ -1,0 +1,75 @@
+
+/* CSS Reset */
+/**我的购物车第一步**/
+.cart-box {margin:10px 0;}
+.cart-box .cart-lc {float:right;text-align:right;width:610px;}
+.cart-box h3 {background:url(../images/web/c_h3_bg.gif) no-repeat scroll 0 0 transparent;display:block;font-size:14px;height:30px;line-height:30px;margin:20px 0 0;text-align:center;
+width:150px;}
+.cart-box .cart-table {border:1px solid #E0E0E0;border-collapse:collapse;width:100%;}
+.cart-box .cart-table th {background:url(../images/web/c_th_bg.gif) repeat-x scroll 0 0 transparent;line-height:21px;text-align:center;}
+.cart-box .cart-table td {border:1px solid #E0E0E0;line-height:20px;padding:5px;vertical-align:middle}
+.cart-box h4 {background:none repeat scroll 0 0 #EFEFEF;font-size:13px;font-weight:300;line-height:30px;text-align:center;}
+.cart-box h4 strong {color:#FF0000;font-size:16px;font-weight:600;}
+
+/*我的购物车第2步*/
+.dz-box-address {border: 1px dotted #CCCCCC;margin-bottom: 10px;}
+.dz-box {border: 1px dotted #CCCCCC;margin-bottom: 10px;}
+.dz-box ul {margin:5px 10px;}
+.dz-box ul li {line-height: 20px;padding-left: 8px;width: 98%;}
+.dz-box ul li p{ padding-left:15px;}
+.dz-table th, .dz-table td{ padding:5px;}
+.red{ color:#F00;}
+#address {margin: 10px;}
+#address li {line-height: 25px;padding-left: 8px;width: 98%;}
+#address li.selected {background: none repeat scroll 0 0 #FFFFCC;}
+.address_tal {margin-bottom: 10px;margin-left: 40px;}
+.address_tal th {font-size: 14px;font-weight: 100;text-align: right;}
+.address_tal th, .address_tal td {line-height: 25px;vertical-align: middle;}
+.f-price { overflow:hidden;text-align: right;}
+.f-price ol li{padding: 10px; background-color: #FFFAF7;border: 1px solid #FFE0D2; }
+.f-price ol li strong.f16 {color: red;font-size: 16px;}
+
+/*支付方式选择页面*/
+.num {background: none repeat scroll 0 0 #E4E4E4;height: 23px;line-height: 23px;margin: 10px 0;overflow: hidden;}
+.num li {float: left;line-height: 23px;margin: 0;text-align: center;width: 190px;}
+.num li span {color: #BA7B12;display: block;font-size: 14px;height: 23px;line-height: 23px;}
+.num li.current {background: url("../images/web/num_l.gif") no-repeat scroll left top #FFA900;}
+.num li.current span {background: url("../images/web/num_r.gif") no-repeat scroll right top transparent;color: #FFFFFF;font-weight: 600;}
+.pay-tab {float: left;margin: 20px 0 0;}
+.pay-tab li {background: url("../images/web/pay_tab_bg.gif") no-repeat scroll 0 0 transparent;float: left;height: 27px;line-height: 27px;margin-right: 8px;text-align: center;width: 120px;}
+.pay-tab li.current {background: url("../images/web/pay_tab_c_bg.gif") no-repeat scroll 0 0 transparent;}
+.pay-tab li a {color: #000000;font-size: 14px;font-weight: 600;}
+.pay-tab li.current a {color: #FFFFFF;}
+.pay-box {background-color: #F4BD52;border: 1px solid #EC970F;width: 948px;}
+.pay-box p{ line-height:30px; text-align:center;}
+.pay-box p a{ display:inline-block;}
+.table-2-14 {background-color: #FFFFFF;margin: 5px;}
+.table-2-14 table {border: 0 none;width: 730px !important;}
+.table-2-14 table td {color: #000000;font-size: 14px;padding: 10px 0 10px 5px;}
+.table-2-14 table td.tb-label {line-height: 15px;text-align: right;width: 25%;}
+.table-2-14 table td.tb-field {width: 70%;}
+.table-2-14 table .tb-field .f-f90 {float: left;width: 180px;}
+.table-2-14 table .tb-field .f-red {float: left;width: 100px;}
+.table-2-14 table .tb-field .f-red span {color: #333333;font-size: 12px;font-weight: 300;}
+/*购物车按钮*/
+
+.btn-confirm  {color:white;font-weight:bold;}
+.btn { background:url(../images/web/button24_bg.png) no-repeat scroll 0 0 transparent;border:0 none;cursor:pointer;height:25px;width:99px;line-height:25px;margin:0px 5px;}
+.btn a{color:#fff;font-weight:bold;line-height:25px;}
+.btn_h { background:url(../images/web/button25_bg.png) no-repeat scroll 0 0 transparent;border:0 none;cursor:pointer;height:25px;width:99px;line-height:25px;margin:0px 5px;}
+.btn_h a{color:#000;}
+
+/*处理成功失败*/
+.success-box, .error-box {background: url("../images/web/success_bg.gif") no-repeat scroll 0 0 transparent;height: 314px;margin: 20px auto;width: 750px;}
+.success-box h2, .error-box h2 {color: #1E6E19;height: 70px;line-height: 70px;text-align: center;}
+.success-box dl, .error-box dl {margin: 20px 0 0 230px;}
+.success-box dl dt, .error-box dl dt {color: #003366;font-size: 14px;line-height: 30px;}
+.success-box dl dd, .error-box dl dd {font-size: 13px;line-height: 20px;margin-left: 24px;}
+.success-box dl dd a, .error-box dl dd a {margin-left: 15px;}
+.error-box {background: url("../images/web/error_bg.gif") no-repeat scroll 0 0 transparent;}
+.error-box h2 {color: #570000;}
+/* -- 收货地址 -- */
+.list-table, .fk, .qt, .spbj, .gm_list{margin-bottom:10px;border-collapse:collapse;width:100%;}
+.list-table th{border-bottom:1px solid #DDD7CD;background-color:#FAF8F6;line-height:25px;padding:5px;}
+.list-table td{border-bottom:1px dotted #CDCDCD; line-height:30px;padding:5px;}
+.list-table td a{ color:#069;}

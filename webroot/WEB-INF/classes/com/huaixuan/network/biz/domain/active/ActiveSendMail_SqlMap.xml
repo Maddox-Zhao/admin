@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SendEmailDao">
+	
+	<!-- 得到活动框同款产品数量大于2的的goodsId（可能存在相同价格） -->
+	<select id="getGoodsIdNumGTtwo" parameterClass="java.lang.Long">
+		SELECT
+		g.product_id
+		FROM hx_moveframe_product g
+		GROUP BY g.product_id,g.discount_price
+		HAVING COUNT(g.product_id) > 1
+</select>
+
+	<!-- 得到所有的顾客ID，然后去循环判断该客户是否有同款产品有不同价格的产品存在 -->
+	<select id="getCustomerIds" resultClass="java.lang.Long">
+		SELECT DISTINCT(u.customer_id)
+		FROM
+		hx_moveframe_user u
+		GROUP BY u.customer_id
+</select>
+
+
+
+
+
+
+
+
+
+</sqlMap>

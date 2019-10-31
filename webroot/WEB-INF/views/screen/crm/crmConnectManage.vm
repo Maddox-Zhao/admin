@@ -1,0 +1,123 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>CRM系统  - 预约记录查询</h2>
+
+  <form action="$appServer/crm/crmConnectManage.html?initFlag=false" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>搜预约记录</span></h3>
+		<table >
+			<tr>
+				<th>客户名称：</th>
+                <td>
+					<input value="$!userName" type="text" name="userName" id="userName" value="$!{userName}" size="15" theme="simple" maxlength="30" />
+				</td>
+				<th>状态：</th>
+				<td >
+					<select id="status" name="status">
+                        <option value="">-=请选择=-</option>
+						#foreach($s in $connectRecordStatusMap.entrySet())
+                            <option value='$s.key' #if($status == $s.key) selected  #end >$s.value</option>
+						#end
+                    </select>
+                </td>
+            </tr>
+
+			<tr>
+				<th>时间：</th>
+                <td>
+					<input value="$!gmtTimeStart" type="text" name="gmtTimeStart" id="gmtTimeStart" size="10" theme="simple" readonly="true" />
+					-
+					<input value="$!gmtTimeEnd" type="text" name="gmtTimeEnd" id="gmtTimeEnd" size="10" theme="simple" readonly="true" />
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "gmtTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "gmtTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+            </tr>
+
+			<tr>
+				<th></th>
+                <td>
+					<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+				</td>
+				<th></th>
+				<td >
+                </td>
+            </tr>
+        </table>
+    </div>
+  </form>
+
+<center><div id="result" style="color:red;">$!message</div></center>
+
+<div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>客户名称</th>
+		<th>类型</th>
+        <th>时间</th>
+        <th>状态</th>
+		<th>服务人员</th>
+        <th>操作</th>
+      </tr>
+      #foreach($connectRecordTmp in $query.items)
+	  <tr #if($velocityCount%2==0) class="bg" #end>
+        <td  align="center">&nbsp;$!connectRecordTmp.userName</td>
+		<td  align="center">&nbsp;$!connectRecordTypeMap.get("$!connectRecordTmp.type")</td>
+		<td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!connectRecordTmp.gmtTime)</td>
+		<td  align="center">&nbsp;$!connectRecordStatusMap.get("$!connectRecordTmp.status")</td>
+		<td  align="center">&nbsp;$!connectRecordTmp.adminUser</td>
+        <td  align="center">
+			#if($adminAccess.has("A_CRM_CONNECT_RECORD_EDIT"))
+				#if($!connectRecordTmp.type && $!connectRecordTmp.type == "order" && $!connectRecordTmp.status == "new") <a href="crmDeleteOrderRecordById.html?id=$!{connectRecordTmp.id}">删除预约</a> #end
+			#end
+			<a href="crmShowConnectRecordDetail.html?id=$!{connectRecordTmp.id}">查看</a>
+		</td>
+	  </tr>
+	  #end
+    </table>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query', $query).put('slider_target',"/crm/crmConnectManage.html?initFlag=false").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+  </form>
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+    function formSubmit(){
+			var dateStart1=document.getElementById("gmtTimeStart").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("gmtTimeEnd").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+    		if(e_date1 < b_date1){
+    			alert("起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("userName").value=document.getElementById("userName").value.trim();
+        	document.forms[0].submit();
+	 }
+</script>

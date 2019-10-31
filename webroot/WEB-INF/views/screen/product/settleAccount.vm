@@ -1,0 +1,300 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>购物车结算</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+          <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+   <div id="form1"  style="margin-left:auto;margin-center:auto;margin-left:100px">
+        <table>
+             <tr style="display:none;">
+                <td>
+                    <label >站點：</label>
+                </td>
+                <td>
+                    <input id="cursitenname"  name="cursite" style="width:80px" class="mini-textbox"  readOnly="true"/>
+                </td>
+            </tr>
+			<tr style="display:none;">
+                <td>
+                    <label >站點ID：</label>
+                </td>
+                <td>
+                    <input id="curSiteId"  name="curSiteId" style="width:80px" class="mini-textbox"  readOnly="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label >总价：</label>
+                </td>
+                <td>
+                    <input id="totalPrice"  name="subTotal" style="width:80px" class="mini-textbox"  readOnly="true"/>
+                </td>
+            </tr>
+			<tr>
+                <td>
+                    <label>销售币种：</label>
+                </td>
+                <td>
+                     <input name="idCurrency"  class="mini-combobox"   style="width:80px" textField="name" valueField="id" emptyText="请选择..."
+                            url="/sell/getAllCurrency.html"  allowInput="false"  value="$!{currencyId}"/>  
+                </td>
+            </tr>
+            <tr id="orderStatusTr">
+                <td>
+                    <label >订单状态：</label>
+                </td>
+                <td>
+                    <input id="orderStatus" name="status"  class="mini-combobox"   style="width:100px" textField="name" valueField="id" emptyText="请选择..."
+                      data="orderStatus"  allowInput="false"  value="1" onValuechanged="orderChange()"/>  
+                </td>
+            </tr>
+            <tr id="paymentTr">
+                <td>
+                    <label >付款方式：</label>
+                </td>
+                <td>
+                       <input id="idPayment" name="idPayment"  class="mini-combobox"   style="width:100px" textField="name" valueField="id" emptyText="请选择..." 
+						url="/sell/getAllPayment.html"  allowInput="false"  value="1" />  
+                </td>
+            </tr>
+            <tr id="cashTr">
+                <td>                   
+                    <label>现金付款：</label>
+                </td>
+                <td>
+                    <input id="cash" name="amountCash" style="width:100px" class="mini-textbox" vtype="float" value="0" />
+                </td>
+            </tr>
+			
+			  <tr>
+                <td>                   
+                    <label>渠道：</label>
+                </td>
+                <td>
+                   <input name="idChannel" id="qudao"  class="mini-combobox"   style="width:100px" textField="name" valueField="id" emptyText="请选择..."
+                            url="/sell/getAllSellChannel.html"  allowInput="false"/>  
+                </td>
+            </tr>
+			
+            <tr>
+                <td>
+                    客户：
+                </td>
+                <td>
+                        <input id="customerShow" name="idCustomer" allowInput="false" style="width:150px"  class="mini-buttonedit"   emptyText="请选择..."  onbuttonclick="onButtonEdit" selectOnFocus="true" />
+                </td>
+            </tr>
+			#if($!adminAgent.username=="1002011")
+			<tr id="operator2Tr">
+                <td>
+             开单工号：
+                </td>
+                <td>
+                       <input id="operator2Id"  name="operator2" style="width:80px" class="mini-textbox"/>
+                </td>
+            </tr>
+		#end	
+			
+             <tr>
+					<td>
+						 &nbsp;&nbsp; <a class="mini-button" iconCls="icon-ok" onclick="submit()">提交</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+			 
+			 
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	var data; //保存页面传过来的开单数据 [{idproduct:price}]
+	var orderStatus = [{id:0,name:'已付款'},{id:1,name:'已确认 待付款'}];
+	var type = "sale";
+	 function SetData(data1,typeTmp) {
+        //跨页面传递的数据对象，克隆后才可以安全使用
+        data = mini.clone(data1);
+		typeTmp = mini.clone(typeTmp);
+		//如果是预开单 则传入ykd
+		if(typeTmp)
+			type = typeTmp;
+		if(type == 'ykd')
+		{
+			jQuery("#orderStatusTr").hide();
+		}
+
+		var total = 0;
+		var curSiteArr=[];
+		for(var i = 0; i < data.length;i++)
+		{
+			var row = data[i];
+			var price = row.ssPrice;
+			var cursite= row.curSiteId;
+			curSiteArr.push(cursite);
+		    if (isNaN(price)) continue;
+			price = Number(price);
+            total += price;
+		}
+		var curSiteArr=curSiteArr.join(",");
+		mini.get("curSiteId").setValue(curSiteArr);
+		mini.get("totalPrice").setValue(total);
+		mini.get("qudao").select(0);
+		
+		
+		
+		orderChange();
+			
+    }
+	
+	//隐藏tr和设置值
+	function orderChange()
+	{
+		var payment = mini.get("idPayment")
+		var cash = mini.get("cash");
+		
+		var paymentTr = jQuery("#paymentTr")
+		var cashTr = jQuery("#cashTr");
+		var orderS = mini.get("orderStatus");
+		if(orderS.getValue() == 1)
+		{
+			payment.setValue(0);
+			cash.setValue(0);
+			paymentTr.hide();
+			cashTr.hide();
+		}
+		else
+		{
+			payment.setValue(1);
+			cash.setValue(0);
+			paymentTr.show();
+			cashTr.show();
+		}
+		
+	}
+	
+	//选中客户
+	function onButtonEdit()
+	{
+		mini.open({
+            url: "/customer/toSearchCustomer.html",
+            title: "选择客户",
+            width: 700,
+            height: 300,
+            onload: function() {
+                 var iframe = this.getIFrameEl();
+             	 iframe.contentWindow.setData();
+            },
+            ondestroy: function(action) {
+               var iframe = this.getIFrameEl();
+               var data = iframe.contentWindow.getData(data);
+			   data = mini.clone(data);
+			   if(data)
+			   {
+			   		mini.get("customerShow").setText(data.name);
+					mini.get("customerShow").setValue(data.idCustomer);
+				 
+			   }
+            }
+        });
+	}
+	
+	function submit()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		var formData = form.getData();//form表单填写的数据
+		
+		var qudaoText = mini.get("qudao").getText();
+	
+		
+		
+		
+		var productRequestStr = "";//产品和售价
+		for(var i = 0; i < data.length;i++)
+		{
+			var row = data[i];
+			var idProduct = row.idProduct;
+			var salePrice = row.ssPrice;
+			if(!salePrice) salePrice = 0;
+			productRequestStr += idProduct+":"+salePrice+";";	
+			
+		}
+		if(productRequestStr == ""){mini.alert("没有产品数据！");return;}
+		
+		if(parseInt(formData.amountCash) > parseInt(formData.subTotal))
+		{
+			mini.alert("现金不能大于总金额");
+			return;
+		}
+		
+		if(mini.get("qudao").getValue() == "")
+		{
+			mini.alert("请选择渠道");
+			return;
+		}
+		
+		var customerShow = mini.get("customerShow");
+		if(!customerShow.getValue())
+		{
+			mini.alert("请选择客户");
+			return;
+		}
+
+		
+		 mini.confirm("销售渠道是【"+qudaoText+"】?","提示",function(action)
+		 {
+				if('ok' == action)
+				{
+					if(formData.totalPrice == undefined) formData.totalPrice = 0; 
+            		formData.idProducts = productRequestStr;
+            		mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '提交中,请勿关闭...'
+                    });
+					var url = "/shoppingCar/settleAccount.html";
+					//预开单
+					if('ykd' == type)
+					{
+						url = "/reservedOrder/settleAccount.html";
+					}
+            		jQuery.post(url,formData,function(text)
+            		{
+            		 	mini.unmask(document.body);
+            			if("ok" == text)
+            			{
+            				CloseWindow('close');
+            			}else if("noGolbal"==text){
+						   mini.alert("该产品的位置不在当前站点");
+						}else if("needName"==text){
+						 mini.alert("请填写开单工号!");
+						}
+            			else
+            			{
+            				mini.alert("提交出错,联系管理员");
+            			}
+            		});
+				}
+		 })
+		 
+		
+		
+		
+		
+	}
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+</script>
+</body>
+</html>

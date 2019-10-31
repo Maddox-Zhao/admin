@@ -1,0 +1,77 @@
+#set($layout = "layout/print.vm")
+#set($title = "打印库存盘点明细")
+<head>
+<title>管理中心 - 盘存商品明细 </title>
+<script type="text/javascript">
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+</script>
+</head>
+
+<body>
+<div class="main">
+<h1>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+
+
+</span>
+<div style="clear:both"></div>
+</h1>
+
+<div class="main-div">
+	<div align="center"></div>
+	<div id="print">
+
+<!-- 订单列表 -->
+
+<div class="clearing"></div>
+  <div class="list-div" id="listDiv">
+    <table  id="listTable" name="listTable" class="list-table">
+    #if($!storageCheckQuery.storType)
+      #if("y"==$!storageCheckQuery.storType)
+	   <tr><td colspan="7" align="center"><font size="5"><B>库存盘盈单明细</B></font</td></tr>
+      #end
+      #if("k"==$!storageCheckQuery.storType)
+	   <tr><td colspan="7" align="center"><font size="5"><B>库存盘亏单明细</B></font</td></tr>
+      #end
+    #else
+	   <tr><td colspan="7" align="center"><font size="5"><B>库存盘点明细</B></font</td></tr>
+    #end
+      <tr>
+		<th>库位</th>
+		<th>产品编码</th>
+        <th>产品名称</th>
+        <th>属性</th>
+		<th>供应商</th>
+		<th>批次</th>
+		<th>库存类型</th>
+		 #if($!storageCheckQuery.storType)<th>库存数量</th>#end
+        <th>盘点数量</th>
+        <th>备注</th>
+      </tr>
+	  #foreach($storageCheckDetail in $query.items)
+	  <tr    #if($velocityCount%2==0) class="list_tdbg" #end>
+		 <td  align="left">$!storageCheckDetail.locName</td>
+		 <td  align="left">$!storageCheckDetail.code</td>
+		 <td  align="left">$!storageCheckDetail.goodsInstanceName</td>
+         <td  align="left">$!attributeManager.getFullAttributeStringByAttrs($storageCheckDetail.attribute)</td>
+		 <td  align="left">$!storageCheckDetail.supplierName</td>
+		 <td  align="center">$!storageCheckDetail.batchNum</td>
+		 <td align="center">&nbsp;$!storTypeMap.get($!storageCheckDetail.storType)</td>
+		 #if($!storageCheckQuery.storType)<td align="center">$!storageCheckDetail.storNumber</td>#end
+		 #if($!storageCheckQuery.storType)<td align="center">$!storageCheckDetail.checkNum</td>#else<td  align="center">&nbsp;</td>#end
+		 #if($!storageCheckQuery.storType)<td  align="center" style="word-break:break-all" width="150">&nbsp;$!storageCheckDetail.remark</td>#else<td  align="center" style="word-break:break-all" width="150">&nbsp;&nbsp;</td>#end
+	  </tr>
+	  #end
+
+    </table></div>
+
+  </div>
+</div>
+</div>
+</body>

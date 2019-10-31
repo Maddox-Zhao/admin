@@ -1,0 +1,31 @@
+#set($layout = '')
+<div class="pages-box"
+	<div class="pages">
+	#if($slider_borker)
+		#set($s_broker = $slider_borker)
+	#else
+		#set($s_broker = $appServer)	
+	#end
+	#if($sliderCurrent == '1')
+	<span style="font-weight:bold"> &laquo; </span>
+	#else
+	<a href="${s_broker.get("$slider_builder.build($query,1)")}" style="font-weight:bold">&laquo;首页</a>
+	<a href="${s_broker.get("$slider_builder.build($query,$sliderPrev)")}" style="font-weight:bold">&laquo;</a>
+	#end
+	#foreach($grid in $grids)
+		#if($grid == 0)
+		<span style="font-weight:bold">...</span>
+		#elseif($grid == $sliderCurrent)
+		<b>${grid}</b>
+		#else
+		<a href="${s_broker.get("$slider_builder.build($query,$grid)")}" style="font-weight:bold">${grid}</a>
+		#end
+	#end
+	#if($sliderCurrent == $sliderTotal )
+		<span class="nextprev" style="font-weight:bold"> &raquo; </span>
+	#else
+		<a href="${s_broker.get("$slider_builder.build($query,$sliderNext)")}" style="font-weight:bold">&raquo;</a>
+		<a href="${s_broker.get("$slider_builder.build($query,$sliderTotal)")}" style="font-weight:bold">末页 &raquo;</a>
+	#end
+    </div>
+</div>

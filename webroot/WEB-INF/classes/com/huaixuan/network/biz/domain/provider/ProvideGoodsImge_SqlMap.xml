@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideGoodsImge" type="com.huaixuan.network.biz.domain.provider.ProvideGoodsImge"/>
+   
+	<resultMap id="provideGoodsImgeResult" class="com.huaixuan.network.biz.domain.provider.ProvideGoodsImge" >
+		<result column="id" property="id"/>
+		<result column="prod_id" property="prodId"/>
+		<result column="ss_proid" property="ssProid"/>
+		<result column="xiyou_image" property="xiyouImage"/>
+		
+		<result column="image_pic" property="imagePic"/>
+		<result column="type" property="type"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	
+	<insert  id ="insertGoodsImge"   parameterClass ="java.util.List"> 
+     <![CDATA[
+    insert into provide_goods_imge(id,prod_id,ss_proid,xiyou_image,image_pic,type,gmt_create,gmt_modify) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgList[].prodId#,#pgList[].ssProid#,#pgList[].xiyouImage#,#pgList[].imagePic#,#pgList[].type#,sysdate(),#pgList[].gmtModify#
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+
+
+<select id="selectGoodsImge" parameterClass="provideGoodsImge" resultMap="provideGoodsImgeResult">
+	select * from
+	provide_goods_imge
+	where 1=1
+	
+	<isNotNull prepend="and" property="prodId">
+		prod_id=#prodId#
+	</isNotNull>
+	<isNotNull prepend="and" property="ssProdid">
+		ss_prodid=#ssProdid#
+	</isNotNull>
+</select>	
+  
+
+<select id="selectOneGoodsImage" parameterClass="java.lang.String" resultMap="provideGoodsImgeResult">
+	select * from
+	provide_goods_imge
+	where 1=1 and prod_id=#value#
+    order by id asc
+</select>
+
+<!-- 更新 -->
+<update id="updatGoodsImage" parameterClass="provideGoodsImge">
+	update provide_goods_imge
+	<dynamic prepend="set">
+		gmt_modify= sysdate()
+		
+		<isNotNull  property="imagePic">
+			,image_pic=#imagePic#
+		</isNotNull>
+		<isNotNull  property="status">
+			,status=#status#
+		</isNotNull>
+	 where prod_id = #prodId# and xiyou_image = #xiyouImage#
+	</dynamic>
+</update>
+
+<select id="getProvideImgDao" resultMap="provideGoodsImgeResult">
+	<![CDATA[
+	  select  * from provide_goods_imge  where 1=1
+	]]>	
+	
+	<isNotNull prepend="and" property="prodIdList">  
+        prod_id in  
+        <iterate property="prodIdList" open="(" conjunction="," close=")">  
+            #prodIdList[]#  
+        </iterate>                      
+    </isNotNull>
+    order by id asc	
+</select>	  		
+
+
+
+
+
+</sqlMap>
+
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GoodsSQL">
+	<typeAlias alias="goodsRule" type="com.huaixuan.network.biz.domain.goods.GoodsRule" />
+	<resultMap class="goodsRule" id="goodsRuleResult">
+	  <result column="id" property="id" />
+	  <result column="goods_id" property="goodsId" />
+	  <result column="return_id" property="returnId" />
+	  <result column="status" property="status" />
+	</resultMap>
+
+
+<insert id="addGoodsRule" parameterClass="goodsRule">
+<![CDATA[
+		insert into emall_goods_rel_rule(id,goods_id,return_id)
+		values(null,#goodsId#,#returnId#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<select id="getGoodsRuleByGoodsId" parameterClass="java.lang.Long" resultMap="goodsRuleResult">
+ <![CDATA[
+      select emall_goods_rel_rule.* from emall_goods_rel_rule where emall_goods_rel_rule.goods_id = #value# and emall_goods_rel_rule.status = 'y'
+ ]]>
+</select>
+
+<select id="countGoodsRuleByReturnId" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+ <![CDATA[
+     select count(t.id)
+	  from emall_goods_rel_rule t
+	 where t.return_id = #value#
+	   and t.status = 'y'
+ ]]>
+</select>
+
+<select id="getGoodsRuleByMap" parameterClass="java.util.Map" resultMap="goodsRuleResult">
+<![CDATA[
+     select emall_goods_rel_rule.* from emall_goods_rel_rule where 1=1
+]]>
+<isNotEmpty prepend="and" property="returnId">
+     emall_goods_rel_rule.return_id = #returnId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="goodsId">
+     emall_goods_rel_rule.GOODS_ID = #goodsId#
+</isNotEmpty>
+</select>
+
+<update id="editGoodsRule" parameterClass="goodsRule">
+<![CDATA[
+     update emall_goods_rel_rule set status = #status# where id = #id#
+]]>
+</update>
+</sqlMap>

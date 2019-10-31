@@ -1,0 +1,165 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+  <form action="list_damaged_goods.html" name="searchForm" method="post">
+	<div class="searchBox">
+		<h3><span>报残单商品查询</span></h3>
+		<table>
+			<tr>
+    <th>产品名称：</th>
+		<td><input type="text" name="goodsName" id="goodsName" value="$!{damagedDetailQuery.goodsName}" size="15" theme="simple" maxlength="30"  />
+			</td>
+	<th>产品编码：</th>
+		<td><input type="text" name="goodsCode" id="goodsCode" value="$!{damagedDetailQuery.goodsCode}" size="15" theme="simple" maxlength="30"  />
+			</td>
+	<th>报残原因：</th>
+		<td>
+			<select id="reason" name="reason" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($entsm in $enumDamagedReason.entrySet())
+                                <option value="$entsm.key" #if("$!{damagedDetailQuery.reason}" == "$!{entsm.key}") selected="selected" #end title="$entsm.value">$entsm.value</option>
+							#end
+						</select>
+		</td>
+	</tr>
+	<tr>
+	<th>一级仓库：</th>
+			<td><select name="depFirstId" id="depFirstId" style="width:100px;">
+				#if($!depositoryFirstList)
+				  #if($depositoryFirstList.size() == 0 )
+					<option value="">您没有权限</option>
+				  #else
+					#if($depositoryFirstList.size() > 1 )
+						<option value="">-=请选择=-</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+						<option value="$depfirst.id" #if("$depfirst.id"==$damagedDetailQuery.depFirstId) selected #end>$depfirst.depFirstName</option>
+					#end
+				  #end
+				#else
+					<option value="">您没有权限</option>
+				#end
+            </select></td>
+
+	<th>报残时间：</th>
+	<td colspan="2"><input type="text" name="damagedTimeStart" id="damagedTimeStart" value="$!damagedDetailQuery.damagedTimeStart" size="10" theme="simple" readonly="true" />
+		-
+		<input type="text" name="damagedTimeEnd" id="damagedTimeEnd" value="$!damagedDetailQuery.damagedTimeEnd" size="10" theme="simple" readonly="true" />
+   </td>
+			  <script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "damagedTimeStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "damagedTimeEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			</script>
+    <td><input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/></td>
+
+            </tr>
+    	</table>
+		</div>
+		</form>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  	<div class="listBox">
+	<h3><span>报残单商品列表</span></h3>
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>产品编码</th>
+		<th>产品名称</th>
+		<th>报残单号</th>
+		<th>类目</th>
+		<th>属性</th>
+		<th>供应商</th>
+		<th>批次</th>
+				<th>一级仓库</th>
+		<th>库位</th>
+		<th>单位</th>
+		<th>数量</th>
+		<th>单位成本</th>
+		<th>合计成本</th>
+        <th>报残日期</th>
+		<th>报残原因</th>
+      </tr>
+   #if($query)
+      #foreach($damaged in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td>&nbsp;$!damaged.goodsCode</td>
+		<td>&nbsp;$!damaged.goodsName</td>
+		<td>&nbsp;<a href="searchDamagedDetail.html?damagedCode=$!damaged.damagedCode">$!damaged.damagedCode</a></td>
+        <td title="$!damaged.catCode">&nbsp;
+			#if ($!damaged.catCode.length()<20)
+				$!damaged.catCode
+			#else
+				$!controlUtil.getNoticesTitle($!damaged.catCode,20)
+			#end
+		 </td>
+         <td title="$!damaged.attrs">&nbsp;
+			#if ($!damaged.attrs.length()<20)
+				$!damaged.attrs
+			#else
+				$!controlUtil.getNoticesTitle($!damaged.attrs,20)
+			#end
+		 </td>
+		<td>&nbsp;$!damaged.supplierName</td>
+        <td>&nbsp;$!damaged.batchNum</td>
+        <td>&nbsp;$!depositoryNameMap.get($!damaged.depfirstId)</td>
+		<td>&nbsp;$!damaged.locName</td>
+		<td>&nbsp;$!damaged.unit</td>
+		<td>&nbsp;$!damaged.amount</td>
+		<td>￥$!moneyUtil.getFormatMoney($!damaged.unitCost,'0.00')</td>
+        <td>￥$!moneyUtil.getFormatMoney($!damaged.costCount,'0.00')</td>
+		<td align="center">&nbsp;$!date.format("yyyy-MM-dd",$!damaged.gmtDamaged)&nbsp;</td>
+		<td>&nbsp;$!enumDamagedReason.get("$!{damaged.reason}")</td>
+      </tr>
+	  #end
+   #end
+    </table>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/damaged/list_damaged_goods.html?goodsName=$!{damagedDetailQuery.goodsName}&goodsCode=$!{damagedDetailQuery.goodsCode}&reason=$!{damagedDetailQuery.reason}&damagedTimeStart=$!{damagedDetailQuery.damagedTimeStart}&damagedTimeEnd=$!{damagedDetailQuery.damagedTimeEnd}&depFirstId=$!{damagedDetailQuery.depFirstId}").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var dateStart1str=document.getElementById("damagedTimeStart").value;
+    		var dateEnd1str=document.getElementById("damagedTimeEnd").value;
+			var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+	    	document.getElementById("goodsName").value=jQuery.trim(document.getElementById("goodsName").value);
+			document.getElementById("reason").value=jQuery.trim(document.getElementById("reason").value);
+	    	document.getElementById("damagedTimeStart").value=jQuery.trim(document.getElementById("damagedTimeStart").value);
+	    	document.getElementById("damagedTimeEnd").value=jQuery.trim(document.getElementById("damagedTimeEnd").value);
+	    	document.getElementById("goodsCode").value=jQuery.trim(document.getElementById("goodsCode").value);
+
+        	document.forms[0].submit();
+	    }
+</script>
+</body>

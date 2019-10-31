@@ -1,0 +1,191 @@
+#set($layout = 'layout\default.vm')
+
+<script language="javascript" type="text/javascript">
+	function selectid(){
+ 		var id = document.getElementById("idstr").value;
+	  	var obj = document.getElementById("adPositionIdstr");
+		obj.value=id;
+	}
+
+</script>
+
+<div class="main">
+##<div class="mag-t1"> 添加失败！ </div>
+  #if($!message)<div class="mag-t2"> $!message </div>#end
+  <div class="formBox">
+    <h3><i></i><span>添加供应商</span></h3>
+	<form  name="addSupplier"  id="addSupplier" action="addSupplier.html" method="post">
+		<div class="content">
+			<table class="c2">
+      			<input type="hidden" id="flag" name="flag" value="add" />
+				<tr>
+    				<th ><span class="red">*</span>供应商名称：</th>
+    				<td>
+						#springBind("supplier.name")
+    					<input type="text" name="${status.expression}" id="name" value="$!{status.value}" class="inp"/>
+    					<span class="error">${status.errorMessage}</span>
+    				</td>
+    				<th>简称：</th>
+    				<td>
+						#springBind("supplier.shortName")
+						<input type="text" name="${status.expression}" id="shortName" value="$!{status.value}" class="inp"/>
+						<span class="error">${status.errorMessage}</span>
+    				</td>
+				</tr>
+
+				<tr>
+				<th ><span class="red">*</span>联系人：</th>
+				<td>
+					#springBind("supplier.linkman")
+					<input type="text" name="${status.expression}" id="linkman" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th >负责人：</th>
+				<td>
+					#springBind("supplier.chargeMan")
+					<input type="text" name="${status.expression}" id="chargeMan" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+
+				<tr>
+				<th ><span class="red">*</span>联系电话：</th>
+				<td>
+					#springBind("supplier.tel")
+					<input type="text" name="${status.expression}" id="tel" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th ><span class="red">&nbsp;</span>手机：</th>
+				<td>
+					#springBind("supplier.mobile")
+					<input type="text" name="${status.expression}" id="mobile" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+
+				<tr>
+				<th >传真：</th>
+				<td>
+					#springBind("supplier.fax")
+					<input type="text" name="${status.expression}" id="fax" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th >QQ/MSN：</th>
+				<td>
+					#springBind("supplier.im")
+					<input type="text" name="${status.expression}"  id="im" value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+
+				<tr>
+				<th >email：</th>
+				<td>
+					#springBind("supplier.email")
+					<input  type="text" name="${status.expression}" id="email"  value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th >&nbsp;</th>
+				<td>&nbsp;</td>
+
+				</tr>
+				<tr>
+				<th >地址：</th>
+				<td>
+					#springBind("supplier.address")
+					<input  type="text" name="${status.expression}"  value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th >&nbsp;</th>
+				<td>&nbsp;</td>
+
+				</tr>
+
+
+
+				<tr>
+				<th >供应商等级：</th>
+				<td>
+					#springBind("supplier.grade")
+					<input  type="radio" name="${status.expression}"  value="g" />优良<input  type="radio" name="${status.expression}"  value="n" checked="checked"/>普通<input  type="radio" name="${status.expression}"  value="b" />差
+				</td>
+
+				<th >营销方式：</th>
+				<td>
+					#springBind("supplier.marketing")
+					<input  type="radio" name="${status.expression}"  value="j" checked="checked"/>经销<input  type="radio" name="${status.expression}"  value="l" />联营<input  type="radio" name="${status.expression}"  value="d" />代销
+				</td>
+
+				</tr>
+
+
+				<tr>
+				<th >付款方式：</th>
+				<td>
+					#springBind("supplier.payment")
+					<input  type="radio" name="${status.expression}"  value="m" checked="checked"/>月结<input  type="radio" name="${status.expression}"  value="c" />现金
+				</td>
+
+				<th >开户银行：</th>
+				<td>
+					#springBind("supplier.bank")
+					<input  type="text" name="${status.expression}"  value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+				<tr>
+				<th >银行帐号：</th>
+				<td>
+					#springBind("supplier.bankNum")
+					<input  type="text" name="${status.expression}"  value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				<th >收款人：</th>
+				<td>
+					#springBind("supplier.payee")
+					<input  type="text" name="${status.expression}"  value="$!{status.value}" class="inp"/>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+
+
+				<tr>
+				<th >经营范围：</th>
+				<td colspan="3">
+					#springBind("supplier.brand")
+					<textarea cols="70" rows="5" name="${status.expression}">$!{status.value}</textarea>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+				</tr>
+				<tr>
+				<th >备注：</th>
+				<td colspan="3">
+					#springBind("supplier.remark")
+					<textarea cols="70" rows="5" name="${status.expression}">$!{status.value}</textarea>
+					<span class="error">${status.errorMessage}</span>
+				</td>
+
+				</tr>
+				 </table>
+    </div>
+    <div class="form-but">
+      <!-- 表单按钮区 -->
+      <button type="button" class="button-s4" onclick="javascript:document.getElementById('addSupplier').submit();">添加</button>
+      <button type="button" class="button-s4" onclick="javascript:window.location = 'addSupplier.html';">取消</button>
+    </div>
+
+
+  </form>
+  </div>
+  </div>

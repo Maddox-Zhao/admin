@@ -1,0 +1,417 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>预开单产品信息</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+
+<style type="text/css">
+    .redRow
+    {
+        background:#FFEBCD;
+    }
+
+</style>
+<body>
+	
+	
+	<div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+                <tr>
+                    <td >
+						<a class="mini-button" iconCls="icon-ok"   onclick="showIdProduct()">查看开单产品</a>
+                      ##  <a class="mini-button" iconCls="icon-remove" style="width:110px"  onclick="remove()">删除选中</a>
+						#if($!adminAccess.has('A_PRODUCT_YKD_SCAN'))
+							<a class="mini-button" iconCls="icon-print"  style="width:110px" id="print" href="/reservedOrder/orderPrint.html?idReserved="  target="_blank"  >打印清单</a>
+							<a class="mini-button" iconCls="icon-ok"   onclick="importOrder">生成订单</a>
+						<a class="mini-button" iconCls="icon-search" >扫描：</a>&nbsp;&nbsp;<a class="mini-textbox" id="scanIdProduct" onenter="autoSetIdProduct()" style="width:150px"></a>
+						#end
+						<a class="mini-button" iconCls="icon-close"   onclick="CloseWindow('close')">关闭</a>
+                    </td>
+                </tr>
+				
+            </table>
+        </div>
+    </div>
+	
+	
+<div id="datagrid" class="mini-datagrid" style="height:390px" allowResize="true"  allowCellEdit="true" allowCellSelect="true"
+	idField="idProduct" multiSelect="true"  pageSize="100" allowAlternating="true" onRowdblclick="edit()"  ondrawsummarycell="onDrawSummaryCell" showSummaryRow="true"
+	showPager="false" onCellbeginedit="cellbeginedit" onCellendedit="setIdProduct" >
+    <div property="columns">
+		<div type="indexcolumn"></div>
+		<div field="idReserved" width="60" headerAlign="center" align="center" allowSort="true">订单号</div>
+        <div field="idProduct" width="100" headerAlign="center" align="center" allowSort="true">idProduct</div>
+		<div field="realyIdProduct" width="120" headerAlign="center" align="center" allowSort="true">实际idProduct
+			<input property="editor"  class="mini-textbox"  />
+		</div>
+		<div field="sku" width="100" headerAlign="center" align="center" allowSort="true">sku</div>
+        <div field="brandName" width="120" headerAlign="center" align="center"  allowSort="true" >品牌</div>
+        <div field="seriesName" width="60" headerAlign="center" align="center"  allowSort="true">品名</div>
+        <div field="type" width="60" headerAlign="center" align="center"  allowSort="true">型号</div>
+        <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质</div>
+        <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色</div>
+        <div field="size" width="60" headerAlign="center" align="center"  allowSort="true">大小</div>
+        <div field="ssPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚上价</div>
+        <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+        <div field="salePrice" width="60" headerAlign="center" align="center"  allowSort="true">实际售价</div>
+		<div field="siteName" width="80" headerAlign="center" align="center"  allowSort="true">站点</div>
+		<div field="status" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderStatus">状态</div>
+    </div>
+</div>
+<script type="text/javascript">
+	mini.parse();
+ 
+	var grid = mini.get("datagrid");
+	
+	
+	grid.on("drawcell", function (e) {
+            var record = e.record,
+            column = e.column,
+            field = e.field,
+            value = e.value;
+
+			if(field == 'status'  && value == 3)
+			{
+				 e.rowCls = "redRow";
+			}
+		});
+	 
+ 	var idReserved = "";
+ 
+		 
+	function SetData(data) {
+            data = mini.clone(data);
+			idReserved = data.id;
+			//获取数据
+            grid.setUrl("/reservedOrder/showOrderDetail.html?idReserved="+data.id);
+			grid.load();
+			var href = jQuery("#print").attr("href");
+			jQuery("#print").attr("href",href+data.id)
+    }
+	
+	
+		//订单状态
+		function renderStatus(row) {
+          if (row.value == '1') return "已提交,未开单";
+		  if (row.value == '2') return "已开单";
+		  if (row.value == '3') return "已取消";
+        }
+		   
+	
+		//总计
+	    function onDrawSummaryCell(e) {
+            var result = e.result;
+            var grid = e.sender;
+            var rows = e.data;
+			var totalRows = 0;
+			
+
+            if (e.field == "siteName") {
+                var total = 0;
+				var realyTotal = 0;
+                for (var i = 0, l = rows.length; i < l; i++) {
+					totalRows = totalRows + 1;
+                    var row = rows[i];
+					var t = row.salePrice;
+					var realyIdProduct = row.realyIdProduct;
+					
+                    if (isNaN(t)) continue;
+				    t = Number(t);
+                    total += t;
+					if(realyIdProduct)
+					{
+						realyTotal += t;
+					}
+                }
+                e.cellHtml = "总计: <span style='color:red;display:inline-block'>" + total +  "</span><br/>实开: <span style='color:red;display:inline-block'>"+realyTotal+"</span><br/>共" + totalRows + "条数据" ;
+            }
+        }
+	
+		
+	//未处理才能编辑真实idProduct
+	 function cellbeginedit(e){
+            if(e.field == "realyIdProduct" && e.record.status != 1){
+                e.cancel = true;
+            }
+      }
+	
+	
+	function renderCurrency(row){
+		  if(!row.value) return "";
+		  if(row.value == '1') return "RMB";
+		  if(row.value == '2') return "EU";
+		  if(row.value == '3') return "HKD";
+		  if(row.value == '4') return "US";
+	}
+	 
+
+	   function edit() {
+            var row = grid.getSelected();
+            if (row) {
+				
+				var realyIdProduct = row.realyIdProduct;
+				var idProduct = row.idProduct;
+				if(realyIdProduct)
+				{
+					idProduct = realyIdProduct;
+				}
+				
+                mini.open({
+                    url: "/product/toEdit.html",
+                    title: "产品明细",
+                    width: 1100,
+                    height: 450,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+							action: "edit",
+                            id: idProduct
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                        // grid.reload();
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+		
+		function showIdProduct() {
+ 
+            var row = grid.getSelected();
+            if (row) {
+                mini.open({
+                    url: "/product/toEdit.html",
+                    title: "产品明细",
+                    width: 1100,
+                    height: 450,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+							action: "edit",
+                            id: row.idProduct
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+	   //自动匹配真实idProduct(扫描)
+	   function autoSetIdProduct()
+	   {
+			var idProduct = mini.get("scanIdProduct").getValue();
+			idProduct = idProduct.replace(/(^\s*)|(\s*$)/g,"");
+			var postData = {idProduct:idProduct,idReserved: idReserved};
+			var gridData = grid.getData();
+			mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '处理中,请勿关闭...'
+            });
+			jQuery.ajax({
+                    url: "/reservedOrder/setRealyIdProduct.html",
+					type: "post",
+					data : postData,
+                    success: function(text) {
+						mini.get("scanIdProduct").setValue("");
+						mini.unmask();
+						if(text.result == 0)
+						{
+							mini.alert(text.message);
+							return;
+						}
+						else if(text.result == 1)
+						{
+							//返回数据格式 idReserd,sku
+							var arr = text.message.split(",");
+							if(arr.length == 2)
+							{
+								var backIdReserved = arr[0];
+								var backidProduct = arr[1];
+								for(var i = 0; i < gridData.length; i++)
+								{
+									var row = gridData[i];
+									var rowidProduct = row.idProduct;
+									var rowRealyIdProduct = row.realyIdProduct;
+									var rowIdReserved = row.idReserved;									
+									
+									//如果真实idProduct不存在且后返回的idProduct和当前行idProduct一致  当前订单id和后台返回id一致
+									if(!rowRealyIdProduct && (rowidProduct == backidProduct) && (backIdReserved == rowIdReserved)) 
+									{
+										//grid.updateRow(row,{realyIdProduct:idProduct});
+										grid.reload();
+										break;
+									}
+									
+								}
+							}
+							else
+							{
+								mini.alert("返回数据出错,联系管理员");
+							}
+						}
+                    },
+                    error: function() {
+						mini.unmask();
+						mini.alert("提交出错,联系管理员");
+					}
+                });	
+	   }
+	
+	   
+	   
+	    //自动匹配真实idProduct(手动修改)
+	   function setIdProduct(e)
+	   {
+	   		if(e.record._state != 'modified')
+			{
+				return ;
+			}
+			var row = e.row;
+			var realyIdProduct = e.value;
+			var idProduct = row.idProduct;
+			var id = row.id;
+			if(realyIdProduct)
+				realyIdProduct = realyIdProduct.replace(/(^\s*)|(\s*$)/g,"");
+			else
+				realyIdProduct = "-1";
+			if(realyIdProduct.length != 13 && realyIdProduct != "-1")
+			{
+				mini.alert("idProduct填写有误");
+				return;
+			}
+			
+			idProducts =  id + ":" + idProduct + ":" + realyIdProduct;
+ 			var postData = {idProducts: idProducts,idReserved: idReserved};
+			mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '处理中,请勿关闭...'
+            });
+			jQuery.ajax({
+                    url: "/reservedOrder/updateRealyIdProduct.html",
+					type: "post",
+					data : postData,
+                    success: function(text) {
+						mini.unmask();
+						grid.reload();
+						if(text.result == 0)
+						{
+							mini.alert(text.message);
+							return;
+						}
+						else if(text.result == 1)
+						{
+							mini.alert("修改成功");
+						}
+						else
+						{
+							mini.alert("后台出错,联系管理员");
+						}
+                    },
+                    error: function() {
+						mini.unmask();
+						mini.alert("后台出错,联系管理员");
+					}
+                });	
+	   }
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	 function importOrder()
+	 {
+	 	grid.load({},function(){ importOrderCallBack() });
+	 }
+
+	 //导入预开单订单到真实订单
+	function importOrderCallBack()
+	{
+		var data = grid.getData();
+		var subTotalCnt = 0;
+		
+		var subTotalPrice = 0;
+		for(var i = 0; i < data.length; i ++)
+		{
+				var row = data[i];
+				var realyIdProduct = row.realyIdProduct;
+				var salePrice = row.salePrice;
+				if(!salePrice) salePrice = 0;
+				if(realyIdProduct && realyIdProduct.length == 13)
+				{
+					subTotalPrice += salePrice;
+					subTotalCnt++;
+				}
+		}	
+		if(subTotalCnt == 0)
+		{
+			mini.alert("必须至少扫描一个产品才能生成订单");
+			return;
+		}
+		
+		var msg = "共【"+data.length + "】条数据,实际扫描【"+subTotalCnt+"】条数据,共【"+subTotalPrice + "】元";
+		 mini.confirm(msg,"提示",function(action)
+		 {
+				if('ok' == action)
+				{	
+					mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿关闭...'
+                    });
+        			var postData = {idReserveds: idReserved};
+        			jQuery.ajax({
+                        url: "/reservedOrder/preOrdertoRealyOrder.html",
+    					type: "post",
+    					data : postData,
+                        success: function(text) {
+    						mini.unmask();
+							grid.reload();
+    						if(text.result != 4)
+    						{
+    							mini.alert(text.message);
+    						}
+							else
+							{
+								mini.alert(text.message);
+							}
+                        },
+                        error: function() {
+    						mini.alert("提交出错,联系管理员");
+    					}
+                    });
+				}
+		});
+		
+	}
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+		
+		
+</script>
+</body>
+</html>

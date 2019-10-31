@@ -1,0 +1,181 @@
+#set($layout = "/layout/print.vm")
+#set($title = "打印圆通物流单")
+
+<script >
+	function preview(oper){
+
+		var ids = document.getElementById("id").value;
+		jQuery.post('$appServer.get("/storage/updateIsExpressPrinted.html")',{ids:ids},
+			function(message){
+				if(message != null && message != ""){
+		   	 		alert(message);
+    		   	}
+		});
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+		window.print();
+		window.document.body.innerHTML=bdhtml;
+	}
+</script>
+
+<body>
+<h1>
+	<span class="action-span"><a href="javascript:window.close();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+</h1>
+<div id="print" >
+#set($index = 0)
+#foreach($printMap in $printList)
+#set($index = $index +1 )
+<div #if($index > 1 ) style= "page-break-before:always " #end >
+<div style=" display:block;background:url(${imageServer}/images/express/ytkdIdzswI.jpg) no-repeat; width:880px; height:502px; overflow:hidden ">
+  <table width="709" border="0">
+    <!--DWLayoutTable-->
+	<input id="id" type="hidden" value="$!idStr" />
+    <tr>
+      <th width="20" height="20"></th>
+      <th width="50"></th>
+      <th width="50">&nbsp;</th>
+      <th width="49">&nbsp;</th>
+      <th width="50"></th>
+      <th width="27"></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th width="20"></th>
+      <th width="86"></th>
+      <th width="130"></th>
+      <th width="80"></th>
+    </tr>
+    <tr>
+	  <th height="15"</th>
+	  <th></th>
+      <th></th>
+	  <th></th>
+      <th></th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    <tr>
+      <th height="30" colspan="3" align="left" valign="middle"><span class="STYLE1">$!{printMap.billNum}</span></th>
+      <th>&nbsp;</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+
+    <tr>
+      <th height="25"></th>
+      <th colspan="4"></th>
+      <th></th>
+      <th></th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+
+    <tr>
+      <th height="30"></th>
+      <th colspan="4" align="left" valign="middle"><span class="STYLE1">$!{printMap.companyAddress1}</span></th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th colspan="2" align="left" valign="middle"><span class="STYLE1">$!{printMap.receiveAddress1}</span></th>
+	  <th></th>
+    </tr>
+    <tr>
+      <th height="30"></th>
+      <th colspan="4" align="left" valign="middle"><span class="STYLE1">$!{printMap.companyAddress2}</span></th>
+      <th></th>
+      <th></th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th></th>
+      <th colspan="2" align="left" valign="middle"><span class="STYLE1">$!{printMap.receiveAddress2}</span></th>
+      <th></th>
+    </tr>
+
+	<tr>
+      <th height="15"></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+
+    <tr>
+      <th height="30"></th>
+      <th colspan="5" align="left" valign="middle"><span class="STYLE1">$!{printMap.company}</span></th>
+	  <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th colspan="5" align="left" valign="middle"><span class="STYLE1">请电话通知本人签收</span></th>
+      <th></th>
+      <th></th>
+    </tr>
+
+	<tr>
+      <th height="25">&nbsp;</th>
+	  <th colspan="4" align="left" valign="middle"><span class="STYLE1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!{printMap.phone}</span></th>
+	  <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+	  <th align="left" valign="middle"><span class="STYLE1">$!{printMap.receiver}</span></th>
+	  <th align="left" valign="middle"><span class="STYLE1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$!{printMap.mobile}</span></th>
+    </tr>
+
+    <tr>
+      <th height="180"></th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+</div>
+</div>
+#end
+</div>
+<h1>
+	<span class="action-span"><a href="javascript:window.close();">关闭</a></span>
+	<span class="action-span"><a href="javascript:preview(1);">打印</a></span>
+</h1>
+</body>

@@ -1,0 +1,42 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 一级仓库列表")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 一级仓库列表</h2>
+
+	<div class="tool">
+		<span><a href="$!appServer.get("/storage/addDepFirst.html?actionType=add")" hidefocus="true" class="bt_add">新增一级仓库</a></span>
+	</div> 
+
+	<div class="clear"></div>
+
+	<!-- 列表模块 -->
+	<div class="listBox">
+		<table>
+			<tr>
+				<th>序号</th>
+				<th>一级仓库名称</th>
+				<th>仓库地址</th>
+				<th>仓库类型</th>
+				#if($adminAccess.has("A_DEP_FIRST_MODIFY"))
+					<th>操作</th>
+				#end
+			</tr>
+			#foreach($df in $depositoryFirstList)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td align="center">$velocityCount</td>
+					<td><a href="$!appServer.get("/storage/updateDepFirst.html").addQueryData("actionType", "update").addQueryData("depFirstId", $df.id)">$!df.depFirstName</a></td>
+					<td>$!{df.address}$!{df.particularAddress}</td>
+					<td>$!enumDepositoryFirstType.get("$!{df.type}")</td>
+					#if($adminAccess.has("A_DEP_FIRST_MODIFY"))
+						<td><a href="$appServer.get("/storage/depFirstAuthority.html").addQueryData("depFirstId", $df.id)">修改用户权限</a></td>
+					#end
+				</tr>
+			#end
+		</table>
+	</div>
+	<!-- 列表模块END -->
+
+</div>
+</body>

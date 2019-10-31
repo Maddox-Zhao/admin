@@ -1,0 +1,233 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 入库单查询")
+
+<body>
+
+<div class="main">
+	<h2>管理中心 - 入库单查询</h2>
+
+	<form action="addInDepository.html" name="searchForm" method="post">
+		<input type="hidden" name="optFlag" id="optFlag" value=""/>
+		<div class="searchBox">
+			<h3><span>搜索订单</span></h3>
+			<table>
+				<tr>
+					<th>单据编号：</th>
+					<td>
+						#springBind("query.billNum")
+						<input type="text" name="${status.expression}" id="query.billNum" value="$!{status.value}" class="inp" />
+                    </td>
+					<th>状态：</th>
+					<td>
+                        #springBind("query.status")
+						<select name="${status.expression}" id="query.status" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $inDepositoryStatusMap.entrySet())
+								<option value="$!en.key" #if("$!en.key" == "${status.value}") selected="selected" #end>$!en.value</option>
+							#end
+						</select>
+					</td>
+					<th>修改时间：</th>
+					<td>
+						#springBind("query.optTimeStart")
+						<input type="text" id="query.optTimeStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.optTimeEnd")
+						<input type="text" id="query.optTimeEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.optTimeStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.optTimeEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+				</tr>
+				<tr>
+					<th>关联单据号：</th>
+					<td>
+						#springBind("query.relationNum")
+						<input type="text" name="${status.expression}" id="query.relationNum" value="$!{status.value}" class="inp" />
+					</td>
+					<th>关联单类型：</th>
+					<td>
+					#springBind("query.type")
+						<select name="${status.expression}" id="query.type" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $inDepositoryTypeMap.entrySet())
+								<option value="$!en.key" #if("$!en.key" == "${status.value}") selected="selected" #end>$!en.value</option>
+							#end
+						</select>
+                    </td>
+					<th>入库时间：</th>
+					<td>
+						#springBind("query.inDepTimeStart")
+						<input type="text" id="query.inDepTimeStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.inDepTimeEnd")
+						<input type="text" id="query.inDepTimeEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.inDepTimeStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.inDepTimeEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+				</tr>
+				<tr>
+					<th>修改人：</th>
+					<td>
+						#springBind("query.creater")
+						<select name="${status.expression}" id="query.creater" class="select" style="width:126px;">
+							<option value="">-=请选择=-</option>
+							#foreach($u in $userList)
+								<option value="$!{u.userName}" #if("${status.value}" == "$!{u.userName}") selected="selected" #end title="$!{u.userName}">$!{u.userName}</option>
+							#end
+						</select>
+					</td>
+					<th>一级仓库：</th>
+					<td>
+						#springBind("query.depFirstId")
+						<select name="${status.expression}" id="query.depFirstId" class="select" style="width:145px;">
+							#if($depositoryFirstList)
+								#if($depositoryFirstList.size() == 0 )
+									<option value="">您没有权限</option>
+								#else
+									<option value="">-=请选择=-</option>
+									#foreach($df in $depositoryFirstList)
+										<option value="$!df.id" #if("$df.id" == "$status.value") selected="selected" #end title="$!df.depFirstName">$!df.depFirstName</option>
+									#end
+								#end
+							#else
+								<option value="">您没有权限</option>
+							#end
+						</select>
+					</td>
+					<th>供应商：</th>
+					<td>
+						#springBind("query.supplierId")
+						<select name="${status.expression}" id="query.supplierId" class="select" style="width:145px;">
+							<option value="">-=请选择=-</option>
+							#foreach($s in $supplierList)
+								<option value="$!{s.id}" #if("$status.value" == "$s.id") selected="selected" #end title="$!{s.name}">$!{s.name}</option>
+							#end
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="8">
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+						<button type="button" class="btn" onclick="formSubmit('exportExcel');">Excel导出</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+	<!-- 入库单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+				<th>单据编号</th>
+				<th>单据类型</th>
+				<th>关联单据号</th>
+				<th>修改时间</th>
+				<th>修改人</th>
+				<th>一级仓库</th>
+				<th>供应商</th>
+				<th>状态</th>
+			</tr>
+			#foreach($inDepositoryDis in $page.items)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td><a href="showInDetail.html?iId=$!inDepositoryDis.id">$!inDepositoryDis.billNum</a></td>
+					<td>$!inDepositoryTypeMap.get("$inDepositoryDis.type")</td>
+					<td>
+						#if($inDepositoryDis.type == "in_sales_refund" || $inDepositoryDis.type == "in_sales_change")
+							<a target="_blank" href="$!appServer.get("/trade/confirmRefund.html").addQueryData("refundId", $inDepositoryDis.relationNum)">$!inDepositoryDis.relationNum</a>
+						#elseif($inDepositoryDis.type == "in_shopping")
+							<a target="_blank" href="$!appServer.get("/stock/search_stock_detail.html").addQueryData("shoppingNum", $inDepositoryDis.relationNum)">$!inDepositoryDis.relationNum</a>
+						#elseif($inDepositoryDis.type == "in_check_more")
+							<a target="_blank" href="$!appServer.get("/storage/detail_storage_check.html").addQueryData("checkId", $inDepositoryDis.relationNum)">$!inDepositoryDis.relationNum</a>
+						#elseif($inDepositoryDis.type == "in_zero_check_more")
+							$!inDepositoryDis.relationNum
+						#elseif($inDepositoryDis.type == "in_move_storage" || $inDepositoryDis.type == "in_borrow_storage" || $inDepositoryDis.type == "in_back_storage")
+							<a target="_blank" href="$!appServer.get("/storage/moveLogReturn.html").addQueryData("moveCode", ${inDepositoryDis.relationNum})">$!inDepositoryDis.relationNum</a>
+						#end
+					</td>
+					<td>$!date.format("yyyy-MM-dd",$!inDepositoryDis.gmtModify)</td>
+					<td>$!inDepositoryDis.creater</td>
+					<td>$!inDepositoryDis.depFirstName</td>
+					<td>$!inDepositoryDis.supplierName</td>
+					<td>$!inDepositoryStatusMap.get("$inDepositoryDis.status")</td>
+				</tr>
+			#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/storage/addInDepository.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	$F = function(id) {
+		return document.getElementById(id).value;
+	}
+
+	$ = function(id) {
+		return document.getElementById(id);
+	}
+
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function formSubmit(optType){
+		$("optFlag").value = optType;
+		var dateStart1=$F("query.optTimeStart").replace(/-/g, "/");
+		var dateEnd1=$F("query.optTimeEnd").replace(/-/g, "/");
+		var b_date1=new Date(Date.parse(dateStart1));
+        var e_date1=new Date(Date.parse(dateEnd1));
+
+		if(e_date1 < b_date1){
+			alert("操作起始时间不能大于结束时间！");
+			return false;
+		}
+	    var inDepDateStart1=$F("query.inDepTimeStart").replace(/-/g, "/");
+		var inDepDateEnd1=$F("query.inDepTimeEnd").replace(/-/g, "/");
+		var bb_date1=new Date(Date.parse(inDepDateStart1));
+		var ee_date1=new Date(Date.parse(inDepDateEnd1));
+
+		if(ee_date1 < bb_date1){
+			alert("入库起始时间不能大于结束时间！");
+			return false;
+		}
+		$("query.billNum").value=$("query.billNum").value.trim();
+		$("query.type").value=$("query.type").value.trim();
+		$("query.optTimeStart").value=$("query.optTimeStart").value.trim();
+		$("query.optTimeEnd").value=$("query.optTimeEnd").value.trim();
+		$("query.creater").value=$("query.creater").value.trim();
+		$("query.status").value=$("query.status").value.trim();
+		$("query.relationNum").value=$("query.relationNum").value.trim();
+    	document.forms[0].submit();
+		$("optFlag").value = "";
+    }
+</script>

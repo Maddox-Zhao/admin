@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+	<!-- 表名:hx_daigou -->
+<sqlMap namespace="daigou">
+	<typeAlias alias="Daigou" type="com.huaixuan.network.biz.domain.hx.DaiGou" />
+	<resultMap id="DaigouResult" class="Daigou" >
+		<result property="id" column="id" />
+		<result property="daigouCode" column="daigou_code" />
+		<result property="status" column="status" />
+		<result property="note" column="note" />
+		<result property="operatorId" column="operator_id" />
+		<result property="num" column="num" />
+		<result property="amount" column="amount" />
+		<result property="paidAmount" column="paid_amount" />
+		<result property="payment" column="payment" />
+		<result property="customerId" column="customer_id" />
+		<result property="idcards" column="idcards" />
+		<result property="idcardsImage" column="idcards_image" />
+		<result property="daigouImage" column="daigou_image" />
+		<result property="gmtCreate" column="gmt_create" />
+		<result property="gmtModify" column="gmt_modify" />
+	</resultMap>
+	<sql id="DaigouFields">
+		id,daigou_code,status,note,operator_id,num,amount,paid_amount,payment,customer_id,idcards,idcards_image,daigou_image,gmt_create,gmt_modify
+	</sql>
+
+	<!-- 根据ID获取 -->
+	<select id="selectDaigouById" parameterClass="java.lang.Long"
+		resultMap="DaigouResult">
+		select
+		<include refid="DaigouFields" />
+		from hx_daigou
+		where id = #id#
+	</select>
+	
+	<!-- 根据代购编号获得代购订单 -->
+	<select id="selectDaigouByDaigouCode" parameterClass="java.lang.String" resultMap="DaigouResult">
+		select
+		<include refid="DaigouFields" />
+		from hx_daigou
+		where daigou_code = #daigouCode#
+	</select>
+	
+	<!-- 判断编号是否存在 -->
+	<select id="daiGouCodeIsExist" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select count(id)
+		from 
+			hx_daigou
+		where
+			daigou_code = #daigouCode#
+	</select>
+
+	<!-- 分页查询 -->
+	<select id="getDaiGouViewByConditionWithPage" parameterClass="java.util.Map"
+		resultMap="DaigouResult">
+		select
+		<include refid="DaigouFields" />
+		from
+		hx_daigou d
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="dateStart">
+			<![CDATA[	d.gmt_create >= #dateStart#]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="dateEnd"> 
+				<![CDATA[ d.gmt_create <= #dateEnd# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+			<![CDATA[	d.status = #status# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by gmt_create desc
+		<isNotEmpty property="dateStart">
+			<isNotEmpty property="dateEnd">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+
+	<select id="getDaiGouViewByConditionWithPageCount" resultClass="java.lang.Integer">
+		select count(id) from hx_daigou d
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  d.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  d.gmt_create <= #dateEnd#]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+				d.status = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 添加 -->
+	<insert id="insertDaigou" parameterClass="Daigou">
+		insert into hx_daigou(
+		id,
+		daigou_code,
+		status,
+		note,
+		operator_id,
+		num,
+		amount,
+		paid_amount,
+		payment,
+		customer_id,
+		idcards,
+		idcards_image,
+		daigou_image,
+		gmt_create,
+		gmt_modify
+		) values (
+		#id#,
+		#daigouCode#,
+		default,
+		#note#,
+		#operatorId#,
+		0,
+		0.0,
+		0.0,
+		#payment#,
+		#customerId#,
+		#idcards#,
+		#idcardsImage#,
+		#daigouImage#,
+		sysdate(),
+		sysdate()
+		)
+		<selectKey keyProperty="id" resultClass="Long">
+			select
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<!-- 更新 -->
+	<update id="updateDaigouByNotNull" parameterClass="Daigou">
+		update hx_daigou
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="id">
+				id=#id#
+			</isNotNull>
+			<isNotNull prepend="," property="daigouCode">
+				daigou_code=#daigouCode#
+			</isNotNull>
+			<isNotNull prepend="," property="status">
+				status=#status#
+			</isNotNull>
+			<isNotNull prepend="," property="note">
+				note=#note#
+			</isNotNull>
+			<isNotNull prepend="," property="operatorId">
+				operator_id=#operatorId#
+			</isNotNull>
+			<isNotNull prepend="," property="num">
+				num=#num#
+			</isNotNull>
+			<isNotNull prepend="," property="amount">
+				amount=#amount#
+			</isNotNull>
+			<isNotNull prepend="," property="paidAmount">
+				paid_amount=#paidAmount#
+			</isNotNull>
+			<isNotNull prepend="," property="payment">
+				payment=#payment#
+			</isNotNull>
+			<isNotNull prepend="," property="customerId">
+				customer_id=#customerId#
+			</isNotNull>
+			<isNotNull prepend="," property="idcards">
+				idcards=#idcards#
+			</isNotNull>
+			<isNotNull prepend="," property="idcardsImage">
+				idcards_image=#idcardsImage#
+			</isNotNull>
+			<isNotNull prepend="," property="daigouImage">
+				daigou_image=#daigouImage#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtCreate">
+				gmt_create=#gmtCreate#
+			</isNotNull>
+			<isNotNull prepend="," property="gmtModify">
+				gmt_modify=#gmtModify#
+			</isNotNull>
+			where id = #id#
+		</dynamic>
+	</update>
+	<!-- 删除 -->
+	<delete id="deleteDaigouById" parameterClass="java.lang.Long">
+		delete from
+		hx_daigou
+		where id = #id#
+	</delete>
+</sqlMap>

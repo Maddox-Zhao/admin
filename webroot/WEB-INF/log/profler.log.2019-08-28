@@ -1,0 +1,15 @@
+2019-08-28 13:59:15,422 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1419] in StockUpdateService:autoSyncPlatformStock
+Task:StockUpdateService:autoSyncPlatformStock running time(millis)[0->1419]=1419 100%
+--Task:PlatformStockUpdateDao:selectStockUpdateByMap running time(millis)[0->1419]=1419 100%
+----Trace:prepareStatement: select * from  hx_stock_update  where 1=1                                                                                        and   (now_stock-order_stock)!= last_update_stock            ORDER BY last_order_time DESC
+2019-08-28 14:01:15,555 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[128] in StockUpdateService:autoSyncPlatformStock
+Task:StockUpdateService:autoSyncPlatformStock running time(millis)[0->128]=128 100%
+--Task:PlatformStockUpdateDao:selectStockUpdateByMap running time(millis)[0->128]=128 100%
+----Trace:prepareStatement: select * from  hx_stock_update  where 1=1                                                                                        and   (now_stock-order_stock)!= last_update_stock            ORDER BY last_order_time DESC
+2019-08-28 14:03:15,685 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[128] in StockUpdateService:autoSyncPlatformStock
+Task:StockUpdateService:autoSyncPlatformStock running time(millis)[0->128]=128 100%
+--Task:PlatformStockUpdateDao:selectStockUpdateByMap running time(millis)[0->128]=128 100%
+----Trace:prepareStatement: select * from  hx_stock_update  where 1=1                                                                                        and   (now_stock-order_stock)!= last_update_stock            ORDER BY last_order_time DESC

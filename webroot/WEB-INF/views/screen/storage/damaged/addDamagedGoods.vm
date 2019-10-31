@@ -1,0 +1,221 @@
+#set($layout = "layout/default.vm")
+
+<script language="javascript" type="text/javascript">
+
+    function getInstanceInfo(ss){
+		if(ss!=null){
+			document.getElementById('goodsInstanceId').value=ss.id;
+			document.getElementById('instanceName').value=ss.instanceName;
+		}
+	}
+
+	function modifyTo(){
+		window.open("${appServer}/instance/select_instance.html?muse=true","window","");
+	}
+
+	function searchGoods(){
+		var form1=document.forms[0];
+		var insName = document.getElementById('instanceName').value;
+		if(insName==""){
+			alert("产品名称不能为空！");
+			return false;
+		}else{
+			form1.action="searchStorageGoods.html";
+			form1.submit();
+		}
+	}
+
+	function changeNum(count_no,amount){
+		var obj_amount=document.getElementById('amount_' + count_no);
+		var unitPrice = document.getElementById('unitCost_' + count_no).value;
+		var storageNum = Number(document.getElementById('storageNum_' + count_no).value);
+		var priceNum = Number(unitPrice);
+		var amount_num = Number(amount);
+
+		if(amount==null||amount.trim()==""){
+			alert("出错：您没有输入.");
+			obj_amount.select();
+            obj_amount.focus();
+			return false;
+		}
+		else if(!isIntNumber(amount)){
+			alert("出错：您输入了不正确的数量.");
+			document.getElementById('amount_' + count_no).value = "";
+			obj_amount.select();
+            obj_amount.focus();
+			return false;
+		}else if(amount_num > storageNum){
+			alert("出错：您输入的报残数量超出了总库存数量.");
+			document.getElementById('amount_' + count_no).value = "";
+			obj_amount.select();
+            obj_amount.focus();
+			return false;
+		}else{
+			document.getElementById('costCount_' + count_no).value=(priceNum*amount_num).toFixed(2);
+		}
+	}
+
+	function addGoods(){
+		var amount;
+		var reason;
+		var storageNum;
+
+		#if($storageList)
+      		#foreach($goods in $storageList)
+			amount = Number(document.getElementById("amount_$velocityCount").value);
+			if(amount != 0){
+				reason = document.getElementById("reason_$velocityCount").value;
+				storageNum = Number(document.getElementById("storageNum_$velocityCount").value);
+
+				if(amount > storageNum){
+					alert("第【"+ $velocityCount +"】条报残产品记录中的报残数量大于库存总数！");
+					return false;
+				}
+				if(reason == ""){
+					alert("第【"+ $velocityCount +"】条报残产品记录中的报残原因为空！");
+					return false;
+				}
+			}
+			#end
+		#end
+		document.forms[0].action = "addDamagedGoods.html";
+		document.forms[0].submit();
+	}
+
+	String.prototype.trim = function() {
+        // 用正则表达式将前后空格
+        // 用空字符串替代。
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function isIntNumber(val){
+		var reg = /^[0-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+	function isNumber(val){
+	  	var reg = /^[\d|\.|,]+$/;
+	  	return reg.test(val);
+	}
+</script>
+
+<form  name="addDamagedGoods"  action="" method="post">
+    <input type="hidden" name="damagedId" id="damagedId" value="$!damagedId"/>
+	<input type="hidden" name="actionType" id="actionType" value="$!actionType"/>
+	<input type="hidden" name="goodsInstanceId" id="goodsInstanceId" value="$!goodsInstance.id"/>
+	<div class="searchBox">
+<h3><span>新增报残产品</span></h3>
+    	<label>&nbsp;&nbsp;产品名称：</label>
+			<input  type="text" name="instanceName"  id="instanceName" value="$!{instanceName}" onclick="javascript:modifyTo();" readonly="readonly"/>
+			<input  type="hidden" name="goodsInstanceId"  id="goodsInstanceId" value="$!{pgoodsInstanceId}"/>
+
+    	<input type="button" value=" 查询 " class="button" onclick="searchGoods();"/>
+
+	</div>
+	<!-- 订单列表 -->
+	#if($goodsInstance)
+		<h3><span>报残单信息</span></h3>
+					<div id="print">
+				<div class="formBox">
+				<div class="content">
+		<table class="c6">
+				<tr>
+				<th>产品名称</th>
+				<td>$!{goodsInstance.instanceName}</td>
+
+				<th>产品编码</th>
+				<td>$!{goodsInstance.code}</td>
+				</tr>
+
+				<tr>
+				<th>类目</th>
+				<td>$!{goodsInstance.catCode}</td>
+
+				<th>属性</th>
+				<td>$!{goodsInstance.attrs}</td>
+				</tr>
+
+				<tr>
+				<th>单位</th>
+				<td>$!{goodsInstance.goodsUnit}</td>
+
+				<th></th>
+				<td></td>
+
+				</tr>
+			</tbody>
+		</table>
+</div>
+    </div>
+</div>
+	#end
+	#set($count=0)
+	#if($storageList)
+    <div class="clearing"></div>
+  <div class="listBox" id="listDiv">
+		<table  id="listTable" name="listTable"  class="list-table">
+          <tr>
+			<th>序号</th>
+            <th>供应商名称</th>
+            <th>批次</th>
+            <th>库位	</th>
+    		<th>库存数量</th>
+            <th>报残数量</th>
+			<th>单位成本	</th>
+			<th>合计成本	</th>
+            <th>报残原因</th>
+            <th>备注</th>
+          </tr>
+          #foreach($storage in $storageList)
+			#if("$!{storage.depType}"=="common_dep")
+			#set($count=$count+1)
+    	  <tr    #if($velocityCount%2==0) class="bg" #end>
+			<td align="center">&nbsp;$velocityCount&nbsp;</td>
+    		<td>&nbsp;$!storage.supplierName
+				<input  type="hidden" name="supplierId" id="supplierId_${velocityCount}" value="$!storage.supplierId"/>
+			</td>
+            <td>&nbsp;$!storage.batchNum
+				<input  type="hidden" name="batchNum" id="batchNum_${velocityCount}" value="$!storage.batchNum"/>
+			</td>
+    		<td>&nbsp;$!storage.depLocationName
+				<input  type="hidden" name="locId" id="locId_${velocityCount}" value="$!storage.locId"/>
+			</td>
+    		<td  align="center">
+				<input  type="text" name="storageNum" id="storageNum_${velocityCount}" value="$!storage.storageNum " size="10" readonly=true />
+			</td>
+            <td  align="center">
+				<input  type="text" name="amount" id="amount_${velocityCount}" value="$!storage.amount" size="10" maxlength="10" onchange="changeNum(${velocityCount},this.value);"/>
+			</td>
+            <td  align="center">
+				￥<input  type="text" name="unitCost" id="unitCost_${velocityCount}" value="$!moneyUtil.getFormatMoney($!storage.price,'0.00')" size="10" readonly=true />
+			</td>
+			<td  align="center">
+				￥<input  type="text" name="costCount" id="costCount_${velocityCount}" value="$!moneyUtil.getFormatMoney(0,'0.00')" size="10" readonly=true />
+			</td>
+			<td  align="center">
+				<select name="reason" id="reason_${velocityCount}">
+					<option value=''>-=请选择=-</option>
+				#foreach($reason in $reasonSet)
+					<option value="$!{reason.key}" #if("$!{goods.reason}" == "$!{reason.key}") selected #end>$!{reason.value}</option>
+				#end
+				</select>
+			</td>
+            <td>
+				<input  type="text" name="remark" id="remark_${velocityCount}" value="" size="30" maxlength="120"/>
+			</td>
+          </tr>
+			#end
+    	  #end
+        </table>
+	</div>
+	#if($count > 0)
+	<br />
+		<div>
+    <h1 id="addGoodsH">
+		<input type="button" name="finish" value=" 新 增 " onclick="addGoods();"/>
+		</h1>
+ </div>
+	#end
+	#end
+</form>
+</body>

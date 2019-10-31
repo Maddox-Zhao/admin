@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CabinetSQL">
+	<cacheModel id="cabinet-cache" type="LRU">
+		<flushInterval hours="24"/>
+	   <flushOnExecute statement="addCabinet"/>
+	   <flushOnExecute statement="editCabinet"/>
+	   <flushOnExecute statement="removeCabinet"/>
+	   <flushOnExecute statement="updateCabinetSortUpdtae"/>
+	   <flushOnExecute statement="updateCabinetSortlow"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+	<typeAlias alias="cabinet"
+		type="com.huaixuan.network.biz.domain.shop.Cabinet" />
+	<typeAlias alias="goods"
+		type="com.huaixuan.network.biz.domain.goods.Goods" />
+	<resultMap class="cabinet" id="cabinetResult">
+		<result column="id" property="id" />
+		<result column="cabinet_name" property="cabinetName" />
+		<result column="cabinet_url" property="cabinetUrl" />
+		<result column="cabinet_pic" property="cabinetPic" />
+		<result column="is_show" property="isShow" />
+		<result column="sort" property="sort" />
+		<result column="goods_num" property="goodsNum" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="shop_id" property="shopId" />
+		<result column="cabinet_type" property="cabinetType" />
+
+	</resultMap>
+	<resultMap class="goods" id="recommandGoods">
+	<result column="id" property="id" />
+		<result column="cat_code" property="catCode" />
+		<result column="goods_sn" property="goodsSn" />
+		<result column="title" property="title" />
+		<result column="brand_id" property="brandId" />
+		<result column="sale_number" property="saleNumber" />
+		<result column="market_price" property="marketPrice" />
+		<result column="goods_price" property="goodsPrice" />
+		<result column="goods_number" property="goodsNumber" nullValue="0"/>
+		<result column="goods_desc" property="goodsDesc" />
+		<result column="img_large" property="imgLarge" />
+		<result column="img_middle" property="imgMiddle" />
+		<result column="img_small" property="imgSmall" />
+		<result column="attr_value" property="attrValue" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="goods_status" property="goodsStatus" />
+		<result column="gmt_listing" property="gmtListing" />
+		<result column="gmt_delisting" property="gmtDelisting" />
+		<result column="click_count" property="clickCount" />
+		<result column="goods_weight" property="goodsWeight" />
+		<result column="warn_number" property="warnNumber" />
+		<result column="original_img" property="originalImg" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="goods_rank" property="goodsRank" />
+		<result column="is_cutprice" property="isCutprice" />
+		<result column="gmt_cutprice" property="gmtCutprice" />
+		<result column="sales_pro_price" property="salesProPrice" />
+		<result column="goods_unit" property="goodsUnit" />
+	    <result column="agent_price" property="agentPrice" nullValue="0.00"/>
+		<result column="is_agent" property="isAgent"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="goods_item" property="goodsItem"/>
+	</resultMap>
+
+	<!-- create Cabinet object -->
+	<insert id="addCabinet" parameterClass="cabinet">
+		<![CDATA[
+		insert into emall_cabinet
+		(id,cabinet_name,cabinet_url,cabinet_pic,is_show,sort,goods_num,gmt_create,gmt_modify,shop_id,cabinet_type )values( null,
+		#cabinetName#,
+		#cabinetUrl#,
+		#cabinetPic#,
+		#isShow#,
+		#sort#,
+		#goodsNum#,
+		sysdate(),
+		sysdate(),
+		#shopId#,
+		#cabinetType#
+		 )
+]]>
+	<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update Cabinet object -->
+	<update id="editCabinet" parameterClass="cabinet">
+		<![CDATA[
+		update emall_cabinet set cabinet_name = #cabinetName#,
+		cabinet_url = #cabinetUrl#,
+		cabinet_pic = #cabinetPic#,
+		is_show = #isShow#,
+		sort = #sort#,
+		goods_num = #goodsNum#,
+		cabinet_type = #cabinetType#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+	</update>
+	<!-- delete Cabinet object -->
+	<delete id="removeCabinet" parameterClass="java.lang.Long">
+		<![CDATA[
+		delete from emall_cabinet where emall_cabinet.ID = #value#
+]]>
+	</delete>
+	<!-- search Cabinet object -->
+	<select id="getCabinet" parameterClass="java.lang.Long"
+		resultMap="cabinetResult">
+		<![CDATA[
+		select emall_cabinet.* from emall_cabinet where emall_cabinet.ID = #value#
+]]>
+	</select>
+	<!-- searchAll Cabinet List -->
+	<select id="getCabinets" resultMap="cabinetResult">
+		<![CDATA[
+		select emall_cabinet.* from emall_cabinet order by sort
+]]>
+	</select>
+
+	<select id="getCabinetMaxSort" resultClass="java.lang.Integer">
+		<![CDATA[
+		select max(sort) from  emall_cabinet
+]]>
+	</select>
+
+	<update id="updateCabinetSortUpdtae"
+		parameterClass="java.util.Map">
+		<![CDATA[
+		update emall_cabinet set
+		emall_cabinet.sort = emall_cabinet.sort+1,
+		gmt_modify = sysdate()
+		 where emall_cabinet.sort >= #maxid#
+			and emall_cabinet.sort < #maxid2#
+]]>
+	</update>
+
+	<update id="updateCabinetSortlow" parameterClass="java.util.Map">
+		<![CDATA[
+		update emall_cabinet set
+		emall_cabinet.sort = emall_cabinet.sort-1,
+		gmt_modify = sysdate()
+		 where emall_cabinet.sort <= #maxid#
+			and emall_cabinet.sort > #maxid2#
+]]>
+	</update>
+	<select id="getCabinetAvailable" resultMap="cabinetResult">
+		<![CDATA[
+	select ec.* from emall_cabinet ec   where   ec.is_show=1 order by ec.sort  asc
+]]>
+	</select>
+
+	<select id="getCabinetAvailableCount" parameterClass="long"
+		resultClass="int">
+		<![CDATA[
+	select count(*)
+	from emall_cabinet a,  emall_showcase b, emall_goods c
+	where  a.id=b.cabinet_id and c.id=b.goods_id and a.is_show=1 and  c.goods_status='on_sale' and b.cabinet_id=#id#
+]]>
+	</select>
+
+	<select id="getCabinetByName"
+		resultMap="cabinetResult"  >
+		<![CDATA[
+	select a.*
+	from emall_cabinet a
+	where   a.is_show=1 and  a.cabinet_name=#value# LIMIT 1
+]]>
+	</select>
+
+	<select id="getCabGoodsByName" parameterClass="java.lang.String" resultMap="recommandGoods">
+		select c.*
+		  from emall_cabinet a, emall_showcase b, emall_goods c
+		 where a.id = b.cabinet_id
+		   and c.id = b.goods_id
+		   and a.is_show = 1
+		   and c.goods_status = 'on_sale'
+		   and a.cabinet_name = #name#
+		 order by b.sort asc
+	</select>
+
+</sqlMap>

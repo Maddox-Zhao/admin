@@ -1,0 +1,24 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>产品可用库存列表</span></h3>
+            <table >
+                <tr>
+                    <th>产品名称</th>
+                    <th>一级仓库</th>
+                    <th>数量</th>
+                </tr>
+				 #foreach($ai in $availableStocks)
+                <tr>
+                    <td align="center">$!{gs.instanceName}</td>
+					<td align="center">$!{ai.depFirstName}</td>
+					<td align="center">$!{ai.goodsNumber}</td>
+                </tr>
+				 #end
+            </table>
+         </div>
+</div>

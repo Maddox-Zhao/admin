@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TaobaoInterfaceSyncSQL">
+	<typeAlias alias="TaobaoInterfaceSync" type="com.huaixuan.network.biz.domain.taobao.TaobaoInterfaceSync" />
+	<resultMap class="taobaoInterfaceSync" id="taobaoInterfaceSyncResult">
+         <result column="id" property="id"/>
+         <result column="gmt_create" property="gmtCreate"/>
+         <result column="gmt_modify" property="gmtModify"/>
+         <result column="interface_type" property="interfaceType"/>
+         <result column="user_id" property="userId"/>
+         <result column="goods_id" property="goodsId"/>
+         <result column="goods_instance_id" property="goodsInstanceId"/>
+         <result column="status" property="status"/>
+         <result column="item_id" property="itemId"/>
+	</resultMap>
+	<resultMap  id="taobaoInterfaceSyncResultextends"  class="taobaoInterfaceSync"  extends="taobaoInterfaceSyncResult" >
+		<result column="goods_sn" property="goodsSn"/>
+		<result column="title" property="title" />
+		<result column="reason" property="reason" />
+	</resultMap>
+	<insert id="addTaobaoInterfaceSync" parameterClass="TaobaoInterfaceSync">
+	   <![CDATA[
+	      insert into interface_sync(id,gmt_create,interface_type,user_id,goods_id,goods_instance_id,status,item_id)
+	      values(null,sysdate(),#interfaceType#,#userId#,#goodsId#,#goodsInstanceId#,#status#,#itemId#)
+	   ]]>
+	   <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- added by chenhang 2010-01-07 started-->
+	<select id="getInterfaceSyncListForCheck" parameterClass="java.util.Map" resultClass="int">
+	  <![CDATA[
+	     select count(1) from (
+	        select i.* from interface_sync i
+	        where i.user_id = #userId#
+	        and i.goods_id =#goodsId#
+	   ]]>
+	     ) aa
+	</select>
+	<!-- added by chenhang 2010-01-07 ended-->
+<!-- added by chenhang 2011-01-05 started-->
+    <select id="getTaobaoInterfaceSyncListSearch" parameterClass="java.util.Map" resultMap="taobaoInterfaceSyncResultextends">
+       <include refid="pageSQLHead"/>
+         <![CDATA[
+           select i.*,g.goods_sn,g.title from interface_sync i left join emall_goods g on i.goods_id=g.id
+           where 1=1
+         ]]>
+         <isNotEmpty prepend="and" property="goodsSn">
+           g.goods_sn = #goodsSn#
+         </isNotEmpty>
+         <isNotEmpty prepend="and" property="title">
+           g.title like CONCAT('%',#title#,'%')
+         </isNotEmpty>
+         <isNotEmpty prepend="and" property="interfaceType">
+           i.interface_type = #interfaceType#
+         </isNotEmpty>
+         <isNotEmpty prepend="and" property="status">
+           i.status = #status#
+         </isNotEmpty>
+	   <isNotEmpty prepend="and" property="userId">
+	      i.user_id = #userId#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="gmtModifyStart">
+<![CDATA[			i.gmt_modify >= STR_TO_DATE(#gmtModifyStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModifyEnd">
+<![CDATA[			i.gmt_modify < DATE_ADD(STR_TO_DATE(#gmtModifyEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+         order by i.gmt_modify asc
+       <include refid="pageSQLFoot"/>
+    </select>
+<!-- added by chenhang 2011-01-05 ended-->
+<!-- added by chenhang 2011-01-05 started-->
+	<select id="getTaobaoInterfaceSyncSearchCount" parameterClass="java.util.Map" resultClass="int">
+	   <![CDATA[
+	     select count(1) from (
+	        select i.* from interface_sync i left join emall_goods g on i.goods_id=g.id
+	        where 1=1
+	   ]]>
+	   <isNotEmpty prepend="and" property="goodsSn">
+           g.goods_sn = #goodsSn#
+         </isNotEmpty>
+         <isNotEmpty prepend="and" property="title">
+           g.title like CONCAT('%',#title#,'%')
+         </isNotEmpty>
+	   <isNotEmpty prepend="and" property="interfaceType">
+	      i.interface_type = #interfaceType#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="status">
+	      i.status = #status#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="userId">
+	      i.user_id = #userId#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="gmtModifyStart">
+<![CDATA[			i.gmt_modify >= STR_TO_DATE(#gmtModifyStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModifyEnd">
+<![CDATA[			i.gmt_modify < DATE_ADD(STR_TO_DATE(#gmtModifyEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	     ) aa
+	</select>
+<!-- added by chenhang 2011-01-05 ended-->
+
+    <select id="getTaobaoInterfaceSyncList" parameterClass="java.util.Map" resultMap="taobaoInterfaceSyncResult">
+       <include refid="pageSQLHead"/>
+         <![CDATA[
+           select interface_sync.* from interface_sync where 1=1
+         ]]>
+         <isNotEmpty prepend="and" property="interfaceType">
+           interface_type = #interfaceType#
+         </isNotEmpty>
+         <isNotEmpty prepend="and" property="status">
+           status = #status#
+         </isNotEmpty>
+         order by interface_sync.gmt_modify asc
+       <include refid="pageSQLFoot"/>
+    </select>
+
+	<select id="getTaobaoInterfaceSyncCount" parameterClass="java.util.Map" resultClass="int">
+	   <![CDATA[
+	     select count(1) from (
+	        select interface_sync.* from interface_sync where 1=1
+	   ]]>
+	   <isNotEmpty prepend="and" property="interfaceType">
+	      interface_type = #interfaceType#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="and" property="status">
+	      status = #status#
+	   </isNotEmpty>
+	     ) aa
+	</select>
+
+	<update id="updateTaobaoInterfaceSync" parameterClass="taobaoInterfaceSync">
+	  <![CDATA[
+	     update interface_sync set status = #status#,
+	     gmt_modify = sysdate()
+	    ]]>
+	     <isNotEmpty prepend="," property="reason">
+	       reason = #reason#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="," property="itemId">
+	       item_id = #itemId#
+	     </isNotEmpty>
+	  <![CDATA[
+	     where id = #id#
+	  ]]>
+	</update>
+<!--added by chenhang 2010-01-07 started-->
+	<update id="updateSync" parameterClass="taobaoInterfaceSync">
+	<![CDATA[
+	update interface_sync set gmt_modify = sysdate()
+	]]>
+	<isNotEmpty prepend="," property="goodsInstanceId">
+	       goods_instance_id = #goodsInstanceId#
+	</isNotEmpty>
+	<isNotEmpty prepend="," property="itemId">
+	       item_id = #itemId#
+	</isNotEmpty>
+	<isNotEmpty prepend="," property="status">
+	       status = #status#
+	</isNotEmpty>
+	<isNotEmpty prepend="," property="reason">
+	       reason = #reason#
+	</isNotEmpty>
+	<isNotEmpty prepend="," property="interfaceType">
+	       interface_type = #interfaceType#
+	</isNotEmpty>
+	<![CDATA[
+	where user_id=#userId# and goods_id=#goodsId#
+	 ]]>
+	</update>
+	<!--added by chenhang 2010-01-07 ended-->
+</sqlMap>

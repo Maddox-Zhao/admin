@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<!-- 表名:hx_account -->
+<sqlMap namespace="BaseData">
+<resultMap class="com.huaixuan.network.biz.domain.purchase.BaseData" id="BaseDataResult">
+	<result column="idBrand" property="idBrand"/>
+	<result column="idSeries" property="idSeries"/>
+	<result column="Type" property="type"/>
+	<result column="Material" property="material"/>
+	<result column="Color" property="color"/>
+	<result column="picture" property="picture"/>
+	<result column="bookNumber" property="bookNumber"/>
+	<result column="noPurchase" property="noPurchase"/>
+	<result column="euPrice" property="euPrice"/>
+	<result column="hkPrice" property="hkPrice"/>
+	<result column="goods_id" property="goodsId"/>
+</resultMap>
+
+<resultMap class="com.huaixuan.network.biz.domain.purchase.BaseData" id="BaseTmpResult">
+	<result column="idBrand" property="idBrand"/>
+	<result column="idSeries" property="idSeries"/>
+	<result column="Type" property="type"/>
+	<result column="Material" property="material"/>
+	<result column="Color" property="color"/>
+</resultMap>
+
+<resultMap class="com.huaixuan.network.biz.domain.purchase.BaseData" id="BaseDataForInStorageResult">
+	<result column="idBrand" property="idBrand"/>
+	<result column="idSeries" property="idSeries"/>
+	<result column="Type" property="type"/>
+	<result column="Material" property="material"/>
+	<result column="Color" property="color"/>
+	<result column="picture" property="picture"/>
+	<result column="euPrice" property="euPrice"/>
+	<result column="hkPrice" property="hkPrice"/>
+	<result column="Date" property="date"/>
+	<result column="idProduct" property="idProduct"/>
+</resultMap>
+<!-- 查询单款产品的基本数据 -->
+<select id="getBaseDataByMap" parameterClass="java.util.Map" resultMap="BaseDataResult">
+SELECT DISTINCT(p.goods_id),p.idBrand,p.idSeries,p.Material,p.Type,p.Color,(SELECT g.img_middle FROM emall_goods g WHERE g.id = p.goods_id LIMIT 1) picture,
+(
+SELECT COUNT(p.idProduct) 
+FROM
+Product p,LifeCycle lf
+WHERE 
+p.Material = #material# AND
+p.Type = #type# AND
+p.Color =  #color# AND
+lf.idProduct = p.idProduct AND
+lf.idStatus = 3 AND
+lf.idStatus != 7
+ORDER BY p.idProduct DESC 
+LIMIT 1
+) bookNumber,
+(
+SELECT COUNT(pp.idPurchaseLifeCycle)
+FROM 
+ PurchaseLifeCycle plf,PurchaseProduct pp
+WHERE
+plf.idPurchaseLifeCycle = pp.idPurchaseLifeCycle
+AND plf.idStatus = 12 AND pp.material = #material# AND  pp.type = #type# AND pp.color =  #color#
+) noPurchase,
+(
+SELECT lf.HXPrice
+FROM
+Product p,LifeCycle lf
+WHERE 
+p.Material = #material# AND
+p.Type = #type# AND
+p.Color = #color# AND
+lf.idProduct = p.idProduct AND
+(
+lf.idStatus = 3 OR
+lf.idStatus = 4 OR
+lf.idStatus = 1
+) AND
+lf.idStatus != 7
+ORDER BY p.idProduct DESC 
+LIMIT 1
+) hkPrice,
+(
+SELECT p.EUPrice
+FROM
+Product p,LifeCycle lf
+WHERE 
+p.Material = #material# AND
+p.Type = #type# AND
+p.Color = #color# AND
+lf.idProduct = p.idProduct AND
+(
+lf.idStatus = 3 OR
+lf.idStatus = 4 OR
+lf.idStatus = 1
+) AND
+lf.idStatus != 7
+ORDER BY p.idProduct DESC 
+LIMIT 1
+) euPrice
+FROM
+Product p,LifeCycle lf
+WHERE 
+p.Material = #material# AND
+p.Type = #type# AND
+p.Color = #color# AND
+lf.idProduct = p.idProduct AND
+lf.idStatus != 7
+ORDER BY p.idProduct DESC
+	 
+</select>
+
+<!-- 根据 型号，材质，颜色，品牌，品名 进行分页查询出需要得到分析的数据 -->
+<select id="getBaseDataTmpByMap" resultClass="java.util.Map" resultMap="BaseTmpResult">
+	SELECT DISTINCT(p.goods_id),p.idBrand,p.idSeries,p.Type,p.Material,p.Color
+	FROM
+	Product p
+	<dynamic prepend="WHERE">
+		<isNotNull property="material" prepend="and">
+			p.Material = #material#
+		</isNotNull>
+		<isNotNull property="type" prepend="and">
+			p.Type = #type#
+		</isNotNull>
+		<isNotNull property="color" prepend="and">
+			p.Color = #color#
+		</isNotNull>
+		<isNotNull property="idBrand" prepend="and">
+			p.idBrand = #idBrand#
+		</isNotNull>
+		<isNotNull property="idSeries" prepend="and">
+			p.idSeries = #idSeries#
+		</isNotNull>
+	</dynamic>
+	
+	<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getBaseDataTmpByMapCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+	SELECT COUNT(DISTINCT(p.goods_id))
+	FROM
+	Product p
+	<dynamic prepend="WHERE">
+		<isNotNull property="material" prepend="and">
+			p.Material = #material#
+		</isNotNull>
+		<isNotNull property="type" prepend="and">
+			p.Type = #type#
+		</isNotNull>
+		<isNotNull property="color" prepend="and">
+			p.Color = #color#
+		</isNotNull>
+		<isNotNull property="idBrand" prepend="and">
+			p.idBrand = #idBrand#
+		</isNotNull>
+		<isNotNull property="idSeries" prepend="and">
+			p.idSeries = #idSeries#
+		</isNotNull>
+	</dynamic>
+</select>
+
+
+
+<!-- 查询入库价格有过改变的欧洲价和尚上价 -->
+<resultMap class="java.util.HashMap" id="getNotSamePriceResultMap">
+	<result property="hkPrice" column="hkPrice"/>
+	<result property="euPrice" column="euPrice"/>
+	<result property="inStorage" column="inStorage"/>
+</resultMap>
+<select id="getNotSamePriceByGoodsId" resultClass="java.lang.Long" resultMap="getNotSamePriceResultMap">
+	SELECT
+   p.idProduct, p.EUPrice euPrice,lf.HXPrice hkPrice,(SELECT h.Date FROM History h WHERE h.idProduct = p.idProduct AND (h.idOperation = 3 OR h.idOperation = 2)) inStorage
+   FROM Product p, LifeCycle lf
+   WHERE 
+   p.goods_id = #goodsId# AND
+   lf.idProduct = p.idProduct AND
+    (
+       lf.idStatus = 3 OR 
+       lf.idStatus = 4 OR 
+       lf.idStatus = 1
+    )
+    AND lf.idStatus != 7 
+    ORDER BY p.gmt_create 
+</select>
+
+
+
+<!-- 根据提供的条件查询入库记录 -->
+<select id="getInStorageInfo" parameterClass="java.util.Map" resultMap="BaseDataForInStorageResult">
+SELECT
+  DISTINCT(p.idProduct),p.Type,p.Material,p.Color,p.EUPrice,lf.HXPrice,p.HKPrice,p.idSeries,p.idBrand,h.Date,(SELECT img_small FROM emall_goods  WHERE id = p.goods_id LIMIT 1) picture
+  FROM Product p,LifeCycle lf,History h
+   WHERE 
+	<isNotNull property="type" prepend="AND">
+	 p.Type = #type#
+	</isNotNull>
+	<isNotNull property="material" prepend="AND">
+	 p.Material = #material#
+	</isNotNull>
+	<isNotNull property="color" prepend="AND">
+	 p.Color = #color#
+	</isNotNull>
+	<isNotNull property="idBrand" prepend="AND">
+	 p.idBrand = #idBrand#
+	</isNotNull> 
+    lf.idProduct = p.idProduct AND
+    h.idProduct = lf.idProduct AND
+    (h.idOperation = 2 OR h.idOperation = 3 )
+   ORDER BY p.gmt_create    
+   	<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+
+<select id="getInStorageInfoCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+SELECT
+  COUNT(DISTINCT(p.idProduct))
+  FROM Product p,LifeCycle lf,History h
+   WHERE 
+	<isNotNull property="type" prepend="AND">
+	 p.Type = #type#
+	</isNotNull>
+	<isNotNull property="material" prepend="AND">
+	 p.Material = #material#
+	</isNotNull>
+	<isNotNull property="color" prepend="AND">
+	 p.Color = #color#
+	</isNotNull>
+	<isNotNull property="idBrand" prepend="AND">
+	 p.idBrand = #idBrand#
+	</isNotNull> 
+    lf.idProduct = p.idProduct AND
+    h.idProduct = lf.idProduct AND
+    (h.idOperation = 2 OR h.idOperation = 3 )
+   ORDER BY p.gmt_create 
+</select>
+</sqlMap>

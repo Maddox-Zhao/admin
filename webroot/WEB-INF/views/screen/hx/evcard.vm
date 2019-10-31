@@ -1,0 +1,51 @@
+<head>
+  #set($title = "evard")
+</head>
+
+
+
+<body>
+	<div style="text-align:center;	margin-top:20px;font-size:16px">
+	姓名: <input type="text" id="userName" name="userName"/><br/><br/>
+	身份证: <input type="text"  id="sfz" name="sfz"/><br/><br/>
+	旺旺ID: <input type="text"  id="wangwangID" name="wangwangID"/><br/><br/>
+	url: <input type="text"  id="url" name="url" style="width:800px"/><br/><br/>
+	<input type="button" value="提交" id="submit" width="80" height="80"/>
+	</div>
+ 
+	
+</body>
+	
+<script type="text/javascript">
+
+$("#submit").click(function(){
+	 var userName =  $("#userName").val();
+	 var sfz =  $("#sfz").val();
+	 var url =  $("#url").val();
+	 var wangwangID =  $("#wangwangID").val();
+	 if(url)
+	 {
+	 	var arr = url.split('uid=');
+		if(arr.length == 2)
+		{
+			if(arr[1].length != 64)
+			{
+				alert("url有误");
+				return;
+			}
+		}
+	 }
+	 var r=confirm("确定提交?")
+ 	 if(r==true)
+     {
+      		var data = {userName: userName,sfz: sfz,url: url,wangwangID: wangwangID};
+        	 jQuery.post("/timetask/evcard/regist.html",data,function(text) {
+        	 	 alert(text.msg);
+        	 });
+	 }
+ 
+	 
+})
+
+
+</script>

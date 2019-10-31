@@ -1,0 +1,168 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>调货明细</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+<style type="text/css">
+    .redRow
+    {
+        background:red;
+    }
+	.yellowRow
+    {
+        background:yellow;
+    }
+</style>
+   </head>
+<body>
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                       <td class="form-label" style="width:60px;">操作人：</td>
+                    <td   colspan="3">
+                        <input id="reallName" name="reallName" class="mini-textbox"   />
+                    </td>
+                    <td class="form-label" style="width:60px;">创建时间：</td>
+                    <td   colspan="3">
+                        <input id="inStockDateStart" name="inStockDateEnd" class="mini-datepicker" format="yyyy-MM-dd"  />
+                   ~
+                        <input id="inStockDateEnd" name="endDateEnd" class="mini-datepicker" format="yyyy-MM-dd"  />
+                    </td>
+					<td class="form-label" style="width:60px;">原位置：</td>
+                    <td style="width:150px">
+                        <input  name="beforeidLocation" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..." multiSelect="true" 
+                            url="/site/getSiteByType.html"  allowInput="false"    /> 
+                    </td>
+					<td class="form-label" style="width:60px;">当前位置：</td>
+                    <td style="width:150px">
+                        <input  name="idLocation" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..." multiSelect="true" 
+                            url="/site/getSiteByType.html"  allowInput="false"    /> 
+                    </td>
+					
+					<td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+                    </td>
+                </tr>
+				<tr >
+					<td class="form-label" style="width:80px;">是否已调货入库：</td>
+                   <td style="width:150px">
+                        <input  name="status"  onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	
+	
+	
+ 
+ 
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowResize="true" multiSelect="true" 
+        url="getTransferList.html"  idField="id"  onRowdblclick="edit()"  pageSize="50" pageIndex="1" >
+        <div property="columns">
+            <div field="id" width="120" headerAlign="center" align="center" allowSort="true">id</div>
+            <div field="reallName" width="120" headerAlign="center" align="center"  allowSort="true">创建人</div>
+			<div field="beforesiteName" width="100" headerAlign="center" align="center"  allowSort="true">原站点</div>
+            <div field="siteName" width="100" headerAlign="center" align="center"  allowSort="true">现站点</div>
+			<div field="statu" renderer= "statu" width="100" headerAlign="center" align="center"  allowSort="true">是否已调入</div>
+            <div field="createDate" width="120" headerAlign="center" align="center"  allowSort="true">创建时间</div>
+			<div field="remark" width="120" headerAlign="center" align="center"  allowSort="true">备注</div>
+			<div field="cname" width="120" headerAlign="center" align="center"  allowSort="true">客户</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+		var userSite = "$!{site}"; //site
+        var statusData = [{id: 1,value: "已调货入库"  },  { id: 2, value: "未调货入库" }] ;
+
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		search();
+		function statu(row){
+		if (row.value==1) return "已调货入库";
+		  else if (row.value==2) return "未调货入库";
+		   else return "未处理";
+		}
+		//查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+			if(!data.reallName)
+				delete data.reallName;
+			if(!data.inStockDateStart)
+			  delete data.createDate;
+			if(!data.inStockDateEnd){
+				delete data.endDateEnd;
+			} 
+			
+           //处理日期
+            var date = mini.get("inStockDateStart").getValue();
+            if (date instanceof Date) {
+                data.inStockDateStart = formatDate(date);
+            }
+            var date = mini.get("inStockDateEnd").getValue();
+            if (date instanceof Date) {
+                data.inStockDateEnd = formatDate(date);
+            }
+            grid.load(data);
+        }
+		
+		function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		grid.on("drawcell", function (e) {
+            var record = e.record,
+            column = e.column,
+            field = e.field,
+            value = e.value;
+
+			if(field == 'statu'  && value == 2)
+			{
+				 e.rowCls = "redRow";
+			}
+		});
+		
+		function edit() {
+            var row = grid.getSelected();
+            if(row)
+			{
+              	var url = "/product/toGetDiaoHuoList.html?id="+row.id  
+				var win = mini.open({
+                    url: url,
+                    title: "产品信息",
+                    width: 1000,
+                    height: 550,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                       
+						iframe.focus();
+                    },
+					ondestroy: function(action) {
+                         grid.reload();
+                    }
+                });
+            } 
+			 
+        }
+		
+	   
+</script>
+</body>
+</html>

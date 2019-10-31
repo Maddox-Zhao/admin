@@ -1,0 +1,54 @@
+body {
+	margin-left:auto;
+	margin-top: 0px;
+	margin-right:auto;
+	margin-bottom: 0px;
+	width:1003px;
+	
+}
+body,td,th {
+	font-size: 12px;
+}
+
+/******************ͨ�ò���******************/
+.f01{color:#FF0000; }
+.bot01 {
+	background-image: url(../../images/mySpace/botton.jpg);
+	background-repeat: no-repeat;
+	height: 39px;
+	width: 94px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #FFFFFF;
+	border:0;
+}
+
+.f02{color:#000000; padding-right:15px;}
+.f03{color:#898989;}
+.f04{color:#FF0000; font-size:14px; font-weight:bold;}
+.clear{clear:both;}
+.ipu01{border:1px solid #8c8c8c;height:22px;line-height:22px;padding:1px 8px 0 3px;}
+.pad01{padding-right:10px;}
+
+/******************ͨ�ò���******************/
+
+
+.div0{float:left;}
+.top{margin-bottom:10px;}
+.main{float:left; width:960px;}
+.left{float:left; margin-right:15px;}
+.right{float:left; width:750px;}
+.right_top{margin-bottom:8px;background-image:url(../../images/mySpace/tit_bg01.jpg); background-position:top left; background-repeat:no-repeat; float:left; width:737px; padding:2px; margin-bottom:10px; height:112px;}
+.top_left{float:left; margin:2px 2px 2px 2px;}
+.top_right{float:left;}
+.con_top{background-image:url(../../images/mySpace/line.jpg); background-repeat:no-repeat; background-position:left bottom; width:620px; height:38px; padding:3px;}
+.con_bo{margin-top:10px;background-image:url(../../images/mySpace/tit_bg04.jpg);background-repeat:no-repeat;background-position:left 1px; padding-left:95px;}
+.bo_left{}
+.bo_left ul li{list-style-type:none;display:inline;}
+.bo_right{ float:right;}
+.right_iput{padding:0px 10px 0px 10px;}
+.tit_01{float:left;color:#FF0000; font-size:14px; font-weight:bold; width:100%; height:28px; text-align:left; line-height:28px;}
+.tie_02{float:left;background-image:url(../../images/mySpace/in_01.jpg); background-repeat:no-repeat; background-position:5px; padding-left:35px;color:#000; font-size:14px; font-weight:bold; width:94%; border-bottom:1px #000 dashed; line-height:30px; text-align:left;}
+.tab_01{float:left; width:100%; margin-top:8px; margin-bottom:8px;}
+
+.pro_bot{background-image:url(../../images/pro_bot.jpg); background-repeat:no-repeat; background-position:left; width:64px; height:23px;}

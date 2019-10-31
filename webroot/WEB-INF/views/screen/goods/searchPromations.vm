@@ -1,0 +1,294 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>套餐管理</span></h3>
+<form id="form1" action="/goods/searchPromation.html" method="post" name="form1">
+    <table>
+      <tr>
+        <th>套餐名称：</th>
+        <td>
+			#springBind("promation.name")
+			<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+		</td>
+      </tr>
+      <tr>
+        <th>套餐类型：</th>
+        <td>
+			#springBind("promation.modeCode")
+            <select class="select" name="${status.expression}" value ="$!{status.value}" >
+               <option value="">-=请选择=-</option>
+               <option value="combined_sale" #if("combined_sale"=="$!{status.value}") selected #end>组合销售</option>
+               <option value="sale_give" #if("sale_give"=="$!{status.value}") selected #end>买就赠</option>
+               <option value="full_give" #if("full_give"=="$!{status.value}") selected #end>满就送</option>
+               <option value="full_reduce" #if("full_reduce"=="$!{status.value}") selected #end>满就减</option>
+			   <option value="sale_exempt_postage" #if("sale_exempt_postage"=="$!{status.value}") selected #end>买就包邮</option>
+			   <option value="discount" #if("discount"=="$!{status.value}") selected #end>打折促销</option>
+            </select>
+		</td>
+      </tr>
+	  <tr>
+        <th>套餐时间：</th>
+        <td colspan="4">
+			#springBind("promation.startDate")
+			开始时间<input name="${status.expression}" id="startDate" readonly="true" value="$!{status.value}"/>到
+			#springBind("promation.endDate")
+			<input name="${status.expression}" id="endDate" readonly="true" value="$!{status.value}"/>
+			#springBind("promation.startDateEnd")
+			结束时间<input name="${status.expression}" id="startDateEnd" readonly="true" value="$!{status.value}"/>到
+			#springBind("promation.endDateEnd")
+			<input name="${status.expression}" id="endDateEnd" readonly="true" value="$!{status.value}"/>
+			<script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "startDate",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "endDate",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "startDateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "endDateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			 </script>
+		</td>
+      </tr>
+      <tr>
+		<th></th>
+		<td><button type="button" class="btn" onclick="doSearch();">查询套餐</button></td>
+	  </tr>
+    </table>
+</form>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "freezesuccesss")
+		冻结成功！
+	#end
+	#if($!message == "isfreezesuccesss")
+		取消冻结成功！
+	#end
+	#if($!message == "addsuccess")
+		添加成功！
+	#end
+	#if($!message == "updatesuccess")
+		修改成功！
+	#end
+</div>
+ #end
+
+#set($errormessage = $request.getParameter('errormessage'))
+ #if($!errormessage)
+<div class="mag-t1">
+	#if($!errormessage == "nopromation")
+		对不起该套餐不存在！
+	#end
+	#if($!errormessage == "systemerror")
+		系统出错！
+	#end
+	#if($!errormessage == "addfail")
+		添加失败！
+	#end
+	#if($!errormessage == "updatefail")
+		修改失败！
+	#end
+</div>
+ #end
+
+ #if($!adminAccess.has("A_PROMATION_ADD_USER"))
+       <div class="tool">
+
+            <span>
+			        套餐类型:
+			   <select name="addmodeCode" id="addmodeCode" >
+				  <option value="combined_sale" #if("combined_sale"=="$!promation.modeCode") selected #end>组合销售</option>
+				  <option value="sale_give" #if("sale_give"=="$!promation.modeCode") selected #end>买就赠</option>
+				  <option value="full_give" #if("full_give"=="$!promation.modeCode") selected #end>满就送</option>
+				  <option value="full_reduce" #if("full_reduce"=="$!promation.modeCode") selected #end>满就减</option>
+				  <option value="sale_exempt_postage" #if("sale_exempt_postage"=="$!promation.modeCode") selected #end>买就包邮</option>
+				  <option value="discount" #if("discount"=="$!promation.modeCode") selected #end>打折促销</option>
+               </select>
+			</span>
+
+            <span><a href="#" hidefocus="true" class="bt_add" onclick="return doAddPro();">发布套餐</a></span>
+        </div>
+ #end
+
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>套餐列表</span></h3>
+            <table >
+                <tr>
+                    <th>套餐名称</th>
+                    <th>套餐类型</th>
+                    <th>套餐状态</th>
+                    <th>套餐时间</th>
+                    <th>操作</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($promation in $query.items)
+                <tr>
+                    <td align="center">$!{promation.name}</td>
+                    <td align="center">
+						#if("combined_sale"==$!promation.modeCode)组合销售
+						#elseif("sale_give"==$!promation.modeCode)买就赠
+						#elseif("full_give"==$!promation.modeCode) 满就送
+						#elseif("full_reduce"==$!promation.modeCode)满就减
+						#elseif("sale_exempt_postage"==$!promation.modeCode)买就包邮
+						#elseif("discount"==$!promation.modeCode)打折促销
+						#end
+					</td>
+                	<td align="center">
+						#if($!promation.isFreeze=="yes")冻结
+						#elseif($date.difference($!promation.endDate,$!newDate).seconds.intValue() < 0 && $date.difference($!promation.startDate,$!newDate).seconds.intValue() < 0) 未发布
+    					#elseif($date.difference($!promation.endDate,$!newDate).seconds.intValue() < 0)使用
+    					#else 到期
+    					#end
+					</td>
+                    <td align="center">
+						#if(${promation.startDate} || ${promation.endDate})
+							$!date.format('yyyy-MM-dd HH:mm:ss',${promation.startDate})
+							/
+							$!date.format('yyyy-MM-dd HH:mm:ss',${promation.endDate})
+						#end
+					</td>
+                    <td align="center">
+						#if($!adminAccess.has("A_PROMATION_MODIFY_USER"))
+						<a href="#" onclick="return doUpdatePromation($promation.Id)">修改</a>
+						#end
+						#if($!promation.isFreeze=="no")
+							<a href="#" onclick="return doFreeze($promation.Id)">冻结</a>
+    					#else
+							<a href="#" onclick="return doIsFreeze($promation.Id)">取消冻结</a>
+    					#end
+				    </td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/goods/searchPromation.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+<script language="javascript" type="text/javascript">
+function doFreeze(Id){
+	if(!confirm("确实要冻结该套餐吗？"))
+		return false;
+	var url="/goods/freezePro.html?id="+Id;
+	document.location=url;
+}
+
+function doIsFreeze(Id){
+	if(!confirm("确实要对该套餐取消冻结吗？"))
+		return false;
+	var url="/goods/isfreezePro.html?id="+Id;
+	document.location=url;
+}
+
+function doSearch(){
+	var form1=document.getElementById("form1");
+	form1.action="/goods/searchPromation.html";
+	form1.submit();
+}
+
+
+/* add goods number using prototype ajax*/
+
+
+
+function doAddPro(){
+var modeCode =document.getElementById("addmodeCode").value;
+var url="/goods/addPro.html?modeCode="+modeCode;
+	document.location=url;
+}
+
+function doUpdatePromation(id){
+
+var url="/goods/updatePromation.html?id="+id;
+	document.location=url;
+}
+
+function doCanelCutPriceGoodsOnSale(Id){
+	var url="deCutPrice.html?pageFlag=on_sale&amp;id="+Id;
+	document.location=url;
+}
+function doCutPriceGoodsOnDepot(Id){
+	var url="cutPrice.html?pageFlag=on_depot&amp;id="+Id;
+	document.location=url;
+}
+
+function doCanelCutPriceGoodsOnDepot(Id){
+	var url="deCutPrice.html?pageFlag=on_depot&amp;id="+Id;
+	document.location=url;
+}
+
+function doCutPriceGoods(Id){
+	var url="cutPrice.html?pageFlag=cut_price&amp;id="+Id;
+	document.location=url;
+}
+
+function doCanelCutPriceGoods(Id){
+	var url="deCutPrice.html?pageFlag=cut_price&amp;id="+Id;
+	document.location=url;
+}
+function deListGoodsBat(){
+	if(!isAtLeastOneChecked('ids')){
+		alert("请选择要做批量的商品！");
+		return false;
+	}
+
+	$('form1').action="delistinggb.html";
+	$('form1').submit();
+}
+function doDeleteGoods(Id){
+	if(!confirm("确实要删除商品吗？"))
+		return false;
+	var url="deleteg.html?id="+Id;
+	document.location=url;
+}
+
+function doDeleteGoods(Id){
+	if(!confirm("确实要删除商品吗？"))
+		return false;
+	var url="deleteg.html?id="+Id;
+	document.location=url;
+}
+
+function isAtLeastOneChecked(checkName){
+	var flag=false;
+
+	var elements=document.getElementsByName(checkName);
+	var elementsArray=$A(elements);
+	elementsArray.each(function(node){
+		if(node.checked==true){
+			flag=true;
+		}
+	});
+
+	return flag;
+}
+</script>

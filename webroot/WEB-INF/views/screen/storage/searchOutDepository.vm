@@ -1,0 +1,515 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 出库单查询")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 出库单查询</h2>
+
+	<div class="tool">
+		<span><a href="searchTodayList.html" hidefocus="true" class="bt_par">今日发货出库清单</a></span>
+		<span><a href="javascript:preview1();" hidefocus="true" class="bt_all">打印出库单</a></span>
+		<span>
+			<select name="printExpressId" id="printExpressId" >
+				<option value="">--物流公司--</option>
+				#foreach($obj in $expressInfoList)
+					<option value="$!{obj.expressCode},$!{obj.id}">$!{obj.expressName}</option>
+				#end
+			</select>
+		</span>
+		<span><a href="javascript:preview2();" hidefocus="true" class="bt_all">打印运单</a></span>
+	</div>
+
+	<form action="searchOutDepository.html" name="searchForm" method="post">
+		<input type="hidden" name="optFlag" id="optFlag" value=""/>
+		<input type="hidden" name="outDepositoryIds" id="outDepositoryIds" value=""/>
+		<div class="searchBox">
+			<h3><span>搜索订单</span></h3>
+			<table>
+				<tr>
+					<th>单据编号：</th>
+					<td>
+						#springBind("query.billNum")
+						<input type="text" id="query.billNum" name="${status.expression}" value="$!{status.value}" onkeypress="checkInfo(event);" class="inp" />
+					</td>
+					<th>修改时间：</th>
+					<td>
+						#springBind("query.optTimeStart")
+						<input type="text" id="query.optTimeStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+						#springBind("query.optTimeEnd")
+						<input type="text" id="query.optTimeEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "query.optTimeStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "query.optTimeEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+                    </td>
+					<th>修改人：</th>
+					<td>
+						#springBind("query.creater")
+						<select id="query.creater" name="${status.expression}" class="select" style="width:auto;">
+							<option value="">-=请选择=-</option>
+							#foreach($userInfo in $userList)
+								<option value="$!{userInfo.userName}" #if("$!{status.value}" == "${userInfo.userName}") selected="selected" #end>$!{userInfo.userName}</option>
+							#end
+						</select>
+					</td>
+    			</tr>
+    			<tr>
+    				<th>关联单据号：</th>
+    				<td>
+    					#springBind("query.relationNum")
+    					<input type="text" id="query.relationNum" name="${status.expression}" value="$!{status.value}" class="inp" />
+    				</td>
+    				<th>出库时间：</th>
+    				<td>
+    					#springBind("query.outDepTimeStart")
+    					<input type="text" id="query.outDepTimeStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					-
+    					#springBind("query.outDepTimeEnd")
+    					<input type="text" id="query.outDepTimeEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					<script type="text/javascript">
+    						Calendar.setup({
+    							inputField : "query.outDepTimeStart",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    						Calendar.setup({
+    							inputField : "query.outDepTimeEnd",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    					</script>
+    				</td>
+    				<th>物流方式：</th>
+    				<td>
+    					#springBind("query.expressId")
+        				<select name="${status.expression}" id="expressId" onchange="changeExpress()" class="select" style="width:auto;">
+            				<option value="">-=请选择=-</option>
+                    		#foreach($obj in $expressInfoList)
+                            	<option value="$!{obj.id}" #if("$!{status.value}"=="$!{obj.id}") selected="selected" #end>$!{obj.expressName}</option>
+        					#end
+        				</select>
+    				</td>
+                </tr>
+				<tr>
+					<th>关联单类型：</th>
+					<td>
+						#springBind("query.type")
+						<select id="query.type" name="${status.expression}" class="select" style="width:auto;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $outDepositoryTypeMap.entrySet())
+								<option value="$!en.key" #if("$!en.key" == "${status.value}") selected="selected" #end >$!en.value</option>
+							#end
+						</select>
+					</td>
+        			<th>配货时间：</th>
+    				<td>
+    					#springBind("query.gmtCreateStart")
+    					<input type="text" id="query.gmtCreateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					-
+    					#springBind("query.gmtCreateEnd")
+    					<input type="text" id="query.gmtCreateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+    					<script type="text/javascript">
+    						Calendar.setup({
+    							inputField : "query.gmtCreateStart",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    						Calendar.setup({
+    							inputField : "query.gmtCreateEnd",
+    							ifFormat   : "%Y-%m-%d",
+    							align      : "BR"
+    						});
+    					</script>
+    				</td>
+					<th>一级仓库：</th>
+					<td>
+						#springBind("query.depfirstId")
+						<select id="query.depfirstId" name="${status.expression}" class="select" style="width:auto;">
+							#if($depositoryFirstList)
+								<option value="">-=请选择=-</option>
+								#foreach($depfirst in $depositoryFirstList)
+									<option value="$depfirst.id" #if("$depfirst.id" == "$!{status.value}") selected="selected" #end>$depfirst.depFirstName</option>
+								#end
+							#else
+								<option value="">您不能选择</option>
+							#end
+						</select>
+					</td>
+    			</tr>
+    			<tr>
+					<th>状态：</th>
+					<td>
+						#springBind("query.status")
+						<select id="query.status" name="${status.expression}" class="select" style="width:auto;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $outDepositoryStatusMap.entrySet())
+								<option value="$!en.key" #if("$!en.key" == "${status.value}") selected="selected" #end >$!en.value</option>
+							#end
+						</select>
+					</td>
+    				<th>出库单打印状态：</th>
+    				<td>
+    					#springBind("query.isOutDepositoryPrinted")
+    					<select name="${status.expression}" id="isOutDepositoryPrinted" class="select" style="width:auto;">
+    						<option value="">-=请选择=-</option>
+    						<option value="n" #if("n" == "$status.value") selected="selected" #end>否</option>
+    						<option value="y" #if("y" == "$status.value") selected="selected" #end>是</option>
+    					</select>
+    				</td>
+    				<th>运单打印状态：</th>
+    				<td>
+    					#springBind("query.isExpressPrinted")
+    					<select name="${status.expression}" id="isExpressPrinted" class="select" style="width:auto;">
+    						<option value="">-=请选择=-</option>
+    						<option value="n" #if("n" == "$status.value") selected="selected" #end>否</option>
+    						<option value="y" #if("y" == "$status.value") selected="selected" #end>是</option>
+    					</select>
+    				</td>
+    			</tr>
+    			<tr>
+					<th>处理人：</th>
+					<td>
+						#springBind("query.handleAdminId")
+						<select name="${status.expression}" id="handleAdminId" class="select" style="width:auto;">
+            				<option value="" >全部</option>
+            				<option value="-99" #if("$status.value"=="-99") selected="true" #end>未分配</option>
+            				#foreach($userInfo in $userList)
+                    			<option value="$!{userInfo.id}" #if("$status.value" == "${userInfo.id}") selected="true" #end>$!{userInfo.userName}</option>
+                    		#end
+						</select>
+                    </td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td colspan="2">
+        				<button type="button" class="btn" onclick="formSubmit();">查询</button>
+        				<button type="button" class="btn" onclick="formSubmit('exportExcel');">Excel导出</button>
+					</td>
+    			</tr>
+            </table>
+        </div>
+	</form>
+
+	<!-- 入库单列表 -->
+	#if($optResult && $optResult != "")<div class="success_min" id="modifySuccess">$!optResult</div>#end
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table onkeydown="enterToTab(this,event);">
+			<tr>
+				<th><input id="anothercheckall" type="checkbox" onclick="selectAll('anothercheckall');"/>全选</th>
+				<th>单据编号</th>
+				<th>单据类型</th>
+				<th>关联单据号</th>
+				<th>配货时间</th>
+				<th>物流单号</th>
+				<th>制单人</th>
+				<th>仓管</th>
+				<th>处理人</th>
+				<th>一级仓库</th>
+				<th>状态</th>
+				<th>出库单打印状态</th>
+				<th>运单打印状态</th>
+			</tr>
+			#foreach($outDepositoryDis in $page.items)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td><input id="ids" name="ids" type="checkbox" value="$!outDepositoryDis.id,$!outDepositoryDis.type,$!outDepositoryDis.billNum" #if($outDepositoryDis.status == 'out_new' && $outDepositoryDis.type != 'out_sales') disabled="true" #end/></td>
+					<td align="left"><a href="showOutDetail.html?outDepId=$!outDepositoryDis.id">$!outDepositoryDis.billNum</a></td>
+					<td align="left">$!outDepositoryTypeMap.get("$outDepositoryDis.type")</td>
+					<td align="center">
+						#if(!$outDepositoryDis.tradePackageList || $outDepositoryDis.tradePackageList.size() == 0)
+							#if($outDepositoryDis.type == "out_damaged")
+								<a target="_blank" href="$!appServer.get("/storage/damaged/searchDamagedDetail.html").addQueryData("damagedCode", $outDepositoryDis.relationNum)">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_shopping")
+								<a target="_blank" href="$!appServer.get("/stock/refund/search_sr_detail_list.html").addQueryData("refNum", $outDepositoryDis.relationNum).addQueryData("aType", "view").addQueryData("cType", "ct")">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_check_damaged")
+								<a target="_blank" href="$!appServer.get("/storage/detail_storage_check.html").addQueryData("checkId", $outDepositoryDis.relationNum)">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_sales_change")
+								<a target="_blank" href="$!appServer.get("/trade/confirmRefund.html").addQueryData("refundId", $outDepositoryDis.relationNum)">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_storage_refund")
+								<a target="_blank" href="$!appServer.get("/storage/searchKTDetail.html").addQueryData("refNum", $outDepositoryDis.relationNum).addQueryData("aType", "view").addQueryData("cType", "kt")">$!outDepositoryDis.relationNum</a>
+							#elseif($outDepositoryDis.type == "out_move_storage" || $outDepositoryDis.type == "out_borrow_storage" || $outDepositoryDis.type == "out_back_storage")
+								<a target="_blank" href="$!appServer.get("/storage/moveLogReturn.html").addQueryData("moveCode", ${outDepositoryDis.relationNum})">$!outDepositoryDis.relationNum</a>
+							#end
+						#else
+    						#foreach($tradePackage in $outDepositoryDis.tradePackageList)
+    							<a target="_blank" href="$!appServer.get("/trade/detail.html?tradeId=$tradePackage.tid")">$tradePackage.tid</a>
+    						#end
+						#end
+					</td>
+					<td align="center">$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $!outDepositoryDis.gmtCreate)</td>
+					<td align="center">
+						#if("$outDepositoryDis.type"=="out_sales" || "$outDepositoryDis.type"=="out_sales_change")
+							<input type="text" tabIndex="$velocityCount" onchange="updateExpressCode('$!outDepositoryDis.id');" name="expressCode_$!{outDepositoryDis.id}" id="expressCode_$!{outDepositoryDis.id}" value="$!{outDepositoryDis.expressCode}" class="inp"/>
+							<input type="hidden" id="expressCodehidden_$!{outDepositoryDis.id}" value="$!{outDepositoryDis.expressCode}"/>
+						#else
+							&nbsp;
+						#end
+					</td>
+					<td align="left">$!outDepositoryDis.creater</td>
+					<td align="left">$!outDepositoryDis.modifier</td>
+					<td align="center">&nbsp;
+        				#foreach($userInfoTemp in $userList)
+                			#if("$!{outDepositoryDis.handleAdminId}" == "${userInfoTemp.id}") $!{userInfoTemp.userName} #end
+        				#end
+        			</td>
+					<td align="center">$!depositoryNameMap.get($!outDepositoryDis.depFirstId)</td>
+					<td align="center">$!outDepositoryStatusMap.get("$outDepositoryDis.status")</td>
+					<td align="center">#if($outDepositoryDis.isOutDepositoryPrinted=='y')是 #else 否 #end</td>
+					<td align="center">#if($outDepositoryDis.isExpressPrinted=='y')是 #else 否 #end</td>
+				</tr>
+			#end
+		</table>
+		<span class="action-span">
+    		<input type="button" name="Submit4" value="接管处理" class="button" onclick="javascript:handleSubmit();"/>
+    	</span>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/storage/searchOutDepository.html").put('slider_path','/contain/formPagingPageSizeSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+		// 用正则表达式将前后空格
+		// 用空字符串替代。
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	window.onload = function(){
+		var text1=document.getElementById("query.billNum");
+		text1.focus();
+		document.getElementById("query.billNum").value="";
+	}
+
+	function checkInfo(event){
+		var e = event?event:(window.event?window.event:null);
+
+		if (event.keyCode==13) {
+			document.getElementById("query.billNum").value=document.getElementById("query.billNum").value.trim();
+			document.forms[0].submit();
+			document.getElementById("optFlag").value = "";
+		}
+	}
+
+	function formSubmit(optType){
+			document.getElementById("optFlag").value = optType;
+			var dateStart1=document.getElementById("query.optTimeStart").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("query.optTimeEnd").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+    		if(e_date1 < b_date1){
+				alert("操作起始时间不能大于结束时间！");
+				return false;
+    		}
+			var outDepDateStart1=document.getElementById("query.outDepTimeStart").value.replace(/-/g, "/");
+    		var outDepDateEnd1=document.getElementById("query.outDepTimeEnd").value.replace(/-/g, "/");
+    		var bb_date1=new Date(Date.parse(outDepDateStart1));
+            var ee_date1=new Date(Date.parse(outDepDateEnd1));
+
+    		if(ee_date1 < bb_date1){
+    				   alert("出库起始时间不能大于结束时间！");
+    			   return false;
+    		}
+            document.getElementById("query.billNum").value=document.getElementById("query.billNum").value.trim();
+            document.getElementById("query.type").value=document.getElementById("query.type").value.trim();
+            document.getElementById("query.optTimeStart").value=document.getElementById("query.optTimeStart").value.trim();
+            document.getElementById("query.optTimeEnd").value=document.getElementById("query.optTimeEnd").value.trim();
+            document.getElementById("query.creater").value=document.getElementById("query.creater").value.trim();
+            document.getElementById("query.status").value=document.getElementById("query.status").value.trim();
+            document.getElementById("query.relationNum").value=document.getElementById("query.relationNum").value.trim();
+			document.getElementById("query.gmtCreateStart").value=document.getElementById("query.gmtCreateStart").value.trim();
+			document.getElementById("query.gmtCreateEnd").value=document.getElementById("query.gmtCreateEnd").value.trim();
+        	document.forms[0].submit();
+        	document.getElementById("optFlag").value = "";
+	    }
+		
+		function handleSubmit(){
+			var ids = document.getElementsByName("ids");
+    		//初始化为全都没有选
+    		var flag = false;
+    		for(var i=0;i<ids.length;i++)
+        		{
+        			//判断该复选框是否可用
+        			if(ids[i].checked == true)
+        			{
+    					flag = true;
+        			}
+        	}
+    		//如果全都没有选，则返回
+    		if(flag == false)
+    		{
+    			alert("请选择要接管处理的出库单！");
+    			return;
+    		}
+    		//拼接出库单ids
+    		var idStr = "";
+    		for (var i = 0; i < ids.length; i++)
+    		{
+                if (ids[i].checked == true)
+    			{
+    				checkBoxValue = ids[i].value.split(",");
+                	idStr += checkBoxValue[0]+",";
+    
+            	}
+    		}
+    		document.getElementById("outDepositoryIds").value=idStr;
+    		formSubmit("handleOutDepository");
+		}
+	
+	function preview1(){
+		var ids = document.getElementsByName("ids");
+		//初始化为全都没有选
+		var flag = false;
+		for(var i=0;i<ids.length;i++) {
+    			//判断该复选框是否可用
+    			if(ids[i].checked == true) {
+					flag = true;
+    			}
+    	}
+		//如果全都没有选，则返回
+		if(flag == false) {
+			alert("请选择要打印的出库单！");
+			return;
+		}
+		//拼接出库单ids
+		var idStr = "";
+		for (var i = 0; i < ids.length; i++) {
+            if (ids[i].checked == true) {
+				//查看是否有不能打印运单的单据类型
+				checkBoxValue = ids[i].value.split(",");
+            	idStr += checkBoxValue[0]+",";
+
+        	}
+		}
+		window.showModalDialog('$appServer/storage/printMulOutDep.html?ids=' + idStr, null, "dialogWidth:1000px;dialogHeight:800px;help:no;status:no;");
+	}
+
+	function updateExpressCode(id){
+		var expressCode=document.getElementById('expressCode_' + id);
+		var expressCodeValue=expressCode.value;
+		var expressCodehidden = document.getElementById('expressCodehidden_' + id);
+		var oldValue = expressCodehidden.value;
+
+		if(expressCodeValue==null||expressCodeValue.trim()==""){
+			alert("出错：您没有输入.");
+			expressCode.value=oldValue;
+			expressCode.select();
+            expressCode.focus();
+		} else if(expressCodeValue.length>40){
+			alert("出错：您输入的物流号太长.");
+			expressCode.value=oldValue;
+			expressCode.select();
+            expressCode.focus();
+		} else{
+			jQuery.post('updateExpressCodeByJQuery.html',{param1:id,param2:expressCodeValue},function(message){
+			    var msgType = message.substring(message.indexOf("\'") + 1, message.indexOf("\',"));
+		        if (msgType == 'false') {
+			        alert("修改物流单号失败!");
+		        } else {
+					expressCodehidden.value = expressCodeValue;
+				}
+		    });
+		}
+	}
+
+	function preview2(){
+		var ids = document.getElementsByName("ids");
+		//初始化为全都没有选
+		var flag = false;
+		for(var i=0;i<ids.length;i++)
+    		{
+    			//判断该复选框是否可用
+    			if(ids[i].checked == true)
+    			{
+					flag = true;
+    			}
+    	}
+		//如果全都没有选，则返回
+		if(flag == false)
+		{
+			alert("请选择要打印的运单！");
+			return;
+		}
+		var expressId = document.getElementById("printExpressId");
+		if(expressId.value.length<=0 || expressId.value.length == "")
+		{
+			alert("请选择物流公司后再打印！");
+			return;
+		}
+		//物流单编码
+		var expressCode = expressId.value.split(",")[0];
+
+		if(expressCode != "ZTO" && expressCode != "SFO" && expressCode != "YTO" && expressCode != "EMS" && expressCode != "YWEMS"
+		&& expressCode != "STO" && expressCode != "YWSTO" && expressCode != "DBO" && expressCode != "YWYD" && expressCode != "SUER" && expressCode != "UC" ){
+			alert("暂不支持此物流速递，不能打印！");
+			return ;
+		}
+
+		//拼接出库单ids
+		var idStr = "";
+		var checkBoxValue;
+		var billNums = "";
+		for (var i = 0; i < ids.length; i++)
+		{
+            if (ids[i].checked == true)
+			{
+				//查看是否有不能打印运单的单据类型
+				checkBoxValue = ids[i].value.split(",");
+            	if(checkBoxValue[1] != 'out_sales' && checkBoxValue[1] != 'out_sales_change')
+				{
+					billNums += checkBoxValue[2]+",";
+				}
+            	idStr += checkBoxValue[0]+",";
+        	}
+		}
+		if(billNums.length >0)
+		{
+			alert(billNums+"不能打印！");
+			return;
+		}
+
+		window.showModalDialog("$appServer/storage/printMul.html?expressTmp=" + expressCode + "&ids=" + idStr, null, "dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+	}
+
+	function changeExpress()
+	{
+		document.forms[0].submit();
+	}
+
+	function selectAll(chkName){
+		var ids = document.getElementsByName("ids");
+
+		//全选复选框的状态
+		var chk_checked = document.getElementById(chkName);
+		for(var i=0;i<ids.length;i++) {
+			//判断该复选框是否可用
+			if(ids[i].disabled == false) {
+				//把其他的复选框设置成跟全选状态一样
+				ids[i].checked = chk_checked.checked;
+			}
+		}
+	}
+	function enterToTab(obj,e){
+		if (window.event){
+			if (window.event.keyCode==13){
+				window.event.keyCode=9;
+			}
+		} else {
+			//firefox不支持
+		}
+	}
+</script>

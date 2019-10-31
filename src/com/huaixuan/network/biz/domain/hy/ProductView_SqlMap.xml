@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="productViewDAO">
+	<typeAlias alias="productView" type="com.huaixuan.network.biz.domain.hy.ProductView"/>
+	<resultMap id="productViewResult" class="com.huaixuan.network.biz.domain.hy.ProductView">
+	  <result column="idBrand" property="idBrand" />
+	  <result column="Brandname" property="brandname" />
+	  <result column="idSeries" property="idSeries" />
+	  <result column="Seriesname" property="seriesname" />
+	  <result column="Size" property="size" />
+	  <result column="targetCustomers" property="targetCustomers" />
+	  <result column="Color" property="color" />
+	  <result column="Material" property="material" />
+	  <result column="idLocation" property="idLocation" />
+	  <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="idPurchase" property="idPurchase" />
+	  <result column="Type" property="type" />
+	  <result column="Picture" property="picture" />
+	  <result column="idProduct" property="idProduct" />
+	</resultMap>
+	
+    <select id="getProductViewByConditionWithPage" resultMap="productViewResult" parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*
+	   from view_product t
+	   ]]>
+	   <dynamic prepend="where">
+	   <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="size" prepend="and">
+		<![CDATA[  t.Size = #size# ]]>
+       </isNotEmpty>
+       </dynamic>
+       GROUP BY t.Type,t.Material,t.Color
+       order by t.idPurchase desc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+    <select id="getProductViewByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(*) from (select count(t.idBrand) from view_product t
+		<dynamic prepend="where">
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="size" prepend="and">
+		<![CDATA[  t.Size = #size# ]]>
+        </isNotEmpty>
+        </dynamic>
+        GROUP BY t.Type,t.Material,t.Color)p
+	</select>
+
+</sqlMap>

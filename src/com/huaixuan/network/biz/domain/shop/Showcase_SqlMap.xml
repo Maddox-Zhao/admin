@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShowcaseSQL">
+<typeAlias alias="showcase" type="com.huaixuan.network.biz.domain.shop.Showcase"/>
+	<resultMap class="showcase" id="showcaseResult">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="sort" property="sort"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="cabinet_id" property="cabinetId"/>
+		<result column="img_middle" property="imgMiddle"/>
+		<result column="title" property="goodsTitle"/>
+		<result column="vice_name" property="viceName"/>
+	</resultMap>
+
+	<resultMap class="showcase" id="showcaseResultSimple">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="sort" property="sort"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="cabinet_id" property="cabinetId"/>
+		<result column="vice_name"  property="viceName"/>
+	</resultMap>
+
+<!-- create Showcase object -->
+<insert id="addShowcase" parameterClass="showcase">
+<![CDATA[
+insert into emall_showcase
+  (id, goods_id, sort, gmt_create, gmt_modify, cabinet_id , vice_name)
+values
+  (null, #goodsId#, #sort#, sysdate(), sysdate(), #cabinetId#, #viceName#)
+
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Showcase object -->
+<update id="editShowcase" parameterClass="showcase">
+<![CDATA[
+update emall_showcase
+   set goods_id   = #goodsId#,
+       sort       = #sort#,
+       gmt_create = #gmtCreate#,
+       gmt_modify = sysdate(),
+       cabinet_id = #cabinetId#,
+       vice_name  = #viceName#
+ where id = #id#
+
+]]>
+</update>
+<!-- delete Showcase object -->
+<delete id="removeShowcase" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_showcase where emall_showcase.ID = #value#
+]]>
+</delete>
+<!-- search Showcase object -->
+<select id="getShowcase" parameterClass="java.lang.Long" resultMap="showcaseResultSimple">
+<![CDATA[
+		select emall_showcase.* from emall_showcase where emall_showcase.ID = #value#
+]]>
+</select>
+<!-- searchAll Showcase List -->
+<select id="getShowcases" resultMap="showcaseResultSimple">
+<![CDATA[
+		select emall_showcase.* from emall_showcase
+]]>
+</select>
+
+<!-- searchAll Showcase List -->
+<select id="getShowcasesByCabinetId" parameterClass="java.lang.Long" resultMap="showcaseResult">
+<![CDATA[
+select a.id,
+       a.goods_id,
+       a.sort,
+       a.gmt_create,
+       a.gmt_modify,
+       a.cabinet_id,
+       a.vice_name,
+       b.img_middle,
+       b.title
+  from emall_showcase a, emall_goods b
+ where a.cabinet_id = #cabinetId#
+   and a.goods_id = b.id
+ order by a.sort
+
+]]>
+</select>
+
+
+<select id="getShowcaseMaxSortByCabinetId"  parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+<![CDATA[
+		select max(sort) from  emall_showcase a where a.cabinet_id=#cabinetId#
+]]>
+</select>
+
+<update id="updateShowcaseSortByCabinetId" parameterClass="showcase">
+<![CDATA[
+		update emall_showcase a set
+		a.sort = a.sort-1,
+		gmt_modify = sysdate()
+		 where a.cabinet_id = #cabinetId#
+			and a.sort > #sort#
+]]>
+</update>
+
+<update id="showcaseUpBig" parameterClass="java.lang.Long">
+<![CDATA[
+		update emall_showcase a set
+		a.sort = a.sort-1,
+		gmt_modify = sysdate()
+		 where a.id = #showcaseId#
+]]>
+</update>
+
+<update id="showcaseUpSamll" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_showcase a set
+		a.sort = a.sort+1,
+		gmt_modify = sysdate()
+		 where a.cabinet_id = #cabinetId#
+			and a.sort = #sort#
+]]>
+</update>
+
+<update id="showcaseDownBig" parameterClass="java.lang.Long">
+<![CDATA[
+		update emall_showcase a set
+		a.sort = a.sort+1,
+		gmt_modify = sysdate()
+		 where a.id = #showcaseId#
+]]>
+</update>
+
+<update id="showcaseDownSamll" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_showcase a set
+		a.sort = a.sort-1,
+		gmt_modify = sysdate()
+		 where a.cabinet_id = #cabinetId#
+			and a.sort = #sort#
+]]>
+</update>
+
+<select id="getShowcaseByGoodsIdAndCabId" parameterClass="java.util.Map" resultMap="showcaseResultSimple">
+<![CDATA[
+		select emall_showcase.* from emall_showcase
+		where emall_showcase.cabinet_id = #cabId#
+		 and emall_showcase.goods_id = #goodsId#
+]]>
+</select>
+
+<select id="getShowcasesCount" resultClass="java.lang.Integer" parameterClass="java.lang.Long">
+<![CDATA[
+		select count(*) from emall_showcase a ,emall_goods b
+		where a.goods_id = b.id and a.cabinet_id =#cabinetId#
+		order by a.sort,a.id
+]]>
+</select>
+
+<select id="getShowcasesPage" parameterClass="java.util.Map"
+		resultMap="showcaseResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+	select
+		a.id,
+		a.goods_id,
+		a.sort,
+		a.gmt_create,
+		a.gmt_modify,
+		a.cabinet_id,
+		a.vice_name,
+		b.img_middle,
+		b.title
+	from emall_showcase a,emall_goods b
+	where a.goods_id = b.id and a.cabinet_id =#cabinetId#
+	order by  a.sort,a.id
+]]>
+<include refid="pageSQLFoot"/>
+</select>
+
+
+</sqlMap>

@@ -1,0 +1,105 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css"  href="${ctx}/styles/${appConfig.get('csstheme')}/std_notice.css" />
+
+
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>系统日志查询</span></h3>
+<form id="form1" action="/admin/logSearch.html" method="post" name="form1">
+    <table>
+      <tr>
+        <th>操作人：</th>
+        <td>
+			#springBind("adminlog.account")
+			<input type="text" name="${status.expression}" id="account" value="$!{status.value}" class="inp"/>
+		</td>
+        <th>操作类型：</th>
+        <td>
+			#springBind("adminlog.operationType")
+			<input type="text" name="${status.expression}" id="operationType" value="$!{status.value}" class="inp"/>
+		</td>
+        <th>操作时间：</th>
+        <td>
+			#springBind("adminlog.gmtCreateStart")
+			<input name="${status.expression}" id="gmtCreateStart" readonly="true" value="$!{status.value}"/>到
+			#springBind("adminlog.gmtCreateEnd")
+			<input name="${status.expression}" id="gmtCreateEnd" readonly="true" value="$!{status.value}"/>
+			<script type="text/javascript">
+			      Calendar.setup({
+			          inputField : "gmtCreateStart",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			      Calendar.setup({
+			          inputField : "gmtCreateEnd",
+			          ifFormat   : "%Y-%m-%d",
+			          align      : "BR"
+			      });
+			 </script>
+		</td>
+		<td><button type="button" class="btn" onclick= "validator();">搜 索</button></td>
+      </tr>	  
+    </table>
+</form>
+  </div>
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>系统日志列表</span></h3>
+            <table>
+                <tr>
+                    <th>操作人</th>
+                    <th>操作类型</th>
+                    <th>操作名称</th>
+                    <th>ip地址</th>
+                    <th>操作时间</th>
+                    <th>内容</th>
+                </tr>
+				#if($query && $query.items.size()>0)
+				 #foreach($adminlog in $query.items)
+                <tr>
+                    <td align="center">$!{adminlog.account}</td>
+                    <td align="center">$!{adminlog.operationType}</td>
+                	<td align="center">$!adminLogMap.get("$!{adminlog.operationType}")</td>
+					<td align="center">$!{adminlog.ip}</td>
+                    <td align="center">$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!adminlog.gmtCreate)</td>
+                    <td align="center">
+                        #if($!adminlog.content.length()>30) #direct($!adminlog.content.substring(0,12))...#else #direct($!adminlog.content) #end
+					</td>
+                </tr>
+				 #end
+                #end
+            </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/admin/logSearch.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+
+        </div>
+    </div>
+<script language="javascript" type="text/javascript">
+function validator(){
+  	var dateStart1=document.getElementById("gmtCreateStart").value;
+    var dateEnd1=document.getElementById("gmtCreateEnd").value;
+
+    if(dateEnd1 < dateStart1){
+	    alert("起始时间不能大于结束时间！");
+		return false;
+	}
+	
+	document.form1.submit();
+}
+</script>

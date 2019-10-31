@@ -1,0 +1,489 @@
+#set($layout = "layout/default.vm")
+
+<link href="$ctx/styles/calendar-aqua/calendar-blue.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css"  href="${ctx}/styles/${appConfig.get('csstheme')}/std_notice.css" />
+
+<script src="$ctx/scripts/admin/transport.js" type="text/javascript"></script>
+<script src="$ctx/scripts/admin/common.js" type="text/javascript"></script>
+
+<script src="${ctx}/scripts/calendar/calendar.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-chs.js" type="text/javascript" language="JavaScript"></script>
+<script src="${ctx}/scripts/calendar/calendar-setup.js" type="text/javascript" language="JavaScript"></script>
+
+<script language="javascript" type="text/javascript">
+
+    function checksubmit(){
+    	var validateTitle = document.getElementById("validateTitle").innerHTML="";
+    	var validateTime = document.getElementById("validateTime").innerHTML="";
+		
+    	var validateContext = document.getElementById("validateContext").innerHTML="";
+        var nowValue = document.getElementById("title").value;
+
+        if(nowValue.length == 0){
+    		document.getElementById('validateTitle').innerHTML="<font color='red'>活动名称必须填写</font>" ;
+    		document.theForm.title.focus();
+            return false;
+        }
+        if(nowValue.length > 32){
+        	document.getElementById("validateTitle").innerHTML="<font color='red'>活动名称不能超过32个字符</font>" ;
+        	document.theForm.title.focus();
+    		return false;
+        }
+
+        var nowValue1 = document.getElementById("activity.gmtStart_str").value;
+        var nowValue2 = document.getElementById("activity.gmtEnd_str").value;
+        if(nowValue1.length == 0 ||nowValue2.length == 0 ){
+    		document.getElementById("validateTime").innerHTML="<font color='red'>活动开始时间结束时间必须填写</font>" ;
+            return false;
+        }
+        
+		var nowValue3 = document.getElementById("img_home_small").value;
+
+    	
+
+		if(nowValue3!=''){
+		  if (!isAllowedAttach(nowValue3)){
+            	document.getElementById("validateImages3").innerHTML="<font color='red'>上传的图片类型有误,请选择jpeg .gif .jpg .png格式的图片</font>" ;
+            	return false;
+            }
+		}
+
+        var nowValue = document.getElementById("context").value;
+        if(nowValue.length == 0){
+        	document.getElementById("validateContext").innerHTML="<font color='red'>活动内容必须填写</font>" ;
+        	document.theForm.context.focus();
+            return false;
+        }
+        if(nowValue.length > 1024){
+        	document.getElementById("validateContext").innerHTML="<font color='red'>活动内容不能超过1024字符</font>" ;
+        	document.theForm.context.focus();
+            return false;
+        }
+
+			var dateStart1str = document.getElementById("activity.gmtStart_str").value;
+		    var dateEnd1str = document.getElementById("activity.gmtEnd_str").value;
+		    var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(dateStart1));
+            var e_date=new Date(Date.parse(dateEnd1));
+			if(dateStart1str==""||dateEnd1str==""){
+				alert("请选择时间");
+				return  false;
+			}else if(e_date < b_date){
+    				   alert("起始时间不能大于结束时间！");
+    			   return false;
+    		}
+
+    	document.theForm.action = "/shop/updateActity.html";
+    	document.theForm.submit();
+    }
+
+   //判断图片格式
+    function isAllowedAttach(sFile)
+    {
+         var sUploadImagesExt = " .jpeg .gif .jpg .png ";
+         var sExt = sFile.match( /\.[^\.]*$/ ) ;
+         if (sExt) {
+          sExt = sExt[0].toLowerCase();
+         } else {
+          return false;
+         }
+         if ( sUploadImagesExt.indexOf( sExt ) != -1 ) {
+          return true;
+         }
+         return false;
+    }
+
+
+    //判断图片象素大小
+    function isRightSize(){
+            var obj = document.getElementById("img");
+    	var sUrl = getFullPath(obj);
+            var myImage = new Image();
+            myImage.src = sUrl;
+    	var imgwith =  myImage.width ;
+    	var imgheight =  myImage.height ;
+    	if("950" !=imgwith || "200" !=imgheight){
+    	    return false;
+    	}else{
+    	    return true;
+    	}
+    }
+    //获取图片全路径（不同的浏览器
+    function getFullPath(obj) {
+        if(obj){
+            //ie
+            if (window.navigator.userAgent.indexOf("MSIE")>=1)
+            {
+                obj.select();
+                return document.selection.createRange().text;
+            }
+            //firefox
+            else if(window.navigator.userAgent.indexOf("Firefox")>=1)
+            {
+                if(obj.files)
+                {
+                    return obj.files.item(0).getAsDataURL();
+                }
+                return obj.value;
+            }
+            return obj.value;
+        }
+    }
+
+
+
+	function addGoods(catType){
+		var category;
+		var oldCategory;
+
+		if(catType=="c1"){
+			category = document.getElementById('categorys1').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys1').value.replace(/-/g, "/");
+		}
+		if(catType=="c2"){
+			category = document.getElementById('categorys2').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys2').value.replace(/-/g, "/");
+		}
+		if(catType=="c3"){
+			category = document.getElementById('categorys3').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys3').value.replace(/-/g, "/");
+		}
+		if(catType=="c4"){
+			category = document.getElementById('categorys4').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys4').value.replace(/-/g, "/");
+		}
+		if(catType=="c5"){
+			category = document.getElementById('categorys5').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys5').value.replace(/-/g, "/");
+		}
+
+		if(category==""){
+			alert("请填写活动分类名称");
+			return false;
+		}
+		if(oldCategory != "" && category != oldCategory){
+			if(!confirm("确实要修改活动分类名称吗?")){
+             	return false;
+			}
+			document.getElementById('oldCategoryName').value=oldCategory;
+		}
+
+		
+		var ret=window.open('$appServer/goods/addsalegoods.html?chtype=setActivityValue', 'window', '');
+		document.getElementById('categoryName').value=category;
+
+	}
+
+		function setActivityValue(ss){
+		document.getElementById('goodsIds').value=ss;
+
+		document.addForm.action = "/shop/addGoodsByActivityId.html";
+		document.addForm.submit();
+	}
+
+
+	function updateCatName(catType){
+		var category;
+		var oldCategory;
+
+		if(catType=="c1"){
+			category = document.getElementById('categorys1').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys1').value.replace(/-/g, "/");
+		}
+		if(catType=="c2"){
+			category = document.getElementById('categorys2').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys2').value.replace(/-/g, "/");
+		}
+		if(catType=="c3"){
+			category = document.getElementById('categorys3').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys3').value.replace(/-/g, "/");
+		}
+		if(catType=="c4"){
+			category = document.getElementById('categorys4').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys4').value.replace(/-/g, "/");
+		}
+		if(catType=="c5"){
+			category = document.getElementById('categorys5').value.replace(/-/g, "/");
+			oldCategory = document.getElementById('oldCategorys5').value.replace(/-/g, "/");
+		}
+
+		if(category==""){
+			alert("请填写活动分类名称");
+			return false;
+		}
+		if(category == oldCategory){
+            return false;
+		}
+		if(oldCategory != "" && category != oldCategory){
+			if(!confirm("确实要修改活动分类名称吗?")){
+             	return false;
+			}
+		}
+		document.getElementById('oldCategoryName').value=oldCategory;
+		document.getElementById('categoryName').value=category;
+		document.addForm.action = "/shop/addGoodsByActivityId.html";
+		document.addForm.submit();
+	}
+
+</script>
+#set($title = "专场管理 - 修改专场")
+<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>修改专场</span></h3>
+	<div class="content">
+		<form  name="theForm"  action="" method="post" enctype="multipart/form-data">
+			#springBind("activity.id")
+			<input type="hidden" id="activity.id" name="${status.expression}" value="$!{activity.id}" />
+
+			<input type="hidden" id="flagpage" name="flagpage" value="updateImg" />
+
+			<table id="general-table" width="100%">
+    			<tbody id="newtr">
+				<div class="form">
+				<ol>
+          <li>
+			<label>活动名称：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.title")
+					<input type="text" id="title" name="${status.expression}" value="$!activity.title" size="24"/>
+				</li>
+						<li><em>*</em></li>
+				<li id="validateTitle">
+				</li>
+            </ul>
+            </span>
+          </li>
+		  
+		  <li>
+			<label>图片位置：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.activityPosition")
+			<select id="activityPosition" name="activityPosition">
+				<option value="无">请选择</option>
+				<option value="indexSwiper" #if($!{activity.activityPosition} == "indexSwiper") selected #end)>首页轮播</option>
+				<option value="indexNew" #if($!{activity.activityPosition} == "indexNew") selected #end>首页最新上线</option>
+				<option value="discountTop" #if($!{activity.activityPosition} == "discountTop") selected #end>特惠上方</option>
+				<option value="discountLeftMiddle" #if($!{activity.activityPosition} == "discountLeftMiddle") selected #end>特惠左侧中间</option>
+				<option value="discountLeftBottom" #if($!{activity.activityPosition} == "discountLeftBottom") selected #end>特惠左下角</option>
+				<option value="discountRight" #if($!{activity.activityPosition} == "discountRight") selected #end>特惠右侧</option>
+            </select>
+				</li>
+						<li><em>*</em></li>
+            </ul>
+            </span>
+          </li>
+		  
+          <li>
+			<label>活动时间：</label>
+				<span class="con">
+					<ul>
+              <li>
+				#springBind("activity.gmtStart_str")
+					<input type="text" name="${status.expression}" id="activity.gmtStart_str" size="10" theme="simple" readonly="true" value="$!{activity.gmtStart_str}"/>
+			            <script type="text/javascript">
+			               Calendar.setup({
+			                  inputField : "activity.gmtStart_str",
+			                  ifFormat   : "%Y-%m-%d",
+			                  align      : "BR"
+			             });
+                        </script>
+					 #springBind("activity.gmtEnd_str")
+					 <input type="text" name="${status.expression}" id="activity.gmtEnd_str" size="10" theme="simple" readonly="true" value="$!{activity.gmtEnd_str}"/>
+			             <script type="text/javascript">
+			              Calendar.setup({
+			                 inputField : "activity.gmtEnd_str",
+			                 ifFormat   : "%Y-%m-%d",
+			                 align      : "BR"
+			              });
+			             </script>
+</li>
+						<li><em>*</em></li>
+				<li id="validateTime">
+				</li>
+            </ul>
+            </span>
+          </li>
+		  
+		  
+          
+		         
+		           <li>
+			<label>首页小图：</label>
+    				<span class="con">
+					<ul>
+              <li>#if($!{activity.img_home_small})
+								<!--<img src="${imageService}/$!{activity.imgSmall}" width="150" height="70" />-->
+								<img src="${upServer}/$!{activity.img_home_small}"/><br/>
+							#end
+    					<input type="file" id="img_home_small" name="images"/>
+				</li>
+				<li id="validateImages3">
+					 <label class="red">$!{errorMessage3}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<ul>
+    				<li class="label"></li>
+    				<li>
+						<font color="red"><B>（必须上传jpeg .gif .jpg .png格式，小于200K的图片。设置小图后将在首页专场专区显示）</B></font>
+    				</li>
+    				<li id="validateImages"></li>
+			</ul>
+		 </li>
+          <li>
+			<label>活动内容：</label>
+				<span class="con">
+					<ul>
+              <li>
+					#springBind("activity.context")
+    					<textarea id="context" name="${status.expression}" cols="35" rows="5">$!activity.context</textarea>
+				</li>
+						<li><em>*</em></li>
+				<li id="validateContext">
+
+				</li>
+            </ul>
+            </span>
+          </li>
+			</ol>
+	       </div>
+    		</tbody>
+
+                    <tr>
+						<td class="label">&nbsp;</td>
+                        <td>
+							<input class="button" value=" 修 改 " type="button" onclick="return checksubmit();">
+						</td>
+					</tr>
+			</table>
+    	</form>
+		</div></div></div>
+<div class="clearing"></div>
+#if($message)
+<div id="result" align="center" style="color:red;">$message</div>
+#end
+ <div class="main">
+		<div class="formBox">
+	<div class="content">
+	<form  id="addForm" name="addForm"  action="" method="post">
+		<input type="hidden" id="goodsIds" name="goodsIds" value="" />
+		<input type="hidden" id="activityId" name="activityId" value="$!{activity.id}" />
+		<input type="hidden" id="categoryName" name="categoryName" value="" />
+		<input type="hidden" id="oldCategoryName" name="oldCategoryName" value="" />
+    <table  id="listTable" name="listTable"  class="list-table">
+		<div class="form">
+		<tr>
+			<th>活动分类：
+				<input type="text" id="categorys1" name="categorys1" value="$!{category1}" maxlength="50"/>
+				<input type="hidden" id="oldCategorys1" name="oldCategorys1" value="$!{category1}"/>
+				#if(${category1})
+				<input class="button" value="修改分类名称" type="button" onclick="updateCatName('c1');">
+				#end
+			</th>
+			<th>
+				<div id="addGoodsH_1">
+            		<input class="button" value="选择商品" type="button" onclick="addGoods('c1');">
+            	</div>
+			</th>
+			<th>
+        		<div id="addGoodsHL_1" style="display:none">
+        			<span class="action-span"><img src="$imageServer/images/admin/loading.gif" /></span>
+        		</div>
+			</th>
+            <th>
+				<div id="addGoodsH_1">
+            		<input class="button" value="批量删除" type="button" onclick="delectGoods();">
+            	</div>
+			</th>
+		</tr>
+		
+		<tr>
+        	<td colspan="4">
+				#if($!listgoods1)
+    				<table>
+                        <tr>
+						  <th><input type="checkbox" id="allbox" />全选</th>
+                          <th>商品编号</th>
+    					  <th>商品图片</th>
+    					  <th>商品名称</th>
+    					  <th>&nbsp;可用库存&nbsp;</th>
+    					  <th>&nbsp;香港库存&nbsp;</th>
+						  <th>&nbsp;已售数量&nbsp;</th>
+						  <th>&nbsp;尚上价(RMB)&nbsp;</th>
+						  <th>&nbsp;欧洲价(EU)&nbsp;</th>
+						  <th>&nbsp;大陆价(RMB)&nbsp;</th>
+						  <th>&nbsp;促销价&nbsp;</th>
+						  <th>&nbsp;操作 </th>
+						</tr>
+						<tr>
+    						#foreach($goods in $listgoods1)
+								<td><input name="ids" type="checkbox" value="$!goods.id"/></td>
+								<td style="text-align:center;">$!goods.goodsSn</td>
+								<td>
+									<img src="${upServer}/${goods.imgMiddle}" width="100" height="100" />
+								</td>
+								<td style="text-align:center;">$!goods.title</td>
+								<td style="text-align:center;">$!goods.goodsNumber</td>
+								<td style="text-align:center;">$!goods.hkGoodsNumber</td>
+								<td style="text-align:center;">$!goods.saleNumber</td>
+								<td style="text-align:center;color:red;">$!moneyUtil.getFormatMoney($!goods.goodsPrice,'0.00')</td>
+								<td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.euPrice,'0.00')</td>
+								<td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.marketPrice,'0.00')</td>
+								<td style="text-align:center;"><a onclick="setsalesproprice($!goods.id)">$!goods.salesProPrice</a></td>
+								<td><a name="ids" href="deleteActivityGoods.html?activityId=$!{activity.id}&goodsId=$!{goods.id}&categoryName=$!{category1}">删除</a></td>
+								#set($flag= ${velocityCount}%1 )
+								#if("$flag"=="0")
+						</tr><tr>
+								#end
+							#end
+						</tr>
+					</table>
+				#end
+			</td>
+    	</tr>
+            </div>
+	</table>
+	</form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/updateActivityPage.html?chtype=$!chtype&selectids=$!selectids").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+</div>
+</div>
+<script>
+		//批量处理
+		jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+		});
+		
+		function checkIds(){
+		     var objs = document.getElementsByName("ids");
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   if(objs[i].checked){
+				     return true;
+				   }
+				}
+			  }
+			  alert('至少选择一条商品信息');
+			  return false;
+		}
+		
+        function delectGoods(){
+            if(!checkIds())return;
+            document.getElementById('addForm').action="deleteActivityGoods.html?activityId=$!{activity.id}&categoryName=$!{category1}";
+			document.getElementById('addForm').submit();
+        }		
+
+</script>

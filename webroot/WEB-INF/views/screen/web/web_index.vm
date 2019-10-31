@@ -1,0 +1,79 @@
+#set($layout = '')
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="loading">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta name="viewport" content="width=device-width, initial-scale=0.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="keywords" content="首页" />
+<link rel="stylesheet" type="text/css" href="/phone/css/style1.css" />
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta content="telephone=no" name="format-detection">
+<script type="text/javascript">
+		function logout(){
+        	if (confirm("您确定要退出管理平台吗？"))
+        	window.location.href = "/exit.html";
+        	return false;
+        }
+	</script>
+<title>首页</title>
+</head>
+
+<body>
+ 
+
+<div id="menu">
+ 
+		<ul>
+			<li class="nav_index menu_cur"><a href="/m/index.html"><i></i><span>首页</span><b></b><div class="clear"></div></a></li>
+			<li class="nav_site"><a href="/m/product/productList.html"><i></i><span>产品</span><b></b><div class="clear"></div></a></li>
+			#if($!adminAccess.has("A_ORDER_MANAGER"))
+			<li class="nav_help"><a href="/m/order/list.html"><i></i><span>订单</span><b></b><div class="clear"></div></a></li>
+			#end
+			<li class="nav_about"><a href="/index.html"><i></i><span>采购</span><b></b><div class="clear"></div></a></li>
+		</ul>
+	</div>
+ 
+	<div id="header">
+		<div class="wrap">
+			<i class="menu_open"></i>
+			<div class="logo"><a href="/index.html" title=""><img src="/phone/css/logo.png" /></a></div>
+			 
+		</div>
+		<div class="logo_msk"></div>
+	</div>
+	
+	
+	
+	<div id="container">
+		<div id="content">	
+			<div id="list" style="margin-top:100px;margin-left:100px">
+					
+				<a style="font-size:20px;color:red;" href="javascript:void(0)" onClick="logout();">安全退出</a> 
+ 
+			</div>
+		</div>
+		
+		<div class="push_msk"></div>
+	</div>
+
+<div id="sort_content">
+		<div class="asort">
+			<div class="hd">
+				<div class="wrap">
+	 
+					<div class="fr"></div>
+					<div class="clear"></div>
+				</div>
+			</div>
+	</div>
+</div>
+ 
+	<script language="javascript" src="/phone/js/zepto.min.js"></script>
+	<script language="javascript" src="/phone/js/fx.js"></script>
+	<script language="javascript" src="/phone/js/script1.js"></script>
+	
+	
+</body>
+</html>

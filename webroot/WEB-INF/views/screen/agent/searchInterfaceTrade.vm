@@ -1,0 +1,130 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>接口同步数据查询</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>接口同步数据查询</span></h3>
+  <form action="searchInterfaceTrade.html" name="searchForm" method="post" id="searchForm">
+  <table>
+      <tr>
+    <th>用户名：</th>
+	<td>
+	#springBind("searchInterfaceTradeQuery.userName")
+	<input  type="text" name="${status.expression}"  value="$!{status.value}" size="10" id="userName"/></td>
+    <th>ERP订单号：</th>
+			<td>
+				#springBind("searchInterfaceTradeQuery.tradeId")
+			<input  type="text" name="${status.expression}"  value="$!{status.value}" size="10" id="tradeId"/></td>
+<th>接口订单号：</th>
+			<td>
+				#springBind("searchInterfaceTradeQuery.interfaceCode")
+			<input  type="text" name="${status.expression}"  value="$!{status.value}" size="10" id="interfaceCode"/></td>
+<th>创建日期：从</th>
+			<td>
+				#springBind("searchInterfaceTradeQuery.gmtCreateStart")
+			<input name="${status.expression}"  id="gmtCreateStart" value="$!{status.value}"  size="10" readonly="true"/><label>到</label>
+				#springBind("searchInterfaceTradeQuery.gmtCreateEnd")
+		<input  name="${status.expression}" id="gmtCreateEnd" value="$!{status.value}"   size="10" readonly="true"/></td>
+		<script type="text/javascript">
+		      Calendar.setup({
+		          inputField : "gmtCreateStart",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		      Calendar.setup({
+		          inputField : "gmtCreateEnd",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		</script>
+				<td>
+				<input name="chaxun" value="查询" class="button" type="button" onclick="sumbitForm();" />			</td>
+<script language="javascript" type="text/javascript">
+function sumbitForm(){
+var dateStart=document.getElementById("gmtCreateStart").value.replace(/-/g, "/");
+        var dateEnd=document.getElementById("gmtCreateEnd").value.replace(/-/g, "/");
+        var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+        if(e_date < b_date){
+            alert("起始时间不能大于结束时间！");
+            return false;
+        }
+        document.getElementById("gmtCreateStart").value=document.getElementById("gmtCreateStart").value.trim();
+        document.getElementById("gmtCreateEnd").value=document.getElementById("gmtCreateEnd").value.trim();
+document.getElementById("userName").value=document.getElementById("userName").value.trim();
+document.getElementById("tradeId").value=document.getElementById("tradeId").value.trim();
+document.getElementById("interfaceCode").value=document.getElementById("interfaceCode").value.trim();
+        document.searchForm.submit();
+    }
+
+</script>
+</tr>
+    </table>
+ </form>
+</div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+  <div class="listBox">
+          <h3><span>接口同步数据</span></h3> 
+    <table>
+      <tr>
+                <th>用户名</th>
+                <th>ERP订单号</th>
+				<th>创建时间</th>
+				<th>接口订单号</th>
+                <th>接口订单创建时间</th>
+				<th>接口订单支付时间</th>
+                <th>同步结果</th>
+				<th>操作</th>
+            </tr>
+            #foreach($agent in $query.items)
+        	<tr #if($velocityCount%2==0) class="bg" #end>
+				<td>$!agent.userName</td>
+				<td><a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", $agent.tradeId)">$!agent.tradeId</a></td>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${agent.gmtCreate})</td>
+				<td>$!agent.paipaiTradeId</td>
+			    <td>$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${agent.gmtPaipaiCreate})</td>
+				<td>$!dateUtil.convertDateToString('yyyy-MM-dd HH:mm:ss',${agent.gmtPaipaiPaied})</td>
+			    <td width="200px" style="word-break:break-all">$!agent.reason</td>
+				<td>
+					 #if(!$!agent.tradeId)
+					<a href="javascript:deleteTrade('$!{agent.id}')">删除</a>
+					#end
+				</td>
+				<!--<input type="hidden" id="htradeId" name="htradeId" value="" />-->
+				<!--<td align="center">#if($agent.isReceive=="y")已返券#end#if($agent.isReceive=="n")未返券#end</td> -->
+            </tr>
+            #end
+
+    </table>
+       
+   <div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/agent/searchInterfaceTrade.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function deleteTrade(tradeId){
+	  if(confirm('确定要删除？')){
+	     document.searchForm.action="deleteInterfaceTrade.html?htradeId="+tradeId;
+		 document.searchForm.submit();
+		 document.searchForm.action="searchInterfaceTrade.html";
+	  }
+	}
+</script>

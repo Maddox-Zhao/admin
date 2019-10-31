@@ -1,0 +1,6 @@
+2019-09-06 14:46:25,564 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1171] in http://www.shangit.com:8077/login.html 
+Task:execute web action in:LoginAction with method:login running time(millis)[15->15]=0 0%
+Task:render screen:screen/login.vm running time(millis)[1054->1170]=116 9%
+Task:merge template:layout/default.vm running time(millis)[1170->1170]=0 0%
+Task:write output to servlet outputstream with size:3KB. running time(millis)[1170->1171]=1 0%

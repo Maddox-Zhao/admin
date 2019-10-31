@@ -1,0 +1,103 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	 <div class="mag-t1">
+		$!message
+	 </div>
+ #end
+	
+<div class="formBox">
+	<h3><span>管理中心 - 仓库库位列表</span></h3>
+	<div class="content">
+		<table  id="listTable" name="listTable"  class="c2">
+			<tr>
+            	<th>一级仓库：</th>
+				<td>
+					<select name="depFirstId" id="depFirstId" style="width:100px;" onchange="showDep();">
+                			#if($depositoryFirstList)
+            					#foreach($depfirst in $depositoryFirstList)
+                				   <option value="$depfirst.id" #if("$depfirst.id"==$depFirstId) selected #end>$depfirst.depFirstName</option>
+                  				#end
+                			#else
+                					<option value="">您不能选择</option>
+                			#end
+            		</select>
+                </td>
+			</tr>
+		</table>
+	</div>
+<!-- 功能列表 -->
+	<div class="tool">
+        <span><a href="/storage/list_storage_check.html" hidefocus="true" class="bt_wu">库存盘点查询</a></span>
+    </div>
+
+<!-- 仓库列表 -->
+<div>仓库列表：</div>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable">
+      <tr>
+        <th>仓库编号</th>
+        <th>仓库名称</th>
+        <th>地址</th>
+        <th>操作</th>
+      </tr>
+	  #foreach($depository in $depositorys)
+	  <tr>
+		 <td>$!depository.id</td>
+		 <td>$!depository.name</td>
+		 <td>$!depository.address</td>
+		 <td><a href="#" onclick="return depositoryCheck($!depository.id);">盘点</a></td>
+	  </tr>
+	  #end
+
+    </table>
+  </div>
+
+<!-- 库位列表 -->
+<div>库位列表：</div>
+	<div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable">
+      <tr>
+		<th>仓库名称</th>
+        <th>库位编号</th>
+        <th>库位名称</th>
+        <th>操作</th>
+      </tr>
+	  #foreach($depLocation in $depLocations)
+	  <tr>
+		  <td>$!depLocation.depName</td>
+		  <td>$!depLocation.id</td>
+		  <td>$!depLocation.locName</td>
+		  <td><a href="#" onclick="return locCheck($!depLocation.id);">盘点</a></td>
+	  </tr>
+	  #end
+    </table>
+  </div>
+	           <script language="javascript" type="text/javascript">
+                        function showDep()
+                        {
+                        var depFirstId = document.getElementById("depFirstId").value;
+                         location.href='$appServer/storage/add_storage_check.html?depFirstId='+depFirstId;
+                        }
+
+                		function depositoryCheck(sid){
+                		var answer = confirm("盘点这个仓库?")
+                		if (answer){
+                			window.location = '$appServer/storage/addStorageCheck.html?depId='+sid;
+                		}
+
+                		}
+
+                		function locCheck(sid){
+                		var answer = confirm("盘点这个库位?")
+                		if (answer){
+                			window.location = '$appServer/storage/addStorageCheck.html?locId='+sid;
+                		}
+
+                		}
+                </script>
+
+</div>
+</div>

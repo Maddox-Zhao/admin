@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SumGoodsSQL">
+	<typeAlias alias="sumGoods"	type="com.huaixuan.network.biz.domain.goods.SumGoods" />
+
+	<!-- create SumGoods object -->
+	<insert id="addSumGoods" parameterClass="sumGoods">
+		<![CDATA[
+insert into emall_sum_goods
+  (id, lising_goods_number, new_lising_goods_num, gmt_create, gmt_modify)
+values
+  (null, #lisingGoodsNumber#, #newLisingGoodsNum#, sysdate(), sysdate())
+
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+
+	<!-- update Goods object -->
+	<update id="editSumGoods" parameterClass="sumGoods">
+		<![CDATA[
+update emall_sum_goods
+   set lising_goods_number  = #lisingGoodsNumber#,
+       new_lising_goods_num = #newLisingGoodsNum#,
+       gmt_modify           = sysdate()
+
+]]>
+	</update>
+
+	<select id="getSumGoods" resultClass="sumGoods">
+		<![CDATA[
+select id                   as id,
+       lising_goods_number  as lisingGoodsNumber,
+       new_lising_goods_num as newLisingGoodsNum,
+       gmt_create           as gmtCreate,
+       gmt_modify           gmtModify
+  from emall_sum_goods
+
+]]>
+	</select>
+
+</sqlMap>

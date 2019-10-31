@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="UserSalesSQL">
+	<resultMap id="userSalesResult" class="com.huaixuan.network.biz.domain.user.UserSales">
+         <result column="id" property="id"/>
+         <result column="user_id" property="userId"/>
+         <result column="admin_id" property="adminId"/>
+         <result column="opt_time" property="optTime"/>
+         <result column="trade_num" property="tradeNum"/>
+         <result column="sales_amount" property="salesAmount"/>
+         <result column="refund_amount" property="refundAmount"/>
+	</resultMap>
+	<resultMap id="userSalesInfoResult" class="com.huaixuan.network.biz.domain.user.UserSales">
+         <result column="trade_num" property="tradeNum" nullValue="0"/>
+         <result column="sales_amount" property="salesAmount" nullValue="0"/>
+	</resultMap>
+	<resultMap id="userSalesRecordResult" class="com.huaixuan.network.biz.domain.user.UserSales">
+	      <result column="user_id" property="userId"/>
+	      <result column="account" property="account"/>
+          <result column="trade_num" property="tradeNum"/>
+          <result column="sales_amount" property="salesAmount"/>
+          <result column="refund_amount" property="refundAmount"/>
+          <result column="type" property="userType"/>
+          <result column="rankNum" property="rankNum"/>
+	</resultMap>
+	<resultMap id="salesManRecordResult" class="com.huaixuan.network.biz.domain.user.UserSales">
+	      <result column="admin_id" property="adminId"/>
+	      <result column="user_name" property="saleName"/>
+          <result column="trade_num" property="tradeNum"/>
+          <result column="sales_amount" property="salesAmount"/>
+          <result column="refund_amount" property="refundAmount"/>
+          <result column="rankNum" property="rankNum"/>
+	</resultMap>
+    <resultMap id="userTradeDetailResult" class="com.huaixuan.network.biz.domain.trade.Trade">
+           <result column="tid" property="tid"/>
+           <result column="gmt_create" property="gmtCreate"/>
+           <result column="amount" property="amount"/>
+           <result column="express_payment" property="expressPayment"/>
+           <result column="status" property="status"/>
+           <result column="dep_first_id" property="depFirstId"/>
+           <result column="is_wholesale" property="isWholesale"/>
+    </resultMap>
+
+
+	<insert id="addUserSales" parameterClass="com.huaixuan.network.biz.domain.user.UserSales">
+	<![CDATA[
+	insert into emall_user_sales
+	  (id,
+	   user_id,
+	   admin_id,
+	   opt_time,
+	   trade_num,
+	   sales_amount,
+	   refund_amount)
+	values
+	  (null,
+	   #userId#,
+	   #adminId#,
+	   #optTime#,
+	   #tradeNum#,
+	   #salesAmount#,
+	   #refundAmount#)
+	]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+<select id="getUserSalesInfo" resultMap="userSalesInfoResult" parameterClass="java.util.Map">
+  <![CDATA[
+     select 
+       count(s.tid) as trade_num,
+       sum(s.goods_amount) as sales_amount
+     from emall_trade            s,
+     	  emall_trade_package    p,
+          ioss_out_depository    a
+     where s.status in ('trade_finish', 'wait_buyer_confirm_goods')
+       and a.relation_num = p.merge_tid
+       and s.tid = p.tid
+       and a.status = 'out_finished'
+       and a.type = 'out_sales'
+  ]]>
+  <isNotEmpty prepend="and" property="userId">
+       s.buy_id = #userId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_out_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+
+<select id="getUserRefundInfo" parameterClass="java.util.Map" resultClass="java.lang.Double">
+  <![CDATA[
+     select 
+       coalesce(sum(er.fact_fee), 0)
+     from ioss_in_depository a, emall_refund r, emall_refund_order er
+     where r.refund_id = er.refund_id
+       and r.status = 'success'
+       and a.relation_num = r.refund_id
+       and a.status = 'in_finished'
+       and a.type = 'in_sales_refund'
+  ]]>
+  <isNotEmpty prepend="and" property="userId">
+        r.buy_id = #userId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_in_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_in_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+</select>
+
+<select id="getUserSalesListsByParameterMap" parameterClass="java.util.Map" resultMap="userSalesRecordResult">
+	
+  <![CDATA[
+	select eu.user_id as user_id,
+       u.account,
+       u.type,
+       coalesce(sum(eu.trade_num), 0) as trade_num,
+       coalesce(sum(eu.sales_amount), 0) as sales_amount,
+       coalesce(sum(eu.refund_amount), 0) as refund_amount
+  from emall_user_sales eu, emall_users u
+ where eu.user_id = u.id
+  ]]>
+  <isNotEmpty prepend="and" property="customerName">
+     u.account like concat('%',#customerName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ eu.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ eu.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+ group by eu.user_id, u.account,u.type
+ order by coalesce(sum(eu.sales_amount), 0) desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getUserSalesCountByParameterMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+  select count(1) from
+     (select eu.user_id as user_id,
+       u.account,
+       u.type,
+       coalesce(sum(eu.trade_num), 0) as trade_num,
+       coalesce(sum(eu.sales_amount), 0) as sales_amount,
+       coalesce(sum(eu.refund_amount), 0) as refund_amount
+  from emall_user_sales eu, emall_users u
+ where eu.user_id = u.id
+  ]]>
+  <isNotEmpty prepend="and" property="customerName">
+     u.account like concat('%',#customerName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ eu.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ eu.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+  group by eu.user_id, u.account,u.type ) cc
+</select>
+
+<select id="getSalesManListsByParameterMap" parameterClass="java.util.Map" resultMap="salesManRecordResult">
+	
+  <![CDATA[
+select eu.admin_id,
+       a.user_name,
+       coalesce(sum(eu.trade_num), 0) as trade_num,
+       coalesce(sum(eu.sales_amount), 0) as sales_amount,
+       coalesce(sum(eu.refund_amount), 0) as refund_amount
+  from emall_user_sales eu, emall_admin a
+ where eu.admin_id = a.id
+  ]]>
+  <isNotEmpty prepend="and" property="saleName">
+     a.user_name like concat('%',#saleName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ eu.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ eu.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+ group by eu.admin_id,a.user_name
+ order by coalesce(sum(eu.sales_amount), 0) desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getSalesManCountByParameterMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+  select count(1) from
+     (select eu.admin_id,
+       a.user_name,
+       coalesce(sum(eu.trade_num), 0) as trade_num,
+       coalesce(sum(eu.sales_amount), 0) as sales_amount,
+       coalesce(sum(eu.refund_amount), 0) as refund_amount
+  from emall_user_sales eu, emall_admin a
+ where eu.admin_id = a.id
+  ]]>
+  <isNotEmpty prepend="and" property="saleName">
+     a.user_name like concat('%',#saleName#,'%')
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeStart">
+       <![CDATA[ eu.opt_time >= STR_TO_DATE(#gmtOptTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="gmtOptTimeEnd">
+       <![CDATA[ eu.opt_time <  DATE_ADD(STR_TO_DATE(#gmtOptTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+  </isNotEmpty>
+  group by eu.admin_id,a.user_name) cc
+</select>
+
+<select id="getUserTradeDetail" parameterClass="java.util.Map" resultMap="userTradeDetailResult">
+	
+  <![CDATA[
+  select s.tid,
+       s.gmt_create,
+       s.amount,
+       s.express_payment,
+       s.status,
+       s.dep_first_id,
+       s.is_wholesale
+  from emall_trade s, 
+  	   emall_trade_package p,
+  	   ioss_out_depository a
+ where s.status in ('trade_finish', 'wait_buyer_confirm_goods') 
+ 	and a.relation_num = p.merge_tid
+    and s.tid = p.tid
+ 	and a.status = 'out_finished' 
+ 	and a.type = 'out_sales'
+  ]]>
+  <isNotEmpty prepend="and" property="userId">
+      s.buy_id = #userId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_out_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+  </isNotEmpty>
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</select>
+
+<select id="getUserTradeDetailCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+    select count(1) from
+    (select s.tid,
+       s.gmt_create,
+       s.amount,
+       s.express_payment,
+       s.status,
+       s.dep_first_id,
+       s.is_wholesale
+  from emall_trade s, 
+  	   emall_trade_package p,
+  	   ioss_out_depository a
+ where s.status in ('trade_finish', 'wait_buyer_confirm_goods') 
+ 	and a.relation_num = p.merge_tid
+    and s.tid = p.tid
+  	and a.status = 'out_finished' 
+  	and a.type = 'out_sales'
+  ]]>
+  <isNotEmpty prepend="and" property="userId">
+      s.buy_id = #userId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataStart">
+       <![CDATA[ a.gmt_out_dep >= STR_TO_DATE(#dataStart#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="dataEnd">
+       <![CDATA[ a.gmt_out_dep <  DATE_ADD(STR_TO_DATE(#dataEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)  ]]>
+  </isNotEmpty>
+  ) cc
+</select>
+
+<delete id="deleteUserSalesByParameterMap" parameterClass="java.util.Map">
+  <![CDATA[
+    delete from emall_user_sales eu where 1=1
+  ]]>
+   <isNotEmpty prepend="and" property="searchDay">
+       <![CDATA[ eu.opt_time = STR_TO_DATE(#searchDay#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+</delete>
+
+<select id="getSearchDayByMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+  <![CDATA[
+  select count(1) from(
+   select * from emall_user_sales where 1=1
+   ]]>
+  <isNotEmpty prepend="and" property="searchDay">
+       <![CDATA[ emall_user_sales.opt_time = STR_TO_DATE(#searchDay#,'%Y-%m-%d %H:%i:%s') ]]>
+  </isNotEmpty>
+  )aa
+</select>
+</sqlMap>

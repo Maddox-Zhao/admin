@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ActivityUsersSQL">
+<typeAlias alias="activityUsers" type="com.huaixuan.network.biz.domain.shop.ActivityUsers"/>
+	<resultMap class="activityUsers" id="activityUsersResult">
+		<result column="Id" property="id"/>
+		<result column="users_id" property="usersId"/>
+		<result column="act_id" property="actId"/>
+		<result column="act_type" property="actType"/>
+		<result column="trade_id" property="tradeId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create ActivityUsers object -->
+<insert id="addActivityUsers" parameterClass="activityUsers">
+<![CDATA[
+		insert into emall_activity_users
+		(Id,users_id,act_id,act_type,trade_id,gmt_create,gmt_modify )values( null,
+		#usersId#,
+		#actId#,
+		#actType#,
+		#tradeId#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ActivityUsers object -->
+<update id="editActivityUsers" parameterClass="activityUsers">
+<![CDATA[
+		update emall_activity_users set users_id = #usersId#,
+		act_id = #actId#,
+		act_type = #actType#,
+		trade_id = #tradeId#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = #gmtModify#
+		 where Id = #id#
+
+]]>
+</update>
+<!-- delete ActivityUsers object -->
+<delete id="removeActivityUsers" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_activity_users where emall_activity_users.ID = #value#
+]]>
+</delete>
+<!-- search ActivityUsers object -->
+<select id="getActivityUsers" parameterClass="java.lang.Long" resultMap="activityUsersResult">
+<![CDATA[
+		select emall_activity_users.* from emall_activity_users where emall_activity_users.ID = #value#
+]]>
+</select>
+<!-- searchAll ActivityUsers List -->
+<select id="getActivityUserss" resultMap="activityUsersResult">
+<![CDATA[
+		select emall_activity_users.* from emall_activity_users
+]]>
+</select>
+
+<!-- searchAll ActivityUsers List -->
+<select id="countActivityUserssByParMap" resultClass="java.lang.Integer" >
+<![CDATA[
+		select count(*) from emall_activity_users where 1=1
+]]>
+		<isNotEmpty prepend="and" property="usersId">
+			users_id = #usersId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="actId">
+			act_id = #actId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="actType">
+			act_type = #actType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="tradeId">
+			trade_id = #tradeId#
+		</isNotEmpty>
+</select>
+</sqlMap>

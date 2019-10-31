@@ -1,0 +1,408 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>采购订单详情</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+ 
+<body style="background-color:#e3e6e8">
+  <div id="form1"  >
+        <table style="border-collapse:separate; border-spacing:10px;">
+            
+            <tr>
+                <td>
+                    <label >ID：</label>
+                </td>
+                <td>
+                    <input id="idPurchaseLifeCycle"  name="idPurchaseLifeCycle" style="width:120px" class="mini-textbox"  readOnly="true"/>
+					<input id="idPurchase"  name="idPurchase" style="display:none" class="mini-textbox"   />
+                </td>
+        
+                <td>
+                    <label>货源：</label>
+                </td>
+                <td>
+                    <input id="supplyName"  name="supplyName" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+				
+             
+                <td>
+                    <label >金额：</label>
+                </td>
+                <td>
+                    <input id="subTotal"  name="subTotal" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+				
+				 <td rowspan="2">
+                    <a class="mini-button" id="submit"   style="width:150px;">清除原始文件</a>
+                </td>
+            </tr>
+            <tr >
+                <td>
+                    <label >运费：</label>
+                </td>
+                <td>
+                      <input id="extraFee"  name="extraFee" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+             
+                <td>                   
+                    <label>额外费用：</label>
+                </td>
+                <td>
+                    <input id="extraFee"  name="extraFee" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+				
+				 <td>                   
+                    <label>供货商欠款：</label>
+                </td>
+                <td>
+                    <input id="supplyDebt"  name="supplyDebt" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+				
+            </tr>
+			
+			  <tr>
+                <td>                   
+                    <label>付款账号：</label>
+                </td>
+                <td style="width:50px" align="center">
+                            <input name="idPayAccount" onenter=""  class="mini-combobox"   textField="name" valueField="idPayAccount" emptyText="请选择..."  
+								url="/purchase/bank.html"   allowInput="true" showNullItem="true" nullItemText="请选择..."/> 
+                </td>
+            
+                <td>
+						 <label>汇率：</label>
+                </td>
+                <td>
+                      <input id="exchangeRate"  name="exchangeRate" style="width:120px" class="mini-textbox" />
+                </td>
+				<td>
+						 <label>货代公司：</label>
+                </td>
+				<td style="width:50px" align="center">
+                            <input name="idProxyAgency" onenter=""  class="mini-combobox"   textField="name" valueField="idProxyAgency" emptyText="请选择..."  
+								url="/purchase/company.html"   allowInput="true" showNullItem="true" nullItemText="请选择..."/> 
+                </td>
+				 <td rowspan="2">
+                    <a class="mini-button" id="submit"   style="width:150px;">查看原始文件</a>
+                </td>
+            </tr>
+			
+			
+			  <tr>
+                <td>                   
+                    <label>航班日期：</label>
+                </td>
+				<td> 
+					<input id="sentDate" name="sentDate" class="mini-datepicker"  format="yyyy-MM-dd" />
+				</td>
+                <td>
+						 <label>货款状态：</label>
+                </td>
+                <td>
+                      <input id="idMoneyStatus"  name="moneyStatus" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+				<td>
+						 <label>订单状态：</label>
+                </td>
+                <td>
+                      <input id="idStatus"  name="status" style="width:120px" class="mini-textbox"  readOnly="true"/>
+                </td>
+            </tr>
+			
+			<tr>
+                <td>                   
+                    <label>税率：</label>
+                </td>
+                <td>
+                   <input id="taxesReate"  name="taxesReate" vtype="float" style="width:120px" class="mini-textbox"  />
+                </td>
+            
+                
+            </tr>
+			 
+			<tr>
+                <td>                   
+                    <label>备注：</label>
+                </td>
+                <td colspan="3">
+                   <input id="remark"  name="remark" style="width:320px;height:120px" class="mini-textarea" />
+                </td>
+				<td class="siteId" style="visibility: hidden;">                   
+                    <label>站点：<br/>
+							  年份：<br/>
+							  季节：
+					</label>
+                </td>
+                <td class="siteId" style="visibility: hidden;">
+                   <input id="siteId"  name="siteId"  class="mini-combobox"  textField="value" valueField="id" data="statusData" /><br/>
+				   <input id="years"  name="years"  class="mini-combobox"  textField="value" valueField="id" data="yearsData" /><br/>
+				   <input id="month"  name="month"  class="mini-textbox"    />
+                </td>
+              <td rowspan="2">
+                    <a class="mini-button" id="showProduct"   style="width:150px;"   href="/purchaseproduct/purchaseProducts.html?idPurchaseLifeCycle="  target="_blank">查看/修改采购产品</a>
+               </td>
+            </tr>
+			
+			
+         
+			 
+			 
+		</table>
+   </div>
+ 
+     <div style="text-align:center;padding:50px;"> 
+		
+	  <a class="mini-button" id="update" onclick="updateFn" style="width:90px;margin-right:20px;">更新</a>
+	  #if($!adminAccess.has("A_PURCHASE_MANAGER_INSTOCK"))	  
+		<a class="mini-button" id="instocBtn" onclick="instockFn" style="width:90px;margin-right:20px;display:none">产品入库</a>
+	  #end
+	  #if($!adminAccess.has("A_ORDER_PAY"))
+		<a class="mini-button" id="confirmBtn" onclick="confirmFn" style="width:90px;margin-right:20px;display:none">确认订单</a>
+	  #end
+      <a class="mini-button" onclick="onCancel" style="width:60px;margin-right:20px;">取消</a>
+     </div>  
+    </div> 
+   </div>
+  </form>  
+
+  <script type="text/javascript">
+            var statusData = [{id: 104, value: "帝国中心608"},{id: 103, value: "帝国中心408"},{ id: 101,value: "尚上总仓"},{ id: 209,value: "紫安仓"} ]
+			
+			//年份
+            var nowDate = new Date();
+			var nowYear = nowDate.getFullYear();
+			var beforYear = nowYear-1;
+			var yearsData = [];
+			yearsData[0] = {id: beforYear,value: beforYear};
+			yearsData[1] = {id: nowYear,value: nowYear};
+			for(var i = 0; i < 4;i++)
+			{
+				yearsData[i+2] = {id: nowYear+i+1,value: nowYear+i+1};
+			}
+			 
+			mini.parse();
+            var form = new mini.Form("form1");
+   			var idProduct = '';
+			
+            function SetData(data) {
+              
+                //跨页面传递的数据对象，克隆后才可以安全使用
+                data = mini.clone(data);
+				idProduct = data.id;
+				
+				jQuery("#showProduct").attr("href","/purchaseproduct/purchaseProducts.html?idPurchaseLifeCycle="+data.idPurchaseLifeCycle);
+                jQuery.ajax({
+                    url: "/purchase/list.html?idPurchaseLifeCycle=" + data.idPurchaseLifeCycle,
+                    cache: false,
+                    success: function(text) {
+						
+                        var o = mini.decode(text);    //反序列化成对象
+						if(o.total == 1)
+						{
+							var resultData = o.data[0];
+							if(resultData.subTotal)
+								resultData.subTotal = resultData.subTotal.toFixed(2);
+                            form.setData(resultData);
+    						
+    						if(resultData.idStatus == 14)
+							{
+								jQuery("#instocBtn").show();
+								jQuery(".siteId").css("visibility","visible");
+							}
+							if(resultData.idStatus == 11)
+							{
+								jQuery("#confirmBtn").show();
+								
+							}
+							 
+						}
+						
+                    }
+                });
+                
+            }
+            
+            function GetData() {
+			   form.validate();
+               if (form.isValid() == false) return;
+
+                var o = form.getData();
+                return o;
+            }
+			
+			
+            function CloseWindow(action) {
+                if (action == "close" && form.isChanged()) {
+                    if (confirm("数据被修改了，是否先保存？")) {
+                        return false;
+                    }
+                }
+                if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+                else window.close();
+            }
+			
+			 
+			
+			//入库
+			function  instockFn()
+			{
+				var data = GetData(); 
+				var siteId = mini.get("siteId").getValue();
+				if(!siteId)
+				{
+					mini.alert("请选择站点");
+					return ;
+				} 
+				data.idLocation = siteId; //idLocation 必须
+				
+				
+				var years = mini.get("years").getValue();
+				if(!years)
+				{
+					mini.alert("请选择年份");
+					return ;
+				} 
+				var month = mini.get("month").getValue();
+				if(!month)
+				{
+					mini.alert("请填写季节");
+					return ;
+				} 
+
+				var siteName = mini.get("siteId").getText();
+				if(data == undefined){return;}
+				 if (!confirm("确定录入【" + siteName + "】?")) {
+                        return false;
+                 }
+				 
+				
+				mini.mask({
+                    el: document.body,
+                    cls: 'mini-mask-loading',
+                    html: '提交中,时间较长,请勿关闭...'
+                });
+				jQuery.post("/purchase/purchaseProductInStock.html",data,function(text){
+					mini.unmask(document.body);
+					if(text)
+					{
+						 mini.alert("成功入库【" + text + "】条记录");
+						 jQuery("#instocBtn").hide();
+					}
+					else
+					{
+						mini.alert("入库失败，联系管理员");
+					}
+					 
+				})
+			 
+			}
+		  
+	
+		 function selectProduct() {
+          	  var row = GetData();
+			  var idPurchaseLifeCycle = mini.get("idPurchaseLifeCycle").getValue();
+               if(idPurchaseLifeCycle){
+			    mini.open({
+                url: "purchaseProduct.html",
+                title: "采购产品详情",
+                width: 1100,
+                height: 520,
+                onload: function() {
+                    var iframe = this.getIFrameEl();
+					var data = {
+						id: idPurchaseLifeCycle,
+					};
+                    iframe.contentWindow.SetData(data);
+                },
+           
+            });
+			
+			}
+        }
+		
+		
+		
+		//更新税率和备注
+		function  updateFn()
+		{
+			var data = GetData();
+			var date = mini.get("sentDate").getValue();
+			data.sentDate = formatDate(date);
+			var resultData = {idPurchaseLifeCycle:data.idPurchaseLifeCycle,taxesReate: data.taxesReate,remark: data.remark,sentDate:data.sentDate};
+			mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '提交中,请勿关闭...'
+            });
+			jQuery.post("/purchase/updatePurchaseLifecyle.html",resultData,function(text){
+				mini.unmask(document.body);
+				if(text == "ok")
+				{
+					 mini.alert("更新成功");
+				}
+				else
+				{
+					mini.alert("更新失败，联系管理员");
+				}
+				 
+			})
+		 
+		}
+		//确认付款账号，汇率，货代公司，航班日期，修改货款状态和订单状态为确认，已发货
+		function confirmFn(){
+			var data = GetData();
+			var date = mini.get("sentDate").getValue();
+			data.sentDate = formatDate(date);
+			var resultData = {
+			idPurchaseLifeCycle:data.idPurchaseLifeCycle,
+			idPayAccount:data.idPayAccount,
+			exchangeRate:data.exchangeRate,
+			idProxyAgency:data.idProxyAgency,
+			idMoneyStatus:23,
+			sentDate:data.sentDate,
+			idStatus:14
+			};
+			mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '提交中,请勿关闭...'
+            });
+			jQuery.post("/purchase/confirmPurchaseLifecyle.html",resultData,function(text){
+				mini.unmask(document.body);
+				if(text == "ok")
+				{
+					 mini.alert("确认订单成功");
+				}
+				else
+				{
+					mini.alert("确认订单失败，联系管理员");
+				}
+				 
+			})
+		}
+		
+		    function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+             var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += " " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+        function onCancel(e) {
+            CloseWindow("cancel");
+        }
+</script>   
+ </body>
+</html>

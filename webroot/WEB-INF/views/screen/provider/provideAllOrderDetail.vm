@@ -1,0 +1,336 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>供应商产品订单详情</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+
+</head>
+
+<body>
+	 <form id="excelForm"  action="/HxStockOrder/exportStockOrderDetail.html" method="post" target="excelIFrame" enctype="multipart/form-data" name="uploadForm">
+       <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0"  cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:70px;">推送订单号:</td>
+                    <td style="width:180px">
+                        <input name="tradeId" class="mini-textbox" onenter="search()"/>
+                    </td>					
+
+				   <td class="form-label" style="width:70px;">下单时间：</td>
+                    <td style="width:340px" colspan="2">
+                        <input id="createDateStart" name="createDateStarts" class="mini-datepicker"    format="yyyy-MM-dd"  />
+                        ~
+                        <input id="createDateEnd"  name="createDateEnds" class="mini-datepicker"    format="yyyy-MM-dd" />
+                    </td>
+				   <td style="width:70px;">订单平台:</td>
+                    <td >
+						<input name="sellPlatform" class="mini-combobox" textField="value" valueField="id" emptyText="请选择..."
+						data="ptypeData" allowInput="false" showNullItem="true" nullItemText="请选择..."/>
+                    </td>             
+					
+					
+				</tr>
+                <tr>
+				<td class="form-label" style="width:60px;" >供应商sku:</td>
+                    <td style="width:150px">
+                        <input name="ProdId" class="mini-textbox" onenter="search()"/>
+                    </td>
+					<td class="form-label" style="width:70px;">我们的sku:</td>
+                    <td style="width:150px">
+                        <input name="itemId" class="mini-textbox" onenter="search()"/>
+                    </td>
+					
+					<td rowspan="2">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>	
+						<a class="mini-button" iconCls="icon-add"   onclick="postOrder()">推送订单</a>
+						##<a class="mini-button" iconCls="icon-add" onclick="addOrder()">添加订单</a>
+						<a class="mini-button" iconCls="icon-download" onclick="exportProdOrderDetalis()">导出</a>
+                    </td>
+				</tr>
+            </table>
+        </div>
+    </div>
+  </form>
+	<iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:450px;"  allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        url="/provider/selectSearchOrderDetalis.html" onRowdblclick="edit()"  idField="id"    pageSize="50" allowAlternating="true" pageIndex="1"  oncellendedit="cellendedit">
+        <div property="columns">
+            
+            <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+            ##<div field="id" width="60" headerAlign="center" align="center" allowSort="true">id</div>
+			<div field="originalTradeId" width="200" headerAlign="center" align="center" allowSort="true">平台订单号</div>
+			<div field="tradeId" width="200" headerAlign="center" align="center" allowSort="true">推送订单号</div>
+			##<div field="ptype" width="120" headerAlign="center" align="center"  allowSort="true" renderer="ptype">订单平台</div>
+			<div field="prodId" width="120" headerAlign="center" align="center"  allowSort="true">供应商sku</div>
+			<div field="itemId" width="120" headerAlign="center" align="center"  allowSort="true">尚上sku</div>
+			
+			##<div field="totalPrice" width="120" headerAlign="center" align="center"  allowSort="true">订单总额</div>
+			##<div field="payPrice" width="120" headerAlign="center" align="center"  allowSort="true">实付金额</div>
+			<div field="sellPrice" width="120" headerAlign="center" align="center"  allowSort="true">商品供货价</div>
+			<div field="ourSellPrice" width="120" headerAlign="center" align="center"  allowSort="true">商品售价</div>
+			<div field="qty" width="120" headerAlign="center" align="center"  allowSort="true">数量</div>
+			<div field="insertTime" width="120" headerAlign="center" align="center"  allowSort="true">插入时间</div>
+			
+			<div field="createTime" width="120" headerAlign="center" align="center"  allowSort="true">下单时间</div>
+			<div field="payTime" width="120" headerAlign="center" align="center"  allowSort="true">支付时间</div>
+			<div field="title" width="370" headerAlign="center" align="center"  allowSort="true">商品名称</div>
+			<div field="freight" width="120" headerAlign="center" align="center"  allowSort="true">运费</div>
+			
+			
+			<div field="sellPlatform" width="120" headerAlign="center" align="center"  allowSort="true" renderer="ptype">售卖的平台</div>
+			<div field="provider" width="120" headerAlign="center" align="center"  allowSort="true" renderer="pty">供应商平台</div>
+	    	<div field="userName" width="120" headerAlign="center" align="center"  allowSort="true">收件人</div>
+			<div field="phone" width="120" headerAlign="center" align="center"  allowSort="true">联系电话</div>
+			
+			<div field="province" width="120" headerAlign="center" align="center"  allowSort="true">省</div>
+            <div field="city" width="120" headerAlign="center" align="center">市</div>	
+			<div field="region" width="120" headerAlign="center" align="center"  allowSort="true">区</div>
+			<div field="location" width="120" headerAlign="center" align="center"  allowSort="true">详细地址</div>
+ </div>
+    </div>
+    <script type="text/javascript">
+	   
+		var ptypeData=[{id:"Mlh",value:"魅力惠"},{id:"xhs",value:"小红书"},{id:"Ofashion",value:"Ofashion"},{id:"weimob",value:"weimob"},{id:"zp",value:"珍品"},{id:"kaola",value:"考拉"},{id:"tmall",value:"天猫"},{id:"fql",value:"分期乐"},{id:"pdd",value:"拼多多"},{id:"siku",value:"寺库"},{id:"yinTai",value:"银泰"},{id:"sikunew",value:"寺库香港"},{id:"shepin",value:"天猫奢品"}]
+		//将html标签解析为miniui控件
+		mini.parse();
+		//根据id获取控件对象
+		var grid = mini.get("datagrid1");
+		
+		
+		function ptype(row){
+		 if(row.value =='Mlh') return "魅力惠";
+		 else if (row.value=='xhs') return "小红书";
+		 else if (row.value=='Ofashion') return "Ofashion";
+		 else if (row.value=='weimob') return "weimob";
+		 else if (row.value=='zp') return "珍品";
+		 else if (row.value=='kaola') return "考拉";
+		 else if (row.value=='tmall') return "天猫";
+		 else if (row.value=='fql') return "分期乐";
+		 else if (row.value=='pdd') return "拼多多";
+		 else if (row.value=='siku') return "寺库";
+		 else if (row.value=='yinTai') return "银泰";
+		 else if (row.value=='sikunew') return "寺库香港";
+		 else if (row.value=='shepin') return "天猫奢品";
+		 else return "";
+		}
+		
+		function pty(row){
+		 if(row.value =='xiyou') return "西有银泰";
+		 else if (row.value=='yshang') return "云尚";
+		 else return "";
+		}
+		
+		search();
+		 //查询
+        function search() {
+		     //提交表单数据
+            var form = new mini.Form("#form1");
+            var data = form.getData();//获取表单多个控件的数据		
+			
+			if(!data.tradeId)
+				delete data.tradeId;
+				
+			if(!data.ProdId)
+				delete data.ProdId;
+				
+			if(!data.itemId){
+				delete data.itemId;
+				}
+				
+				//处理日期
+			if(!data.createDateStart){
+			  delete data.createDateStart;
+			}
+			if(!data.createDateEnd){
+			  delete data.createDateEnd;
+			}
+			
+			
+			if(!data.createDateStarts){
+			  delete data.createDateStarts;
+			}
+			if(!data.createDateEnds){
+			  delete data.createDateEnds;
+			}
+			
+			//处理日期
+            var date = mini.get("createDateStart").getValue();
+            if (date instanceof Date) {
+                data.createDateStarts = formatDate(date);
+            }
+            var date = mini.get("createDateEnd").getValue();
+            if (date instanceof Date) {
+                data.createDateEnds = formatDate(date);
+            }
+            grid.load(data);
+			
+			
+        }
+		
+		//处理时间
+		 function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		
+		function postOrder() {
+             var rows = grid.getSelecteds();
+             
+			 if(rows.length==1){
+                if (confirm("确定推送订单吗？")) {
+				var orderId = rows[0].tradeId;
+				var prodId = rows[0].prodId;
+				 mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿刷新...'
+                    });
+                    jQuery.ajax({
+                        url: "/provider/pushOrder.html",
+						type: 'POST',
+						data: {orderId:orderId,prodId:prodId},
+                        success: function(data) {
+							mini.unmask();
+							if(data.code == "100")
+							{
+								mini.alert(data.message);
+							}
+							else if(data.code == "300")
+							{
+								mini.alert(data.message);
+							}
+							else if(data.code == "200")
+							{
+								mini.alert(data.message);
+							}else{
+							mini.alert(data.message);
+							} 
+                        },
+                        error: function() {}
+                    });
+
+				}
+			 
+			 }else{
+			  alert("请选中一条记录");
+			 }
+        }
+		
+		
+		 //导出
+        function exportStockDatailOrder() {
+
+			var excelForm = document.getElementById("excelForm");
+	  		excelForm.submit();
+        }
+		
+		
+		function edit() {
+            var row = grid.getSelected();
+    		//alert(row.tradeId)
+            if (row) {
+               var win = mini.open({
+                    url: "/provider/toProviderEdit.html",
+                    title: "订单详情",
+                    width: 1100,
+                    height: 500,
+                    onload: function() {
+    				    var iframe = this.getIFrameEl();
+                        iframe.contentWindow.setData(row);
+    					iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                       grid.reload();
+                    }
+                });
+            }
+	}
+	
+	
+	
+	function addOrder() {
+               mini.open({
+                url: "/provider/toAddOrder.html",
+                title: "添加订单",
+                width: 400,
+                height: 200,
+                onload: function() {
+                    
+                },
+                ondestroy: function(action) {
+                    grid.reload();
+                }
+            });
+        }
+		
+		
+		
+//导出
+        function exportProdOrderDetalis() {
+		
+		
+		  
+            var form = new mini.Form("#form1");
+			
+            var data = form.getData(); //获取表单多个控件的数据   
+			if(!data.tradeId)
+				delete data.tradeId;
+				
+			if(!data.ProdId)
+				delete data.ProdId;
+				
+			if(!data.itemId){
+				delete data.itemId;
+				}
+				
+				//处理日期
+			if(!data.createDateStart){
+			  delete data.createDateStart;
+			}
+			if(!data.createDateEnd){
+			  delete data.createDateEnd;
+			}
+			
+			
+			if(!data.createDateStarts){
+			  delete data.createDateStarts;
+			}
+			if(!data.createDateEnds){
+			  delete data.createDateEnds;
+			}
+			
+			//处理日期
+            var date = mini.get("createDateStart").getValue();
+            if (date instanceof Date) {
+                data.createDateStarts = formatDate(date);
+            }
+            var date = mini.get("createDateEnd").getValue();
+            if (date instanceof Date) {
+                data.createDateEnds = formatDate(date);
+            }
+			var uploadForm = document.getElementById("excelForm");
+			uploadForm.action = "/provider/exportProdOrderDetalis.html";
+	  		uploadForm.submit();
+			
+        }
+	</script>
+</body>
+</html>

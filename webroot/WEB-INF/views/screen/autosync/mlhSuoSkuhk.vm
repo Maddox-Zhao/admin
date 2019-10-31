@@ -1,0 +1,18 @@
+#set($layout = '')
+<html>
+<head>
+	<title>新寺库HK-SKU</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" action="/timetask/touploadMlhSuoFileForhk.html"  enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			hk-新寺库sku对应关系 :<input type="file" name="mlh" /><br/>
+			<input type="hidden" name="type" value="hk" />
+			<input type="submit" value="上传"/>
+		</form>
+</body>
+
+</html>

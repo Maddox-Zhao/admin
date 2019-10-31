@@ -1,0 +1,118 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>部门详情</h2>
+		 
+		 <script type="text/javascript">
+		 	function check()
+			{
+				document.updateConsignment.submit();
+			};
+			
+		 </script>		
+		 
+#set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "updatesuccess")
+					修改成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+    </div>
+
+	##寄卖凭证信息
+	<form name="form1" id="form1" method="post" action="update.html" >
+		<span id="print">
+    	<div class="formBox">
+    		<h3><span>部门信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>部门编号：</th>
+							
+        			    <td style="width:240px;">$!{department.depCode}</td>
+        			    <th>部门名称：</th>
+        			    <td style="width:240px;">${department.name}</td>
+    				</tr>
+    				<tr>
+    					<th>上级部门：</th>
+        			    <td>$!{department.parentCode}</td>
+        			    <th>部门员工数：</th>
+        			    <td style="width:240px;">$!department.staffNum</td>
+    				</tr>
+    				<tr>
+						<th>创建时间：</th>
+    					<td>$!department.gmtCreate</td>
+    					<th>修改时间：</th>
+    					<td>$!department.gmtModify       </td>
+    				</tr>
+					<tr>
+						<th >
+							备注：
+						</th>
+						#springBind("department.id")
+						<input type="hidden" name="${status.expression}" value="$!department.id"/>
+						
+						<td colspan="3">
+							#springBind("department.note")
+							<textarea cols="70" rows="5" name="note" id="note">$!{department.note}</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<div class="form-but">
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.form1.submit()">保存</button>
+                               <a  href="/department/list.html" >返回 </a>
+                               
+								
+			
+   							</div>
+						</td>
+	
+					</tr>
+					
+    			</table>
+    		</div>					
+			
+			</div>
+		</div>
+		</span>
+	</form>
+	<br/>
+	
+##职务信息
+	<div class="formBox">
+	<h4><span>职务信息</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+					<tr> 
+    					<th style="text-align:center;">职务名称</th>
+    					<th style="text-align:center;">操作</th>
+					</tr>
+
+				#if($roles)
+				 #foreach($roles in $roles.entrySet())
+                 <tr #if($velocityCount%2 == 0) class="bg" #end height="40">
+					<td style="text-align:center;">$!roles.value</td>
+					<td style="text-align:center;">查看</td>
+                 </tr>
+				 #end					
+				#end
+				</table>
+			
+			</div>
+	</div>	
+##职务信息查询完毕

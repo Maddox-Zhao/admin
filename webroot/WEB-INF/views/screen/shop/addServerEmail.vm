@@ -1,0 +1,103 @@
+#set($layout = "layout/default.vm")
+<script src="${imageServer}/scripts/ckeditor/ckeditor.js" type="text/javascript">
+</script>
+
+#set($title = "站内信管理")
+		<div class="main">
+		<div class="formBox">
+				#if($!{str}=="update")<h2>修改站内信</h2> #else<h2>添加站内信</h2>#end
+        <form name="theForm"  action="/shop/saveWebSite.html" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="flag" name="flag" value="add" />
+			<input type="hidden" id="oldValue" name="oldValue" value="$!{webSiteEmail.content}" />
+			#springBind("webSiteEmail.id")
+             <input type="hidden" id="id" name="${status.expression}" value="$!webSiteEmail.id" />
+<div class="content">
+				<div class="form">
+               <ol>
+          <li>
+            <label>主题：</label>
+			<span class="con">
+				<ul>
+				<li>#springBind("webSiteEmail.title")
+					<input id="title" size="35" name="${status.expression}"  style="width:400px; "  value="$!webSiteEmail.title" >
+				</li>
+				<li><em>*</em></li>
+				</ul>
+				   </span>
+          </li>
+
+              <li>
+				<label>内容：</label>
+				<span class="con">
+				<ul>
+					<li>#springBind("webSiteEmail.content")
+					<textarea  id="content" rows="5" cols="35" name="${status.expression}">$!{status.value}</textarea>
+					<script type="text/javascript">
+            				CKEDITOR.replace( 'content' );
+                        </script>
+					</li>
+					<li><em>*</em></li>
+				</ul>
+				</span>
+	</li>
+
+                <!--
+                <tr>
+                <td class="label"><span class="require-field">*</span>绫诲瀷</td>
+                <td><select name="webSiteEmail.type" style="width:60px;">
+                                <option value="0" #if($!{webSiteEmail.type}=="0") selected #end>鍏憡</option>
+                                <option value="1" #if($!{webSiteEmail.type}=="1") selected #end>绉佷俊</option>
+                 </select>
+                </td></tr>
+                -->
+				  </ol>
+            </div></div>
+      </form>
+  <div class="form-but"><input class="button" value="确定" type="button" onclick="return checkWebSite();">
+    #if($!{str}=="update")
+	<input class="button" value="重置" type="reset" onclick="javascript:resetUpdateWebSite();">
+	#else
+		<input class="button" value="重置" type="reset" onclick="location.href='/shop/addServerMsg.html';">
+			#end
+		<input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div>
+
+
+<script type="text/javascript">
+function resetUpdateWebSite(){
+	window.location.href = "$appServer.get('/shop/updateAdminWebSite.html').addQueryData('id',$!{webSiteEmail.id}).addQueryData('str',"update")";
+
+}
+function checkWebSite(){
+
+        var msgTitle=document.getElementById("title").value;
+        var s=msgTitle;
+		s=jQuery.trim(s);
+        if(s==null||s.length==0){
+            alert("请输入主题!");
+            return false;
+        }
+        if(s.length>160){
+            alert("主题超长,请重新输入！");
+            document.getElementById("title").value='';
+            return false;
+        }
+
+        var msgContent=CKEDITOR.instances.content.getData();
+
+        var contents=msgContent;
+		contents=jQuery.trim(contents);
+        if(contents==null || contents.length==0){
+            alert("请输入信件内容!");
+            return false;
+        }
+        if(contents.length>1500){
+            alert("您输入的留言内容过长，超出字数限制!");
+            return false;
+        }
+
+        document.theForm.submit();
+    }
+
+</script>
+

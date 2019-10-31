@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="KeywordSQL">
+   <cacheModel id="keyword-cache" type="LRU">
+   		<flushInterval hours="24"/>
+	   <flushOnExecute statement="addKeyword"/>
+	   <flushOnExecute statement="editKeyword"/>
+	   <flushOnExecute statement="removeKeyword"/>
+	   <flushOnExecute statement="updateKeywordSort"/>
+	   <flushOnExecute statement="updateKeywordSortUpdtae"/>
+	   <flushOnExecute statement="updateKeywordSortsamll"/>
+	   <flushOnExecute statement="updateKeywordSortlow"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+<typeAlias alias="keyword" type="com.huaixuan.network.biz.domain.shop.Keyword"/>
+	<resultMap class="keyword" id="keywordResult">
+		<result column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="link" property="link"/>
+		<result column="desc_" property="desc"/>
+		<result column="sort" property="sort"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="shop_id" property="shopId"/>
+	</resultMap>
+<!-- create Keyword object -->
+<insert id="addKeyword" parameterClass="keyword">
+<![CDATA[
+insert into emall_keyword
+  (id,
+   name,
+   link,
+   emall_keyword.desc_,
+   sort,
+   gmt_create,
+   gmt_modify,
+   shop_id)
+values
+  (null, #name#, #link#, #desc#, #sort#, sysdate(), sysdate(), #shopId#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Keyword object -->
+<update id="editKeyword" parameterClass="keyword">
+<![CDATA[
+		update emall_keyword set name = #name#,
+		link = #link#,
+		emall_keyword.desc_ = #desc#,
+		sort = #sort#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Keyword object -->
+<delete id="removeKeyword" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_keyword where emall_keyword.ID = #value#
+]]>
+</delete>
+<!-- search Keyword object -->
+<select id="getKeyword" parameterClass="java.lang.Long" resultMap="keywordResult">
+<![CDATA[
+		select emall_keyword.* from emall_keyword where emall_keyword.ID = #value#
+]]>
+</select>
+<!-- searchAll Keyword List -->
+<select id="getKeywords" resultMap="keywordResult">
+<![CDATA[
+		select emall_keyword.* from emall_keyword order by emall_keyword.sort
+]]>
+</select>
+
+<!-- search Keyword object -->
+<select id="getKeywordMaxSort"  resultClass="java.lang.Long">
+<![CDATA[
+		select max(sort) from  emall_keyword a
+]]>
+</select>
+
+<update id="updateKeywordSort" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_keyword set
+		emall_keyword.sort = emall_keyword.sort+1,
+		gmt_modify = sysdate()
+		 where emall_keyword.sort >= #maxid#
+
+]]>
+</update>
+
+<update id="updateKeywordSortUpdtae" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_keyword set
+		emall_keyword.sort = emall_keyword.sort+1,
+		gmt_modify = sysdate()
+		 where emall_keyword.sort >= #maxid#
+			and emall_keyword.sort < #maxid2#
+]]>
+</update>
+
+<update id="updateKeywordSortlow" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_keyword set
+		emall_keyword.sort = emall_keyword.sort-1,
+		gmt_modify = sysdate()
+		 where emall_keyword.sort <= #maxid#
+			and emall_keyword.sort > #maxid2#
+]]>
+</update>
+
+<update id="updateKeywordSortsamll" parameterClass="java.util.Map">
+<![CDATA[
+		update emall_keyword set
+		emall_keyword.sort = emall_keyword.sort-1,
+		gmt_modify = sysdate()
+		 where
+		emall_keyword.sort > #sort#
+]]>
+</update>
+
+<select id="getKeywordsCount" resultClass="java.lang.Integer" parameterClass="java.lang.Long">
+<![CDATA[
+		select count(*) from emall_keyword
+		order by emall_keyword.sort,emall_keyword.id
+]]>
+</select>
+
+<select id="getKeywordsPage" parameterClass="java.util.Map"
+		resultMap="keywordResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+	select * from emall_keyword a
+	order by  a.sort,a.id
+]]>
+<include refid="pageSQLFoot"/>
+</select>
+
+</sqlMap>

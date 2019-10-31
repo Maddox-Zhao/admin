@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="LoginLogo">
+<typeAlias alias="loginLog" type="com.huaixuan.network.biz.domain.admin.LoginLogo"/>
+	<resultMap class="loginLog" id="LogResult">
+		<result column="id" property="id"/>
+		<result column="user" property="user"/>
+		<result column="time" property="time"/>	
+		<result column="ip" property="ip"/>		
+	</resultMap>
+
+<!-- create AdminLog object -->
+<insert id="addLoginLog" parameterClass="loginLog">
+  insert into login_logo values(null,#user#, sysdate(),#ip#)	
+	<selectKey resultClass="int" keyProperty="id" > 
+            SELECT @@IDENTITY AS ID 
+      </selectKey> 
+</insert>
+
+<select id="getLoginLogoLsitCount" resultClass="java.lang.Integer" parameterClass="java.util.Map" >
+	select count(*) from login_logo where 1=1
+	<isNotEmpty prepend="and" property="user">
+			user =#user#  
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="ip">
+			ip =#ip#  
+	</isNotEmpty>
+	<isNotEmpty property="inStockDateStart" prepend="and">
+			<![CDATA[  time >= #inStockDateStart# ]]>
+	</isNotEmpty>
+	<isNotEmpty property="inStockDateEnd" prepend="and">
+			<![CDATA[   time <= '$inStockDateEnd$ 23:59:59'  ]]>
+	</isNotEmpty>
+		 order by time desc
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+    </isNotEmpty>
+</select>
+
+<select id="showloginLogoInformation" parameterClass="java.util.Map" resultMap="LogResult">
+	select * from login_logo where 1=1
+	
+	<isNotEmpty prepend="and" property="user">
+			user =#user#  
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="ip">
+			ip =#ip#  
+	</isNotEmpty>
+	<isNotEmpty property="inStockDateStart" prepend="and">
+			<![CDATA[  time >= #inStockDateStart# ]]>
+	</isNotEmpty>
+	<isNotEmpty property="inStockDateEnd" prepend="and">
+			<![CDATA[   time <= '$inStockDateEnd$ 23:59:59'  ]]>
+	</isNotEmpty>
+		 order by time desc
+	<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+    </isNotEmpty>
+</select>
+
+</sqlMap>

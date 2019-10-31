@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DepositoryFirstSQL">
+<typeAlias alias="depositoryfirst" type="com.huaixuan.network.biz.domain.storage.DepositoryFirst"/>
+	<resultMap class="depositoryfirst" id="depositoryfirstResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="dep_first_name" property="depFirstName"/>
+		<result column="region_code" property="regionCode"/>
+	   <result column="ADDRESS" property="address"/>
+		<result column="PARTICULAR_ADDRESS" property="particularAddress"/>
+        <result column="TYPE" property="type"/>
+	</resultMap>
+	<resultMap class="depositoryfirst" id="depositoryfirstResultExtend"  extends="depositoryfirstResult">
+		<result column="is_stocked" property="isStocked"/>
+	</resultMap>
+<insert id="addDepositoryFirst" parameterClass="depositoryfirst">
+<![CDATA[
+        insert into ioss_depository_first
+  (id,
+   dep_first_name,
+   region_code,
+   gmt_create,
+   gmt_modify,
+   ADDRESS,
+   PARTICULAR_ADDRESS,TYPE,is_stocked
+   )
+values
+  (null,
+   #depFirstName#,
+   #regionCode#,
+   sysdate(),
+   sysdate(),
+   #address#,
+   #particularAddress#
+   ,#type#,#isStocked#
+   )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update Depository object -->
+<update id="editDepositoryFirst" parameterClass="depositoryfirst">
+<![CDATA[
+        update ioss_depository_first  set
+            dep_first_name       = #depFirstName#,
+            region_code          = #regionCode#,
+            gmt_modify           = sysdate(),
+            ADDRESS              =#address#,
+            PARTICULAR_ADDRESS   = #particularAddress#,
+            is_stocked           = #isStocked#
+         where id = #id#
+
+]]>
+</update>
+
+<select id="getDepositoryFirstListByIds" resultMap="depositoryfirstResult" parameterClass="java.util.Map">
+	select * from ioss_depository_first
+		<dynamic prepend="where"> 
+ 		<isNotEmpty prepend="and" property="ids">
+			id in(
+			<iterate property="ids" conjunction=",">#ids[]:NUMERIC#</iterate>
+			)
+		</isNotEmpty>
+		</dynamic>
+</select>
+
+<select id="getDepositoryById" parameterClass="java.lang.Long" resultMap="depositoryfirstResultExtend">
+     <![CDATA[
+           select ioss_depository_first.* from ioss_depository_first where ioss_depository_first.ID = #value#
+     ]]>
+</select>
+
+<select id="getDepositoryFirstByName" parameterClass="java.lang.String" resultMap="depositoryfirstResult">
+     <![CDATA[
+           select ioss_depository_first.* from ioss_depository_first where ioss_depository_first.dep_first_name = #value#
+     ]]>
+</select>
+
+<!--lilei add 查询一级仓库 2010/06/11-->
+<select id="getDepositoryFirstListByParMap" resultMap="depositoryfirstResult" parameterClass="java.util.Map">
+     <![CDATA[
+             select * from ioss_depository_first where 1=1
+     ]]>
+     <isNotEmpty prepend="and" property="type">
+     		type = #type#
+     </isNotEmpty>
+ 	 <isNotEmpty prepend="and" property="depfirstIds">
+	   id in(
+		<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+	   )
+	  </isNotEmpty>
+</select>
+
+</sqlMap>

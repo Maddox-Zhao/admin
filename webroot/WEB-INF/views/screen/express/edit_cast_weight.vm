@@ -1,0 +1,143 @@
+#set($layout = "layout/default.vm")
+#set($title = "修改计抛重量")
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="formBox">
+	<h3><span>管理中心 - 修改计抛重量</span></h3>
+	<form name="editForm" action="/express/add_cast_weight.html?flag=modify" method="post">
+		<div class="content">
+		<table  id="listTable" name="listTable"  class="c2">
+			<tr >
+        		<th>商品编码：</th>
+				<td >
+					<input id="parMap.goodsSn" name="goodsSn" value="$!parMap.goodsSn" type="text" class="inp" onchange="searchCastWeight();"/>
+                </td>
+			#if($!addFlag=='true')
+				#if(${castWeight.goodsName})
+				<td>
+					<span>商品名称：<strong>$!{castWeight.goodsName}</strong></span>
+				</td>
+				#end
+				#if(${castWeight.goodsWeight})
+				<td>
+					<span>重量：<strong>$!{castWeight.goodsWeight}</strong></span>
+				</td>
+				#end
+
+    			<td>
+    				<input type="button" value=" 提交 " class="button-s4"  onclick="formSubmit();"/>
+    			</td>
+			#end
+            </tr>
+        </table>
+		</div>
+<!-- 物流信息列表 -->
+	<div class="listBox" id="listDiv">
+		#if($query && $query.items.size()>0)
+			<span><strong>此商品已与以下快递关联：</strong></span><br>
+            	#foreach($o in $query.items)
+        			【
+            		#foreach($obj in $expressInfoList)
+            			#if("$!{o.expressId}"=="$!{obj.id}") $!{obj.expressName}#end
+            		#end
+            		—>始重：$!{o.goodsWeight}&nbsp;,计抛：$!{o.castWeight}&nbsp;&nbsp;
+        			】
+        		#end
+        #end
+		<table  id="listTable" name="listTable">
+			<tr>
+                <th>物流公司</th>
+        		<th>计抛重量</th>
+                <th>状态</th>
+			</tr>
+		#foreach($obj in $expressInfoList)
+			#set($tempFlag='true')
+			<tr #if($velocityCount%2==0) class="bg" #end>
+			<td align="left">
+				$!{obj.expressName}
+				<input type="hidden" name="eId" id="eId" value="$!{obj.id}"/>
+			</td>
+		<td align="center">
+			#set($tempValue='')
+			#if($query && $query.items.size()>0)
+			#foreach($c in $query.items)
+				#if($tempFlag=='true')
+					#if($!{c.expressId}==$!{obj.id})
+						#set($tempValue=$c.castWeight)
+						#set($tempFlag='false')
+					#end
+				#end
+			#end
+			#end
+			<input type="text" name="cWeight" id="$!{obj.id}"  size="15"  value="$!tempValue" onchange="inputCastWeight('$!{obj.id}','$!tempValuesdd')"/>
+		</td>
+		<td align="center">
+			#set($tmpFlag='true')
+			#set($tmpValue='')
+			#if($query && $query.items.size()>0)
+			#foreach($c in $query.items)
+				#if($tmpFlag=='true')
+					#if($!{c.expressId}==$!{obj.id})
+						#if($!{c.status}=='y')
+							#set($tmpValue='y')
+							#set($tmpFlag='false')
+						#end
+					#end
+				#end
+			#end
+			#end
+			<select name="status" id="check">
+    			<option value="y"  #if($!{tmpValue}=="y") selected #end>有效</option>
+    			<option value="n"  #if($!{tmpValue}!="y") selected #end>无效</option>
+            </select>
+        </td>
+		</tr>
+		#end
+    </table>
+  </div>
+  </form>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var goodsSn=document.getElementById("parMap.goodsSn").value.trim();
+			if(goodsSn==""){
+			alert("商品编码不能为空");
+			}else{
+                document.forms[0].submit();
+			}
+	    }
+
+
+		function searchCastWeight(){
+		document.getElementById("parMap.goodsSn").value=document.getElementById("parMap.goodsSn").value.trim();
+		var goodsSn=document.getElementById("parMap.goodsSn").value.trim();
+		if(goodsSn==""){
+			alert("查询条件不能为空");
+		}else{
+		var form1=document.forms[0];
+		form1.action="searchCastWeightByCon.html?flag=modify";
+		form1.submit();
+		form1.action="add_cast_weight.html?flag=modify";
+		}
+	}
+
+		function inputCastWeight(oId,value){
+			var castWeight=document.getElementById(oId);
+			var castWeightValue=castWeight.value;
+
+			if(isNaN(castWeightValue)||castWeightValue<0){
+    			alert("出错：请输入数字.");
+    			castWeight.value=value;
+    			castWeight.select();
+                castWeight.focus();
+			}
+		}
+
+</script>
+</div>
+</div>

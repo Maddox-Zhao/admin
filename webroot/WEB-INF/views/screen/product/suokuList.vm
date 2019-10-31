@@ -1,0 +1,384 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>锁库产品</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+   </head>
+#set($isAdmin = false)
+#if($dutyids.contains("52"))
+		#set($isAdmin = true)
+#end
+##1002009是李建东的账号，使他的‘批量解锁’按钮可用
+##if($!adminAgent.username=="1002009")
+##	#set($isAdmin = true)
+###end
+
+#if($!adminAccess.has('A_PRODUCT_JIESUO'))
+     #set($isAdmin = true)
+#end
+<body>
+	 <form id="excelForm"  action="/product/exportSuoKuProduct.html" method="post" target="excelIFrame">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">idProduct：</td>
+                    <td style="width:150px">
+                        <input name="idProduct" class="mini-textbox" onenter="search()"/>
+						 <input name="suokuId" class="mini-textbox"  value="$!{suokuId}" style="display:none"/>
+                    </td>
+                    <td class="form-label" style="width:60px;">sku：</td>
+                    <td style="width:150px">
+                        <input name="sku" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:60px;">型号：</td>
+                    <td style="width:150px">
+                        <input name="type" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:40px;">材质：</td>
+                    <td style="width:100px">
+                        <input name="material" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:60px;">颜色：</td>
+                    <td style="width:150px">
+                        <input name="color" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label" style="width:60px;">品牌：</td>
+                    <td style="width:150px">
+                        <input name="brandID" onenter="search()" class="mini-combobox"   textField="brandName" valueField="id" emptyText="请选择..."
+                            url="/brand/getListByBrandName.html"   allowInput="true" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                    <td class="form-label" style="width:60px;">品名：</td>
+                    <td style="width:150px">					
+                        <input name="seriesId" onenter="search()"  class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..."
+                            url="/series/getAllSeries.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/>  
+                    </td>					
+					<td class="form-label" style="width:60px;">当前位置：</td>
+                    <td style="width:150px">
+                        <input  name="idLocation" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..." multiSelect="true" 
+                            url="/site/getSiteByType.html"  allowInput="false"    /> 
+                    </td>
+                    <td class="form-label" style="width:40px;">客户：</td>
+                    <td style="width:100px">
+                        <input name="customerName" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:60px;">状态：</td>
+                    <td style="width:150px">
+                        <input  name="idStatus" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+                    </td>
+                </tr>
+               
+                <tr>
+                    <td class="form-label" style="width:60px;">入库时间：</td>
+                    <td style="width:150px" colspan="3">
+                        <input id="inStockDateStart" name="inStockDateStart" class="mini-datepicker"    format="yyyy-MM-dd"  />
+                        ~
+                        <input id="inStockDateEnd"  name="inStockDateEnd" class="mini-datepicker"    format="yyyy-MM-dd" />
+                    </td>
+                    <td class="form-label" style="width:60px;">结束时间：</td>
+                    <td   colspan="1">
+						<!-- 
+                        <input id="endDateStart" name="endDateStart" class="mini-datepicker"  format="yyyy-MM-dd" />
+                        ~
+						-->
+                        <input id="endDateEnd" name="endDateEnd" class="mini-datepicker" format="yyyy-MM-dd"  />
+                    </td>
+					
+					<td class="form-label" style="width:60px;">size：</td>
+                    <td >
+                        <input id="size" name="size" class="mini-textbox" onenter="search()" />
+                    </td>
+					 <td >
+						<a class="mini-button" iconCls="icon-download" onclick="exportSuoKuProduct()">导出</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	</form>
+	<iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+	
+	 <div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:100%;">
+						#if($!adminAccess.has('A_SHOPPINGCAR_SUOKU'))
+							<a class="mini-button" id="add2ShoppingCar" iconCls="icon-ok" onclick="batchSuoku()">批量解锁</a>
+						#end
+						 #if($!adminAccess.has('A_SHOPPINGCAR_ADD'))
+							<a class="mini-button" id="addhoppingCar" iconCls="icon-add" onclick="addShoppingCar()">加入购物车</a>
+						 #end
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+ 
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:400px;" allowResize="true" multiSelect="true" 
+        url="getSuoKuProductList.html"  idField="idProduct"  onRowdblclick="edit()"  pageSize="50" pageIndex="1"  onselectionchanged="canAdd2ShoppingCar()" >
+        <div property="columns">
+            <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+            <div field="idProduct" width="120" headerAlign="center" align="center" allowSort="true">idProduct</div>
+            <div field="sku" width="120" headerAlign="center" align="center"  allowSort="true">sku</div>
+            <div field="brandName" width="100" headerAlign="center" align="center"  allowSort="true">品牌</div>
+            <div field="seriesName" width="40" headerAlign="center" align="center"  allowSort="true">品类</div>
+            <div field="type" width="100" headerAlign="center" align="center"  allowSort="true">型号</div>
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质</div>
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色</div>
+            <div field="size" width="40" headerAlign="center" align="center"  allowSort="true">size</div>
+            <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+            <div field="ssPrice" width="60" headerAlign="center"  align="center"  allowSort="true">尚上价</div>            
+            <div field="location" width="60" headerAlign="center" align="center"  allowSort="true">当前位置</div>
+            <div field="status" width="60" headerAlign="center" align="center"  allowSort="true">状态</div>
+            <div field="customerName" width="80" headerAlign="center" align="center"  allowSort="true">客户</div>
+			<div field="customerManager" width="80" headerAlign="center" align="center"  allowSort="true">客户经理</div>
+			<div field="inStockDate" width="130" headerAlign="center" align="center"  allowSort="true"  >入库时间</div>
+			<div field="createDate" width="130" headerAlign="center" align="center"  allowSort="true"  >创建时间</div>
+			<div field="endDate" width="130" headerAlign="center" align="center"  allowSort="true"  >锁库结束时间</div>
+			<div field="createUserName" width="60" headerAlign="center" align="center"  allowSort="true"  >创建人</div>
+			
+        </div>
+    </div>
+    <script type="text/javascript">
+		 var userSite = "$!{site}"; //site
+		
+		 var isAdmin = $!{isAdmin};//是否高级管理员 如果是 可以解锁任何站点的
+        var statusData = [{id: 1,value: "可售"  },  { id: 2, value: "运输在途" }, {id: 3, value: "预订"},{ id: 4, value: "已售" },{ id: 5,value: "寄卖已售未结算"},{ id: 6,value: "准入库"},{ id: 8,value: "锁库"} ] ;
+		mini.parse();
+        var grid = mini.get("datagrid1");
+        //grid.load();
+        // grid.sortBy("createtime", "desc");
+		search();
+		
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            //处理日期
+            var date = mini.get("inStockDateStart").getValue();
+            if (date instanceof Date) {
+                data.inStockDateStart = formatDate(date);
+            }
+            var date = mini.get("inStockDateEnd").getValue();
+            if (date instanceof Date) {
+                data.inStockDateEnd = formatDate(date);
+            }
+			/*
+            var date = mini.get("endDateStart").getValue();
+            if (date instanceof Date) {
+                data.endDateStart = formatDate(date);
+            }
+			*/
+            var date = mini.get("endDateEnd").getValue();
+            if (date instanceof Date) {
+                data.endDateEnd = formatDate(date);
+            }
+			//data.pageIndex = 1;
+            grid.load(data);
+        }
+		
+		function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		function edit() {
+            var row = grid.getSelected();
+            if (row) {
+               var win = mini.open({
+                    url: "toEdit.html",
+                    title: "产品详情",
+                    width: 1100,
+                    height: 460,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+                            action: "edit",
+                            id: row.idProduct
+                        };
+                        iframe.contentWindow.SetData(data);
+						iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                       //  grid.reload();
+                    }
+                });
+            } 
+			else 
+			{
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+		
+			//判断添加到购物车是否可用
+		function canAdd2ShoppingCar()
+		{
+		
+			var rows = grid.getSelecteds();
+ 			var canShow = true;
+
+            for (var i = 0, l = rows.length; i < l; i++) 
+			{
+                var r = rows[i];
+				var idStatus = r.status;
+				var curSite = r.idLocation;
+				if(idStatus != "锁库" || userSite != curSite)//只有锁库 且站点为当前用户的站点的按钮才可用
+				{
+					canShow = false;
+				}
+				if(idStatus == "锁库" && isAdmin == true)
+				{
+					canShow = true;
+				}
+            }
+			
+			//加入购物车按钮是否可用
+			if(!canShow)
+			{
+				if(mini.get("add2ShoppingCar"))
+					mini.get("add2ShoppingCar").disable();
+			}
+			else
+			{
+				if(mini.get("add2ShoppingCar"))
+				mini.get("add2ShoppingCar").enable();
+			}
+ 
+		}
+		
+		
+		
+		 function batchSuoku() {
+            var rows = grid.getSelecteds();
+            if (rows.length > 0) {
+				
+                if (confirm("确定解锁【" + rows.length + "】条数据?")) {
+                    var ids = [];
+                    for (var i = 0, l = rows.length; i < l; i++) {
+                        var r = rows[i];
+						var idStatus = r.status;
+						if(idStatus != "锁库")
+						{
+							mini.alert("只能选择锁库的产品,(第" + (i+1) + "行)");
+							return;
+						}
+                        ids.push(r.idProduct);
+                    }
+                    var id = ids.join(',');
+                    grid.loading("操作中，请稍后......");
+                    jQuery.ajax({
+                        url: "/shoppingCar/jiesuo.html?idProducts=" + id,
+                        success: function(text) {
+							grid.reload();
+							grid.unmask(); 
+                        },
+                        error: function() {}
+                    });
+                }
+            } else {
+                mini.alert("请选中一条记录");
+            }
+        }
+		
+		
+		
+		 //导出
+        function exportSuoKuProduct() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            //处理日期
+            var date = mini.get("inStockDateStart").getValue();
+            if (date instanceof Date) {
+                data.inStockDateStart = formatDate(date);
+            }
+            var date = mini.get("inStockDateEnd").getValue();
+            if (date instanceof Date) {
+                data.inStockDateEnd = formatDate(date);
+            }
+            var date = mini.get("endDateEnd").getValue();
+            if (date instanceof Date) {
+                data.endDateEnd = formatDate(date);
+            }
+			var excelForm = document.getElementById("excelForm");
+	  		excelForm.submit();
+        }
+		
+		function addShoppingCar() {
+            var rows = grid.getSelecteds();
+            if (rows.length > 0) {
+				
+                if (confirm("确定加入购物车？")) {
+                    var ids = [];
+	
+                    for (var i = 0, l = rows.length; i < l; i++) {
+                        var r = rows[i];
+						/*
+						var idStatus = r.status;
+						if(idStatus != "可售")
+						{
+							mini.alert("只能选择可售的产品,(第" + (i+1) + "行)");
+							return;
+						}
+						*/
+                        ids.push(r.idProduct);
+                    }
+                    var id = ids.join(',');
+                   mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿刷新...'
+                    });
+                    jQuery.ajax({
+                        url: "/shoppingCar/add2ShoppingCar.html",
+						type: 'POST',
+						data: {idProducts:id},
+                        success: function(text) {
+							mini.unmask();
+							if(text == "ok")
+							{
+								showShoppingCarCnt();
+							}
+							else if(text == "exists_status_error")
+							{
+								mini.alert("购物车只能有一个状态的产品,请先清空购物车")
+							}
+							else if(text == "only_one_status")
+							{
+								mini.alert("加入购物车的产品状态必须一致");
+							} 
+                        },
+                        error: function() {}
+                    });
+                }
+            } else {
+                mini.alert("请选中一条记录");
+            }
+        }
+		
+</script>
+</body>
+</html>

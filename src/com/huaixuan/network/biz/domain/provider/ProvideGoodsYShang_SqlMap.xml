@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideGoodsYShang" type="com.huaixuan.network.biz.domain.provider.ProvideGoodsYShang"/>
+   <typeAlias alias="providerYShangPage" type="com.huaixuan.network.biz.domain.provider.ProviderYShangPage"/>
+	<resultMap id="provideGoodsYShangResult" class="com.huaixuan.network.biz.domain.provider.ProvideGoodsYShang" >
+		<result column="id" property="id"/>
+		<result column="sku_id" property="skuId"/>
+		<result column="our_sku" property="ourSku"/>
+		<result column="spu_id" property="spuId"/>
+		
+		<result column="stock" property="stock"/>
+		<result column="color" property="color"/>
+		<result column="size" property="size"/>
+		<result column="model" property="model"/>
+		
+		<result column="product_name" property="productName"/>
+		<result column="brand_chname" property="brandChname"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="category_id" property="categoryId"/>
+		
+		<result column="category_name" property="categoryName"/>
+		<result column="market_price" property="marketPrice"/>
+		<result column="settle_price" property="settlePrice"/>
+		<result column="our_price" property="ourPrice"/>
+		
+		<result column="source" property="source"/>
+		<result column="area_type" property="areaType"/>
+		<result column="sell_status" property="sellStatus"/>
+		<result column="is_exchange" property="isExchange"/>
+		
+		
+		<result column="main_img" property="mainImg"/>
+		<result column="level" property="level"/>
+		<result column="stock_change_time" property="stockChangeTime"/>
+		
+		<result column="cost_change_time" property="costChangeTime"/>
+		<result column="insert_time" property="insertTime"/>
+		<result column="update_time" property="updateTime"/>
+		
+	</resultMap>
+	<resultMap id="providerYShangPageResult" class="com.huaixuan.network.biz.domain.provider.ProviderYShangPage" >
+		<result column="id" property="id"/>
+		<result column="page" property="page"/>
+		<result column="need_page" property="needPage"/>
+		<result column="update_time" property="updateTime"/>
+	</resultMap>
+	
+	
+	
+	<select id="selectYShangEntity" resultMap="provideGoodsYShangResult">
+		select * from
+		provide_goods_yshang
+		where 1=1
+		<isNotNull prepend="and" property="skuId">
+			sku_id=#skuId#
+		</isNotNull>
+		<isNotNull prepend="and" property="ourSku">
+			our_sku=#ourSku#
+		</isNotNull>
+   </select>
+	
+	
+	<insert  id ="insertYShangProduct"   parameterClass ="java.util.List"> 
+     <![CDATA[
+insert into provide_goods_yshang(id,sku_id,our_sku,spu_id,stock,color,size,model,product_name,brand_chname,brand_id,category_id,category_name,market_price,settle_price,our_price,source,area_type,sell_status,is_exchange,main_img,level,insert_time,update_time) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgysList[].skuId#,#pgysList[].ourSku#,#pgysList[].spuId#,#pgysList[].stock#,#pgysList[].color#,#pgysList[].size#,
+            #pgysList[].model#,#pgysList[].productName#,#pgysList[].brandChname#,#pgysList[].brandId#,#pgysList[].categoryId#,#pgysList[].categoryName#,
+            #pgysList[].marketPrice#,#pgysList[].settlePrice#,#pgysList[].ourPrice#,#pgysList[].source#,#pgysList[].areaType#,#pgysList[].sellStatus#,
+            #pgysList[].isExchange#,#pgysList[].mainImg#,#pgysList[].level#,sysdate(),sysdate()
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+
+
+
+<select id="getProviderListByPage" resultMap="provideGoodsYShangResult" >
+<![CDATA[
+SELECT * from provide_goods_yshang where  1=1  
+]]>	
+	order by  id 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty> 	
+
+</select>
+
+
+
+<!-- 更新 -->
+<update id="updateGoodsYShangMap" parameterClass="java.util.Map">
+	update provide_goods_yshang
+	<dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="stock">
+			,stock=#stock#
+		</isNotNull>
+	
+		<isNotNull  property="settlePrice">
+			,settle_price=#settlePrice#
+		</isNotNull>
+		<isNotNull  property="ourPrice">
+			,our_price=#ourPrice#
+		</isNotNull>
+		
+		<isNotNull  property="timeChangeUpdateStock">
+			,stock_change_time=sysdate()
+		</isNotNull>
+		
+		<isNotNull  property="costChangeTime">
+			,cost_change_time=sysdate()
+		</isNotNull>
+		
+	 where sku_id = #skuId# or our_sku = #ourSku#
+	</dynamic>
+</update>
+
+ <!-- 批量更新库存 -->
+<update id="updateGoodsYShangByList" parameterClass="java.util.Map">
+  <iterate   conjunction=";" close="" open=""  property="list">
+  		update provide_goods_yshang set update_time= sysdate(),stock = #list[].stock#,settle_price = #list[].settlePrice#,our_price = #list[].ourPrice#
+  		where sku_id =#list[].skuId#
+  </iterate>
+</update>
+
+
+
+
+<!-- 页面查询数据 -->
+
+
+<sql id="provide_goods_YShang">
+     <!-- 云尚商品 -->
+	<isNotNull prepend="and" property="skuId">
+		sku_id=#skuId#
+	</isNotNull>
+
+	
+	<isNotNull prepend="and" property="ourSku">
+		our_sku=#ourSku#
+	</isNotNull>
+	<!-- 品牌名 -->
+	<isNotNull prepend="and" property="brandChname">
+	brand_chname = #brandChname#
+	</isNotNull>
+	<!-- 商品名 -->
+	<isNotNull prepend="and" property="productName">
+		<![CDATA[ product_name  like concat('%',upper(#productName#),'%') ]]>
+	</isNotNull>
+	
+	<!-- 供应商 -->
+	<isNotNull prepend="and" property="categoryName">
+		<![CDATA[ category_name  like concat('%',upper(#categoryName#),'%') ]]>
+	</isNotNull>
+	<!--  价格区间 -->
+	<isEmpty  property="salePriceEnd">
+		<isNotEmpty  property="salePriceStart">
+					<![CDATA[ and price = #salePriceStart#  ]]>
+		</isNotEmpty>
+	</isEmpty>
+	<isNotEmpty  property="salePriceEnd">
+		<isNotEmpty  property="salePriceStart">
+				<![CDATA[ and our_price >= #salePriceStart#  ]]>
+		</isNotEmpty>
+				<![CDATA[ and our_price < #salePriceEnd#  ]]>
+	</isNotEmpty>
+	<!-- 库存 -->
+	<isNotNull prepend="and" property="stock">
+		<![CDATA[ stock = #stock# ]]>
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="stockStr">
+		<![CDATA[ stock > #stockStr# ]]>
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="imageIsNull">
+	 	$imageIsNull$ = '' or $imageIsNull$
+	</isNotNull>
+</sql>
+
+
+<select id="getProviderWithPageCountYShang" resultClass="java.lang.Integer">
+<![CDATA[
+	SELECT	 COUNT(*) from (SELECT * FROM `provide_goods_yshang` WHERE our_price<market_price) mo where  1=1
+]]>
+	<include refid="provide_goods_YShang" />
+</select>
+
+
+ 
+<select id="getProviderListByConditionWithPageYShang" resultMap="provideGoodsYShangResult" >
+<![CDATA[
+SELECT * from (SELECT * FROM `provide_goods_yshang` WHERE our_price<market_price) mo where  1=1  
+]]>
+
+<isNotNull prepend="and" property="hasListProdId">
+
+      mo.sku_id in
+      <iterate conjunction="," open="(" close=")"  property="prodList">  		
+	  		#prodList[]#
+	  </iterate>
+</isNotNull>  
+
+
+	<include refid="provide_goods_YShang" />
+	order by  id 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty>
+
+</select>
+
+
+<!-- 查询获取到的云尚商品的第几页 -->
+
+<select id="selectPage" resultMap="providerYShangPageResult">
+		    select * from provide_yshang_page limit 1
+</select>
+
+
+<!-- 更新 -->
+<update id="updatePage" parameterClass="java.util.Map">
+	update provide_yshang_page
+	<dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="page">
+			,page=#page#
+		</isNotNull>
+	 where id = #id#
+	</dynamic>
+</update>
+
+</sqlMap>
+
+

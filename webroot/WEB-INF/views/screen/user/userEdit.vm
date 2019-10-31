@@ -1,0 +1,245 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+		
+		#if($!message == "editsuccess")
+			<div class="mag-t2">
+					修改成功
+			</div>
+		#end
+        <!-- 表单模块 -->
+        <div class="formBox">
+        	<h3><span>会员信息修改</span></h3>
+        	<div class="content">
+				<form action="update.html" method="post">					
+			#springBind("user.account")
+			<input  id="${status.expression}" name="${status.expression}" value="$!{status.value}" type="hidden" />
+			#springBind("user.id")
+			<input  id="${status.expression}" name="${status.expression}" value="$!{status.value}" type="hidden"/>
+			#springBind("user.userInfo.id")
+			<input  id="${status.expression}" name="${status.expression}" value="$!{status.value}" type="hidden" />
+			#springBind("user.userAddress.id")
+			<input  id="${status.expression}" name="${status.expression}" value="$!{status.value}" type="hidden" />
+			
+        	<table class="c4">
+            	<tr>
+                	<th>用户名：</th>
+                    <td>
+						$!{user.account}
+					</td>	
+					<th>
+						电子邮件：
+					</th>
+					<td>
+						#springBind("user.email")
+						<input tabindex="4"  size="24" name="${status.expression}" value="$!{status.value}" type="text" maxlength="45" />		
+					</td>
+                </tr>
+                <tr>
+                	<th>真实姓名：</th>
+                    <td>
+						#springBind("user.userInfo.userName")
+						<input tabindex="4"  size="24" name="${status.expression}" value="$!{status.value}" type="text" maxlength="20"/>					
+					</td>
+                    <th>手机号码：</th>
+                    <td>
+						#springBind("user.userInfo.mobilePhone") 
+						<input tabindex="4"  size="24" name="${status.expression}" value="$!{status.value}" type="text" />		
+					</td>
+                </tr>
+				
+				<tr>
+                	<th>会员类型：</th>
+                    <td>
+						#springBind("user.type")
+						<select id="s1" tabindex="8" name="${status.expression}">
+							#foreach($t in $userType.entrySet())
+								<option value="$!t.key" #if($!{status.value}==$!{t.key}) selected #end>$!t.value </option>
+							#end
+						</select>
+					</td>
+                    <th>会员等级：</th>
+                    <td>
+						#springBind("user.userRank")
+						<select name="${status.expression}" id="status">
+    				       <option value="">-=请选择=-</option>
+        			       <option value="p" #if("$status.value"=="p")  selected #end>普通VIP</option>
+        			       <option value="pk" #if("$status.value"=="pk")  selected #end>普通客户</option>
+        			       <option value="y" #if("$status.value"=="y")  selected #end>一级VIP</option>
+    				       <option value="e" #if("$status.value"=="e")  selected #end>二级VIP</option>
+    				       <option value="s" #if("$status.value"=="s")  selected #end>三级VIP</option>
+                  </select>
+					</td>
+                </tr>
+				
+                <tr>
+                	<th>所在地区：</th>
+                    <td>
+						#springBind("user.userAddress.province")
+						<select id="s1" tabindex="8" name="${status.expression}" onchange="selectCity(this.value);"><option>请选择</option>
+						#foreach($province in $provinceList)
+								<option value="$!{province.code}" #if($!{status.value}==$!{province.code}) selected #end>$!{province.regionName}</option>
+						#end
+						</select>
+						
+						#springBind("user.userAddress.city")
+						<select id="city" tabindex="9" name="${status.expression}" onchange="selectDistinc(this.value);">
+								<option>请选择</option>
+								#foreach($city in $cityListInit)
+									<option value="$!{city.code}" #if($!{status.value}==$!{city.code}) selected #end>$!{city.regionName}</option>
+								#end
+						</select>
+						
+						#springBind("user.userAddress.district")
+						<select id="district" tabindex="10" name="${status.expression}" #if($!{userAddress.district}) style="" #else style="display:none"  #end>
+								<option>请选择</option>
+								#foreach($district in $distincListInit)
+									<option value="$!{district.code}" #if($!{status.value}==$!{district.code}) selected #end>$!{district.regionName}</option>
+								#end
+						</select>
+						
+					</td>
+                    <th>街道地址：</th>
+                    <td>
+					   #springBind("user.userAddress.address")
+					   <input tabindex="11" id="ipt_addr" size="24" name="${status.expression}" value="${status.value}" type="text" maxlength="100" />
+					</td>
+                </tr>
+                <tr>
+                	<th>邮政编码：</th>
+                    <td>
+						#springBind("user.userAddress.zipcode")
+						<input tabindex="4"  size="24" name="${status.expression}" value="$!{status.value}" type="text" maxlength="7"/>
+					</td>
+                    <th>性别：</th>
+                    <td
+						#springBind("user.sex")
+						<input tabindex="13" style="border: medium none ; width: auto;"  id="user.sex" name="${status.expression}" value="0" checked="checked" type="radio" />保密
+						<input tabindex="14" style="border: medium none ; width: auto;"  id="user.sex" name="${status.expression}" value="2" #if($!{status.value}==2)checked="checked" #end type="radio" />男
+						<input tabindex="15" style="border: medium none ; width: auto;"  id="user.sex" name="${status.expression}" value="1" #if($!{status.value}==1)checked="checked" #end type="radio" />女
+					</td>
+                </tr>
+                <tr>
+                	<th>出生日期：</th>
+                    <td>
+						#springBind("user.userInfo.birthday_str")
+						<input type="text" name="${status.expression}" value="$!{status.value}" size="24" id="birthday" readonly/>
+                            <script type="text/javascript">
+                                Calendar.setup({
+                                inputField : "birthday",
+                                ifFormat   : "%Y-%m-%d",
+                                align      : "BR"
+                                });
+                            </script>
+					</td>
+                    <th>MSN：</th>
+                    <td>
+						#springBind("user.userInfo.msn")
+						<input tabindex="17" name="${status.expression}" value="$!{status.value}" id="ipt_msn" size="24" type="text" maxlength="45"/>
+					</td>
+                </tr>
+                <tr>
+                	<th>QQ：</th>
+                    <td>
+					       #springBind("user.userInfo.qq")
+						   <input tabindex="18" name="${status.expression}" value="$!{status.value}" id="ipt_qq" size="24" type="text" maxlength="11" />
+					</td>
+                    <th>旺旺：</th>
+                    <td>
+						#springBind("user.userInfo.wangwang")
+						<input tabindex="19" name="${status.expression}" value="$!{status.value}" id="ipt_wangwang" size="24" type="text" maxlength="20" />
+					</td>
+               </tr>
+			   
+			   <tr align="center">
+					<td colspan="2" ><input type="reset" value="重置"/></td>
+					<td colspan="2"><input type="submit" value="提交"/></td>				
+			   </tr>
+              </table>
+				</form>
+            </div>
+			
+			
+		</div>
+		
+	</div>
+
+				
+<script language="javascript" type="text/javascript">
+function selectCity(code){
+	var obj = document.getElementById("city");
+	var obj2 = document.getElementById("district");
+	var length = obj.length = 0;
+	if(code==''){
+		obj.style.display='none';
+		obj2.style.display='none';
+		return ;
+	}
+		obj.style.display='';
+        obj.options[length++] = new Option("请选择", "");
+		//按省份取得城市区域     modify by li_ben
+                jQuery.ajax({
+			          type:"post",
+			          url: '/user/select.html',
+			          async:true,
+			          dataType: "json",
+			          data:"code="+code,
+			          timeout:15000,
+			          error:function(){
+			          	alert("连接超时，您未登录或者离开过久，请刷新");
+			          },
+			          success:function(data){
+    					  for(var i=0;i<data.length;i++){
+                			 var city=data[i];
+                 			 obj.options[length++] = new Option(city.regionName, city.code);
+              			  }
+			          }
+			        });
+
+    	var length2 = obj2.length = 0;
+    	obj2.options[length2] = new Option("请选择", "");
+}
+
+function selectDistinc(code){
+	var obj = document.getElementById("district");
+	var length = obj.length = 0;
+    if(jQuery('#s1').value == '810000' || jQuery('#s1').value == '990000' || jQuery('#s1').value == '820000'){
+              obj.style.display='none';
+    }else{
+            //按需要取得县级区域  modify by li_ben
+            jQuery.ajax({
+    	          type:"post",
+    	          url: '/user/select.html',
+    	          async:true,
+    	          dataType: "json",
+    	          data:"code="+code,
+    	          timeout:15000,
+    	          error:function(){
+    	          	alert("连接超时，您未登录或者离开过久，请刷新");
+    	          },
+    	          success:function(data){
+    		          if(data.length==0){
+    		          	 obj.style.display='none';
+    		          }else{
+    		         	 obj.style.display='';
+    					 obj.options[length++] = new Option("请选择", "");
+    			         obj.style.display='';
+    					 for(var i=0;i<data.length;i++){
+            			 	 var district=data[i];
+             				 obj.options[length++] = new Option(district.regionName, district.code);
+          			 	 }
+    		          }
+    	          }
+			});
+   }
+}
+
+
+function check()
+{
+
+
+}
+</script>

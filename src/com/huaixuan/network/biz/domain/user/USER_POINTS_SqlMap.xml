@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="UserPointsSQL">
+	<typeAlias alias="userPoints" type="com.huaixuan.network.biz.domain.user.UserPoints" />
+	<resultMap class="userPoints" id="userPointsResult">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_nick" property="userNick" />
+		<result column="usable_points" property="usablePoints" />
+		<result column="freeze_points" property="freezePoints" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+
+	<resultMap class="userPoints" id="userPointsInfoResult">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_nick" property="userNick" />
+		<result column="usable_points" property="usablePoints" />
+		<result column="freeze_points" property="freezePoints" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="email" property="email" />
+		<result column="home_phone" property="home_phone" />
+		<result column="mobile_phone" property="mobile_phone" />
+	</resultMap>
+
+	<insert id="addUserPoints" parameterClass="userPoints">
+	<![CDATA[
+	insert into emall_user_points
+	  (id,
+	   user_id,
+	   user_nick,
+	   usable_points,
+	   freeze_points,
+	   gmt_create,
+	   gmt_modify)
+	values
+	  (null,
+	   #userId#,
+	   #userNick#,
+	   #usablePoints#,
+	   #freezePoints#,
+	   sysdate(),
+	   sysdate())
+	]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+	<update id="editUserPoints" parameterClass="userPoints">
+			update emall_user_points set
+			<isNotEmpty  property="type">
+				 <isEqual property="type" compareValue="order">
+					usable_points = usable_points-#points#,
+					freeze_points = freeze_points+#points#,
+	             </isEqual>
+				 <isEqual property="type" compareValue="pay">
+					freeze_points = freeze_points-#points#,
+	             </isEqual>
+				 <isEqual property="type" compareValue="cancelOrder">
+					usable_points = usable_points+#points#,
+					freeze_points = freeze_points-#points#,
+	             </isEqual>
+				 <isEqual property="type" compareValue="transaction">
+					usable_points = usable_points+#points#,
+	             </isEqual>
+			</isNotEmpty>
+			gmt_modify = sysdate()
+			where user_nick = #userNick#
+	</update>
+
+
+	<select id="getCountByUserNick" resultClass="java.lang.Integer" parameterClass="java.lang.String">
+	<![CDATA[
+			select count(*) from emall_user_points a where a.user_nick = #userNick#
+	]]>
+	</select>
+
+	<select id="getUserPointsByUserNick" parameterClass="java.lang.String" resultMap="userPointsResult">
+	<![CDATA[
+			select a.* from emall_user_points a where a.user_nick = #userNick#
+	]]>
+	</select>
+
+
+
+	<select id="getUserPoints" parameterClass="java.lang.Long"
+		resultMap="userPointsResult">
+	<![CDATA[
+			select emall_user_points.* from emall_user_points where emall_user_points.ID = #value#
+	]]>
+	</select>
+
+
+	<select id="getUserPointss" resultMap="userPointsInfoResult">
+	
+	<![CDATA[
+		select up.*, eu.email, eui.home_phone, eui.mobile_phone
+		  from emall_user_points up, emall_users eu, emall_user_info eui
+		 where eu.id = eui.user_id
+		   and eu.id = up.user_id
+		   and eu.stauts = 1
+		   and eu.is_admin = 0
+	]]>
+		<isNotEmpty prepend="and" property="userNick">
+			eu.account like concat('%',#userNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="minPoints">
+		    <isGreaterThan prepend="and" property="minPoints" compareValue="0">
+                 up.usable_points>=#minPoints#
+            </isGreaterThan>
+		</isNotEmpty>
+		<isNotEmpty property="maxPoints">
+			<isGreaterThan prepend="and" property="maxPoints" compareValue="0">
+                 #maxPoints#>=up.usable_points
+            </isGreaterThan>
+		</isNotEmpty>
+		order by up.usable_points desc
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ LIMIT #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+	</select>
+
+	<select id="getUserPointsCount" resultClass="java.lang.Integer">
+	<![CDATA[
+select count(*)
+		  from emall_user_points up, emall_users eu, emall_user_info eui
+		 where eu.id = eui.user_id
+		   and eu.id = up.user_id
+		   and eu.stauts = 1
+		   and eu.is_admin = 0
+
+	]]>
+		<isNotEmpty prepend="and" property="userNick">
+			eu.account like concat('%',#userNick#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="minPoints">
+		    <isGreaterThan prepend="and" property="minPoints" compareValue="0">
+                 up.usable_points>=#minPoints#
+            </isGreaterThan>
+		</isNotEmpty>
+		<isNotEmpty property="maxPoints">
+			<isGreaterThan prepend="and" property="maxPoints" compareValue="0">
+                 #maxPoints#>=up.usable_points
+            </isGreaterThan>
+		</isNotEmpty>
+	</select>
+
+
+
+	<select id="getUserPointsList" resultMap="userPointsResult">
+	<![CDATA[
+select up.*
+  from emall_user_points up, emall_users eu
+ where up.user_id = eu.id
+   and eu.stauts = 1
+
+	]]>
+	</select>
+
+
+	<select id="getUserPointsByUserId" parameterClass="java.lang.String" resultMap="userPointsResult">
+	<![CDATA[
+			select a.* from emall_user_points a where a.user_id = #userId#
+	]]>
+	</select>
+</sqlMap>

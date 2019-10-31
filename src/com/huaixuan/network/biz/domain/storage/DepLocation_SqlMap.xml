@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DepLocationSQL">
+
+	<resultMap class="com.huaixuan.network.biz.domain.storage.DepLocation" id="depLocation">
+		<result column="id" property="id" />
+		<result column="dep_id" property="depId" />
+		<result column="loc_name" property="locName" />
+		<result column="loc_code" property="locCode" />
+		<result column="name" property="depName" />
+		<result column="loc_size" property="locSize" />
+		<result column="loc_description" property="locDescription" />
+		<result column="is_check" property="isCheck" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+		<result column="status" property="status" />
+	</resultMap>
+	<resultMap class="com.huaixuan.network.biz.domain.storage.DepLocation" id="useabledLocInfoResult">
+		<result column="id" property="id" />
+		<result column="loc_name" property="locName" />
+		<result column="dep_id" property="depId" />
+		<result column="name" property="depName" />
+	</resultMap>
+
+
+<insert id="createDepLocation">
+<![CDATA[
+insert into ioss_dep_location
+  (id,
+   dep_id,
+   loc_name,
+   loc_code,
+   loc_size,
+   loc_description,
+   gmt_create,
+   gmt_modify,
+   is_check,
+   status)
+values
+  (null,
+   #depId#,
+   #locName#,
+   #locCode#,
+   #locSize#,
+   #locDescription#,
+   sysdate(),
+   sysdate(),
+   #isCheck#,
+   #status#)
+
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update DepLocation object -->
+<update id="editDepLocation" parameterClass="com.huaixuan.network.biz.domain.storage.DepLocation">
+<![CDATA[
+update ioss_dep_location
+   set dep_id          = #depId#,
+       loc_name        = #locName#,
+       loc_code        = #locCode#,
+       loc_size        = #locSize#,
+       status          = #status#,
+       gmt_modify      = sysdate(),
+       loc_description = #locDescription#
+ where id = #id#
+
+]]>
+</update>
+
+<select id="loadAllDepLocation" resultMap="depLocation">
+<![CDATA[
+select ioss_dep_location.*, ioss_depository.name
+  from ioss_dep_location, ioss_depository
+ where ioss_depository.id = ioss_dep_location.dep_id
+   and ioss_dep_location.is_check = 'N'
+   and ioss_dep_location.status = '1'
+ order by dep_id
+
+]]>
+</select>
+
+<select id="getAllDepLocationByMap" resultMap="depLocation">
+	<![CDATA[
+	select a.*, b.name
+	  from ioss_dep_location a, ioss_depository b
+	 where b.id = a.dep_id
+	   and a.is_check = 'N'
+	   and a.status = '1'
+	]]>
+	<isNotEmpty prepend="and" property="status">
+		b.status = #status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		b.type = #type#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="depFirstId">
+		b.DEP_FIRST_ID = #depFirstId#
+	</isNotEmpty>
+    <isNotEmpty prepend="and" property="types" >
+        b.type in(
+          <iterate property="types" conjunction=",">#types[]#</iterate>
+        )
+    </isNotEmpty>
+	order by a.dep_id
+</select>
+
+
+	<select id="getLocationsByDepositoryId"  parameterClass="java.lang.Long" resultMap="depLocation">
+<![CDATA[
+select t.*, (select name from ioss_depository where id = t.dep_id) as name
+  from ioss_dep_location t
+ where t.dep_id = #value#
+
+]]>
+	</select>
+
+<select id="getCheckLocationInfo" parameterClass="java.util.Map" resultMap="depLocation">
+	<![CDATA[
+SELECT idl.*,a.name
+  FROM ioss_dep_location idl, ioss_goods_location igl,ioss_depository a
+ WHERE igl.goods_instance_id = #goodsInstanceId#
+   AND igl.loc_id = idl.id
+   AND idl.is_check = #isCheck#
+	AND a.id= idl.dep_id
+   AND a.dep_first_id = #depFirstId#
+	]]>
+</select>
+
+	<select id="getIsCheckCountById" parameterClass="java.util.Map" resultClass="int">
+	<![CDATA[
+SELECT count(idl.id)
+  FROM ioss_dep_location idl
+ WHERE idl.id = #id#
+   AND idl.is_check = #isCheck#
+
+	]]>
+	</select>
+
+
+	<update id="lockDepLocation" parameterClass="com.huaixuan.network.biz.domain.storage.DepLocation">
+<![CDATA[
+update ioss_dep_location
+   set is_check = #isCheck#, gmt_modify = sysdate()
+ where id = #id#
+
+]]>
+</update>
+
+<select id="getDepLocationsByParMap" resultMap="depLocation">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+select t.*, (select name from ioss_depository where id = t.dep_id) as name
+  from ioss_dep_location t
+ where status = '1'
+
+]]>
+	    <isNotEmpty prepend="and" property="locName">
+			t.loc_name like concat('%',#locName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locCode">
+			t.loc_code = #locCode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+            t.dep_id = #depId#
+        </isNotEmpty>
+          <isNotEmpty prepend="and" property="depIds" >
+             t.dep_id in(
+            <iterate property="depIds" conjunction=",">#depIds[]#</iterate>
+            )
+        </isNotEmpty>
+		order by t.dep_id,t.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getDepLocCountByParMap" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from ioss_dep_location t where status='1'
+]]>
+	    <isNotEmpty prepend="and" property="locName">
+			t.loc_name like concat('%',#locName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locCode">
+			t.loc_code = #locCode#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+            t.dep_id = #depId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="id">
+        <![CDATA[ id <> #id# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depIds" >
+             t.dep_id in(
+            <iterate property="depIds" conjunction=",">#depIds[]#</iterate>
+            )
+        </isNotEmpty>
+</select>
+
+<select id="listUseabledLocInfo" resultMap="useabledLocInfoResult">
+select a.id,
+       a.loc_name,
+       a.dep_id,
+        b.name
+  from ioss_dep_location a,ioss_depository b
+ where UPPER(a.is_check) = 'N'
+   and a.status = '1'
+   and b.id = a.dep_id
+	and b.dep_first_id = #depFirstId#
+</select>
+
+
+<select id="countStorageByDepLocId" resultClass="java.lang.Integer">
+<![CDATA[
+select IFNULL(sum(t.storage_num),0)
+  from ioss_storage t
+ where t.loc_id = #value#
+
+]]>
+</select>
+
+
+	<select id="getRightLocationsByDepositoryId"  parameterClass="java.lang.Long" resultMap="depLocation">
+<![CDATA[
+select t.*, (select name from ioss_depository where id = t.dep_id) as name
+  from ioss_dep_location t
+ where t.dep_id = #value#
+   and t.status = '1'
+
+]]>
+	</select>
+
+<select id="getAllRightLocations" resultMap="depLocation">
+<![CDATA[
+select ioss_dep_location.*, ioss_depository.name
+  from ioss_dep_location, ioss_depository
+ where ioss_depository.id = ioss_dep_location.dep_id
+   and ioss_dep_location.status = '1'
+ order by dep_id
+
+]]>
+</select>
+
+<select id="getLocationsByParMap"  resultMap="depLocation">
+		<![CDATA[
+			select t.*,(select name from ioss_depository where id=t.dep_id) as name from ioss_dep_location  t where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="locationId">
+		      t.id=#locationId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locationName">
+		      t.loc_name=#locationName#
+		</isNotEmpty>
+	</select>
+	
+<select id="getRightDeplocationByDepfirstId" resultMap="useabledLocInfoResult">
+select a.id,
+       a.loc_name,
+       a.dep_id,
+        b.name
+  from ioss_dep_location a,ioss_depository b
+ where UPPER(a.is_check) = 'N'
+   and a.status = '1'
+   and b.id = a.dep_id
+   and b.status = 'v'
+   and b.type = 'common_dep'
+  and b.dep_first_id = #depFirstId#
+</select>
+</sqlMap>

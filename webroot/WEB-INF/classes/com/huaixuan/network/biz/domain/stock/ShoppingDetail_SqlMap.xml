@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShoppingDetail">
+
+<typeAlias alias="shoppingDetail" type="com.huaixuan.network.biz.domain.stock.ShoppingDetail"/>
+
+<resultMap id="shoppingDetailResult" class="shoppingDetail">
+	<result column="id" property="id"/>
+	<result column="shopping_id" property="shoppingId"/>  <!-- 采购单号 -->
+	<result column="goods_id" property="goodsId"/>  <!-- 商品编码 -->
+	<result column="goods_instance_id" property="goodsInstanceId"/>   <!-- 商品实例编码 -->
+	<result column="units" property="units"/>  <!-- 单位 -->
+	<result column="amount" property="amount"/>  <!-- 数量 -->
+	<result column="unit_price" property="unitPrice"/>         <!-- 单价 -->
+	<result column="due_fee" property="dueFee"/>    <!-- 应付款 -->
+	<result column="fact_fee" property="factFee"/>    <!-- 实付款 -->
+	<result column="reject_num" property="rejectNum"/>    <!-- 拒收数量 -->
+	<result column="missing_num" property="missingNum"/>    <!-- 缺货数量 -->
+	<result column="receive_num" property="receiveNum"/>    <!-- 验收数量 -->
+	<result column="gmt_create" property="gmtCreate"/>    <!-- 创建时间 -->
+	<result column="gmt_modify" property="gmtModify"/>    <!-- 修改时间 -->
+</resultMap>
+
+<resultMap id="shoppingDetailSum" class="com.huaixuan.network.biz.domain.stock.ShoppingDetail" >
+	<result column="amount" property="amount" nullValue="0"/>  <!-- 数量 -->
+	<result column="reject_num" property="rejectNum" nullValue="0"/>    <!-- 拒收数量 -->
+	<result column="missing_num" property="missingNum" nullValue="0"/>    <!-- 缺货数量 -->
+</resultMap>
+
+<typeAlias alias="shoppingMoreDetail" type="com.huaixuan.network.biz.domain.stock.ShoppingMoreDetail"/>
+
+	<resultMap class="shoppingMoreDetail" id="shoppingMoreDetailResult">
+		<result column="id" property="id"/>
+		<result column="shopping_id" property="shoppingId"/>  <!-- 采购单号 -->
+		<result column="goods_id" property="goodsId"/>  <!-- 商品ID -->
+		<result column="goods_instance_id" property="goodsInstanceId"/>   <!-- 商品实例ID -->
+		<result column="goods_instance_code" property="goodsInstanceCode"/>   <!-- 商品实例编码 -->
+		<result column="units" property="units"/>  <!-- 单位 -->
+		<result column="amount" property="amount"/>  <!-- 数量 -->
+		<result column="unit_price" property="unitPrice"/>         <!-- 单价 -->
+		<result column="due_fee" property="dueFee"/>    <!-- 应付款 -->
+		<result column="fact_fee" property="factFee"/>    <!-- 实付款 -->
+		<result column="reject_num" property="rejectNum"/>    <!-- 拒收数量 -->
+		<result column="missing_num" property="missingNum"/>    <!-- 缺货数量 -->
+		<result column="receive_num" property="receiveNum"/>    <!-- 验收数量 -->
+		<result column="gmt_create" property="gmtCreate"/>    <!-- 创建时间 -->
+		<result column="gmt_modify" property="gmtModify"/>    <!-- 修改时间 -->
+
+		<result column="instance_name" property="instanceName"/>    <!-- 商品实例名称 -->
+		<result column="supplier_code" property="supplierCode"/>    <!-- 供应商商品ID -->
+		<result column="cat_code" property="catCode"/>    <!-- 类目编码 -->
+		<result column="attrs" property="attrs"/>    <!-- 属性 -->
+	</resultMap>
+
+<!-- 根据供应商ID统计退货数量 -->
+<select id="getGatherNumBySupplierId" parameterClass="java.lang.Long" resultMap="shoppingDetailSum">
+<![CDATA[
+		select sum(reject_num) as reject_num,sum(missing_num) as missing_num,sum(amount) as amount
+		from (
+			 select a.reject_num as reject_num,a.missing_num as missing_num,a.amount as amount
+			 from ioss_shopping_detail a,ioss_shopping_list b
+			 where a.shopping_id=b.id and b.supplier_id = #value#
+		) t
+]]>
+</select>
+
+<!-- create ShoppingDetail object -->
+<insert id="addShoppingDetail" parameterClass="shoppingDetail">
+<![CDATA[
+		insert into ioss_shopping_detail
+		(id,shopping_id,goods_id,goods_instance_id,units,amount,unit_price,due_fee,fact_fee,reject_num,missing_num,receive_num,gmt_create,gmt_modify )values( null,
+		#shoppingId#,
+		#goodsId#,
+		#goodsInstanceId#,
+		#units#,
+		#amount#,
+		#unitPrice#,
+		#dueFee#,
+		#factFee#,
+		#rejectNum#,
+		#missingNum#,
+		#receiveNum#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ShoppingDetail object -->
+<update id="editShoppingDetail" parameterClass="shoppingDetail">
+<![CDATA[
+		update ioss_shopping_detail set shopping_id = #shoppingId#,
+		goods_id = #goodsId#,
+		goods_instance_id = #goodsInstanceId#,
+		units = #units#,
+		amount = #amount#,
+		unit_price = #unitPrice#,
+		due_fee = #dueFee#,
+		fact_fee = #factFee#,
+		reject_num = #rejectNum#,
+		missing_num = #missingNum#,
+		receive_num = #receiveNum#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete ShoppingDetail object -->
+<delete id="removeShoppingDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_shopping_detail where ioss_shopping_detail.ID = #value#
+]]>
+</delete>
+<!-- search ShoppingDetail object -->
+<select id="getShoppingDetail" parameterClass="java.lang.Long" resultMap="shoppingDetailResult">
+<![CDATA[
+		select ioss_shopping_detail.* from ioss_shopping_detail where ioss_shopping_detail.ID = #value#
+]]>
+</select>
+	<!-- 根据采购订单号查询说有采购商品信息 -->
+<select id="getShopDetailsByShopListId" parameterClass="java.lang.Long" resultMap="shoppingDetailResult">
+<![CDATA[
+		select t.* from ioss_shopping_detail  t where t.shopping_id = #value#
+]]>
+</select>
+<!-- 根据采购订单号查询说有采购商品信息_关联查询 -->
+<select id="getShoppingDetailsByShoppingListId" parameterClass="java.lang.Long" resultMap="shoppingMoreDetailResult">
+<![CDATA[
+		select a.*,
+	           b.code as goods_instance_code,
+			   b.instance_name,
+	           (select t.supplier_code
+	            from ioss_goods_instance_supplier t
+	            where t.supplier_id=c.supplier_id and t.goods_instance_id=a.goods_instance_id) as supplier_code,
+	           b.cat_code,
+	           b.attrs
+		from   ioss_shopping_detail a,
+			   ioss_goods_instance b,
+	           ioss_shopping_list c
+        where b.id=a.goods_instance_id
+	          and a.shopping_id=c.id
+	          and a.shopping_id = #value#
+]]>
+</select>
+
+<!-- search MissingNum List by ShoppingListId -->
+<select id="getMissingNumByShoppingListId" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+<![CDATA[
+		select sum(ioss_shopping_detail.missing_num) from ioss_shopping_detail where ioss_shopping_detail.shopping_id = #value#
+]]>
+</select>
+
+<!-- search RejectNum List by ShoppingListId -->
+<select id="getRejectNumByShoppingListId" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+<![CDATA[
+		select sum(ioss_shopping_detail.reject_num) from ioss_shopping_detail where ioss_shopping_detail.shopping_id = #value#
+]]>
+</select>
+
+<!-- 查询一个采购订单是否已采购某个产品 -->
+<select id="getCountByShoppingIdAndGoodsInsId" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from ioss_shopping_detail t where 1=1
+]]>
+	<isNotEmpty prepend="and" property="shoppingId">
+			shopping_id = #shoppingId#
+		</isNotEmpty>
+	<isNotEmpty prepend="and" property="goodsInstanceId">
+			goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+</select>
+
+<!-- 查询同一个采购单中是否存在其他类目的记录 -->
+<select id="getCountShoppingDetailByCatCode" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(t.id) from ioss_shopping_detail t
+		WHERE t.shopping_id=#shoppingId# and t.id not in (
+			select a.id
+			from   ioss_shopping_detail a,
+				   ioss_goods_instance b
+	        where b.id=a.goods_instance_id
+		          and a.shopping_id = #shoppingId#
+]]>
+	<isNotEmpty prepend="and" property="catCode">
+        b.cat_code like CONCAT(#catCode#,'%')
+    </isNotEmpty>
+    )
+</select>
+</sqlMap>

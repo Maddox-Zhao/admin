@@ -1,0 +1,16 @@
+#set($layout = '')
+<html>
+<head>
+	<title>同步 </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+	ERROR   已经在同步中...<br/>
+	1.已经点过正在同步中<br/>
+	2.其他平台正在同步 不能与其他平台一起全量更新 等其他平台更新完在做更新
+	 
+</body>
+
+</html>

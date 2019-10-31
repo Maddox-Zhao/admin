@@ -1,0 +1,110 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 库位列表")
+
+<body>
+
+<div class="main">
+	<h2>管理中心 - 库位列表</h2>
+	#if($message)
+		#if($message == "hasStorage")
+			<div class="mag-t1" id="massage">库位上有货物存放，不能删除！</div>
+		#elseif($message == "editSuccess")
+			<div class="mag-t2" id="massage">删除库位成功！</div>
+		#elseif($message == "ischeck")
+			<div class="mag-t1" id="massage">库位处于盘点状态，不能删除！</div>
+		#end
+	#end
+
+	<form action="searchDepLocation.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索条件</span></h3>
+			<table>
+				<tr>
+					<th>仓库名称：</th>
+					<td>
+						#springBind("loc.depId")
+						<select name="${status.expression}" id="loc.depId" class="select" style="width:205px;">
+							<option value="">-=请选择=-</option>
+							#foreach($d in $depositoryLists)
+								<option value="$!{d.id}" #if("$!{status.value}" == "${d.id}") selected="selected" #end>$!{d.name}</option>
+							#end
+						</select>
+					</td>
+					<th>库位名称：</th>
+					<td>
+						#springBind("loc.locName")
+						<input name="${status.expression}" id="loc.locName" value="$!{status.value}" class="inp" maxlength="50"/>
+					</td>
+					<th>
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+					</th>
+				</tr>
+			</table>
+		</div>
+	</form>
+
+	<div class="tool">
+		<span><a href="$!appServer.get("/storage/addDepLocationPage.html")" hidefocus="true" class="bt_add">新增库位</a></span>
+	</div>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>库位列表</span></h3>
+		<table>
+			<tr>
+				<th>序号</th>
+				<th>库位编号</th>
+				<th>库位名称</th>
+				<th>仓库名称</th>
+				<th>库位大小</th>
+				<th>库位描述</th>
+				<th>操作</th>
+			</tr>
+			#foreach($d in $page.items)
+				<tr #if($velocityCount % 2 == 0) class="bg" #end>
+					<td  align="center">$velocityCount</td>
+					<td>$!d.locCode</td>
+					<td>$!d.locName</td>
+					<td>$!d.depName</td>
+					<td>$!d.locSize</td>
+					<td title="$!d.locDescription">
+						#if ($!d.locDescription.length()<20)
+							$!d.locDescription
+						#else
+							$!controlUtil.getNoticesTitle($!d.locDescription,20)
+						#end
+					</td>
+					<td align="center">
+						<a href="detailDepLocation.html?depLocationId=$!d.id">查看</a>
+						<a href="#" onclick="deleteDepLocation($!d.id);">删除</a></td>
+					</tr>
+			#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items && $page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/storage/searchDepLocation.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+
+	function deleteDepLocation(depId){
+  		var	mymes=confirm("确定删除库位吗？");
+		if(true==mymes){
+	  		document.forms[0].action = "searchDepLocation.html?depLocationId="+depId+"&actionType=delete"
+			document.forms[0].submit();
+	  	}
+	}
+
+	function formSubmit(){
+	    jQuery("#loc.locName").val(jQuery.trim(jQuery("#loc.locName").val()));
+		jQuery("#loc.depId").val(jQuery.trim(jQuery("#loc.depId").val()));
+
+       	document.forms[0].submit();
+	}
+</script>

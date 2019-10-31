@@ -1,0 +1,421 @@
+2019-09-05 10:06:11,543 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1370] in http://www.shangit.com:8077/login.html [returnto=] [type=zy] [userName=1000000] [password=shangshang] [loginSystem=erp] 
+Task:execute web action in:LoginAction with method:login running time(millis)[14->1133]=1119 81%
+--Task:LoginService:login running time(millis)[30->1118]=1088 79%
+----Task:AdminService:getAdminByCondition running time(millis)[30->980]=950 69%
+------Task:AdminDao:getAdminByCondition running time(millis)[30->980]=950 69%
+--------Trace:prepareStatement: select      id, user_name, password, gmt_create, gmt_modify, status, email, mobile, tel, name, dep_first_id,site,dep_code,function_role,site,higher_user_name        from emall_admin   where         emall_admin.user_name = ?
+----Task:MiniuiBaseService:getSiteByType running time(millis)[990->1003]=13 0%
+------Task:MiniUiBaseDataDao:querySiteByType running time(millis)[990->1003]=13 0%
+--------Trace:prepareStatement: select idSite id,name from site where type in ( 1,4 ) order by idSite
+----Task:AdminRoleService:getRoleByAdminId running time(millis)[1004->1009]=5 0%
+------Task:AdminRoleDao:getRoleByAdminId running time(millis)[1004->1009]=5 0%
+--------Trace:prepareStatement: select        admin_id, role_id         from emall_admin_role where admin_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1009->1068]=59 4%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1009->1068]=59 4%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1070->1099]=29 2%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1070->1099]=29 2%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+--Task:LoginLogoService:addLogin running time(millis)[1120->1133]=13 0%
+----Task:LoginLogoDao:insertlogin running time(millis)[1120->1133]=13 0%
+------Trace:prepareStatement: insert into login_logo values(null,?, sysdate(),?)
+------Trace:prepareStatement: SELECT @@IDENTITY AS ID
+Task:write output to servlet outputstream with size:0KB. running time(millis)[1370->1370]=0 0%
+2019-09-05 10:06:32,255 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[5145] in http://www.shangit.com:8077/product/getJsonList.html [idProduct=] [sku=] [type=] [material=] [color=] [brandID=] [seriesId=] [size=] [customerName=] [status=1] [supplierId=] [idLastLocation=] [idLocation=] [idSellChannel=] [isFlaw=] [inStockDateStart=] [inStockDateEnd=] [sellDateStart=] [sellDateEnd=] [activePrice=false] [tongkuan=false] [managerUserName=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:productList2Json running time(millis)[37->5088]=5051 98%
+--Task:SiteService:getSiteByIdSite running time(millis)[38->44]=6 0%
+----Task:SiteDao:getSiteByIdSite running time(millis)[38->44]=6 0%
+------Trace:prepareStatement: select     idSite,name,city,idCurrency,idSellChannel,manager,address,zip,phone,balance,type  ,'' as currencyName, '' as sellChannelName     from site    where idSite = ?
+--Task:ProductService:getProductList running time(millis)[44->5088]=5044 98%
+----Task:ProductDao:getProductListCount running time(millis)[74->2008]=1934 37%
+------Trace:prepareStatement: SELECT count(l.idproduct)   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE   l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                         and   l.idStatus  = ?
+----Task:ProductDao:getProductList running time(millis)[2009->5084]=3075 59%
+------Trace:prepareStatement: select * from (                SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,             (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,   l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,   p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,   p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,   l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,   p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,   sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE     l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                            and   l.idStatus  = ?                                                               ORDER BY l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.color DESC,p.size DESC                     LIMIT 0,50                            ) re
+----Task:OrderDao:canSearchAllOrder running time(millis)[5084->5088]=4 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+Task:write output to servlet outputstream with size:61KB. running time(millis)[5140->5144]=4 0%
+2019-09-05 10:18:08,228 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[402447] in http://www.shangit.com:8077/shoppingCar/diaohuoChuku.html [idSite=101] [customerShow=7554] [remark=123456] [idProductAndSite=9890062658992:101:×Ï°²²Ö;9800044855346:101:×Ï°²²Ö;] 
+Task:execute web action in:ShoppingCarAction with method:diaohuoChuku running time(millis)[26->402442]=402416 99%
+--Task:MiniuiBaseService:getSiteByName running time(millis)[31374->31397]=23 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[31375->31397]=22 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:MiniuiBaseService:getSiteByName running time(millis)[33125->33149]=24 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[33125->33149]=24 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:ProductService:transferChuku running time(millis)[53366->53648]=282 0%
+----Task:ProductDao:getproduct running time(millis)[53369->53423]=54 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+----Task:ProductDao:updateProductLifecyle running time(millis)[53423->53603]=180 0%
+------Trace:prepareStatement: update lifecycle set idProduct = idProduct                        ,     idLocation=?        ,     idLastLocation=?        ,     idStatus=?                        ,     idLastOperator=?                       where idProduct = ?   and    idStatus != 7
+----Task:ProductDao:insertHistory running time(millis)[53603->53648]=45 0%
+------Trace:prepareStatement: insert into history values(null,8,9890062658992,          sysdate()      ,1000000,101,2,111,7554)
+--Task:ProductService:transferChuku running time(millis)[221844->221955]=111 0%
+----Task:ProductDao:getproduct running time(millis)[221844->221922]=78 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+----Task:ProductDao:updateProductLifecyle running time(millis)[221922->221940]=18 0%
+------Trace:prepareStatement: update lifecycle set idProduct = idProduct                        ,     idLocation=?        ,     idLastLocation=?        ,     idStatus=?                        ,     idLastOperator=?                       where idProduct = ?   and    idStatus != 7
+----Task:ProductDao:insertHistory running time(millis)[221941->221955]=14 0%
+------Trace:prepareStatement: insert into history values(null,8,9800044855346,          sysdate()      ,1000000,101,2,54,7554)
+--Task:ProductService:getproduct running time(millis)[239173->239238]=65 0%
+----Task:ProductDao:getproduct running time(millis)[239173->239238]=65 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+--Task:MiniuiBaseService:getSiteByName running time(millis)[260554->260574]=20 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[260554->260574]=20 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:ProductService:transferDiaoHuo running time(millis)[273880->273935]=55 0%
+----Task:ProductDao:addTrsnsferInformation running time(millis)[273881->273935]=54 0%
+------Trace:prepareStatement: insert into hx_transfer values(null,?,?,?,?,sysdate(),?,?)
+------Trace:prepareStatement: SELECT @@IDENTITY AS ID
+--Task:ProductService:selectTransferMaxId running time(millis)[386285->386301]=16 0%
+----Task:ProductDao:selectMaxId running time(millis)[386286->386301]=15 0%
+------Trace:prepareStatement: select max(id) from hx_transfer
+--Task:ProductService:GoodSInformationDiaoHuo running time(millis)[395361->395409]=48 0%
+----Task:ProductDao:addGoodsInformation running time(millis)[395361->395409]=48 0%
+------Trace:prepareStatement: insert into hx_goodsinformation values(?,?,?,?)
+--Task:ProductService:selectTransferMaxId running time(millis)[397603->397617]=14 0%
+----Task:ProductDao:selectMaxId running time(millis)[397604->397617]=13 0%
+------Trace:prepareStatement: select max(id) from hx_transfer
+--Task:ProductService:GoodSInformationDiaoHuo running time(millis)[398987->399025]=38 0%
+----Task:ProductDao:addGoodsInformation running time(millis)[398988->399025]=37 0%
+------Trace:prepareStatement: insert into hx_goodsinformation values(?,?,?,?)
+--Task:ProductShoppingCarService:removeAllShopingCar running time(millis)[399824->399965]=141 0%
+----Task:ProductShoppingCarDao:removeAllShopingCar running time(millis)[399824->399965]=141 0%
+------Trace:prepareStatement: delete from hx_shopping_car where user_name = ?
+Task:write output to servlet outputstream with size:0KB. running time(millis)[402445->402447]=2 0%
+2019-09-05 10:18:16,074 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[5000] in http://www.shangit.com:8077/product/getJsonList.html [idProduct=] [sku=] [type=] [material=] [color=] [brandID=] [seriesId=] [size=] [customerName=] [status=1] [supplierId=] [idLastLocation=] [idLocation=] [idSellChannel=] [isFlaw=] [inStockDateStart=] [inStockDateEnd=] [sellDateStart=] [sellDateEnd=] [activePrice=false] [tongkuan=false] [managerUserName=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:productList2Json running time(millis)[40->4989]=4949 98%
+--Task:SiteService:getSiteByIdSite running time(millis)[41->50]=9 0%
+----Task:SiteDao:getSiteByIdSite running time(millis)[41->50]=9 0%
+------Trace:prepareStatement: select     idSite,name,city,idCurrency,idSellChannel,manager,address,zip,phone,balance,type  ,'' as currencyName, '' as sellChannelName     from site    where idSite = ?
+--Task:ProductService:getProductList running time(millis)[50->4989]=4939 98%
+----Task:ProductDao:getProductListCount running time(millis)[50->1971]=1921 38%
+------Trace:prepareStatement: SELECT count(l.idproduct)   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE   l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                         and   l.idStatus  = ?
+----Task:ProductDao:getProductList running time(millis)[1971->4982]=3011 60%
+------Trace:prepareStatement: select * from (                SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,             (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,   l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,   p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,   p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,   l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,   p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,   sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE     l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                            and   l.idStatus  = ?                                                               ORDER BY l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.color DESC,p.size DESC                     LIMIT 0,50                            ) re
+----Task:OrderDao:canSearchAllOrder running time(millis)[4982->4989]=7 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+Task:write output to servlet outputstream with size:61KB. running time(millis)[4997->5000]=3 0%
+2019-09-05 10:30:29,662 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1253] in http://www.shangit.com:8077/site/getSiteByType.html [_=1567650628404] 
+Task:execute web action in:MiniuiBaseAction with method:getSites running time(millis)[62->1011]=949 75%
+--Task:MiniuiBaseService:getSiteByType running time(millis)[62->1011]=949 75%
+----Task:MiniUiBaseDataDao:querySiteByType running time(millis)[62->1011]=949 75%
+------Trace:prepareStatement: select idSite id,name from site where type in ( 1 ) order by idSite
+Task:write output to servlet outputstream with size:0KB. running time(millis)[1253->1253]=0 0%
+2019-09-05 10:35:26,094 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1051] in http://www.shangit.com:8077/product/toGetTransferList.html 
+Task:execute web action in:ProductAction with method:toTransferList running time(millis)[680->681]=1 0%
+Task:render screen:screen//product/changeDetailed.vm running time(millis)[1013->1029]=16 1%
+Task:write output to servlet outputstream with size:6KB. running time(millis)[1034->1050]=16 1%
+2019-09-05 11:02:55,032 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1611] in http://www.shangit.com:8077/site/getSiteByType.html [_=1567652573413] 
+Task:execute web action in:MiniuiBaseAction with method:getSites running time(millis)[60->1248]=1188 73%
+--Task:MiniuiBaseService:getSiteByType running time(millis)[61->1248]=1187 73%
+----Task:MiniUiBaseDataDao:querySiteByType running time(millis)[61->1248]=1187 73%
+------Trace:prepareStatement: select idSite id,name from site where type in ( 1 ) order by idSite
+Task:write output to servlet outputstream with size:0KB. running time(millis)[1611->1611]=0 0%
+2019-09-05 11:02:59,005 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3732] in http://www.shangit.com:8077/product/getTransferList.html [inStockDateEnd=] [beforeidLocation=] [idLocation=] [status=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:getTransferList running time(millis)[24->3719]=3695 99%
+--Task:ProductService:getTransferList running time(millis)[25->3719]=3694 98%
+----Task:ProductDao:getShowTranListCount running time(millis)[3231->3351]=120 3%
+------Trace:prepareStatement: select count(*) from    emall_admin e,site s,hx_transfer h    where   h.createUser = e.user_name     AND   s.idSite = h.afterLocation                             order by h.id DESC
+----Task:ProductDao:showTran running time(millis)[3351->3719]=368 9%
+------Trace:prepareStatement: SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,    (SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,    h.idStatus statu    FROM emall_admin e,site s,hx_transfer h     WHERE h.createUser = e.user_name     AND   s.idSite = h.afterLocation                              order by h.id DESC                      LIMIT 0,50
+Task:write output to servlet outputstream with size:13KB. running time(millis)[3730->3732]=2 0%
+2019-09-05 11:41:08,796 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1135] in http://www.shangit.com:8077/index.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[701->754]=53 4%
+Task:render screen:screen//index.vm running time(millis)[1088->1120]=32 2%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[1122->1135]=13 1%
+2019-09-05 11:41:10,401 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1475] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[42->1463]=1421 96%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[47->1429]=1382 93%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[1443->1458]=15 1%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[1443->1458]=15 1%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[1458->1463]=5 0%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[1458->1463]=5 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[1474->1474]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1474->1474]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1475->1475]=0 0%
+2019-09-05 11:41:19,018 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[4176] in http://www.shangit.com:8077/product/getTransferList.html [inStockDateEnd=] [beforeidLocation=] [idLocation=] [status=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:getTransferList running time(millis)[35->4154]=4119 98%
+--Task:ProductService:getTransferList running time(millis)[37->4154]=4117 98%
+----Task:ProductDao:getShowTranListCount running time(millis)[3834->3950]=116 2%
+------Trace:prepareStatement: select count(*) from    emall_admin e,site s,hx_transfer h    where   h.createUser = e.user_name     AND   s.idSite = h.afterLocation                             order by h.id DESC
+----Task:ProductDao:showTran running time(millis)[3950->4153]=203 4%
+------Trace:prepareStatement: SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,c.name cname,    (SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,    h.idStatus statu    FROM emall_admin e,site s,hx_transfer h     WHERE h.createUser = e.user_name     AND   s.idSite = h.afterLocation    AND   h.idCustomer = c.idCustomer                              order by h.id DESC                      LIMIT 0,50
+Task:write output to servlet outputstream with size:0KB. running time(millis)[4176->4176]=0 0%
+2019-09-05 11:51:34,388 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1005] in http://www.shangit.com:8077/index.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[444->518]=74 7%
+Task:render screen:screen//index.vm running time(millis)[948->983]=35 3%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[988->1004]=16 1%
+2019-09-05 11:51:36,080 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1582] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1573->1577]=4 0%
+Task:merge template:layout\default.vm running time(millis)[1577->1581]=4 0%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1581->1582]=1 0%
+2019-09-05 11:51:36,464 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1952] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[48->1937]=1889 96%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[51->1837]=1786 91%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[1854->1905]=51 2%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[1854->1905]=51 2%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[1906->1937]=31 1%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[1906->1937]=31 1%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[1950->1950]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1950->1951]=1 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1951->1952]=1 0%
+2019-09-05 11:51:56,743 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[7997] in http://www.shangit.com:8077/product/getTransferList.html [inStockDateEnd=] [beforeidLocation=] [idLocation=] [status=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:getTransferList running time(millis)[39->7981]=7942 99%
+--Task:ProductService:getTransferList running time(millis)[40->7981]=7941 99%
+----Task:ProductDao:getShowTranListCount running time(millis)[7034->7212]=178 2%
+------Trace:prepareStatement: select count(*) from    emall_admin e,site s,hx_transfer h    where   h.createUser = e.user_name     AND   s.idSite = h.afterLocation                             order by h.id DESC
+----Task:ProductDao:showTran running time(millis)[7212->7981]=769 9%
+------Trace:prepareStatement: SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,c.name cname,    (SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,    h.idStatus statu    FROM emall_admin e,site s,hx_transfer h,customer c    WHERE h.createUser = e.user_name     AND   s.idSite = h.afterLocation    AND   h.idCustomer = c.idCustomer                              order by h.id DESC                      LIMIT 0,50
+Task:write output to servlet outputstream with size:13KB. running time(millis)[7996->7997]=1 0%
+2019-09-05 12:05:20,190 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[31] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->30]=30 96%
+2019-09-05 13:30:06,239 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1309] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1292->1306]=14 1%
+Task:merge template:layout\default.vm running time(millis)[1306->1307]=1 0%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1307->1308]=1 0%
+2019-09-05 13:30:06,241 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1296] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[29->608]=579 44%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[32->493]=461 35%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[509->565]=56 4%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[509->565]=56 4%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[565->607]=42 3%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[565->607]=42 3%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[1295->1295]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1295->1295]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1295->1296]=1 0%
+2019-09-05 13:30:06,261 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1238] in http://www.shangit.com:8077/admin_foot.html 
+Task:render screen:screen/admin_foot.vm running time(millis)[1236->1236]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1236->1237]=1 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1237->1238]=1 0%
+2019-09-05 13:30:06,806 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3827] in http://www.shangit.com:8077/product/getTransferList.html [inStockDateEnd=] [beforeidLocation=] [idLocation=] [status=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:getTransferList running time(millis)[860->3216]=2356 61%
+--Task:ProductService:getTransferList running time(millis)[862->3216]=2354 61%
+----Task:ProductDao:getShowTranListCount running time(millis)[863->2517]=1654 43%
+------Trace:prepareStatement: select count(*) from    emall_admin e,site s,hx_transfer h    where   h.createUser = e.user_name     AND   s.idSite = h.afterLocation                             order by h.id DESC
+----Task:ProductDao:showTran running time(millis)[2517->3216]=699 18%
+------Trace:prepareStatement: SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,c.name cname,    (SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,    h.idStatus statu    FROM emall_admin e,site s,hx_transfer h,customer c    WHERE h.createUser = e.user_name     AND   s.idSite = h.afterLocation    AND   h.idCustomer = c.idCustomer                              order by h.id DESC                      LIMIT 0,50
+Task:write output to servlet outputstream with size:13KB. running time(millis)[3824->3827]=3 0%
+2019-09-05 13:30:12,161 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1491] in http://www.shangit.com:8077/product/getTransferList.html [inStockDateEnd=] [beforeidLocation=] [idLocation=] [status=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:getTransferList running time(millis)[40->1486]=1446 96%
+--Task:ProductService:getTransferList running time(millis)[41->1486]=1445 96%
+----Task:ProductDao:getShowTranListCount running time(millis)[41->371]=330 22%
+------Trace:prepareStatement: select count(*) from    emall_admin e,site s,hx_transfer h    where   h.createUser = e.user_name     AND   s.idSite = h.afterLocation                             order by h.id DESC
+----Task:ProductDao:showTran running time(millis)[371->1486]=1115 74%
+------Trace:prepareStatement: SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,c.name cname,    (SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,    h.idStatus statu    FROM emall_admin e,site s,hx_transfer h,customer c    WHERE h.createUser = e.user_name     AND   s.idSite = h.afterLocation    AND   h.idCustomer = c.idCustomer                              order by h.id DESC                      LIMIT 0,50
+Task:write output to servlet outputstream with size:13KB. running time(millis)[1490->1491]=1 0%
+2019-09-05 13:35:49,191 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1309] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1303->1307]=4 0%
+Task:merge template:layout\default.vm running time(millis)[1307->1307]=0 0%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1308->1309]=1 0%
+2019-09-05 13:35:49,554 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1606] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[26->1596]=1570 97%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[31->1512]=1481 92%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[1524->1580]=56 3%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[1524->1580]=56 3%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[1580->1596]=16 0%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[1580->1596]=16 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[1605->1605]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1605->1606]=1 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1606->1606]=0 0%
+2019-09-05 13:36:21,945 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[7878] in http://www.shangit.com:8077/product/getJsonList.html [idProduct=] [sku=] [type=] [material=] [color=] [brandID=] [seriesId=] [size=] [customerName=] [status=1] [supplierId=] [idLastLocation=] [idLocation=] [idSellChannel=] [isFlaw=] [inStockDateStart=] [inStockDateEnd=] [sellDateStart=] [sellDateEnd=] [activePrice=false] [tongkuan=false] [managerUserName=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:productList2Json running time(millis)[19->7807]=7788 98%
+--Task:SiteService:getSiteByIdSite running time(millis)[20->29]=9 0%
+----Task:SiteDao:getSiteByIdSite running time(millis)[21->29]=8 0%
+------Trace:prepareStatement: select     idSite,name,city,idCurrency,idSellChannel,manager,address,zip,phone,balance,type  ,'' as currencyName, '' as sellChannelName     from site    where idSite = ?
+--Task:ProductService:getProductList running time(millis)[29->7807]=7778 98%
+----Task:ProductDao:getProductListCount running time(millis)[62->3575]=3513 44%
+------Trace:prepareStatement: SELECT count(l.idproduct)   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE   l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                         and   l.idStatus  = ?
+----Task:ProductDao:getProductList running time(millis)[3575->7793]=4218 53%
+------Trace:prepareStatement: select * from (                SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,             (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,   l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,   p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,   p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,   l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,   p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,   sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE     l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                            and   l.idStatus  = ?                                                               ORDER BY l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.color DESC,p.size DESC                     LIMIT 0,50                            ) re
+----Task:OrderDao:canSearchAllOrder running time(millis)[7793->7807]=14 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+Task:write output to servlet outputstream with size:61KB. running time(millis)[7872->7878]=6 0%
+2019-09-05 13:37:07,091 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[11295] in http://www.shangit.com:8077/shoppingCar/diaohuoChuku.html [idSite=101] [customerShow=7556] [remark=8520147] [idProductAndSite=9800132705349:101:×Ï°²²Ö;9610135123164:101:×Ï°²²Ö;] 
+Task:execute web action in:ShoppingCarAction with method:diaohuoChuku running time(millis)[19->11293]=11274 99%
+--Task:MiniuiBaseService:getSiteByName running time(millis)[10643->10660]=17 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[10644->10660]=16 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:MiniuiBaseService:getSiteByName running time(millis)[10660->10682]=22 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[10660->10682]=22 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:ProductService:transferChuku running time(millis)[10682->10929]=247 2%
+----Task:ProductDao:getproduct running time(millis)[10682->10735]=53 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+----Task:ProductDao:updateProductLifecyle running time(millis)[10735->10890]=155 1%
+------Trace:prepareStatement: update lifecycle set idProduct = idProduct                        ,     idLocation=?        ,     idLastLocation=?        ,     idStatus=?                        ,     idLastOperator=?                       where idProduct = ?   and    idStatus != 7
+----Task:ProductDao:insertHistory running time(millis)[10891->10929]=38 0%
+------Trace:prepareStatement: insert into history values(null,8,9800132705349,          sysdate()      ,1000000,101,2,54,7556)
+--Task:ProductService:transferChuku running time(millis)[10930->11051]=121 1%
+----Task:ProductDao:getproduct running time(millis)[10930->10938]=8 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+----Task:ProductDao:updateProductLifecyle running time(millis)[10938->11012]=74 0%
+------Trace:prepareStatement: update lifecycle set idProduct = idProduct                        ,     idLocation=?        ,     idLastLocation=?        ,     idStatus=?                        ,     idLastOperator=?                       where idProduct = ?   and    idStatus != 7
+----Task:ProductDao:insertHistory running time(millis)[11012->11051]=39 0%
+------Trace:prepareStatement: insert into history values(null,8,9610135123164,          sysdate()      ,1000000,101,2,101,7556)
+--Task:ProductService:getproduct running time(millis)[11051->11070]=19 0%
+----Task:ProductDao:getproduct running time(millis)[11051->11070]=19 0%
+------Trace:prepareStatement: SELECT p.idProduct idProduct,l.idLifeCycle,   b.name brandName,   s.name seriesName,   size,   p.idBrand brandID,   p.idSeries seriesId,   p.Type Type,   p.Picture Picture,   p.Material Material,   p.color color,   p.targetCustomers targetCustomers,   p.name name,   p.material_des materialdes,   p.color_des colordes,   p.size_des sizedes,   p.UUID UUID,   p.aUUID aUUID,   p.Origin origin,   p.sku sku,   pur.secondHand secondHand,   pur.idSupply,   pur.idPurchase,   l.hasValidCard hasValidCard,   l.isFlaw,   c.name currencyName,   (SELECT NAME FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrencyName,   (SELECT idCurrency FROM currency WHERE idCurrency = co.idCurrency) salePriceCurrency,   l.cost cost,   l.idCostCurrency,   site.name curSiteName,   l.idLocation curSiteId,   l.idLastLocation,   sta.status,   sta.idStatus,   l.price salePrice,   p.CNPrice dlPrice,   p.EUPrice euPrice,   p.HKPrice dxPrice,   l.HKHXPrice smPrice,   l.HXPrice ssPrice,   l.remark remark,   customer.name customerName,   p.goods_id goodsId,   l.idOrder,   p.active_price activePrice,p.years,p.month,   (SELECT NAME FROM emall_admin  WHERE user_name = l.idLastOperator )idLastOperator   FROM product p,   lifecycle l,   brand b,   series s,   site,   currency c,   status sta,   customerorder co,   sellchannel sc,   customer,   purchase pur   WHERE p.idProduct = ?   AND l.idproduct = p.idproduct   AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase   AND c.idCurrency=l.idCostCurrency   and l.idStatus != 7   limit 1
+--Task:MiniuiBaseService:getSiteByName running time(millis)[11070->11093]=23 0%
+----Task:MiniUiBaseDataDao:getSiteByName running time(millis)[11070->11093]=23 0%
+------Trace:prepareStatement: select idSite id,name from site where  name = ?
+--Task:ProductService:transferDiaoHuo running time(millis)[11093->11153]=60 0%
+----Task:ProductDao:addTrsnsferInformation running time(millis)[11093->11153]=60 0%
+------Trace:prepareStatement: insert into hx_transfer values(null,?,?,?,?,sysdate(),?,?)
+------Trace:prepareStatement: SELECT @@IDENTITY AS ID
+--Task:ProductService:selectTransferMaxId running time(millis)[11153->11162]=9 0%
+----Task:ProductDao:selectMaxId running time(millis)[11153->11162]=9 0%
+------Trace:prepareStatement: select max(id) from hx_transfer
+--Task:ProductService:GoodSInformationDiaoHuo running time(millis)[11162->11203]=41 0%
+----Task:ProductDao:addGoodsInformation running time(millis)[11162->11203]=41 0%
+------Trace:prepareStatement: insert into hx_goodsinformation values(?,?,?,?)
+--Task:ProductService:selectTransferMaxId running time(millis)[11203->11215]=12 0%
+----Task:ProductDao:selectMaxId running time(millis)[11203->11215]=12 0%
+------Trace:prepareStatement: select max(id) from hx_transfer
+--Task:ProductService:GoodSInformationDiaoHuo running time(millis)[11215->11242]=27 0%
+----Task:ProductDao:addGoodsInformation running time(millis)[11215->11242]=27 0%
+------Trace:prepareStatement: insert into hx_goodsinformation values(?,?,?,?)
+--Task:ProductShoppingCarService:removeAllShopingCar running time(millis)[11242->11293]=51 0%
+----Task:ProductShoppingCarDao:removeAllShopingCar running time(millis)[11242->11293]=51 0%
+------Trace:prepareStatement: delete from hx_shopping_car where user_name = ?
+Task:write output to servlet outputstream with size:0KB. running time(millis)[11294->11295]=1 0%
+2019-09-05 13:37:18,191 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[8163] in http://www.shangit.com:8077/product/getJsonList.html [idProduct=] [sku=] [type=] [material=] [color=] [brandID=] [seriesId=] [size=] [customerName=] [status=1] [supplierId=] [idLastLocation=] [idLocation=] [idSellChannel=] [isFlaw=] [inStockDateStart=] [inStockDateEnd=] [sellDateStart=] [sellDateEnd=] [activePrice=false] [tongkuan=false] [managerUserName=] [pageIndex=0] [pageSize=50] [sortField=] [sortOrder=] 
+Task:execute web action in:ProductAction with method:productList2Json running time(millis)[30->8152]=8122 99%
+--Task:SiteService:getSiteByIdSite running time(millis)[31->42]=11 0%
+----Task:SiteDao:getSiteByIdSite running time(millis)[31->42]=11 0%
+------Trace:prepareStatement: select     idSite,name,city,idCurrency,idSellChannel,manager,address,zip,phone,balance,type  ,'' as currencyName, '' as sellChannelName     from site    where idSite = ?
+--Task:ProductService:getProductList running time(millis)[42->8152]=8110 99%
+----Task:ProductDao:getProductListCount running time(millis)[42->3336]=3294 40%
+------Trace:prepareStatement: SELECT count(l.idproduct)   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE   l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                         and   l.idStatus  = ?
+----Task:ProductDao:getProductList running time(millis)[3336->8147]=4811 58%
+------Trace:prepareStatement: select * from (                SELECT (SELECT exchangeRate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)exchangeRate,             (SELECT taxesReate FROM purchaselifecycle WHERE idPurchase = l.idPurchase)taxesReate,   l.idLifeCycle,p.idProduct,b.name brandName,s.name seriesName,p.Type type,p.Material material,p.color color,size,p.CNPrice dlPrice,p.picture,   p.EUPrice euPrice,p.HKPrice dxPrice,l.HKHXPrice smPrice,l.HXPrice ssPrice,l.cost,p.goods_id,p.SecurityTC securityTC,   p.ImplementationS implementationS,p.NAME name,p.material_des materialDes,p.color_des colorDes,p.Origin origin,   l.idCostCurrency,site.name curSiteName,l.idLocation curSiteId,sta.status,l.price salePrice,l.idPriceCurrency salePriceCurrency,   p.gmt_create instock,co.date sellDate,co.idOrder sellIdOrder,pur.idSupply,p.active_price activePrice,p.years,p.month,l.isFlaw,   sc.name sellChannel,customer.name customerName,customer.idCustomer customerId,p.sku,customer.customer_operate   FROM  product p,lifecycle l,brand b,series s,site,`status` sta,customerorder co,sellchannel sc,customer,   purchase pur   WHERE     l.idproduct = p.idProduct    AND l.idStatus != 7    AND p.idBrand = b.idBrand   AND p.idSeries = s.idSeries   AND l.idLocation = site.idSite   AND sta.idStatus = l.idStatus   AND l.idOrder = co.idOrder   AND co.idChannel = sc.idSellChannel   AND co.idCustomer = customer.idCustomer   AND pur.idPurchase = l.idPurchase                                                            and   l.idStatus  = ?                                                               ORDER BY l.idLifeCycle DESC ,p.type DESC,p.material DESC,p.color DESC,p.size DESC                     LIMIT 0,50                            ) re
+----Task:OrderDao:canSearchAllOrder running time(millis)[8147->8152]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+Task:write output to servlet outputstream with size:61KB. running time(millis)[8161->8163]=2 0%
+2019-09-05 13:57:04,811 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[37] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->37]=37 100%
+2019-09-05 16:25:33,297 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[2011] in http://www.shangit.com:8077/index.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[889->1000]=111 5%
+Task:render screen:screen//index.vm running time(millis)[1899->1975]=76 3%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[1980->2009]=29 1%
+2019-09-05 16:25:34,897 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1442] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1430->1440]=10 0%
+Task:merge template:layout\default.vm running time(millis)[1440->1441]=1 0%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1441->1442]=1 0%
+2019-09-05 16:25:34,898 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1384] in http://www.shangit.com:8077/admin_foot.html 
+Task:render screen:screen/admin_foot.vm running time(millis)[1377->1377]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1378->1378]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1380->1384]=4 0%
+2019-09-05 16:25:36,956 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3493] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[42->3480]=3438 98%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[46->3368]=3322 95%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[3394->3432]=38 1%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[3394->3432]=38 1%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[3432->3480]=48 1%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[3432->3480]=48 1%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[3492->3492]=0 0%
+Task:merge template:layout\default.vm running time(millis)[3492->3493]=1 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[3493->3493]=0 0%
+2019-09-05 16:34:38,612 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1380] in http://www.shangit.com:8077/index.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[635->703]=68 4%
+Task:render screen:screen//index.vm running time(millis)[1297->1357]=60 4%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[1361->1380]=19 1%
+2019-09-05 16:34:40,337 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1487] in http://www.shangit.com:8077/admin_foot.html 
+Task:render screen:screen/admin_foot.vm running time(millis)[1448->1448]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1457->1486]=29 1%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1486->1486]=0 0%
+2019-09-05 16:34:40,337 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1584] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1535->1539]=4 0%
+Task:merge template:layout\default.vm running time(millis)[1553->1583]=30 1%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1583->1584]=1 0%
+2019-09-05 16:34:40,485 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1749] in http://www.shangit.com:8077/admin_top.html 
+Task:render screen:screen/admin_top.vm running time(millis)[1590->1747]=157 8%
+Task:merge template:layout\default.vm running time(millis)[1747->1748]=1 0%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[1748->1748]=0 0%
+2019-09-05 16:34:40,900 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[2062] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[38->2008]=1970 95%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[41->1908]=1867 90%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[1925->1950]=25 1%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[1926->1950]=24 1%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[1950->2008]=58 2%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[1950->2008]=58 2%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[2061->2061]=0 0%
+Task:merge template:layout\default.vm running time(millis)[2061->2061]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[2062->2062]=0 0%
+2019-09-05 16:37:38,484 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1268] in http://www.shangit.com:8077/index.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[629->711]=82 6%
+Task:render screen:screen//index.vm running time(millis)[1199->1242]=43 3%
+Task:write output to servlet outputstream with size:2KB. running time(millis)[1247->1268]=21 1%
+2019-09-05 16:37:39,894 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1273] in http://www.shangit.com:8077/admin_left.html 
+Task:render screen:screen/admin_left.vm running time(millis)[1263->1269]=6 0%
+Task:merge template:layout\default.vm running time(millis)[1269->1270]=1 0%
+Task:write output to servlet outputstream with size:8KB. running time(millis)[1270->1273]=3 0%
+2019-09-05 16:37:41,111 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[2469] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[29->2204]=2175 88%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[34->2140]=2106 85%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[2178->2196]=18 0%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[2178->2196]=18 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[2196->2204]=8 0%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[2196->2204]=8 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[2467->2467]=0 0%
+Task:merge template:layout\default.vm running time(millis)[2468->2468]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[2468->2469]=1 0%

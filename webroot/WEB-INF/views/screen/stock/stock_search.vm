@@ -1,0 +1,276 @@
+#set($layout = "layout/default.vm")
+#set($title = "采购管理 - 采购订单管理")
+
+<body>
+
+<div class="main">
+	<h2>采购管理 - 采购订单管理</h2>
+
+	<center>
+		<div id="result" style="color:red;">$!message</div>
+	</center>
+
+	<form action="stock_search.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索采购单</span></h3>
+			<table>
+    			<tr>
+    				<th>采购订单号：</th>
+                    <td>
+    					<input type="text" name="shoppingNum" id="shoppingNum" value="$!{shoppingListQuery.shoppingNum}" size="15" theme="simple" maxlength="30"  />
+    				</td>
+    				<th>供应商：</th>
+    				<td >
+    					<input type="text" name="supplierName" id="supplierName" value="$!{shoppingListQuery.supplierName}" readonly/>
+    					<input type="hidden" name="supplierId" id="supplierId" value="$!{shoppingListQuery.supplierId}"/>
+    					<input type="button" value="选择供应商" class="button" onclick="sesp();"/>
+    					<input type="button" value="清空" class="button" onclick="clearSupplier();"/>
+                    </td>
+                </tr>
+    			<tr>
+                	<th>合同编号：</th>
+    				<td >
+    					<input type="text" name="primitiveNum" id="primitiveNum" value="$!{shoppingListQuery.primitiveNum}" size="15" theme="simple" maxlength="30"  />
+                    </td>
+    				<th>创建人：</th>
+    				<td >
+    					<select name="creater" id="creater" >
+    						<option value="">-=请选择=-</option>
+    						#foreach($userInfo in $userList)
+    							<option value="$!{userInfo.userName}" #if("$!{shoppingListQuery.creater}" == "${userInfo.userName}") selected="true" #end>$!{userInfo.userName}</option>
+    						#end
+    					</select>
+                    </td>
+    			</tr>
+    
+    			<tr>
+        			<th>库存类型：</th>
+        			<td >
+        				<select name="storType" id="storType" theme="simple">
+    						<option value="">-=请选择=-</option>
+    						#foreach($s in $storTypeMap.entrySet())
+    							<option value="$s.key" #if($!{shoppingListQuery.storType} == $s.key) selected="true" #end>$!{s.value}</option>
+    						#end
+                        </select>
+                    </td>
+        			<th>财务状态：</th>
+        			<td >
+        				<select name="financeStatus" id="financeStatus" >
+        					<option value="">-=请选择=-</option>
+        					<option value="y" #if($!{shoppingListQuery.financeStatus} == "y") selected="true" #end>已确认</option>
+    						<option value="n" #if($!{shoppingListQuery.financeStatus} == "n") selected="true" #end>未确认</option>
+        				</select>
+                    </td>
+                </tr>
+				
+    			<tr>
+        			<th>订单状态：</th>
+        			<td >
+        				<select name="status" id="status" >
+    						<option value="">-=请选择=-</option>
+    						#foreach($s in $stockStatusMap.entrySet())
+    							<option value="$!{s.key}" #if($!{shoppingListQuery.status} == ${s.key}) selected="true" #end>$!{s.value}</option>
+    						#end
+                        </select>
+                    </td>
+        			<th>订单类型：</th>
+        			<td >
+        				<select name="isWholesale" id="isWholesale" >
+    						<option value="">-=请选择=-</option>
+    						#foreach($s in $stockTypeMap.entrySet())
+    							<option value="$!{s.key}" #if($!{shoppingListQuery.isWholesale} == ${s.key}) selected="true" #end>$!{s.value}</option>
+    						#end
+                        </select>
+                    </td>
+                </tr>
+				
+    			<tr>
+        			<th>采购时间：从</th>
+        			<td >
+        				<input type="text" name="shoppingTimeStart" id="shoppingTimeStart" value="$!shoppingListQuery.shoppingTimeStart" size="10" theme="simple" readonly="true" />
+                    </td>
+        			<th>采购时间：到</th>
+        			<td >
+        				<input type="text" name="shoppingTimeEnd" id="shoppingTimeEnd" value="$!shoppingListQuery.shoppingTimeEnd" size="10" theme="simple" readonly="true" />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "shoppingTimeStart",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "shoppingTimeEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+                </tr>
+				
+    			<tr>
+        			<th>预期到货时间：从</th>
+        			<td >
+        				<input type="text" name="arriveTimeStart" id="arriveTimeStart" value="$!shoppingListQuery.arriveTimeStart" size="10" theme="simple" readonly="true")
+                    </td>
+        			<th>预期到货时间：到</th>
+        			<td >
+        				<input type="text" name="arriveTimeEnd" id="arriveTimeEnd" value="$!shoppingListQuery.arriveTimeEnd" size="10" theme="simple" readonly="true")
+                    </td>
+            		  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "arriveTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "arriveTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+                </tr>
+				
+    			<tr>
+    				<th>&nbsp;</th>
+        			<td colspan="3">
+        				<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+    					<input type="button" value="Excel导出" class="button" onclick="doExport();"/>
+                    </td>
+                </tr>
+    		</table>
+		</div>
+	</form>
+
+	<div class="tool">
+        <span><a href="${appServer}/stock/stock_add_page.html" hidefocus="true" class="bt_add">新增采购订单</a></span>
+		<span><a href="${appServer}/stock/stock_add_page.html?addType=w" hidefocus="true" class="bt_add">新增批发采购订单</a></span>
+    </div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+  <div class="listBox">
+    <table  id="listTable" name="listTable"  class="list-table">
+      <tr>
+        <th>采购订单号</th>
+        <th>供应商名称</th>
+        <th>采购时间</th>
+        <th>预期到货时间</th>
+		<th>实际到货时间</th>
+        <th>合同编号</th>
+		<th>创建人</th>
+		<th>库存类型</th>
+        <th>订单状态</th>
+		<th>订单类型</th>
+		<th>财务状态</th>
+		<th>操作</th>
+      </tr>
+      #foreach($shopping in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+        <td  align="left">&nbsp;<a href="search_stock_detail.html?shoppingNum=$!shopping.shoppingNum">$!shopping.shoppingNum</a></td>
+		<td  align="left">&nbsp;$!shopping.supplierName</td>
+        <td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!shopping.shoppingTime)&nbsp;</td>
+		<td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!shopping.arriveTime)&nbsp;</td>
+		<td  align="center">&nbsp;$!date.format("yyyy-MM-dd",$!shopping.factArriveTime)&nbsp;</td>
+        <td  align="left"> &nbsp;$!shopping.primitiveNum</td>
+		<td  align="left">&nbsp;$!shopping.creater</td>
+		<td  align="center">&nbsp;$!storTypeMap.get("${shopping.storType}")</td>
+        <td  align="center"><span id="displayStatus$shopping.id">&nbsp;$!stockStatusMap.get("${shopping.status}")</span></td>
+		<td  align="center">&nbsp;$!stockTypeMap.get("${shopping.isWholesale}")</td>
+		<td  align="center">&nbsp;#if("$!{shopping.financeStatus}" == "n") 未确认 #elseif("$!{shopping.financeStatus}" == "y") 已确认 #end</td>
+		<td  align="center">&nbsp;
+		#if($!stockStatusMap.get("${shopping.status}")=="新建"||$!stockStatusMap.get("${shopping.status}")=="等待验收")
+          <a href="#" id="doCloseOper$shopping.id" onclick="return doClose($shopping.id);">关闭采购单</a>
+		#end
+	    </td>
+      </tr>
+	  #end
+    </table>
+  </div>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/stock_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+    </div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+    var shopId='';
+
+	function sesp(){
+     	var ret = window.showModalDialog("$appServer/supplier/supplier_select.html",null,"dialogWidth:1000px;dialogHeight:600px;help:no;status:no");
+      	if(ret){
+			document.getElementById('supplierId').value=ret.id;
+			document.getElementById('supplierName').value=ret.name;
+		}else{
+			document.getElementById('supplierId').value="";
+			document.getElementById('supplierName').value="";
+		}
+    }
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="$appServer/stock/export_shopping_list.html";
+		form1.submit();
+		form1.action="$appServer/stock/stock_search.html";
+	}
+
+	function formSubmit(){
+			var dateStart1str = document.getElementById("shoppingTimeStart").value;
+		    var dateEnd1str = document.getElementById("shoppingTimeEnd").value;
+		    var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+			var dateStart2str = document.getElementById("arriveTimeStart").value;
+		    var dateEnd2str = document.getElementById("arriveTimeEnd").value;
+		    var dateStart2 = dateStart2str.replace(/-/g, "/");
+		    var dateEnd2 = dateEnd2str.replace(/-/g, "/");
+    		var b_date2=new Date(Date.parse(dateStart2));
+            var e_date2=new Date(Date.parse(dateEnd2));
+
+			//document.getElementById('shoppingNum').value=document.getElementById('shoppingNum').value.trim();
+			//document.getElementById('primitiveNum').value=document.getElementById('primitiveNum').value.trim();
+
+    		if(e_date1 < b_date1){
+    			alert("采购起始时间不能大于结束时间！");
+    			return false;
+    		}
+			if(e_date2 < b_date2){
+    			alert("预期到货起始时间不能大于结束时间！");
+    			return false;
+    		}
+        	document.forms[0].submit();
+	    }
+
+		function clearSupplier(){
+		    document.getElementById("supplierId").value="";
+			document.getElementById("supplierName").value="";
+	    }
+
+	    function doClose(id){
+		   if(!confirm("确实要关闭采购单吗?")){
+             return false;
+		   }
+		   shopId=id;
+		   	jQuery.get('$appServer/stock/closeDwrShopping.html',{param:id},function(message){
+			    if(message=="userwrong"){
+				   jQuery("#result").html("不是你做的采购单,不能关闭!");
+			    }
+			    if(message=="statuswrong"){
+				   jQuery("#result").html("采购状态已更改,请刷新!");
+			    }
+		        if(message=="success"){
+				   var displayStatusId = document.getElementById('displayStatus'+shopId);
+				   displayStatusId.innerHTML = "采购关闭";
+				   var doCloseOperId = document.getElementById('doCloseOper'+shopId);
+			       doCloseOperId.style.display="none";
+				   jQuery("#result").html("操作成功!");
+		        }
+		    },'');
+		}
+</script>

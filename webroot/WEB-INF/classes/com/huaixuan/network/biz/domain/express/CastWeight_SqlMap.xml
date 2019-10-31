@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="castweight">
+<typeAlias alias="castweight" type="com.huaixuan.network.biz.domain.express.Castweight"/>
+	<resultMap class="castweight" id="castweightResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="GOODS_ID" property="goodsId"/>
+		<result column="GOODS_SN" property="goodsSn"/>
+		<result column="goodsName" property="goodsName"/>
+		<result column="goodsWeight" property="goodsWeight"/>
+		<result column="EXPRESS_ID" property="expressId"/>
+		<result column="CAST_WEIGHT" property="castWeight" nullValue="0.00"/>
+		<result column="STATUS" property="status"/>
+	</resultMap>
+	<resultMap class="castweight" id="castweightResult2">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="GOODS_ID" property="goodsId"/>
+		<result column="GOODS_SN" property="goodsSn"/>
+		<result column="EXPRESS_ID" property="expressId"/>
+		<result column="CAST_WEIGHT" property="castWeight" nullValue="0.00"/>
+		<result column="STATUS" property="status"/>
+	</resultMap>
+<!-- create Castweight object -->
+<insert id="addCastweight" parameterClass="castweight">
+<![CDATA[
+		insert into emall_castweight
+		(ID,GMT_CREATE,GMT_MODIFY,GOODS_ID,GOODS_SN,EXPRESS_ID,CAST_WEIGHT,STATUS )values( null,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#goodsSn#,
+		#expressId#,
+		#castWeight#,
+		#status#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Castweight object -->
+<update id="editCastweight" parameterClass="castweight">
+<![CDATA[
+		update emall_castweight set
+		GMT_MODIFY = sysdate(),
+		GOODS_ID = #goodsId#,
+		GOODS_SN = #goodsSn#,
+		EXPRESS_ID = #expressId#,
+		CAST_WEIGHT = #castWeight#
+		 where ID = #id#
+
+]]>
+</update>
+<!-- added by chenhang 2011/02/17 started-->
+<update id="updateCastweight" parameterClass="castweight">
+<![CDATA[
+		update emall_castweight set
+		GMT_MODIFY = sysdate(),
+		CAST_WEIGHT = #castWeight#,
+		STATUS=#status#
+		 where GOODS_SN = #goodsSn# and EXPRESS_ID=#expressId#
+]]>
+</update>
+<!-- added by chenhang 2011/02/17 ended -->
+<!-- delete Castweight object -->
+<delete id="removeCastweight" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_castweight where emall_castweight.ID = #value#
+]]>
+</delete>
+<!-- search Castweight object -->
+<select id="getCastweight" parameterClass="java.lang.Long" resultMap="castweightResult">
+<![CDATA[
+		select c.*,g.title goodsName,g.goods_weight goodsWeight from emall_castweight c,emall_goods g where c.goods_sn=g.goods_sn
+		and c.ID = #value#
+]]>
+</select>
+
+<!-- search Castweight object -->
+<select id="getCastweightByGoodsIdAndExpessId" resultMap="castweightResult2">
+<![CDATA[
+		select t.* from emall_castweight t where t.CAST_WEIGHT > 0
+]]>
+	 <isNotEmpty prepend="and" property="goodsId">
+	        t.GOODS_ID = #goodsId#
+	 </isNotEmpty>
+	 <isNotEmpty prepend="and" property="expressId">
+	        t.EXPRESS_ID = #expressId#
+	 </isNotEmpty>
+	 <isNotEmpty prepend="and" property="status">
+			t.STATUS=#status#
+	 </isNotEmpty>
+	 LIMIT 1
+</select>
+<select id="getCheckCastWeight" resultMap="castweightResult">
+<![CDATA[
+		select c.*,g.title goodsName,g.goods_weight goodsWeight from emall_castweight c,emall_goods g where c.goods_sn=g.goods_sn
+]]>
+	 <isNotEmpty prepend="and" property="goodsSn">
+	        c.goods_sn = #goodsSn#
+	 </isNotEmpty>
+	 <isNotEmpty prepend="and" property="expressId">
+	        c.EXPRESS_ID = #expressId#
+	 </isNotEmpty>
+</select>
+<!-- searchAll Castweight List -->
+<select id="getCastweights" resultMap="castweightResult">
+<![CDATA[
+		select emall_castweight.* from emall_castweight
+]]>
+</select>
+
+<select id="getCastWeightCount" resultClass="int">
+<![CDATA[
+		select count(c.id) from emall_castweight c,emall_goods g where c.goods_sn=g.goods_sn
+]]>
+		<isNotEmpty prepend="and" property="goodsName">
+			g.title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsSn">
+			c.goods_sn = #goodsSn#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressId">
+			c.express_id = #expressId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			c.status=#status#
+		</isNotEmpty>
+</select>
+
+<select id="getCastWeightList" resultMap="castweightResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select c.*,g.title goodsName,g.goods_weight goodsWeight from emall_castweight c,emall_goods g where c.goods_sn=g.goods_sn
+]]>
+		<isNotEmpty prepend="and" property="goodsName">
+			g.title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsSn">
+			c.goods_sn = #goodsSn#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="expressId">
+			c.express_id = #expressId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			c.status=#status#
+		</isNotEmpty>
+		order by c.gmt_create desc
+		<include refid="pageSQLFoot"/>
+</select>
+</sqlMap>

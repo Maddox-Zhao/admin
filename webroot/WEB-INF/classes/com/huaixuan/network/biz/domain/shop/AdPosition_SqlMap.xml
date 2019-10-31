@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AdPosition">
+	<cacheModel id="adPosition-cache" type="LRU">
+		<flushInterval hours="24"/>
+	   <flushOnExecute statement="addAdPosition"/>
+	   <flushOnExecute statement="editAdPosition"/>
+	   <flushOnExecute statement="removeAdPosition"/>
+	   <property name="size" value="1000" />
+	</cacheModel>
+<typeAlias alias="adPosition" type="com.huaixuan.network.biz.domain.shop.AdPosition"/>
+	<resultMap class="adPosition" id="adPositionResult">
+		<result column="id" property="id"/>
+		<result column="position_name" property="positionName"/>
+		<result column="position_code" property="positionCode"/>
+		<result column="width" property="width"/>
+		<result column="height" property="height"/>
+		<result column="position_desc" property="positionDesc"/>
+		<result column="position_style" property="positionStyle"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+
+<!-- create AdPosition object -->
+<insert id="addAdPosition" parameterClass="adPosition">
+<![CDATA[
+		insert into emall_ad_position
+		(id,position_name,position_code,width,height,position_desc,position_style,gmt_create,gmt_modify )values( null,
+		#positionName#,
+		#positionCode#,
+		#width#,
+		#height#,
+		#positionDesc#,
+		#positionStyle#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update AdPosition object -->
+<update id="editAdPosition" parameterClass="adPosition">
+<![CDATA[
+		update emall_ad_position set position_name = #positionName#,
+		position_code = #positionCode#,
+		width = #width#,
+		height = #height#,
+		position_desc = #positionDesc#,
+		position_style = #positionStyle#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete AdPosition object -->
+<delete id="removeAdPosition" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_ad_position where emall_ad_position.ID = #value#
+]]>
+</delete>
+<!-- search AdPosition object -->
+<select id="getAdPosition" parameterClass="java.lang.Long" resultMap="adPositionResult">
+<![CDATA[
+		select emall_ad_position.* from emall_ad_position where emall_ad_position.ID = #value#
+]]>
+</select>
+<!-- searchAll AdPosition List -->
+<select id="getAdPositions" resultMap="adPositionResult" cacheModel="adPosition-cache">
+<![CDATA[
+		select emall_ad_position.* from emall_ad_position
+]]>
+</select>
+
+<select id="getAdPositionsCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from emall_ad_position
+		order by emall_ad_position.gmt_create desc,emall_ad_position.id
+]]>
+</select>
+
+<select id="getAdPositionsPage" parameterClass="map"
+		resultMap="adPositionResult">
+		  <include refid="pageSQLHead"/>
+<![CDATA[
+	select *
+	from emall_ad_position a
+	order by  a.GMT_CREATE desc,a.id
+]]>
+  <include refid="pageSQLFoot"/>
+
+</select>
+
+
+
+</sqlMap>

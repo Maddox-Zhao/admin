@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="consignmentPro">
+	<typeAlias alias="ConsignmentPro"
+		type="com.huaixuan.network.biz.domain.hx.ConsignmentPro" />
+	<resultMap id="ConsignmentProResult"
+		class="com.huaixuan.network.biz.domain.hx.ConsignmentPro">
+		<result column="id" property="proId" />
+		<result column="con_id" property="conId" />
+		<result column="note" property="note" />
+		<result column="amount" property="price" />
+		<result column="paid_amount" property="paidPrice" />
+		<result column="commission" property="commission" />
+		<result column="brand_id" property="brandId" />
+		<result column="series_id" property="idSeries" />
+		<result column="type" property="type" />
+		<result column="material" property="material" />
+		<result column="color" property="color" />
+		<result column="uuid" property="uuid" />
+		<result column="auuid" property="auuid" />
+		<result column="auuid" property="auuid" />
+		<result column="level" property="level" />
+		<result column="con_code" property="conCode" />
+		<result column="pic" property="pic" />
+		<result column="status" property="status" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+
+	<sql id="consignmentPro">
+		con_id,Note,Amount,Paid_amount,Commission,Brand_id,series_id,Type,Material,Color,UUID,aUUID,level,Con_code,Pic,Status,Gmt_create,Gmt_modify
+	</sql>
+	<select id="getConsignmentProById" parameterClass="java.lang.String" resultMap="ConsignmentProResult">
+		select * from hx_consignment_pro
+		where con_id = #proId#
+	</select>
+
+	<select id="getOneConsignmentPro" parameterClass="java.lang.String"
+		resultMap="ConsignmentProResult">
+		select *
+		from hx_consignment_pro
+		where
+		id = #id#
+	</select>
+
+	<insert id="addConsignmentPro" parameterClass="ConsignmentPro">
+		insert into hx_consignment_pro(
+		<include refid="consignmentPro" />
+		)
+		values(#conId#,#note#,#price#,default,#commission#,#brandId#,#idSeries#,#type#,#material#,
+		#color#,#uuid#,#auuid#,#level#,#conCode#,#pic#,default,sysdate(),null)
+		<selectKey keyProperty="proId" resultClass="int">
+			select
+			last_insert_id() as id from hx_consignment_pro limit 1
+	</selectKey>
+	</insert>
+
+	<update id="updateComsignmentPro" parameterClass="ConsignmentPro">
+		update
+		hx_consignment_pro
+		set note =
+		#note#,Brand_id=#brandId#,series_id=#idSeries#,Type=#type#,Material=#material#,color=#color#,pic=#pic#,
+		uuid=#uuid#,auuid=#auuid#,level=#level#,amount=#price#,Gmt_modify=sysdate()
+		where id = #proId#
+	</update>
+
+	<delete id="deleteConsignmentPro" parameterClass="java.lang.String">
+		delete from
+		hx_consignment_pro
+		where id =#proId#
+	</delete>
+
+	<update id="updateConsignmentProStatus" parameterClass="java.lang.String">
+		update
+		hx_consignment_pro set status = #status#
+	</update>
+
+	<select id="getConsignmentProPrice" parameterClass="java.lang.String"
+		resultClass="java.lang.Integer">
+		select hx_consignment_pro.amount from hx_consignment_pro
+		where id = #proId# 
+	</select>
+
+	<update id="updateConsignmentProPic" parameterClass="java.util.Map">
+		update
+		hx_consignment_pro set pic = #pic#
+		where id = #id#
+	</update>
+
+	<update id="updateConsignmentProPaidAmount" parameterClass="java.util.Map">
+		update hx_consignment_pro set paid_amount = #paidMoney#
+		where id = #id#
+	</update>
+
+	<select id="selectConsignmentProAmount" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select amount from hx_consignment_pro
+		where id = #id#
+	</select>
+
+	<select id="selectConsignmentProPaidAmount" parameterClass="java.lang.String"
+		resultClass="java.lang.Integer">
+		select paid_amount from hx_consignment_pro
+		where id = #id#
+	</select>
+
+	<update id="updateProStatusById" parameterClass="java.util.Map">
+	update hx_consignment_pro set status = #status# where id = #id#
+	</update>
+
+
+</sqlMap>

@@ -1,0 +1,6 @@
+2019-09-27 10:06:08,436 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[23] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->23]=23 100%
+2019-09-27 10:06:08,436 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[23] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->23]=23 100%

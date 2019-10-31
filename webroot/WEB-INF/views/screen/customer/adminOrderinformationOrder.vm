@@ -1,0 +1,481 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>订单数据</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+    <form id="form1" method="post">
+        <div style="width:25%;height:50%;float:left" id="form1">
+            <div class="mini-toolbar" style="border-bottom:0;padding:0px; height:450px;" >
+                <form id="form1" method="post" >
+                    <table class="form-table" border="0" cellpadding="0" cellspacing="2" >
+                        <tr>
+                            <td>
+                                订单号:
+                            </td>
+                            <td>
+                                <input id="idorder" name="idorder" class="mini-textbox" emptyText="idorder" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                订单日期
+                            </td>
+                            <td>
+                                <input  name="date" class="mini-textbox" emptyText="date" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                订单总价
+                            </td>
+                            <td>
+                                <input name="subTotal" id="subTotal" class="mini-textbox" emptyText="" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                付款方式
+                            </td>
+                            <td>
+                              <input name="idPayment" id="combobox" required="true" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..."
+                                    url="/sell/getAllPayment.html"  allowInput="false" showNullItem="true" nullItemText="请选择..." />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                非现金付款金额
+                            </td>
+                            <td>
+                                <input id="amountCard" name="amountCard" 	class="mini-textbox"  enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                现金付款金额
+                            </td>
+                            <td>
+                                <input id="amountCash" name="amountCash" class="mini-textbox" emptyText="amountCash"  enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                客户
+                            </td>
+                            <td>
+                                <input name="customername" class="mini-textbox" emptyText="customername" readonly="readonly" enabled="false"/>
+                            </td>
+                       
+                        <tr>
+                            <td>
+                                经手人
+                            </td>
+                            <td>
+                                <input name="employeename" class="mini-textbox" emptyText="customername" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                销售渠道
+                            </td>
+                            <td>
+                                <input name="idSellChannel"  required="true" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..."
+                                    url="/sell/getAllSellChannel.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                已是否发货
+                            </td>
+                            <td>
+                                <input  name="deliverystatus" id="deliverystatus" class="mini-textbox" emptyText="deliverystatus" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                发货信息
+                            </td>
+                            <td>
+                                <input  name="deliverymeno" class="mini-textbox"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                备注
+                            </td>
+                            <td>
+								<textarea name="remark" class="mini-textarea" >
+								</textarea>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                 <a style="width:200px;" id="update" class="mini-button"   onclick="update()">更新</a> 
+                            </td>
+                        </tr>
+						#if($!adminAccess.has("A_ORDER_DELIVERY"))
+						<tr>
+							 <td colspan="2">
+								 <a style="width:200px" id="delivery" class="mini-button"  onclick="fahuo()">发货</a>
+                            </td>
+                        </tr>
+						#end
+						<tr>
+							 <td colspan="2">
+								 <a style="width:200px" id="print" class="mini-button"   href="/order1/print.html?idorder="  target="_blank">打印</a>
+                            </td>
+                        </tr>
+						 #if($!adminAccess.has("A_ORDER_CANCEL"))
+                        <tr>
+     
+							<td  colspan="2"> 
+								 <a style="width:200px"  id="cancelOrder" class="mini-button"  onclick="cancelOrder">取消订单</a>
+                            </td>
+                        </tr>
+						#end
+                        #if($!adminAccess.has("A_ORDER_PAY"))
+						<tr>
+							  <td colspan="2"> 
+								 <a style="width:200px" id="complant" class="mini-button"   onclick="completionPament">完成付款</a>
+                            </td>
+                        </tr>
+						#end
+						<tr>
+							<td colspan="2" >
+								 
+								  <a style="width:200px" class="mini-button"   onclick="CloseWindow('canel')">  取消</a>
+                            </td>
+                        </tr>
+                    </table>
+</div>
+            </div>
+</form>
+<div id="datagrid" class="mini-datagrid" style="width:75%;height:450px;float:right" allowResize="true"  allowCellEdit="true" allowCellSelect="true"
+	idField="idProduct" multiSelect="false"  pageSize="100" allowAlternating="true" onRowdblclick="edit()" onCellbeginedit="cellbeginedit" showPager="false">
+    <div property="columns">
+		<div type="indexcolumn"></div>
+        <div field="idProduct" width="120" headerAlign="center" align="center" allowSort="true">idProduct</div>
+        <div field="brandName" width="80" headerAlign="center" align="center"  allowSort="true" >品牌</div>
+        <div field="seriesName" width="60" headerAlign="center" align="center"  allowSort="true">品名</div>
+        <div field="type" width="60" headerAlign="center" align="center"  allowSort="true">型号</div>
+        <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质</div>
+        <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色</div>
+        <div field="size" width="60" headerAlign="center" align="center"  allowSort="true">大小</div>
+        <div field="ssPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚上价</div>
+        <div field="smPrice" width="60" headerAlign="center" align="center"  allowSort="true">尚美价</div>
+        <div field="salePrice" width="60" headerAlign="center" align="center"  allowSort="true">实际售价
+			#if($!adminAccess.has('A_ORDER_UPDATE_PRICE'))
+				<input property="editor"  class="mini-spinner" minValue="0" maxValue="200000"/>
+			#end
+		</div>
+        <div field="salePriceCurrency" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">货币单位</div>
+    </div>
+</div>
+<script type="text/javascript">
+	mini.parse();
+	
+    var form = new mini.Form("form1");
+	var noPayment = false;
+	var grid1 = mini.get("datagrid");
+	var userNmae = '$!adminAgent.username'; 
+	var canUpdatePrice = $!adminAccess.has('A_ORDER_UPDATE_PRICE');
+	 //未付款的才能编辑售价
+	 function cellbeginedit(e){
+	 		console.log(noPayment);
+			console.log(canUpdatePrice);
+	 		if(userNmae == '1000000' && e.field == "salePrice")
+			{
+				console.log('if');
+				e.cancel = false;
+			}
+            else if(e.field == "salePrice" && noPayment && canUpdatePrice){
+				console.log('else if');
+                e.cancel = false;
+            }
+			else
+				e.cancel = true;
+      }
+	 grid1.on("cellcommitedit", function (e) {
+            var record = e.record;
+			var salePrice = e.value;
+			var idProduct = record.idProduct;
+			updatesalePrice(idProduct,salePrice);
+        });
+		
+function updatesalePrice(idProduct,salePrice) {
+     jQuery.ajax({
+        type: 'post',
+        cache: false,
+        url: '/product/updatesalePrice.html',
+        dataType: "json",
+        data: "idProduct=" + idProduct + "&salePrice=" + salePrice + "",
+        success: function(data) {
+           var datas = grid1.getData();
+		   var total = 0;
+		   for(var i = 0 ; i < datas.length; i++)
+		   {
+		   		total += datas[i].salePrice;
+		   }
+		   mini.get("subTotal").setValue(total);
+        }
+    });
+}
+		
+	function SetData(data) {
+            data = mini.clone(data);
+			var idPayment = data.idPayment;
+			//隐藏按钮
+			
+			//已取消                                   
+			if(idPayment == 8 || idPayment == 9)
+			{
+				 jQuery("#delivery").hide();
+				 jQuery("#complant").hide();
+				 jQuery("#print").hide();
+				 jQuery("#cancelOrder").hide();
+			}
+			else if(idPayment == 0) //未付款
+			{
+				  jQuery("#delivery").hide();
+				  mini.get("amountCash").setEnabled("true")
+				  noPayment = true; //未付款 可以编辑 售价
+			}
+			else   //已付款
+			{
+    			jQuery("#complant").hide();
+    			jQuery("#cancelOrder").hide();
+				 
+			}
+			//已发货
+			if(data.deliverystatus == 'Yes')
+			{
+				jQuery("#delivery").hide();
+				jQuery("#cancelOrder").hide();
+			}
+			
+			//jQuery("#cancelOrder").hide();
+			
+			var href= "/order1/print.html?idorder="+data.id;
+			jQuery("#print").attr("href",href);
+			//获取数据
+            jQuery.ajax({
+                    url: "/orderinformation/getorderlistByid.html?idorder="+data.id,
+                    cache: false,
+                    success: function (text) {
+                        var o = mini.decode(text);
+            			var j = new Date(parseInt(o.date));
+            			var p = formatDate(j, false);
+            			o.date = p; //设置时间
+						
+                        form.setData(o);
+						
+						//加载该订单产品
+            			var grid = mini.get("datagrid");
+            			grid.setUrl("/orderinformation/getProductByidorder.html?idorder="+data.id);
+            			grid.load();
+                    }
+                });
+            }
+		
+		function renderCurrency(row){
+		  if(!row.value) return "";
+		  if(row.value == '1') return "RMB";
+		  if(row.value == '2') return "EU";
+		  if(row.value == '3') return "HKD";
+		  if(row.value == '4') return "US";
+	}
+	function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+
+	        function edit() {
+			var grid = mini.get("datagrid");
+            var row = grid.getSelected();
+            if (row) {
+                mini.open({
+                    url: "/product/toEdit.html",
+                    title: "订单明细",
+                    width: 1100,
+                    height: 450,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+							action: "edit",
+                            id: row.idProduct
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                        // grid.reload();
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		 function CloseWindow(action) {            
+            if (action == "close" && form.isChanged()) {
+            if (confirm("数据被修改了，是否先保存？")) {
+            return false;
+            }
+            }
+            if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+            else window.close();            
+            }
+		
+		//完成付款
+		function completionPament()
+		{
+			var data = form.getData();
+			if(!data.idPayment || data.idPayment == 0)
+			{
+				mini.alert("请选择付款方式");
+				return false;
+			}
+			var subTotal = mini.get("subTotal").getValue();
+			mini.confirm("确定收到<span style='color:red;font-weight:bold'>"+subTotal+"</span>款项?","提示",function(action)
+			{
+				if(action == 'ok')
+				{
+					
+              	   mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '处理中,请勿关闭...'
+                     });
+					jQuery.post("/order1/orderPayMent.html",data,function(text)
+					{
+						 mini.unmask();
+						 if(text == 'ok')
+						 {
+						 	CloseWindow('canel');
+						 }
+					});
+				}
+			})
+		}
+		
+		
+		//取消订单
+		function cancelOrder()
+		{
+			var data = form.getData();
+			if(!data.idorder)
+			{
+				mini.alert("数据错误");
+				return false;
+			}
+			mini.confirm("确定取消?","提示",function(action)
+			{
+				if(action == 'ok')
+				{
+					
+              	   mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '处理中,请勿关闭...'
+                     });
+					jQuery.post("/order1/cancelOrder.html",data,function(text)
+					{
+						 mini.unmask();
+						 if(text == 'ok')
+						 {
+						 	CloseWindow('canel');
+						 }
+					});
+				}
+			})
+		}
+		
+		//更新订单信息
+		function update()
+		{
+		    form.validate();
+            if(form.isValid() == false) return;
+			var data = form.getData();
+			var resultData = {};
+			resultData.idorder = data.idorder;
+			resultData.idPayment = data.idPayment;
+			resultData.deliverymeno = data.deliverymeno;
+			resultData.remark = data.remark;			
+			 mini.mask({
+                el: document.body,
+                cls: 'mini-mask-loading',
+                html: '处理中,请勿关闭...'
+             });
+    		jQuery.post("/order1/updatCustomerOrder.html",resultData,function(text)
+    		{
+    			 mini.unmask();
+    			 if(text == 'ok')
+    			 {
+				 	mini.alert("更新成功")
+    			 }
+				 else
+				 {
+				 	mini.alert("更新失败")
+				 }
+    		});
+		}
+		
+		
+		//发货
+		function fahuo()
+		{
+		    form.validate();
+            if(form.isValid() == false) return;
+			mini.confirm("确定发货?","提示",function(action)
+			{
+				if(action == 'ok')
+				{	
+        			var data = form.getData();
+        			var resultData = {};
+        			resultData.idorder = data.idorder;
+        			resultData.idPayment = data.idPayment;
+        			resultData.deliverymeno = data.deliverymeno;
+        			resultData.remark = data.remark;
+        			resultData.idSellChannel = data.idSellChannel;
+					resultData.deliverystatus = 'Yes';
+				    resultData.deliverydate = '2015-01-01 00:00:00';//发货有值   更新使用系统时间
+        			 mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿关闭...'
+                     });
+            		jQuery.post("/order1/updatCustomerOrder.html",resultData,function(text)
+            		{
+            			 mini.unmask();
+            			 if(text == 'ok')
+            			 {
+            			 	mini.alert("发货成功")
+        					mini.get("deliverystatus").setValue('Yes');
+        					jQuery("#delivery").hide();
+            			 }
+        				 else
+        				 {
+        				 	mini.alert("发货失败")
+        				 }
+            		});
+				}
+			})
+		}
+</script>
+</body>
+</html>

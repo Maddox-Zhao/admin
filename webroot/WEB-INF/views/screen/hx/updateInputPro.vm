@@ -1,0 +1,102 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>修改寄卖产品信息</h2>
+		 
+				
+        	 	#if($!message == "imgError")
+					<div class="mag-t2">
+        					图片格式不正确或大于了200K！
+					</div>
+				#end
+
+		 
+		 <center>
+		 <form action="update.html" name="updateConsignmentPro" method="post" enctype="multipart/form-data">
+			
+			#springBind("consignmentPro.proId")
+			<input type="hidden" name="${status.expression}" value="$!{status.value}" theme="simple" class="inp inp-w105"/>
+			
+			#springBind("consignmentPro.conId")
+			<input type="hidden" name="${status.expression}" value="$!{status.value}" theme="simple" class="inp inp-w105"/>
+			  
+			  寄卖编号：
+			  #springBind("consignmentPro.conCode")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" readonly="true" theme="simple" class="inp inp-w105"/><br/><br/>
+			  
+			   品&nbsp;&nbsp;&nbsp;&nbsp;名：
+			  #springBind("consignmentPro.idSeries")
+			  <select name="${status.expression}">
+					#foreach($series in ${seriesList.entrySet()})
+							<option value="$!series.key" class="inp inp-w105"  #if($series.key == $consignmentPro.idSeries) selected=true #end size="10">&nbsp;&nbsp;$!{series.value}&nbsp;&nbsp;</option>
+					#end
+			  </select><br/><br/>
+			  
+			 品牌：
+			  #springBind("consignmentPro.brandId")
+			  <select name="${status.expression}">
+					#foreach($brand in $brandList.entrySet())
+							<option value="$!brand.key" class="inp inp-w105" #if($brand.key == $consignmentPro.brandId) selected =true #end size="10">$!brand.value</option>
+					#end
+			  </select><br/><br/>
+			  
+			  材质：
+			  #springBind("consignmentPro.material")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			  型号：
+			  #springBind("consignmentPro.type")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			  
+			  颜色：
+			  #springBind("consignmentPro.color")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="7"/><br/><br/>
+			  
+			   价钱：
+			 #if($!consignmentPro.status.equals("sold"))
+				#springBind("consignmentPro.price")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" readOnly="true" onkeyup="value=value.replace(/[^\d]/g,'')"  class="inp inp-w105" maxlength="7"/><br/><br/>
+			#else
+			  #springBind("consignmentPro.price")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" onkeyup="value=value.replace(/[^\d]/g,'')"  class="inp inp-w105" maxlength="7"/><br/><br/>
+			#end
+			    
+			
+			  
+			    
+			  uuid：
+			  #springBind("consignmentPro.uuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="10"/><br/><br/>
+			  
+			    
+			  auuid：
+			  #springBind("consignmentPro.auuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105" maxlength="10"/><br/><br/>
+			  
+			    
+			  等级：
+			  #springBind("consignmentPro.level")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" theme="simple" class="inp inp-w105"/><br/><br/>
+			 
+			  	
+			  产品图片：
+			  <input type="file" name="img" /><img src="$!{upServer}$!{consignmentPro.pic}" width="80"/>
+				
+			  <br/><br/>
+	</form>
+			 
+		<div class="form-but">
+    		#if($!consignmentPro.status.equals("wait_sell"))<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.updateConsignmentPro.submit()">确定#end</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.updateConsignmentPro.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/consignment/detail.html?id=$!{consignmentPro.conId}';">返回 </button>
+		</div>
+
+		 </center>
+    </div>

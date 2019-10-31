@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="PurchasePorductNameSpace">
+	<typeAlias alias="PurchasePorduct"
+		type="com.huaixuan.network.biz.domain.purchase.PurchaseProduct" />
+	<resultMap class="com.huaixuan.network.biz.domain.purchase.PurchaseProduct" id="PurchasePorductResult">
+		<result property="idPurchaseProduct" column="idPurchaseProduct" />
+		<result property="idPurchaseLifeCycle" column="idPurchaseLifeCycle"/>
+		<result property="idBrand" column="idBrand"/>
+		<result property="brandname" column="brandname"/>
+		<result property="idSeries" column="idSeries"/>
+		<result property="seriesname" column="seriesname"/>
+		<result property="type" column="TYPE" />
+		<result property="material" column="material" />
+		<result property="color" column="color" />
+		<result property="unitCost" column="unitCost" />
+		<result property="EUPrice" column="EUPrice" />
+		<result property="HKPrice" column="HKPrice" />
+		<result property="CNPrice" column="CNPrice" />
+		<result property="HXPrice" column="HXPrice" />
+		<result property="HKHXPrice" column="HKHXPrice" />
+		<result property="idSize" column="idSize"/>
+		<result property="sizename" column="sizename"/>
+		<result property="number" column="number" />
+		<result property="totalNumber" column="totalNumber" />
+		<result property="origin" column="origin" />
+	</resultMap>
+	<sql id="PURCHASEPRODUCT.SEARCHPRODUCT">
+		<isNotEmpty property="idBrand">
+			and b.idBrand = #idBrand#
+		</isNotEmpty>
+		<isNotEmpty property="idSeries">
+			and p.idSeries = #idSeries#
+		</isNotEmpty>
+		<isNotEmpty property="type">
+			and p.type = #type#
+		</isNotEmpty>
+		
+		<isNotEmpty property="material">
+			and p.material = #material#
+		</isNotEmpty>
+		<isNotEmpty property="color">
+			and p.color = #color#
+		</isNotEmpty>
+		<isNotEmpty property="idSize">
+			and p.idSize = #idSize#
+		</isNotEmpty>
+	</sql>
+	<select id="getPurchaseproductCount" resultClass="java.lang.Integer"
+		parameterClass="java.util.Map">
+		SELECT COUNT(p.idPurchaseProduct)
+		FROM
+		purchaseproduct p,
+		purchaselifecycle pur,
+		size s,
+		brand b,
+		series ser
+		WHERE
+		p.idPurchaseLifecycle = pur.idPurchaseLifecycle
+		AND p.idBrand =
+		b.idBrand
+		AND p.idSeries = ser.idSeries
+		AND p.idSize = s.idSize
+		AND p.idPurchaseLifecycle = #idPurchaseLifecycle#
+		<include refid="PURCHASEPRODUCT.SEARCHPRODUCT"/>
+	</select>
+	<select id="getPurchaseproduct" parameterClass="java.util.Map" resultMap="PurchasePorductResult" >
+			SELECT
+				p.idPurchaseProduct,
+				p.idBrand idBrand,
+				p.idPurchaseLifeCycle idPurchaseLifeCycle,
+				b.name brandname,
+				p.idSeries idSeries,
+				ser.name seriesname,
+				p.type TYPE,
+				p.material material,
+				p.color color,
+				p.unitCost unitCost,
+				p.EUPrice EUPrice,
+				p.CNPrice CNPrice,
+				p.HXPrice HXPrice,
+				p.HKPrice HKPrice,
+				p.HKHXPrice HKHXPrice,
+				p.idSize idSize,
+				s.name sizename,
+				p.number number,
+				p.totalNumber totalNumber,
+				p.Origin origin
+			FROM 
+				purchaseproduct p,
+				size s,
+				brand b,
+				series ser
+			WHERE p.idPurchaseLifeCycle = #idPurchaseLifeCycle#
+				AND p.idBrand = b.idBrand
+				AND p.idSeries = ser.idSeries
+				AND p.idSize = s.idSize
+			<include refid="PURCHASEPRODUCT.SEARCHPRODUCT"/>
+	</select>
+	<update id="updatePurchaseProductf" parameterClass="PurchasePorduct">
+	<![CDATA[
+	UPDATE purchaseproduct 
+	SET
+	idBrand = #idBrand#,
+	idSeries =#idSeries#,
+	type = #type#,
+	material = #material#,
+	color =  #color#,
+	idSize = #idSize#,
+	unitCost = #unitCost#,
+	EUPrice = #EUPrice#,
+	CNPrice =#CNPrice#,
+	HXPrice =#HXPrice#,
+	HKPrice =#HKPrice#,
+	HKHXPrice =#HKHXPrice#,
+	number =#number#,
+	totalNumber=#totalNumber#,
+	origin =#origin#
+	WHERE	idPurchaseProduct = #idPurchaseProduct#
+	]]>
+	</update>
+	<insert id="addPurchaseProduct" parameterClass="PurchasePorduct">
+	<![CDATA[
+	INSERT INTO purchaseproduct(
+	idPurchaseLifeCycle,
+	idBrand,
+	idSeries,
+	TYPE,
+	material,
+	color,
+	idSize,
+	unitCost,
+	EUPrice,
+	CNPrice,
+	HXPrice,
+	HKPrice,
+	HKHXPrice,
+	number,
+	totalNumber,
+	origin
+	)
+	VALUES(
+	#idPurchaseLifeCycle#,
+	#idBrand#,
+	#idSeries#,
+	#type#,
+	#material#,
+	#color#,
+	#idSize#,
+	#unitCost#,
+	#EUPrice#,
+	#CNPrice#,
+	#HXPrice#,
+	#HKPrice#,
+	#HKHXPrice#,
+	#number#,
+	#totalNumber#,
+	#origin#
+	)
+	
+	]]>
+	</insert>
+	
+	<select id="getPurchaseProductTotalPrice" resultClass="java.lang.String" parameterClass="java.util.Map">
+	SELECT ROUND(SUM(unitCost * totalNumber),2) AS a
+	FROM purchaseproduct p,size s,brand b,series ser
+	WHERE idPurchaseLifeCycle = #idPurchaseLifeCycle#
+	AND p.idBrand = b.idBrand
+	AND p.idSeries = ser.idSeries
+	AND p.idSize = s.idSize
+	<include refid="PURCHASEPRODUCT.SEARCHPRODUCT"/>
+	</select>
+	
+	<select id="getPurchaseProducttotalNumber" resultClass="java.lang.String" parameterClass="java.util.Map">
+	SELECT ROUND(SUM(totalNumber)) AS a
+	FROM purchaseproduct p,size s,brand b,series ser
+	WHERE idPurchaseLifeCycle = #idPurchaseLifeCycle#
+	AND p.idBrand = b.idBrand
+	AND p.idSeries = ser.idSeries
+	AND p.idSize = s.idSize
+	<include refid="PURCHASEPRODUCT.SEARCHPRODUCT"/>
+	</select>
+	<delete id="deletePurchaseProduct" parameterClass="PurchasePorduct">
+	DELETE FROM purchaseproduct 
+	WHERE 
+	idPurchaseProduct = #idPurchaseProduct#
+	</delete>
+</sqlMap>

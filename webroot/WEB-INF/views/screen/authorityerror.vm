@@ -1,0 +1,10 @@
+#set($layout = 'layout/default.vm')
+<div class="r-error">
+   <h3>
+		出错了，你没有权限进行此操作！
+		<br/>
+		#if($msg)
+			原因：$msg
+		#end
+   </h3>
+</div>

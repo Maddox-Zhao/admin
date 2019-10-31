@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AdDetailSQL">
+<typeAlias alias="adDetail" type="com.huaixuan.network.biz.domain.shop.AdDetail"/>
+	<resultMap class="adDetail" id="adDetailResult">
+		<result column="id" property="id"/>
+		<result column="link" property="link"/>
+		<result column="media_code" property="mediaCode"/>
+		<result column="media_type" property="mediaType"/>
+		<result column="sort" property="sort"/>
+		<result column="click_count" property="clickCount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="ad_id" property="adId"/>
+	</resultMap>
+<!-- create AdDetail object -->
+<insert id="addAdDetail" parameterClass="adDetail">
+<![CDATA[
+		insert into emall_ad_detail
+		(id,link,media_code,media_type,sort,click_count,gmt_create,gmt_modify,ad_id )values( null,
+		#link#,
+		#mediaCode#,
+		#mediaType#,
+		#sort#,
+		#clickCount#,
+		sysdate(),
+		sysdate(),
+		#adId#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update AdDetail object -->
+<update id="editAdDetail" parameterClass="adDetail">
+<![CDATA[
+		update emall_ad_detail set link = #link#,
+		media_code = #mediaCode#,
+		media_type = #mediaType#,
+		sort = #sort#,
+		click_count = #clickCount#,
+		gmt_create = #gmtCreate#,
+		gmt_modify = sysdate()
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete AdDetail object -->
+<delete id="removeAdDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_ad_detail where emall_ad_detail.ID = #value#
+]]>
+</delete>
+<!-- search AdDetail object -->
+<select id="getAdDetail" parameterClass="java.lang.Long" resultMap="adDetailResult">
+<![CDATA[
+		select emall_ad_detail.* from emall_ad_detail where emall_ad_detail.ID = #value#
+]]>
+</select>
+<!-- searchAll AdDetail List -->
+<select id="getAdDetails" resultMap="adDetailResult">
+<![CDATA[
+		select emall_ad_detail.* from emall_ad_detail
+]]>
+</select>
+
+<update id="updateAdDetail" parameterClass="adDetail">
+
+		update emall_ad_detail set link = #link#,
+		<isNotEmpty  property="mediaCode">
+		media_code = #mediaCode#,
+		</isNotEmpty>
+		media_type = #mediaType#,
+		sort = #sort#,
+		gmt_modify = sysdate()
+		 where ad_id = #adId#
+
+
+</update>
+
+<!-- search AdDetail object -->
+<select id="getAdDetailByAdId" parameterClass="java.lang.Long" resultMap="adDetailResult">
+<![CDATA[
+		select emall_ad_detail.* from emall_ad_detail where emall_ad_detail.ad_id = #value#
+]]>
+</select>
+
+</sqlMap>

@@ -1,0 +1,52 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>部门管理</h2>
+		 <div class="tool">
+			<span><a href="addInput.html" hidefocus="true" class="bt_add">添加新部门</a></span>
+		 </div>
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>部门管理</span></h3>
+            <table >
+                <tr>
+					<th>部门名称</th>
+					<th>下级部门数量</th>
+					<th>部门员工数</th>
+					<th >操作</th>
+                </tr>
+				
+				#if($list && $list.size()>0)
+				 #foreach($department in $list)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$!department.name</td>
+					<td style="text-align:center;">$!department.childNums</td>
+					<td style="text-align:center;">$!department.staffNum</td>
+					<td style="text-align:center;"><a href="detail.html?id=$!department.id">查看</a>&nbsp;&nbsp;&nbsp;
+							<a href="#" onclick="javascript:if(confirm('确定删除？')){ location.href = 'delete.html?id=$!department.id&depcode=$!department.depCode'}">删除</a></td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+
+</div> <!-- 列表模块 END -->
+</div>
+	

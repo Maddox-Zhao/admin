@@ -1,0 +1,109 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心——仓库列表")
+
+<body>
+<div class="main">
+    <h2>管理中心——仓库列表</h2>
+
+	<form action="$!appServer.get("/storage/searchDepository.html")" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索仓库</span></h3>
+			<table>
+				<tr>
+					<th>仓库名称：</th>
+					<td>
+						#springBind("query.name")
+						<input type="text" id="query.name" name="${status.expression}" value="$!{status.value}" maxlength="50" class="inp inp-w80"/>
+					</td>
+					<th>负责人：</th>
+					<td>
+						#springBind("query.leader")
+						<select id="query.leader" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($u in $userList)
+                                <option value="$!{u.userName}" #if("${status.value}" == "$!{u.userName}") selected="selected" #end title="$!u.userName">$!u.userName</option>
+							#end
+						</select>
+					</td>
+					<th>仓库类型：</th>
+					<td>
+						#springBind("query.type")
+						<select id="query.type" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($en in $enumDepositoryType.entrySet())
+								<option value="$!en.key" #if("$!{status.value}" == "${en.key}") selected="selected" #end title="$!en.value">$en.value</option>
+							#end
+						</select>
+					</td>
+					<th>状态：</th>
+					<td>
+						#springBind("query.status")
+						<select id="query.status" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							<option value="v" #if("$!{query.status}" == "v") selected="selected" #end>激活</option>
+							<option value="i" #if("$!{query.status}" == "i") selected="selected" #end>失效</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="8">
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+					</td>
+				</tr>
+			</table>
+        </div>
+	</form>
+
+	<div class="tool">
+		<span><a href="$!appServer.get("/storage/addDepositoryPage.html?actionType=add")" hidefocus="true" class="bt_add">新增仓库</a></span>
+	</div>
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+				<th>序号</th>
+				<th>仓库名称</th>
+				<th>一级仓库名称</th>
+				<th>仓库地址</th>
+				<th>负责人</th>
+				<th>联系电话</th>
+				<th>仓库类型</th>
+				<th>状态</th>
+				<th>备注</th>
+			</tr>
+		#foreach($depository in $page.items)
+			<tr #if($velocityCount % 2 == 0) class="bg" #end>
+				<td>&nbsp;$velocityCount</td>
+				<td><a href="detailDepository.html?depositoryId=$!depository.id">$!depository.name</a></td>
+				<td>&nbsp;$!depositoryNameMap.get($!depository.depFirstId)</td>
+				<td> &nbsp;$!depository.address</td>
+				<td> &nbsp;$!depository.leader</td>
+				<td> &nbsp;$!depository.tel</td>
+				<td> &nbsp;$!enumDepositoryType.get("$!{depository.type}")</td>
+				<td align="center"> &nbsp;#if("$!{depository.status}"=="v") 激活 #else 失效 #end</td>
+				<td title="$!depository.remark">&nbsp;#if($!depository.remark.length()>20) $!depository.remark.substring(0,20)....  #else $!depository.remark   #end</td>
+			</tr>
+		#end
+		</table>
+		<!-- 分页 -->
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/storage/searchDepository.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+
+</div>
+</body>
+
+
+<script language="javascript" type="text/javascript">
+function formSubmit(){
+    jQuery("#query.name").val(jQuery.trim(jQuery("#query.name").val()));
+    jQuery("#query.leader").val(jQuery.trim(jQuery("#query.leader").val()));
+    jQuery("#query.status").val(jQuery.trim(jQuery("#query.status").val()));
+    document.forms[0].submit();
+}
+</script>

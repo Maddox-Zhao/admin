@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CommentsSQL">
+<typeAlias alias="comments" type="com.huaixuan.network.biz.domain.Comments"/>
+	<resultMap class="comments" id="commentsResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="user_nickname" property="userNickname"/>
+		<result column="email" property="email"/>
+		<result column="comment_type" property="commentType"/>
+		<result column="id_value" property="idValue"/>
+		<result column="comment_rank" property="commentRank"/>
+		<result column="content" property="content"/>
+		<result column="status" property="status"/>
+		<result column="ip_address" property="ipAddress"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="reply_content" property="replyContent"/>
+		<result column="reply_flag" property="replyFlag"/>
+		<result column="gmt_reply" property="gmtReply"/>
+	</resultMap>
+	<resultMap class="comments" id="countWithReplayFlagResult">
+		<result column="reply_flag" property="replyFlag"/>
+		<result column="countWithReplyFlag" property="countWithReplyFlag"/>
+	</resultMap>
+<!-- create Comments object -->
+<insert id="addComments" parameterClass="comments">
+<![CDATA[
+		insert into emall_comments
+		(id,user_id,user_nickname,email,comment_type,id_value,comment_rank,content,status,ip_address,gmt_create )values( null,
+		#userId#,
+		#userNickname#,
+		#email#,
+		#commentType#,
+		#idValue#,
+		#commentRank#,
+		#content#,
+		#status#,
+		#ipAddress#,
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- reply comments -->
+<update id="replyComments" parameterClass="map">
+<![CDATA[
+		update emall_comments set
+			reply_content = #replyContent#,
+			gmt_create = #gmtCreate#,
+			gmt_reply = sysdate(),
+			reply_flag = #replyFlag#
+		where
+			id=#id#
+]]>
+</update>
+
+<!-- changeStatusOfComments -->
+<update id="changeStatus" parameterClass="map">
+<![CDATA[
+		update emall_comments set
+			status = #status#
+		where
+			id = #id#
+]]>
+</update>
+
+
+<!-- update Comments object -->
+<update id="editComments" parameterClass="comments">
+<![CDATA[
+		update emall_comments set user_id = #userId#,
+		user_nickname = #userNickname#,
+		email = #email#,
+		comment_type = #commentType#,
+		id_value = #idValue#,
+		comment_rank = #commentRank#,
+		content = #content#,
+		status = #status#,
+		ip_address = #ipAddress#,
+		reply_content = #replyContent#,
+		gmt_reply = sysdate(),
+		reply_flag = #replyFlag#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete Comments object -->
+<delete id="removeComments" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_comments where emall_comments.ID = #value#
+]]>
+</delete>
+<!-- search Comments object -->
+<select id="getComments" parameterClass="java.lang.Long" resultMap="commentsResult">
+<![CDATA[
+		select emall_comments.* from emall_comments where emall_comments.ID = #value#
+]]>
+</select>
+<!-- searchAll Comments List -->
+<select id="getCommentss" resultMap="commentsResult">
+<![CDATA[
+		select emall_comments.* from emall_comments
+]]>
+</select>
+<select id="getCommentsByUserId"  resultMap="commentsResult" parameterClass="java.util.Map">
+                  <include refid="pageSQLHead"/>
+<![CDATA[
+		select emall_comments.* from emall_comments where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		order by gmt_create desc
+          <include refid="pageSQLFoot"/>
+</select>
+
+<select id="getCommentsCountByUserId"  resultClass="java.lang.Integer">
+<![CDATA[
+     select count(*) from(
+		select emall_comments.* from emall_comments where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		order by gmt_create desc
+	) a
+</select>
+
+<select id="getCommentsCountByCondition"  resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1)
+		from  emall_goods g right join emall_comments c on c.id_value = g.id
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty property="userNickname" prepend="and">
+			c.user_nickname like CONCAT('%',#userNickname#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsName" prepend="and">
+			g.title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			c.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			c.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="status" prepend="and">
+			c.status  = #status#
+		</isNotEmpty>
+		<isNotEmpty property="replyFlag" prepend="and">
+			c.reply_flag  = #replyFlag#
+		</isNotEmpty>
+		order by c.gmt_create desc
+</select>
+
+<select id="getCommentsByConditionTwo"  resultClass="comments">
+                  <include refid="pageSQLHead"/>
+<![CDATA[
+		select
+			c.id as id,
+			c.user_id as userId,
+			c.user_nickname as userNickname,
+			c.email as email,
+			c.comment_type as commentType,
+			g.title as goodsName,
+			c.comment_rank as commentRank,
+			c.content as content,
+			c.status as status,
+			c.ip_address as ipAddress,
+			c.gmt_create as gmtCreate,
+			c.reply_content as replyContent,
+			c.gmt_reply as gmtReply,
+			c.reply_flag as replyFlag
+		from  emall_goods g right join emall_comments c on c.id_value = g.id
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			c.user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty property="userNickname" prepend="and">
+			c.user_nickname like CONCAT('%',#userNickname#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsName" prepend="and">
+			g.title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			c.gmt_create >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			c.gmt_create < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="status" prepend="and">
+			c.status  = #status#
+		</isNotEmpty>
+		<isNotEmpty property="replyFlag" prepend="and">
+			c.reply_flag  = #replyFlag#
+		</isNotEmpty>
+		order by c.gmt_create desc
+		        <include refid="pageSQLFoot"/>
+
+</select>
+
+<select id="getCommentsByCondition"  resultClass="comments">
+                  <include refid="pageSQLHead"/>
+<![CDATA[
+		select
+			c.id as id,
+			c.user_id as userId,
+			c.user_nickname as userNickname,
+			c.email as email,
+			c.comment_type as commentType,
+			g.title as goodsName,
+			c.comment_rank as commentRank,
+			c.content as content,
+			c.status as status,
+			c.ip_address as ipAddress,
+			c.gmt_create as gmtCreate,
+			c.reply_content as replyContent,
+			c.gmt_reply as gmtReply,
+			c.reply_flag as replyFlag
+		from  emall_goods g right join emall_comments c on c.id_value = g.id
+		where 1=1
+]]>
+		<isNotEmpty prepend="and" property="userId">
+			c.user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty property="userNickname" prepend="and">
+			c.user_nickname like CONCAT('%',#userNickname#,'%')
+		</isNotEmpty>
+		<isNotEmpty property="goodsName" prepend="and">
+			g.title like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateStart">
+<![CDATA[			c.gmt_create >= #gmtCreateStart# ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreateEnd">
+<![CDATA[			gmt_create < (#gmtCreateEnd#+1) ]]>
+		</isNotEmpty>
+		<isNotEmpty property="status" prepend="and">
+			c.status  = #status#
+		</isNotEmpty>
+		<isNotEmpty property="replyFlag" prepend="and">
+			c.reply_flag  = #replyFlag#
+		</isNotEmpty>
+		order by c.gmt_create desc
+		        <include refid="pageSQLFoot"/>
+
+</select>
+
+<select id="getCommentsByParameterMap" resultMap="commentsResult">
+<![CDATA[
+		select emall_comments.* from emall_comments where 1=1
+]]>
+		<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userId">
+			user_id = #userId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userNickname">
+			user_nickname = #userNickname#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="email">
+			email = #email#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="commentType">
+			comment_type = #commentType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idValue">
+			id_value = #idValue#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="commentRank">
+			comment_rank = #commentRank#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="content">
+			content = #content#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ipAddress">
+			ip_address = #ipAddress#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtCreate">
+			gmt_create = #gmtCreate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="replyContent">
+			reply_content = #replyContent#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtReply">
+			gmt_reply = #gmtReply#
+		</isNotEmpty>
+		order by id desc
+</select>
+<select id="commentsCountWithReplyFlag" resultMap="countWithReplayFlagResult">
+	select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+</select>
+</sqlMap>

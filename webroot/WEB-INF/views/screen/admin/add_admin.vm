@@ -1,0 +1,170 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    
+        <!-- 表单模块 -->
+        <div class="formBox">
+          <form id="form1" action="/admin/insertAdmin.html" method="post">
+        	<h3><i></i><span>添加系统用户</span></h3>
+            
+        	<div class="content">
+        		<table class="c2">
+                <tr>
+                    <th>用户名：</th>
+                    <td> #springBind("admin.userName")
+                       <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                       <span class="red">*</span> <span>用户名长度为4到20个字符</span> <span class="error">$!{status.errorMessage}</span> 
+					</td>
+                </tr>
+                <tr>
+                   <th>密码：</th>
+                   <td> #springBind("admin.password")
+                       <input name="${status.expression}" type="password" class="inp" value="$!{status.value}" maxlength="20"/>
+                       <span class="red">*</span> <span>密码由6-16个字符组成</span> <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+                <tr>
+                   <th>确认密码：</th>
+                   <td> #springBind("admin.confirmPassword")
+                       <input name="${status.expression}" type="password" class="inp"  value="$!{status.value}" maxlength="20"/>
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+				<tr>
+                   <th>所属部门：</th>
+                   <td> #springBind("admin.depCode")
+                      <select name="$!{status.expression}" id="depCode" onchange="selectShangJi(this.value)">						
+						<option value="">---------请选择------------</option>
+						#foreach($department in $list)
+						<option value="$!{department.depCode}">$!{department.name}</option>
+						#end
+					  </select>
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+				
+					<tr>
+                   <th>直接上级：</th>
+                   <td> #springBind("admin.higerUserName")
+                      <select name="$!{status.expression}" id="higerUserName">						
+						<option value="">---------请选择------------</option>
+					  </select>
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> 
+				   </td>
+                </tr>
+    				<tr>
+                    <th>所 属 站 点：</th>
+                    <td>#springBind("admin.site")
+        			 <select name="$!{status.expression}" id="idSite">
+						<option value="">---------请选择------------</option>
+                      #foreach($site in $siteList)
+        						<option #if("$!{site.id}" == "$!{status.value}")  selected = "true" #end value="$!{site.id}">$!{site.name}</option>
+        			  #end
+        			 </select>
+                      <span class="error">$!{status.errorMessage}</span> </td>
+				</tr>
+                <tr>
+                  <th>EMAIL地址：</th>
+                  <td> #springBind("admin.email")
+                       <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" maxlength="30"/>
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+				
+				<tr>
+                  <th>c客户端权限：</th>
+                  <td> #springBind("admin.clientrole")
+			          <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+				
+				
+                <tr>
+                  <th>真实姓名：</th>
+                  <td> #springBind("admin.name")
+			          <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr>
+                  <th>电　　话：</th>
+                  <td>#springBind("admin.tel")
+                      <input type="text" class="inp"  name="${status.expression}" value="$!{status.value}"/>
+                      <span class="error">$!{status.errorMessage}</span> 
+				  </td>
+                </tr>
+                <tr>
+                    <th>手　　机：</th>
+                    <td>#springBind("admin.mobile")
+                       <input type="text" class="inp" name="${status.expression}" value="$!{status.value}"/>
+                       <span>手机号码和电话号码必填一个</span> <span class="error">$!{status.errorMessage}</span> 
+					</td>
+                </tr>
+                <tr>
+                    <th>是否冻结：</th>
+                    <td> #springBind("admin.status")
+			            <input  name="${status.expression}" value="0" type="checkbox" />冻结
+                    </td>
+                </tr>
+              </table>
+   	    </div>
+            <div class="form-but"><!-- 表单按钮区 -->
+                    
+            	<button type="button" class="button-s4" onclick="submitFn()">添加</button>
+                <button type="button" class="button-s4" onclick="javascript:history.back(-1);">取消</button>
+              
+          	</div><!-- 表单按钮区 END -->
+                    
+          </form>
+        </div> <!-- 表单模块 END -->
+   
+    </div>
+	
+<script type="text/javascript">
+
+function selectShangJi(depCode)
+{
+	if(depCode)
+	{
+    	jQuery.get("/admin/showUserList2Json.html?depCode="+depCode,function(json)
+    	{
+			jQuery("#higerUserName").html("");
+			var html = '<option value="">---------请选择------------</option>';
+    		if(json && json.length > 0)
+			{
+				for(var i = 0; i < json.length; i++)
+				{
+					var obj = json[i];
+					var userName = obj.userName;
+					var name = obj.name;
+					html = html + '<option value="'+userName+'">'+name+'</option>';
+				}
+			}
+			jQuery("#higerUserName").html(html);
+    	})
+	}
+}
+
+
+function submitFn()
+{
+ 	var depCode = jQuery("#depCode").val();
+	var higerUserName = jQuery("#higerUserName").val();
+	var idSite = jQuery("#idSite").val();
+ 	if(!depCode)
+	{
+		alert("部门必选");
+		return false;
+	}
+	else if(!idSite)
+	{
+		alert("站点必选");
+		return false;
+	}
+	jQuery("#form1").submit();
+
+}
+</script>

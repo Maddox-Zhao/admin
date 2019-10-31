@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BankPayOnlineSql">
+	<typeAlias alias="BaseBankPayOnlineClass"
+		type="com.huaixuan.network.biz.domain.base.payment.BaseBankPayOnline" />
+	<!-- 银行订单全字段 -->
+	<resultMap class="BaseBankPayOnlineClass" id="bankPayOnlineMap">
+		<result column="ID" property="id" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="PAY_DEST" property="payDest" />
+		<result column="INNER_BILL_NO" property="innerBillNo" />
+		<result column="INNER_DATE" property="innerDate" />
+		<result column="GMT_CREATE" property="gmtCreate" />
+		<result column="BANK_TYPE" property="bankType" />
+		<result column="PAY_DATE" property="payDate" />
+		<result column="PAYMENT_TYPE" property="paymentType" />
+		<result column="BANK_BILL_NO" property="bankBillNo" />
+		<result column="PAY_AMOUNT" property="payAmount" />
+		<result column="REAL_AMOUNT" property="realAmount" />
+		<result column="IS_SUCCEED" property="isSucceed" />
+		<result column="IS_CHECK" property="isCheck" />
+		<result column="CHECK_USER" property="checkUser" />
+		<result column="CHECK_DATE" property="checkDate" />
+		<result column="BANK_TRANS_DATE" property="bankTransDate" />
+		<result column="BANK_AUTH_NO" property="bankAuthNo" />
+		<result column="BANK_SERIAL_NO" property="bankSerialNo" />
+		<result column="BANK_ERROR_CODE" property="bankErrorCode" />
+		<result column="ORDER_SEQ" property="orderSeq" />
+		<result column="FLAG_COMPARE" property="flagCompare" />
+		<result column="GMT_MODIFIED" property="gmtModified" />
+		<result column="GMT_TO_BANK" property="gmtToBank" />
+		<result column="OUT_ACCOUNT_NO" property="outAccountNo" />
+	</resultMap>
+	<resultMap class="BaseBankPayOnlineClass" id="bankPayOnlineMapTemp">
+		<result column="ID" property="id" />
+		<result column="ACCOUNT_NO" property="accountNo" />
+		<result column="PAY_DEST" property="payDest" />
+		<result column="INNER_BILL_NO" property="innerBillNo" />
+		<result column="INNER_DATE" property="innerDate" />
+		<result column="GMT_CREATE" property="gmtCreate" />
+		<result column="BANK_TYPE" property="bankType" />
+		<result column="PAY_DATE" property="payDate" />
+		<result column="PAYMENT_TYPE" property="paymentType" />
+		<result column="BANK_BILL_NO" property="bankBillNo" />
+		<result column="PAY_AMOUNT" property="payAmount" />
+		<result column="REAL_AMOUNT" property="realAmount" />
+		<result column="IS_SUCCEED" property="isSucceed" />
+		<result column="IS_CHECK" property="isCheck" />
+		<result column="CHECK_USER" property="checkUser" />
+		<result column="CHECK_DATE" property="checkDate" />
+		<result column="BANK_TRANS_DATE" property="bankTransDate" />
+		<result column="BANK_AUTH_NO" property="bankAuthNo" />
+		<result column="BANK_SERIAL_NO" property="bankSerialNo" />
+		<result column="BANK_ERROR_CODE" property="bankErrorCode" />
+		<result column="ORDER_SEQ" property="orderSeq" />
+		<result column="FLAG_COMPARE" property="flagCompare" />
+		<result column="GMT_MODIFIED" property="gmtModified" />
+		<result column="GMT_TO_BANK" property="gmtToBank" />
+		<result column="OUT_ACCOUNT_NO" property="outAccountNo" />
+		<result column="ACCOUNT" property="account"/>
+	</resultMap>
+	<!-- 生成银行订单序列号 -->
+	<select id="getBankBillNoSeq" resultClass="java.lang.Long">
+		<![CDATA[
+				SELECT max(a.id)+1 FROM ep_bank_pay_online a 
+		]]>
+	</select>
+
+	<insert id="addBankPayOnline" parameterClass="BaseBankPayOnlineClass">
+		<![CDATA[
+        insert into ep_bank_pay_online t
+          (t.ID,
+           t.ACCOUNT_NO,
+           t.PAY_DEST,
+           t.INNER_BILL_NO,
+           t.INNER_DATE,
+           t.GMT_CREATE,
+           t.BANK_TYPE,
+           t.PAY_DATE,
+           t.PAYMENT_TYPE,
+           t.BANK_BILL_NO,
+           t.PAY_AMOUNT,
+           t.REAL_AMOUNT,
+           t.IS_SUCCEED,
+           t.IS_CHECK,
+           t.CHECK_USER,
+           t.CHECK_DATE,
+           t.BANK_TRANS_DATE,
+           t.BANK_AUTH_NO,
+           t.BANK_SERIAL_NO,
+           t.BANK_ERROR_CODE,
+           t.ORDER_SEQ,
+           t.FLAG_COMPARE,
+           t.GMT_MODIFIED,
+           t.GMT_TO_BANK,
+           t.OUT_ACCOUNT_NO)
+        values
+          (null,
+           #accountNo#,
+           #payDest#,
+           #innerBillNo#,
+           #innerDate#,
+           sysdate(),
+           #bankType#,
+           #payDate#,
+           #paymentType#,
+           #bankBillNo#,
+           #payAmount#,
+           #realAmount#,
+           #isSucceed#,
+           #isCheck#,
+           #checkUser#,
+           #checkDate#,
+           #bankTransDate#,
+           #bankAuthNo#,
+           #bankSerialNo#,
+           #bankErrorCode#,
+           #orderSeq#,
+           #flagCompare#,
+           sysdate(),
+           #gmtToBank#,
+           #outAccountNo#)
+		]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- 根据流水号删除流水信息 -->
+	<delete id="removeBankPayOnlineById" parameterClass="java.lang.Long">
+		<![CDATA[
+			delete from ep_bank_pay_online t where t.ID = #id#
+		]]>
+	</delete>
+	<!-- 更新流水信息(全字段) -->
+	<update id="editBankPayOnlineById" parameterClass="BaseBankPayOnlineClass">
+	<![CDATA[
+		update ep_bank_pay_online t
+		   set t.ACCOUNT_NO      = #accountNo#,
+		       t.PAY_DEST        = #payDest#,
+		       t.INNER_BILL_NO   = #innerBillNo#,
+		       t.INNER_DATE      = #innerDate#,
+		       t.GMT_CREATE      = #gmtCreate#,
+		       t.BANK_TYPE       = #bankType#,
+		       t.PAY_DATE        = #payDate#,
+		       t.PAYMENT_TYPE    = #paymentType#,
+		       t.BANK_BILL_NO    = #bankBillNo#,
+		       t.PAY_AMOUNT      = #payAmount#,
+		       t.REAL_AMOUNT     = #realAmount#,
+		       t.IS_SUCCEED      = #isSucceed#,
+		       t.IS_CHECK        = #isCheck#,
+		       t.CHECK_USER      = #checkUser#,
+		       t.CHECK_DATE      = #checkDate#,
+		       t.BANK_TRANS_DATE = #bankTransDate#,
+		       t.BANK_AUTH_NO    = #bankAuthNo#,
+		       t.BANK_SERIAL_NO  = #bankSerialNo#,
+		       t.BANK_ERROR_CODE = #bankErrorCode#,
+		       t.ORDER_SEQ       = #orderSeq#,
+		       t.FLAG_COMPARE    = #flagCompare#,
+		       t.GMT_MODIFIED    = sysdate(),
+		       t.GMT_TO_BANK     = #gmtToBank#,
+		       t.OUT_ACCOUNT_NO  = #outAccountNo#
+		 where t.ID = #id#
+		]]>
+	</update>
+	<!-- 更新流水信息(查询次数和checkUser) -->
+	<update id="editBankPayOnlineForQueryService" parameterClass="BaseBankPayOnlineClass">
+	<![CDATA[
+		update ep_bank_pay_online t
+		   set t.CHECK_USER      = #checkUser#,
+		       t.ORDER_SEQ       = #orderSeq#,
+		       t.GMT_MODIFIED    = sysdate()
+		 where t.ID = #id#
+		]]>
+	</update>
+	<!-- 获取银行订单查询列表-->
+	<select id="getBankPayOnlinesForRecovery" parameterClass="java.util.Map"
+		resultMap="bankPayOnlineMap">
+		
+		 select *
+		  from ep_bank_pay_online t
+		 where t.order_seq &lt; 3
+		   and t.is_succeed = 'I'
+		   and t.inner_date = DATE_FORMAT(sysdate(), '%Y%m%e')
+		   and t.bank_type = 'ICBC'
+		 order by t.gmt_create desc
+		<isNotEmpty property="maxRow">
+				<![CDATA[ LIMIT 0,#maxRow# ]]>
+		</isNotEmpty>
+	</select>
+	<!-- 根据流水号取得银行订单信息(全字段) 要求:唯一-->
+	<select id="getBankPayOnlineById" parameterClass="java.lang.Long"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.ID=#id#
+		]]>
+	</select>
+	<!-- 根据外部订单号取得银行订单信息(全字段) 要求:唯一 -->
+	<select id="getBankPayOnlineByBankBillNo" parameterClass="java.lang.String"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.BANK_BILL_NO=#bankBillNo#
+		]]>
+	</select>
+	<!-- 根据外部订单号和银行名称取得银行订单信息(全字段) 要求:唯一 -->
+	<select id="getUniqueBankPayOnline" parameterClass="java.util.Map"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.BANK_TYPE=#bankType# and t.BANK_BILL_NO=#bankBillNo#
+		]]>
+	</select>
+	<!-- 根据外部订单号和银行名称取得银行订单信息(全字段) 要求:唯一 -->
+	<select id="getUniqueBankPayOnlineAndLock" parameterClass="java.util.Map"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.BANK_TYPE=#bankType# and t.BANK_BILL_NO=#bankBillNo# and t.PAYMENT_TYPE=#paymentType# for update nowait
+		]]>
+	</select>
+	<!-- 根据内部订单号取得银行订单信息(全字段) 要求:唯一 -->
+	<select id="getBankPayOnlineByInnerBillNo" parameterClass="java.lang.String"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.INNER_BILL_NO=#innerBillNo#
+		]]>
+	</select>
+	<!-- 根据流水创建时间取得银行订单信息(全字段) -->
+	<select id="getBankPayOnlinesByInnerDate" parameterClass="java.lang.String"
+		resultMap="bankPayOnlineMap">
+		<![CDATA[
+		select t.* from ep_bank_pay_online t where t.INNER_DATE=#innerDate#
+		]]>
+	</select>
+	<!--  根据条件搜索支付流水公共SQL -->
+	<sql id="basebankpayonline-searchCommon-condition">
+			<isNotEmpty prepend="and" property="bankType">
+				p.BANK_TYPE=#bankType#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="isSucceed">
+				p.IS_SUCCEED=#isSucceed#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="paymentType">
+				p.PAYMENT_TYPE=#paymentType#
+        </isNotEmpty>
+			<isNotEmpty prepend="and" property="flagCompare">
+				p.FLAG_COMPARE=#flagCompare#
+        </isNotEmpty>
+			<isNotEmpty prepend="and" property="payDest">
+				p.PAY_DEST=#payDest#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="payDateStart">
+            <![CDATA[p.PAY_DATE >= STR_TO_DATE(#payDateStart#,'%Y-%m-%d %H:%i:%s')]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="payDateEnd">
+            <![CDATA[p.PAY_DATE < DATE_ADD(STR_TO_DATE(#payDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="bankBillNo">
+				p.BANK_BILL_NO=#bankBillNo#
+        </isNotEmpty>
+	</sql>
+
+	<!--  根据条件统计满足条件的支付流水数 -->
+	<select id="basebankpayonline-searchBasebankpayonlineByCondition-count"
+		parameterClass="java.util.Map" resultClass="int">
+    <![CDATA[SELECT count(*) FROM ep_account e, emall_users u,ep_bank_pay_online p
+	         where e.USER_ID = u.id and p.account_no= e.account_no(+)]]>
+		<include refid="basebankpayonline-searchCommon-condition" />
+	</select>
+
+	<!--  根据条件搜索支付流水，查询结果  -->
+	<select id="basebankpayonline-searchBasebankpayonlineByCondition-query"
+		parameterClass="java.util.Map" resultMap="bankPayOnlineMapTemp">
+	<!--<![CDATA[
+		SELECT * FROM ep_bank_pay_online
+         ]]>
+    -->
+	<!--  需求是要查询用户名 -->
+	    <![CDATA[
+		  SELECT p.*,u.account FROM ep_account e, emall_users u,ep_bank_pay_online p
+		  where e.USER_ID = u.id(+) and p.account_no= e.account_no(+)]]>
+		  <include refid="basebankpayonline-searchCommon-condition" />
+	    <![CDATA[ORDER BY p.PAY_DATE DESC ]]>
+		<![CDATA[ LIMIT #startRow#,#endRow#
+        ]]>
+	</select>
+</sqlMap>

@@ -1,0 +1,62 @@
+#set($layout = '')
+<table><tr><th>补帐类型：　</th>
+         <td><select name="transType" id="transType" onchange="doListSubTransCode(this.value)">
+	         <option value="deposit" #if("$!transType"=="deposit") selected #end>充值</option>
+	         <option value="withdraw" #if("$!transType"=="withdraw") selected #end>提现</option>
+	         <option value="transfer" #if("$!transType"=="transfer") selected #end>转账</option>
+	     </select>
+	     &nbsp;&nbsp;&nbsp;
+	     <select name="accTransReq.subTransCode">
+	         <option value=""></option>	
+	         #foreach($subCode in $!transSubCode)
+			   #if($!subCode.code!="301201")	
+	         	 <option value="$!subCode.code">$!subCode.description</option>
+		       #end		
+         	 #end
+	     </select>&nbsp;&nbsp;<font color="red">*</font>
+	     </td>
+	     </tr>
+#if("$!transType"=="deposit")
+	  <tr> <th>
+	    转入账户：</th>　<td><input type="text" name="accTransReq.accountNo" id="accTransReq.accountNo" size="20">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>	<th> 金额：</th><td><input type="text" name="accTransReq.amount" id="amount" size="10">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>	<th> 外部流水号：</th><td><input type="text" name="accTransReq.outBizNo" id="accTransReq.outBizNo" size="20">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>	<th> 内部流水号：</th><td><input type="text" name="accTransReq.innerBizNo" id="accTransReq.innerBizNo" size="20"></td></tr>
+	     <tr>	<th> 内部时间：</th><td>
+	     <input type="text" name="accTransReq.transDate" id="accTransReq.transDate" maxlength="8" value="" "readonly=false" />&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>	<th> 外部时间：</th><td><input type="text" name="accTransReq.outDate" id="accTransReq.outDate" maxlength="8" value="" "readonly=false" />
+	     &nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>	<th> 银行名称：</th><td><select name="accTransReq.bankType" id="accTransReq.bankType">
+		     	<option value=""></option>
+		     	#set($bankEnumMap = $!accountUtil.getInstitutionMap())
+		     	#foreach($bankEnum in $bankEnumMap.entrySet())
+		     	    <option value="$!bankEnum.key" #if("$!payOnlineSearch.bankType"=="$bankEnum.key") selected #end>$!bankEnum.value</option>
+	     		#end
+	         </select>&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr><th> 备注：　　</th>　<td><textarea name="accTransReq.memo" id="accTransReq.memo" width="200px" height="" style="width:300px;height:120px;OVERFLOW-X:hidden;OVERFLOW-Y:auto"></textarea>&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     #elseif("$!transType"=="withdraw")
+     	   <tr>	 <th> 转出账户：</th><td><input type="text" name="accTransReq.accountNo" id="accTransReq.accountNo" size="20">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    <tr>	 	<th> 金额：　</th>　<td><input type="text" name="accTransReq.amount" id="accTransReq.amount" size="10">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>		<th> 内部流水号：</th><td><input type="text" name="accTransReq.innerBizNo" id="accTransReq.innerBizNo" size="20"></td></tr>
+	     <tr>		<th> 内部时间：</th><td><input type="text" name="accTransReq.transDate" id="accTransReq.transDate" maxlength="8" value="" "readonly=false" />&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	     <tr>		<th> 银行名称：</th><td><select name="accTransReq.bankType" id="accTransReq.bankType">
+		     	<option value=""></option>
+		     	#set($bankEnumMap = $!accountUtil.getInstitutionMap())
+		     	#foreach($bankEnum in $bankEnumMap.entrySet())
+		     	    <option value="$!bankEnum.key" #if("$!payOnlineSearch.bankType"=="$bankEnum.key") selected #end>$!bankEnum.value</option>
+	     		#end
+	         </select>&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    <tr>	 	<th> 备注：　</th>　<td><textarea name="accTransReq.memo" id="accTransReq.memo" width="200px" height="" style="width:300px;height:120px;OVERFLOW-X:hidden;OVERFLOW-Y:auto"></textarea>&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    	#elseif("$!transType"=="transfer")
+     	   <tr>	 <th> 转入账户：</th>　<td><input type="text" name="accTransReq.inAccountNo" id="accTransReq.inAccountNo" size="20">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+     	   <tr>	 <th> 转出账户：</th>　<td><input type="text" name="accTransReq.outAccountNo" id="accTransReq.outAccountNo" size="20">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    <tr>	 	<th> 金额：　　</th>　<td><input type="text" name="accTransReq.amount" id="accTransReq.amount" size="10">&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    <tr>	 	<th> 内部流水号：</th>　<td><input type="text" name="accTransReq.innerBizNo" id="accTransReq.innerBizNo" size="20"></td></tr>
+	    <tr>	 	<th> 内部时间：</th>　<td><input type="text" name="accTransReq.transDate" id="accTransReq.transDate" maxlength="8" value="" "readonly=false" /> &nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    <tr>	 	<th> 备注：　　</th>　<td><textarea name="accTransReq.memo" id="accTransReq.memo" width="200px" height="" style="width:300px;height:120px;OVERFLOW-X:hidden;OVERFLOW-Y:auto"></textarea>&nbsp;&nbsp;<font color="red">*</font></td></tr>
+	    #end
+	    </table>
+	    <script>
+    
+</script>
+ </div>

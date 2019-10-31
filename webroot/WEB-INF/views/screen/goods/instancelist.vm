@@ -1,0 +1,114 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+   	  <div class="searchBox">
+    <h3><span>产品列表</span></h3>
+    <table>
+      <tr>
+        <th>商品名称：</th>
+        <td>
+			$!{goods.title}
+		</td>
+		<th>编码：</th>
+		<td>
+		    $!{goods.id}
+		</td>
+		<th>品牌：</th>
+		<td>
+		    $!{goods.brandName} 
+		</td>
+      </tr>
+      <tr>
+		<th>单位：</th>
+		<td>
+		    $!{goods.goodsUnit}
+		</td>
+		<th>类目：</th>
+		<td>
+		    $!{goods.catName}
+		</td>
+		##<th>类目：</th>
+		##<td>
+		##    $!{goods.catName}
+		##</td>
+		<th></th>
+		<td>
+		    &nbsp;
+		</td>
+	  </tr>	  
+    </table>
+  </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "addsuccess")
+		新增产品成功！
+	#end
+	#if($!message == "editsuccess")
+		修改产品成功！
+	#end
+</div>
+#end
+       <div class="tool">
+
+            <span><a href="/instance/initnew_instance.html?goodsId=$!{goods.id}" hidefocus="true" class="bt_add">新增产品</a></span>
+
+        </div>
+
+        <div class="clear"></div>
+
+
+        <!-- 列表模块 -->
+        <div class="listBox">
+            <table >
+                <tr>
+                  <th>产品名称</th>
+                  <th>编码</th>
+                  <th>拼音码</th>
+			      <th>属性</th>
+                  ##<th>操作</th>
+                </tr>
+                #foreach($gi in $goodsInstances)
+                <tr>
+                    <td align="center">$!{gi.instanceName}</td>
+                    <td align="center">$!{gi.id}</td>
+					<td align="center">$!{gi.pyCode}</td>
+                	<td align="center">
+					    #foreach($pro in $gi.properties.entrySet())
+							$!{attributeManager.getAttributeByAttrCode($pro.key).attrName}=$!{pro.value}
+						#end
+					</td>
+					##<td align="center">
+						##<a href="$appServer.get('/instance/load_instance.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">信息修改</a>
+						##<a href="$appServer.get('/instance/instance_location.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">库位编辑</a><br/>
+						##<a href="$appServer.get('/instance/instance_supplier.html').addQueryData('id',$!{gi.id}).addQueryData('gid',$!{gi.goodsId})">供应商编辑</a>
+
+                    ##</td>
+                </tr>
+				#end
+            </table>
+		</div>
+		<!-- 类目模块 -->
+	    <div class="tool">
+            <span><a href="/goods/updata_catcod.html?goodsIds=$!{goods.id}" hidefocus="true" class="bt_add">修改类目</a></span>
+        </div>
+		<div class="listBox">
+            <table >
+                <tr>
+				  <th>产品名称</th>
+                  <th>类目名称</th>
+                  ##<th>类目</th>
+                  ##<th>id</th>
+                </tr>
+                <tr>
+					<td align="center">$!{goods.title}</td>
+                    <td align="center">$!{goods.catName}</td>
+                    ##<td align="center">$!{goods.catCode}</td>
+					##<td align="center">$!{goods.id}</td>
+                </tr>
+            </table>
+		</div>
+        </div>
+    </div>

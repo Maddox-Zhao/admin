@@ -1,0 +1,126 @@
+#set($layout = "/layout/default.vm")
+#set($title = "管理中心 - 修改用户一级仓库权限")
+
+<body>
+<div class="main">
+	
+	<h2>管理中心 - 修改用户一级仓库权限</h2>
+	
+	<div class="tool">
+		<span><a href="$!appServer.get("/storage/searchDepFirst.html")" hidefocus="true" class="bt_ren">一级仓库列表</a></span>
+	</div>
+	
+	#if($success)
+		<div class="mag-t2">${success}</div>
+	#end
+	
+	<form name="form1" action="$appServer.get("/storage/saveAdminAuthority.html")" method="post">
+		<input type="hidden" id="depFirstId" name="depFirstId" value="$!depFirst.id" />
+		
+		<div class="formBox">
+    		<h3><i></i><span>仓库信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th style="width:100px;">一级仓库名称：</th>
+        			    <td>$!{depFirst.depFirstName}</td>
+        			    <th style="width:100px;">一级仓库类型：</th>
+        			    <td>$!enumDepositoryFirstTypeMap.get("$!{depFirst.type}")</td>
+                    </tr>
+                </table>
+			</div>
+			
+			<div class="listBox" style="margin-top:10px;">
+				<h3><span>选择用户</span></h3>
+				<table>
+    				<tr>
+    					<th>无权限管理员</th>
+						<th></th>
+        			    <th>已有权限</th>
+                    </tr>
+					<tr>
+						<td>
+							<select multiple id="select1" style="width:300px;height:250px;">  
+								#foreach($admin in $userAdminList)
+									#if(!$hasRightsIds.contains($admin.id))
+										<option value="$!admin.Id" onclick="true">$!admin.userName</option>
+									#end
+								#end
+							</select> 
+						</td>
+						<td>
+							<input type="button" id="add" value="&gt;"/>
+							<br/>
+							<br/>
+							<input type="button" id="remove" value="&lt;"/>
+							<br/>
+							<br/>
+							<input type="button" id="addAll" value="&gt;&gt;"/>
+							<br/>
+							<br/>
+							<input type="button" id="removeAll" value="&lt;&lt;" />
+						</td>
+						<td>
+							<select multiple id="select2" name="selectIds" style="width:300px;height:250px;">  
+								#foreach($admin in $userAdminList)
+									#if($hasRightsIds.contains($admin.id))
+										<option value="$!admin.Id">$!admin.userName</option>
+									#end
+								#end
+							</select>
+						</td>
+					</tr>
+                </table>
+			</div>
+        </div>
+		
+		<div class="form-but">
+			<button type="button" class="button-s4" onclick="javascript:formSubmit();">保存</button>
+		</div>
+	</form>
+	
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+
+	function formSubmit(){
+		jQuery("#select2").find("option").attr("selected", true);
+		document.form1.submit();
+	}
+
+	jQuery(document).ready(function(){   
+        jQuery('#add').click(function(){   
+            var options = jQuery('#select1 option:selected');//获取当前选中的项   
+            var remove = options.remove();//删除下拉列表中选中的项   
+            remove.appendTo('#select2');//追加给对方   
+        });
+		
+        jQuery('#remove').click(function(){   
+            var removeOptions = jQuery('#select2 option:selected');   
+            removeOptions.appendTo('#select1');//删除和追加可以用appendTo()直接完成   
+        });
+		
+        jQuery('#addAll').click(function(){   
+            var options = jQuery('#select1 option');   
+            options.appendTo('#select2');   
+        });
+		
+        jQuery('#removeAll').click(function(){   
+            var options = jQuery('#select2 option');   
+            options.appendTo('#select1');   
+        });
+		
+        //双击事件   
+   //     jQuery('#select1').dblclick(function(){   
+   //        //var $options = $('#select1 option:selected');   
+   //         var $options = jQuery('option:selected', this);//注意此处“option”与“:”之间的空格，有空格是不可以的   
+   //         $options.appendTo('#select2');   
+   //     });
+           
+    //    jQuery('#select2').dblclick(function(){   
+    //        jQuery('#select2 option:selected').appendTo('#select1');   
+    //    });
+
+    });   
+</script>

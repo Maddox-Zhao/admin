@@ -1,0 +1,116 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>$account.accountName ----- 现金账户详情</h2>
+		  <div class="tool">
+			<span><a href="/hxaccount/addInput.html?accountId=$!account.id" hidefocus="true" class="bt_add">添加详情</a></span>
+		 </div>
+		 
+<form action="search.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>日期：从</th>
+        			<td >
+						#springBind("accountDetail.dateStart")
+        				<input type="text" name="${status.expression}" id="dateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105" />
+						<input type="hidden" name="accountId" value="$!account.id"/>
+        			&nbsp; 到  &nbsp; 
+						#springBind("accountDetail.dateEnd")
+        				<input type="text" name="${status.expression}" id="dateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105"  />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "dateStart",
+            		          ifFormat   : "%Y-%m-%d ",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "dateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+					<th >&nbsp;</th>
+					<td>
+						操作人：
+						#springBind("accountDetail.operationId")
+						<select name="${status.expression}">
+							<option value="">---请选择---</option>
+							#foreach($admin in $adminList)
+								#set($String =  'a')
+							<option value="$admin.userName" #if($admin.userName.equals($String.valueOf($accountDetail.operationId))) selected #end/>$admin.name</option>
+							#end
+						</select>
+                    </td>
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value="查询 " class="button" />
+                    </td>
+                </tr>
+    		</table>
+		</div>
+	</form>
+
+	
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>现金账户详情</span></h3>
+            <table >
+                <tr>
+					<th>欧元帐户</th>
+					<th>港元帐户</th>
+					<th>人名币账户</th>
+                    <th>美元账户</th>
+                    <th>支出/收入</th>
+                    <th>业务归类属性</th>
+                    <th>操作者ID</th>
+					<th>时间</th>
+					<th>备注</th>
+                </tr>
+				
+				#if($query.items && $query.items.size()>0)
+				 #foreach($accountDetail in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$!accountDetail.euroAccount</td>
+					<td style="text-align:center;">$!accountDetail.hkAccount</td>
+					<td style="text-align:center;">$!accountDetail.rmbAccount</td>
+					<td style="text-align:center;">$!accountDetail.dollarAccount</td>
+					<td style="text-align:center;">#if($!accountDetail.type == 0)收入#else 支出 #end</td>
+					<td style="text-align:center;">
+						#set($jimai = "寄卖")
+						#set($shougou = "收购")
+						#set($daigou = "代购")
+						#if($jimai.equals($accountDetail.operationType) && $!accountDetail.hrefId)
+							<a href="/consignment/detail.html?id=$!accountDetail.hrefId"/>寄卖</a>
+						#elseif($shougou.equals($accountDetail.operationType) && $!accountDetail.hrefId)
+							<a href="/acquisition/detail.html?id=$!accountDetail.hrefId"/>收购</a>
+						#elseif($daigou.equals($accountDetail.operationType) && $!accountDetail.hrefId)
+							<a href="/daigou/detail.html?id=$!accountDetail.hrefId"/>代购</a>
+						#else
+							$!accountDetail.operationType
+						#end
+						
+					##	|$jimai|$shougou|$daigou   | $jimai.equals($accountDetail.operationType) || $!accountDetail.hrefId
+					</td>
+					<td style="text-align:center;">$!accountDetail.operationId</td>
+					<td style="text-align:center;">$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!accountDetail.gmtCreate)</td>
+					<td style="text-align:center;">$!accountDetail.note</td>
+					
+                 </tr>
+				 #end
+                #end
+            </table>
+
+	
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/hxaccount/search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div> <!-- 列表模块 END -->
+</div>
+	

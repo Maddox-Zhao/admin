@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RuleDefSQL">
+<typeAlias alias="ruleDef" type="com.huaixuan.network.biz.domain.goods.RuleDef"/>
+	<resultMap class="ruleDef" id="ruleDefResult">
+		<result column="id" property="id"/>
+		<result column="rule_code" property="ruleCode"/>
+		<result column="rule_type" property="ruleType"/>
+		<result column="condition_expression" property="conditionExpression"/>
+		<result column="result_expression" property="resultExpression"/>
+		<result column="remark" property="remark"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create RuleDef object -->
+<insert id="addRuleDef" parameterClass="ruleDef">
+<![CDATA[
+insert into emall_rule_def
+  (id,
+   rule_code,
+   rule_type,
+   condition_expression,
+   result_expression,
+   remark,
+   gmt_create,
+   gmt_modify)
+values
+  (null,
+   #ruleCode#,
+   #ruleType#,
+   #conditionExpression#,
+   #resultExpression#,
+   #remark#,
+   sysdate(),
+   sysdate())
+
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update RuleDef object -->
+<update id="editRuleDef" parameterClass="ruleDef">
+<![CDATA[
+update emall_rule_def
+   set rule_code            = #ruleCode#,
+       rule_type            = #ruleType#,
+       condition_expression = #conditionExpression#,
+       result_expression    = #resultExpression#,
+       remark               = #remark#,
+       gmt_modify           = sysdate()
+ where id = #id#
+
+]]>
+</update>
+<!-- delete RuleDef object -->
+<delete id="removeRuleDef" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_rule_def where emall_rule_def.ID = #value#
+]]>
+</delete>
+<!-- search RuleDef object -->
+<select id="getRuleDef" parameterClass="java.lang.Long" resultMap="ruleDefResult">
+<![CDATA[
+		select emall_rule_def.* from emall_rule_def where emall_rule_def.ID = #value#
+]]>
+</select>
+
+<select id="getRuleDefByCode" parameterClass="java.lang.String" resultMap="ruleDefResult">
+<![CDATA[
+		select emall_rule_def.* from emall_rule_def where emall_rule_def.rule_code = #value#
+]]>
+</select>
+<!-- searchAll RuleDef List -->
+<select id="getRuleDefs" resultMap="ruleDefResult">
+<![CDATA[
+		select emall_rule_def.* from emall_rule_def
+]]>
+</select>
+</sqlMap>

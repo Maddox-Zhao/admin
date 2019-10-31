@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+    <typeAlias alias="provideGoodsXiYou" type="com.huaixuan.network.biz.domain.provider.ProvideGoodsXiYou"/>
+   
+	<resultMap id="provideGoodsResult" class="com.huaixuan.network.biz.domain.provider.ProvideGoodsXiYou" >
+		<result column="id" property="id"/>
+		<result column="prod_id" property="prodId"/>
+		<result column="ss_prodid" property="ssProdid"/>
+		<result column="stock" property="stock"/>
+		<result column="brand_name" property="brandName"/>
+		<result column="prod_name" property="prodName"/>
+		<result column="tax_rate" property="taxRate"/>
+		<result column="provider_id" property="providerId"/>
+		<result column="provider_name" property="providerName"/>
+		
+		
+		<result column="price" property="price"/>
+		<result column="cost" property="cost"/>
+		<result column="market_price" property="marketPrice"/>
+		<result column="size" property="size"/>
+		<result column="color" property="color"/>
+		<result column="provider_sku_numbr" property="provideSkuNumbr"/>
+		<result column="detail_description" property="detailDescription"/>
+		<result column="image_addresses" property="imageAddresses"/>	
+		
+		<result column="stock_change_time" property="stockChangeTime"/>
+		<result column="cost_change_time" property="costChangeTime"/>
+		<result column="insert_time" property="insertTime"/>	
+		<result column="update_time" property="updateTime"/>
+		<result column="our_sale_price" property="ourSalePrice"/>
+	</resultMap>
+<sql id="provide_goods_xiyous">
+	<isNotNull prepend="and" property="prodId">
+		prod_id=#prodId#
+	</isNotNull>
+
+	<!-- 银泰商品 -->
+	<isNotNull prepend="and" property="ssProdid">
+		ss_prodid=#ssProdid#
+	</isNotNull>
+	<!-- 品牌名 -->
+	<isNotNull prepend="and" property="brandName">
+	brand_name = #brandName#
+	</isNotNull>
+	<!-- 商品名 -->
+	<isNotNull prepend="and" property="prodName">
+		<![CDATA[ prod_name  like concat('%',upper(#prodName#),'%') ]]>
+	</isNotNull>
+	<!-- 税率 -->
+	<isNotNull prepend="and" property="taxRate">
+		tax_rate=#taxRate#
+	</isNotNull>
+	<!-- 供应商 -->
+	<isNotNull prepend="and" property="detailDescription">
+		<![CDATA[ detail_description  like concat('%',upper(#detailDescription#),'%') ]]>
+	</isNotNull>
+	<!--  价格区间 -->
+	<isEmpty  property="salePriceEnd">
+		<isNotEmpty  property="salePriceStart">
+					<![CDATA[ and price = #salePriceStart#  ]]>
+		</isNotEmpty>
+	</isEmpty>
+	<isNotEmpty  property="salePriceEnd">
+		<isNotEmpty  property="salePriceStart">
+				<![CDATA[ and price >= #salePriceStart#  ]]>
+		</isNotEmpty>
+				<![CDATA[ and price < #salePriceEnd#  ]]>
+	</isNotEmpty>
+	<!-- 库存 -->
+	<isNotNull prepend="and" property="stock">
+		<![CDATA[ stock = #stock# ]]>
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="stockStr">
+		<![CDATA[ stock > #stockStr# ]]>
+	</isNotNull>
+	
+	<isNotNull prepend="and" property="imageIsNull">
+	 	$imageIsNull$ = '' or $imageIsNull$
+	</isNotNull>
+</sql>
+	<insert  id ="insertXiYouProduct"   parameterClass ="java.util.List"> 
+     <![CDATA[
+insert into provide_goods_xiyou(id,prod_id,ss_prodid,stock,brand_name,prod_name,tax_rate,provider_id,provider_name,price,cost,market_price,our_sale_price,size,color,provider_sku_numbr,detail_description,image_addresses,insert_time,update_time) values       
+    ]]> 
+    <iterate  conjunction =","  > 
+     <![CDATA[
+            (null,#pgList[].prodId#,#pgList[].ssProdid#,#pgList[].stock#,#pgList[].brandName#,#pgList[].prodName#,#pgList[].taxRate#
+            ,#pgList[].providerId#,#pgList[].providerName#,#pgList[].price#,#pgList[].cost#,#pgList[].marketPrice#,#pgList[].ourSalePrice#,
+            #pgList[].size#,#pgList[].color#,#pgList[].provideSkuNumbr#,#pgList[].detailDescription#,#pgList[].imageAddresses#,sysdate(),sysdate()
+            )         
+       ]]> 
+        
+    </iterate> 
+</insert>
+
+
+<select id="selectAllProid" parameterClass="provideGoodsXiYou" resultMap="provideGoodsResult">
+	select * from
+	provide_goods_xiyou
+	where 1=1
+	<isNotNull prepend="and" property="prodId">
+		prod_id=#prodId#
+	</isNotNull>
+	<isNotNull prepend="and" property="ssProdid">
+		ss_prodid=#ssProdid#
+	</isNotNull>
+	
+</select>
+  
+
+<select id="selectOneProidProduct" parameterClass="provideGoodsXiYou" resultMap="provideGoodsResult">
+	select * from
+	provide_goods_xiyou
+	where 1=1
+	<isNotNull prepend="and" property="prodId">
+		prod_id=#prodId#
+	</isNotNull>
+	<isNotNull prepend="and" property="ssProdid">
+		ss_prodid=#ssProdid#
+	</isNotNull>
+	
+</select>
+
+
+
+
+
+
+<!-- 更新 -->
+<update id="updateGoodsXiYou" parameterClass="provideGoodsXiYou">
+	update provide_goods_xiyou
+	<dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="stock">
+			,stock=#stock#
+		</isNotNull>
+		<isNotNull  property="cost">
+			,cost=#cost#
+		</isNotNull>
+		<isNotNull  property="ourSalePrice">
+			,our_sale_price=#ourSalePrice#
+		</isNotNull>
+	 where ss_prodid = #ssProdid# or prod_id = #prodId#
+	</dynamic>
+</update>
+  
+ <!-- 更新 -->
+<update id="updateGoodsXiYouMap" parameterClass="java.util.Map">
+	update provide_goods_xiyou
+	<dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="stock">
+			,stock=#stock#
+		</isNotNull>
+		
+		<isNotNull  property="cost">
+			,cost=#cost#
+		</isNotNull>
+		<isNotNull  property="ourSalePrice">
+			,our_sale_price=#ourSalePrice#
+		</isNotNull>
+		
+		<isNotNull  property="timeChangeUpdateStock">
+			,stock_change_time=sysdate()
+		</isNotNull>
+		
+		<isNotNull  property="costChangeTime">
+			,cost_change_time=#costChangeTime#
+		</isNotNull>
+		
+		<isNotNull  property="imageAddresses">
+			,image_addresses=#imageAddresses#
+		</isNotNull>
+	 where ss_prodid = #ssProdid# or prod_id = #prodId#
+	</dynamic>
+</update>
+
+<select id="getProviderWithPageCount" resultClass="java.lang.Integer">
+<![CDATA[
+	SELECT	 COUNT(*) from (SELECT * FROM `provide_goods_xiyou` WHERE our_sale_price<market_price) mo where  1=1
+]]>
+	<include refid="provide_goods_xiyous" />
+</select>
+
+
+ 
+<select id="getProviderListByConditionWithPage" resultMap="provideGoodsResult" >
+<![CDATA[
+SELECT * from (SELECT * FROM `provide_goods_xiyou` WHERE our_sale_price<market_price) mo where  1=1  
+]]>
+
+<isNotNull prepend="and" property="hasListProdId">
+
+      mo.prod_id in
+      <iterate conjunction="," open="(" close=")"  property="prodList">  		
+	  		#prodList[]#
+	  </iterate>
+</isNotNull>  
+
+
+	<include refid="provide_goods_xiyous" />
+	order by  id 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty> 	
+
+</select>
+
+
+	  		
+  <select id="getProvidStockNoZero"  resultMap="provideGoodsResult">
+	select * from
+	provide_goods_xiyou
+	where 1=1 and stock>0
+	
+</select>
+
+
+
+
+</sqlMap>
+
+

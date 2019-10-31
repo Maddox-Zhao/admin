@@ -1,0 +1,18 @@
+#set($layout = '')
+<html>
+<head>
+	<title>魅力惠SH-SKU</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" action="/timetask/updateMlhSkuByFile.html"  enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			sh-魅力惠sku对应关系 :<input type="file" name="Mlh" /><br/>
+			<input type="hidden" name="type" value="sh" />
+			<input type="submit" value="上传"/>
+		</form>
+</body>
+
+</html>

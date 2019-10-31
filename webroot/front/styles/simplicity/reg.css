@@ -1,0 +1,242 @@
+/**
+ * styles for page: register
+**/
+
+div#reg{
+	margin:0pt auto;
+	width:100%;
+}
+
+.inp input{
+_height:20px;
+_padding:1px 8px 0 3px;
+_border:1px solid #A7A6AA;
+}
+
+#reg_items li{
+height:30px;
+overflow:hidden;
+}
+
+
+
+#reg_items li.submit{
+	text-align:center;
+	margin:20px 0 10px 0;
+	height:80px}
+#reg_items .s_btn{
+width:500px;
+}
+#reg_items .s_btn input{
+width:80px;
+margin:0px 5px;
+}
+#reg_items li div.inp{
+	float:left;
+	width:175px;
+}
+
+#reg_items li div.inf{
+
+	margin-left:350px;
+	margin-right:20px;
+	_margin:2px 0px;
+	height:22px;
+
+}
+
+#reg_items li input[type="text"], #reg_items li input[type="password"]{
+	border:1px solid #A7A6AA;
+	height:18px;
+	width:160px;
+	margin-top:4px;
+	padding:2px 8px 0pt 3px;
+}
+#reg_items li input.readonly{
+   border:none;
+   background:#fff;
+}
+#reg_items li input.ccode{
+	width:54px;
+}
+
+
+
+#reg_items li label{
+	color:#404040;
+	float:left;
+	font-size:14px;
+	line-height:28px;
+	margin-right:5px;
+	text-align:right;
+	width:160px;
+}
+
+.default{
+	margin-left:30px;
+	color:#AAA;
+	padding-top:6px;
+
+}
+
+ul#reg_terms{
+	list-style-image:none;
+	list-style-position:outside;
+	list-style-type:none;
+	margin:0pt;
+	padding:0pt;
+}
+
+.seperator{
+	border-top:1px solid #EEEEEE;
+	clear:both;
+	font-size:0pt;
+	height:0pt;
+	width:100%;
+}
+
+.title{
+	color:#333;
+	font-size:14px;
+	line-height:22px;
+	font-weight:bold;
+	}
+
+.reg_title{
+    color:#000;
+    font-size:14px;
+    line-height:20px;
+    font-weight:bold;
+    height:20px;
+    background:url(../../images/login_bg_06.png) no-repeat;
+    padding-left:15px;
+    margin:10px 0;
+    }
+
+ul#reg_terms li.terms_content{
+	line-height:200%;
+	margin:20px 0pt 10px;
+	text-align:center;
+}
+
+ul#reg_terms li.terms_content div{
+	background-color:#FAFAFA;
+	border:1px solid #CCCCCC;
+	height:60px;
+	margin:0pt auto;
+	overflow:auto;
+	padding:5px;
+	text-align:left;
+	width:700px;
+}
+
+
+.WarningMsg{
+	background:#FFEAF7 url(../../images/msg_warning.gif) no-repeat scroll 5px 50%;
+	/*border:1px solid #FFBABE;*/
+	color:#000;
+	margin:-1px 0 0 4px !important;
+	margin:0 0 0 4px;
+	height:16px !important;
+	height:12px;
+	padding:2px 5px 2px 25px !important;
+	padding:4px 5px 2px 25px;
+}
+
+.FailedMsg{
+	background:#FFF2E9 url(../../images/standard_msg_error.gif) no-repeat scroll 5px 50%;
+	/*border:1px solid #FF6600;*/
+	color:#000;
+	margin:-1px 0 0 4px !important;
+	margin:0px;
+	height:16px !important;
+	height:12px;
+	padding:2px 5px 2px 25px !important;
+	padding:4px 5px 2px 25px;
+	width:300px
+}
+
+.SucceedMsg{
+	background:#E6FFE6 url(../../images/standard_msg_ok.gif) no-repeat scroll 5px 45%;
+	/*border:1px solid #00BE00;*/
+	color:#000;
+	height:16px !important;
+	height:12px;
+	padding:2px 5px 2px 25px !important;
+	padding:4px 5px 2px 25px;
+	margin:-1px 0 0 4px !important;
+	margin:0 0 0 4px;
+	width:300px
+}
+
+/*组件-流程标签*/
+.step1{
+height:28px;
+	padding:0px;
+	margin:0px;
+	width:450px;
+	float:right;
+	}
+
+.step1 li{
+	display:block;
+	width:100px;
+	line-height:25px;
+	height:25px;
+	text-align:center;
+	font-size:12px;
+	float:right;
+	color:#939393;
+}
+.step1 li.Selected{
+	display:block;
+	font-weight:bold;
+	color:#ff8604;
+	white-space: nowrap;	}
+
+
+span.require-field {
+	font: 12px verdana; margin-left: 1em; color: #ff0000
+}
+/* 注册页面的按钮和步骤图 by zyq */
+.reg_nav_list{
+background:url(../../images/reg.jpg) no-repeat;float:left;width:100%; height:65px;}
+.reg_nav_list .infonav li{margin:0px;}
+.nav_list{float:left;width:100%; height:65px;}
+##.nav_list .infonav li{margin:0px;}
+.nav_list .infonav li{ float:left; margin-right:10px; font-size:12px; font-weight:300; color:#999;}
+
+.list_reg{width:700px;margin:0px auto;}
+
+.tg_reg{float:right;width:710px;overflow:hidden;}
+
+.tg_reg #reg_items li div.inf{width:350px;_width:330px;float:left;}
+
+.tg_reg #reg_items .textarea{height:100px}
+.tg_reg #reg_items li.address div.inp{width:270px;float:left;}
+.tg_reg #reg_items li.address div.inf {margin:0px;float:left;width:250px;}
+.tg_reg #reg_items li.textarea div.inp{width:270px;float:left;}
+.tg_reg #reg_items li.textarea div.inf {margin:0px;float:left;width:250px;}
+
+.tg_reg #reg_items li.address div.inp #district{width:90px;}
+.tg_reg #reg_items li.address div.inp #city{width:70px;}
+.tg_reg #reg_items li.address div.inp #s1{width:40px;}
+.tg_reg #reg_items textarea{overflow-y:scroll;width:250px;height:90px}
+.tg_reg_btn{border:0 none;margin:0 auto;background:url(../../images/skin/myspace/tg_btn.png) no-repeat;width:83px;height:26px;display:block;}
+.tg_reg div#reg{float:left;border-left:1px solid #d5d7d2;border-right:1px solid #d5d7d2;width:708px;overflow:hidden;}
+.tg_reg #reg_items{margin:0px 8px;_margin:0px 0px;}
+.tg_reg #reg_items .title {width:658px;}
+.tg_reg #reg_items li.submit{height: 30px;}
+.tg_reg #reg_items li.clearing{height:10px;}
+
+#siveSignupAgent_20100312{
+ width:500px; height:210px;}
+ 
+#siveSignupAgent_20100312 p{
+font-size:12px; color:#000; margin:0; padding:0;
+}
+
+.fontcolor_red{
+color:#ff0000;
+}
+

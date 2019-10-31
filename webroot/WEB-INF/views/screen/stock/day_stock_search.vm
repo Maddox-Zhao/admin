@@ -1,0 +1,137 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main-title">
+   <div class="btn-box-t1 fr">
+   </div>
+</div>
+
+<div class="main">
+	<h2>采购管理 - 订单库存查询</h2>
+	<div class="searchBox">
+	<h3><span>搜索订单库存</span></h3>
+	<form action="$appServer/stock/day_stock_search.html" name="searchForm" method="post">
+		<table >
+			<tr>
+				<th>产品编号：</th>
+                <td>
+					<input type="text" name="instanceCode" id="instanceCode" value="$!{queryObject.instanceCode}" size="15" theme="simple" maxlength="30")
+				</td>
+				<th>产品名称：</th>
+				<td >
+					<input type="text" name="instanceName" id="instanceName" value="$!{queryObject.instanceName}" size=15" theme="simple" maxlength="30")
+                </td>
+            </tr>
+
+			<tr>
+				<th>订单时间：从</th>
+                <td>
+					<input type="text" name="startTime" id="startTime" value="$!{queryObject.startTime}" size="10" theme="simple" readonly="true")
+				</td>
+				<th>到</th>
+				<td >
+					<input type="text" name="endTime" id="endTime" value="$!{queryObject.endTime}" size="10" theme="simple" readonly="true")
+                </td>
+				<script type="text/javascript">
+                  Calendar.setup({
+                      inputField : "startTime",
+                      ifFormat   : "%Y-%m-%d",
+                      align      : "BR"
+                  });
+                  Calendar.setup({
+                      inputField : "endTime",
+                      ifFormat   : "%Y-%m-%d",
+                      align      : "BR"
+                  });
+            </script>
+            </tr>
+
+			<tr>
+				<th></th>
+                <td>
+                    <input type="button" value=" 查询 " class="button"  onclick="javascript:formSubmit();"/>
+                    <input type="button" value="Excel导出" class="button" onclick="javascript:doExport();"/>
+				</td>
+				<th></th>
+				<td >
+                </td>
+            </tr>
+
+        </table>
+	</form>
+</div>
+<!-- 当日订单显示列表 -->
+<div class="clearing"></div>
+<div class="listBox" id="listDiv">
+  <table  id="listTable" name="listTable"  class="list-table">
+    <tr>
+      <th>产品编号</th>
+      <th>产品名称</th>
+      <th>产品属性</th>
+      <th>已销售数量</th>
+	  <th>库存情况</th>
+    </tr>
+    #foreach($checkDetail in $query.items)
+	 <tr #if($velocityCount%2==0) class="bg" #end>
+
+	 #set($linkCode = $!checkDetail.code )
+	 #if($linkCode)
+	 #set($linkCode = $linkCode.substring(0,7))
+	 #end
+    <td  align="center">$!checkDetail.code</td>
+    <td  align="center"><a href="$appServer/trade/orderList.html?goodsSn=$!linkCode" target="_blank">$!checkDetail.goodsInstanceName</a></td>
+    <td  align="center">$!attributeManager.getFullAttributeStringByAttrs($checkDetail.goodsAttr)</td>
+    <td  align="center">$!checkDetail.goodsNumber</td>
+    <td  align="center">
+    	   #foreach($storage in ${checkDetail.storagelist})
+           <label>$!storage.depositoryName</label>($!storage.storageNumSum)
+           #end
+    </td>
+	</tr>
+        #end
+      </table>
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/stock/day_stock_search.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+	#end
+
+    </div>
+
+</div>
+  <script language="javascript" type="text/javascript">
+  	String.prototype.trim = function() {
+      	// 用正则表达式将前后空格
+      	// 用空字符串替代。
+      	return this.replace(/(^\s*)|(\s*$)/g, "");
+  	}
+
+	function doExport(){
+  		var form1=document.forms[0];
+  		form1.action="$appServer/stock/export_day_stock_search.html";
+  		form1.submit();
+  		form1.action="$appServer/stock/day_stock_search.html";
+  	}
+  	function formSubmit(){
+  			var dateStart1=document.getElementById("startTime").value.replace(/-/g, "/");
+      		var dateEnd1=document.getElementById("endTime").value.replace(/-/g, "/");
+      		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+
+      		if(e_date1 < b_date1){
+      			alert("起始时间不能大于结束时间！");
+      			return false;
+      		}
+
+  	    	document.getElementById("startTime").value=document.getElementById("startTime").value.trim();
+  	    	document.getElementById("endTime").value=document.getElementById("endTime").value.trim();
+  	    	document.getElementById("instanceCode").value=document.getElementById("instanceCode").value.trim();
+			document.getElementById("instanceName").value=document.getElementById("instanceName").value.trim();
+          	document.forms[0].submit();
+  	    }
+  </script>
+  </body>
+

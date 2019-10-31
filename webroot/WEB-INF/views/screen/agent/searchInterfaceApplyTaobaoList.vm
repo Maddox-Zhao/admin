@@ -1,0 +1,314 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>淘宝网店接入申请查询</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>淘宝网店接入申请查询</span></h3>
+  <form action="searchInterfaceApplyTaobaoList.html" name="searchForm" method="post">
+  <table>
+  <tr>
+
+    <th>参数一：</th>
+	<td>
+		#springBind("interfaceApplyQuery.paramOne")
+	<input  type="text" name="${status.expression}"  value="$!{status.value}" id="paramOne" size="10"/></td>
+ <th>用户名：</th>
+		<td>
+				#springBind("interfaceApplyQuery.account")
+		<input  type="text" name="${status.expression}"  value="$!{status.value}" id="account" size="10"/></td>
+ <th>状态</th>
+			<td>
+							#springBind("interfaceApplyQuery.status")
+							<select name="${status.expression}">
+							<option value="" #if(""==$!{status.value})selected#end>-=请选择=-</option>
+														<option value="new" #if("new"==$!{status.value})selected#end>待审核</option>
+																					<option value="pass" #if("pass"==$!{status.value})selected#end>审核通过</option>
+																												<option value="fail" #if("fail"==$!{status.value})selected#end>审核不通过</option>
+</td>
+<th>创建日期：</th>
+											<td>
+											#springBind("interfaceApplyQuery.gmtCreateStart")
+											<input name="${status.expression}"  id="gmtCreateStart" value="$!{status.value}"  size="6" readonly="true"/>到
+			#springBind("interfaceApplyQuery.gmtCreateEnd")
+			<input  name="${status.expression}" id="gmtCreateEnd" value="$!{status.value}"   size="6" readonly="true"/>
+			</td>
+		<script type="text/javascript">
+		      Calendar.setup({
+		          inputField : "gmtCreateStart",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		      Calendar.setup({
+		          inputField : "gmtCreateEnd",
+		          ifFormat   : "%Y-%m-%d",
+		          align      : "BR"
+		      });
+		</script>
+		<td>
+	<input name="chaxun" value="查询" class="button" type="button" onclick="return sumbitForm();" />
+</td>
+<script language="javascript" type="text/javascript">
+
+function sumbitForm(){
+         document.getElementById("result").style.display="none";
+        var dateStart=document.getElementById("gmtCreateStart").value.replace(/-/g, "/");
+        var dateEnd=document.getElementById("gmtCreateEnd").value.replace(/-/g, "/");
+        var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+        if(e_date < b_date){
+            alert("起始时间不能大于结束时间！");
+            return false;
+        }
+		document.getElementById("paramOne").value=document.getElementById("paramOne").value.trim();
+		document.getElementById("account").value=document.getElementById("account").value.trim();
+        document.searchForm.submit();
+    }
+
+
+function doModifyOwnExpress(taobaoApplyId){
+        var flag=document.getElementById("ownExpressId_"+taobaoApplyId).options[0].selected;
+        var ownExpressId=document.getElementById("ownExpressId_"+taobaoApplyId).value
+
+        if(flag){
+            alert("请选择订单物流");
+        } else if(confirm("确定要更换订单物流吗？")){
+            jQuery.post('$appServer.get("/agent/modifyOwnExpressIdByJson.html")',{param1:taobaoApplyId,param2:ownExpressId},function(message){
+				alert("修改订单物流成功！");
+    		});
+		}
+    }
+	
+function doModifyTaobaoExpress(taobaoApplyId){
+        var flag=document.getElementById("interfaceExpressCode_"+taobaoApplyId).options[0].selected;
+        var interfaceExpressCode=document.getElementById("interfaceExpressCode_"+taobaoApplyId).value
+
+        if(flag){
+            alert("请选择淘宝物流");
+        } else if(confirm("确定要更换淘宝物流吗？")){
+            jQuery.post('$appServer.get("/agent/modifyInterfaceExpressCodeByJson.html")',{param1:taobaoApplyId,param2:interfaceExpressCode},function(message){
+    			alert("修改淘宝物流成功！");
+    		});
+		}
+    }
+</script>
+</table>
+</div>
+<!-- 订单列表 -->
+<div class="clearing"></div>
+#if($!message)<div class="mag-t2"> $!message </div>#end
+<div id="result" class="mag-t2" style="display:none">$!message</div>
+
+   <div class="listBox">
+          <h3><span>申请列表</span></h3>
+    <table>
+      <tr>
+         <th>参数一</th>
+		 <th>接入方式</th>
+		 <th>用户名</th>
+         <th>店铺地址</th>
+		 <th>订单物流</th>
+		 <th>淘宝物流</th>
+		 <th>平邮价格</th>
+		 <th>EMS价格</th>
+		 <th>快递价格</th>
+		 <th>创建时间</th>
+		 <th>状态</th>
+		 <th>操作</th>
+      </tr>
+            #foreach($obj in $query.items)
+        	<tr #if($velocityCount%2==0) class="bg" #end>
+        		<td>$obj.paramOne</td>
+				<td align="center">$enumInterfaceTypeMap.get("$obj.type")</td>
+				<td>$obj.account</td>
+				<td title="$obj.shopUrl"><a href="$obj.shopUrl" target="_blank">
+
+						$obj.shopUrl
+
+				</a></td>
+				<td align="right">
+					<select id="ownExpressId_$!{obj.id}" name="ownExpressId_$!{obj.id}" onchange="doModifyOwnExpress($!{obj.id})">
+						#foreach($expressTemp in $expressList)
+							<option value="$expressTemp.id" #if("$expressTemp.id" == "$!obj.ownExpressId") selected="true" #end>$expressTemp.expressName</option>
+						#end
+					$!obj.ownExpressId
+                    </select>
+				</td>
+				<td align="right">
+					<select name="interfaceExpressCode_$!{obj.id}" id="interfaceExpressCode_$!{obj.id}" onchange="doModifyTaobaoExpress($!{obj.id});">
+                        #foreach($enumTaobaoExpressTemp in $enumTaobaoExpressMap.entrySet())
+							<option value="$!enumTaobaoExpressTemp.key" #if($!obj.interfaceExpressCode == $!enumTaobaoExpressTemp.key) selected="true" #end>$!enumTaobaoExpressTemp.value</option>
+                        #end
+					</select>
+				</td>
+				<td align="right">$!moneyUtil.getFormatMoney($obj.postNormal,'0.00')</td>
+                <td align="right">$!moneyUtil.getFormatMoney($obj.postEms,'0.00')</td>
+				<td align="right">$!moneyUtil.getFormatMoney($obj.postExpress,'0.00')</td>
+				<td align="center">$!dateUtil.convertDateToString('yyyy-MM-dd',${obj.gmtCreate})</td>
+				<td align="center">
+					<span id="status_${obj.id}">
+						#if("$obj.status"=="pass")
+							审核通过
+						#elseif("${obj.status}"=="fail")
+							审核不通过
+						#else
+							待审核
+						#end
+					</span>
+					<input type="hidden" id="statusText_${obj.id}" value="${obj.stauts}"/>
+				</td>
+				<td align="center">
+					#if("$obj.type"=="paipai")
+					<input id="test_${obj.id}" name="test_${obj.id}" type="button" value="测试" onclick="this.disabled='true';tryInterfaceByJQuery($!obj.id,'$!obj.paramOne','$!obj.paramTwo','$!obj.paramThree','$!obj.paramFour');"/>
+					#elseif("$obj.type"=="taobao")
+					<input id="test_${obj.id}" name="test_${obj.id}" type="button" value="测试" onclick="this.disabled='true';tryInterfaceTaobaoByJson($!obj.id,'$!obj.paramOne','$!obj.paramTwo','$!obj.paramThree');"/>
+					#else
+					#end
+					<input id="pass_${obj.id}" name="pass_${obj.id}" type="button" value="通过" onclick="chooseOperate($obj.id,'pass');" disabled="disabled"/>
+					<input id="fail_${obj.id}" name="fail_${obj.id}" type="button" value="不通过" onclick="chooseOperate($obj.id,'fail');" disabled="disabled"/>
+				</td>
+            </tr>
+            #end
+
+    </table>
+	<!-- 分页 -->
+	</form>
+    <!-- 分页 -->
+   <div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/agent/searchInterfaceApplyTaobaoList.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+	var failMsg="";
+	function chooseOperate(id,op){
+    	var statusTextId="statusText_"+id;
+		var pass_button="pass_"+id;
+		var fail_button="fail_"+id;
+		var userStatusId="status_"+id;
+    	var status= document.getElementById(statusTextId).value;
+
+		var memo="";//审核不通过原因
+		if(op == "fail"){//审核不通过需要输入原因
+			var obj = new Object();
+			obj.msg = failMsg;
+			var ret = window.showModalDialog("$appServer.get('/agent/memoInputForTaobao.html')",obj,"dialogWidth:400px;dialogHeight:300px;help:no;status:no");
+      		if(!ret){
+				alert("审核不通过必须输入原因");
+				return;
+			}
+			memo = ret;
+			//alert(memo);
+		}
+
+		 					jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/agent/editInterfaceApplyTaobaoByJQuery.html')",
+            			data :{param1:id,param2:op,param3:memo},
+    			        success:function(data){
+
+	                            if(data.indexOf("pass") > -1){
+			                                   document.getElementById(pass_button).disabled="disabled";
+			                                   document.getElementById(fail_button).disabled="";
+			                                    var userStatus = document.getElementById(userStatusId);
+			                                    userStatus.innerHTML = "审核通过";
+			                                    document.getElementById(statusTextId).value = "pass";
+			                                    jQuery("#result").html("审核通过！");
+		                            }else if(data.indexOf("fail") > -1){
+			                                    document.getElementById(fail_button).disabled="disabled";
+			                                    document.getElementById(pass_button).disabled="";
+			                                    var userStatus = document.getElementById(userStatusId);
+			                                    userStatus.innerHTML = "审核不通过";
+			                                    document.getElementById(statusTextId).value = "fail";
+			                                    jQuery("#result").html("审核不通过！");
+		                             }else if(message.indexOf("failed") > -1){
+			                                    jQuery("#result").html("审核操作失败！");
+		                             }
+    			                   }
+			     });
+
+    }
+
+	function tryInterfaceByJQuery(id,paramOne,paramTwo,paramThree,paramFour){
+		if(paramOne==null||paramOne.trim()==""){
+			alert("出错：QQ参数为空！");
+		}else if(paramTwo==null||paramTwo.trim()==""){
+			alert("出错：TOKEN参数为空！");
+		}else if(paramThree==null||paramThree.trim()==""){
+			alert("出错：SPID参数为空！");
+		}else if(paramFour==null||paramFour.trim()==""){
+			alert("出错：seckey参数为空！");
+		}
+		else{
+
+				 					jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/agent/tryInterfaceByJson.html')",
+            			data :{param1:paramOne,param2:paramTwo,param3:paramThree,param4:paramFour},
+    			        success:function(data){
+
+	                   var msgType = data.substring(data.indexOf("\'") + 1, data.indexOf("\',"));
+		                  var msgValue = data.substring(data.indexOf("\',\'") + 3, data.lastIndexOf("\']"));
+		                     if (msgType == 'true') {
+			                         alert("成功：测试网店接入通过!");
+					                         document.getElementById('pass_'+id).disabled="";
+					                         document.getElementById('fail_'+id).disabled="";
+		                     } else{
+			                         alert("失败："+msgValue);
+					                         failMsg = msgValue;
+					                         document.getElementById('fail_'+id).disabled="";
+					                     }
+					                   }
+
+			    });
+
+	}
+	}
+
+	function tryInterfaceTaobaoByJson(id,paramOne,paramTwo,paramThree){
+		var test_button="test_"+id;
+
+		if(paramOne==null||paramOne.trim()==""){
+			alert("出错：App Key参数为空！");
+		}else if(paramTwo==null||paramTwo.trim()==""){
+			alert("出错：secret参数为空！");
+		}else{
+
+							jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/agent/tryInterfaceTaobaoByJson.html')",
+            			data :{param1:paramOne,param2:paramTwo,param3:paramThree},
+    			        success:function(data){
+                         var msgType = data.substring(data.indexOf("\'") + 1, data.indexOf("\',"));
+		                         var msgValue = data.substring(data.indexOf("\',\'") + 3, data.lastIndexOf("\']"));
+		                 if (msgType == 'true') {
+			                         alert("成功：测试网店接入通过!");
+					                         document.getElementById('pass_'+id).disabled="";
+					                         document.getElementById('fail_'+id).disabled="";
+					                         jQuery("#"+test_button).attr("disabled","");
+		                 } else{
+			                          alert("失败："+msgValue);
+					                          failMsg = msgValue;
+					                          document.getElementById('fail_'+id).disabled="";
+					                           jQuery("#"+test_button).attr("disabled","");
+		                 }
+		                }
+			    });
+
+		}
+	}
+</script>
+

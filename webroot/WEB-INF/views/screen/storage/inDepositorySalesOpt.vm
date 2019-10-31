@@ -1,0 +1,190 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 分配库位")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 分配库位</h2>
+	
+	#if($succFlag)
+		<div class="mag-t2" id="modifySuccess">分配库位成功</div>
+	#end
+	#if($errorInfo && $errorInfo != "")
+		<div class="mag-t1" id="modifyError">$errorInfo</div>
+	#end
+
+	<!-- 表单模块 -->
+	<form name="form1" action="inDepositoryOpt.html?optId=$!{optId}&optType=$!{optType}&dfi=$!{dfi}" method="post">
+		<div class="formBox"> 
+			<h3><i></i><span>销售基本信息</span></h3>
+			<div class="content">
+				<table class="c6">
+					<tr>
+						<th>产品编号</th>
+						<td>$!{inDetailBaseInfo.code}</td>
+						<th>产品名称</th>
+						<td>$!{inDetailBaseInfo.instanceName}</td>
+					</tr>
+					<tr>
+						<th>一级仓库</th>
+						<td colspan="3">$!{inDetailBaseInfo.depFirstName}</td>
+					</tr>
+					<tr>
+						<th>数量</th>
+						<td colspan="3">$!{inDetailBaseInfo.amount}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="listBox" style="margin-top:10px;">
+			<h3><span>分配库位列表</span></h3>
+			#if(!$notAllowEdit)
+				<table>
+					<tr>
+						<th>原库位名称</th>
+						<th>原仓库名称</th>
+						<th>供应商名称</th>
+						<th>批次</th>
+						<th>库存类型</th>
+						<th>原出货数量</th>
+						<th>分配数量</th>
+						<th>仓库名称</th>
+						<th>库位名称</th>
+					</tr>
+					#if($goodsForLocationLists)
+						#foreach($goodsForLocationInfo in $goodsForLocationLists)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<input type="hidden" name="supplierIdForUpdate" id="supplierIdForUpdate_${velocityCount}" value="$!goodsForLocationInfo.supplierId"/>
+								<input type="hidden" name="batchNumForUpdate" id="batchNumForUpdate_${velocityCount}" value="$!goodsForLocationInfo.batchNum"/>
+								<input type="hidden" name="selfCostForUpdate" id="selfCostForUpdate_${velocityCount}" value="$!goodsForLocationInfo.price"/>
+								<input type="hidden" name="storTypeForUpdate" id="storTypeForUpdate_${velocityCount}" value="$!goodsForLocationInfo.storType"/>
+								<td>$!goodsForLocationInfo.locName</td>
+								<td>$!goodsForLocationInfo.depName</td>
+								<td>$!goodsForLocationInfo.supplierName</td>
+								<td>$!goodsForLocationInfo.batchNum</td>
+								<td>$!storTypeMap.get($goodsForLocationInfo.storType)</td>
+								<td>$!goodsForLocationInfo.oriAmount</td>
+								<td>
+									<input type="text" name="disCount" id="disCount_${velocityCount}" value="$!goodsForLocationInfo.oriAmountForDis" onblur="javascript:isNumber(this.value,'请输入大于0的正整数！');" class="inp"/></td>
+								<td>
+									<select id="depId_${velocityCount}" name="depId" onchange="selectLoc(this.value,'locationNum_${velocityCount}');" class="select" style="width:auto;">
+										<option value="">请选择仓库</option>
+										#foreach($depository in $depositoryList)
+											<option value="$!{depository.id}" #if("$depository.id" == "$goodsForLocationInfo.oriDepIdForDis") selected="selected" #end>$!{depository.name}</option>
+										#end
+									</select>
+								</td>
+								<td>
+									<select name="locationNum" id="locationNum_${velocityCount}" class="select" style="width:auto;">
+										<option value="">请选择库位</option>
+										#if($depLocationInfoList)
+											#foreach($depLocationInfo in $depLocationInfoList)
+												#if("$depLocationInfo.depId" == "$goodsForLocationInfo.oriDepIdForDis")
+												<option value="$depLocationInfo.id" #if("$depLocationInfo.id" == "$goodsForLocationInfo.oriLocIdForDis") selected="selected" #end>${depLocationInfo.locName}[${depLocationInfo.depName}]</option>
+											    #end
+											#end
+										#end
+									</select>
+								</td>
+							</tr>
+						#end
+					#end
+				</table>
+				#if($goodsForLocationLists.size() == 0)
+					没有可分配的仓库！
+				#end
+			#else
+				<table>
+    				<tr>
+    					<th>库位名称</th>
+    					<th>仓库名称</th>
+    					<th>分配数量</th>
+    				</tr>
+					#if($inDetailInfoForDisList)
+						#foreach($inDetailInfoForDisInfo in $inDetailInfoForDisList)
+							<tr #if($velocityCount % 2 == 0) class="bg" #end>
+								<td>$!inDetailInfoForDisInfo.locName</td>
+								<td>$!inDetailInfoForDisInfo.depName</td>
+								<td>$!inDetailInfoForDisInfo.oriAmount</td>
+							</tr>
+						#end
+					#end
+				</table>
+				#if(!$inDetailInfoForDisList || $inDetailInfoForDisList.size() == 0)
+					没有可分配的仓库！
+				#end
+			#end
+		</div>
+
+		<div class="formBox">
+			<div class="form-but">
+				#if(!$notAllowEdit)
+					<button type="button" class="button-s4" onclick="javascript:finishOpt();">完成</button>
+				#end
+				<button type="button" class="button-s4" onclick="javascript:window.close();">关闭</button>
+			</div>
+		</div>
+	</form>
+	
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+		// 用正则表达式将前后空格
+		// 用空字符串替代。
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function finishOpt(){
+		var depIds = jQuery('select[name="depId"]');
+		for(var i = 0; i < depIds.length; i++) {
+			if(depIds.get(i).value == "") {
+				alert('必须选择仓库！');
+				return;
+			}
+		}
+
+		var locationNums = jQuery('select[name="locationNum"]');
+		for(var i = 0; i < locationNums.length; i++) {
+			if(locationNums.get(i).value == "") {
+				alert('必须选择库位！');
+				return;
+			}
+		}
+		document.form1.submit();
+	}
+
+	function isNumber(val,errMsg) {
+    	if(val != ""){
+    		var reg = /^[\d|\.|,]+$/;
+    		if(!reg.test(val)){
+    			alert(errMsg);
+    		}
+    	}
+	}
+
+	var depLocationList = new Array();
+	var j=0;
+	#foreach($depLocation in $depLocationInfoList)
+		depLocationList[j] = new Array("$!{depLocation.id}","$!{depLocation.depId}","$!{depLocation.locName}","[${depLocation.depName}]");
+		j++;
+	#end
+	var count=j;
+
+	function selectLoc(code,cityVar){
+		var obj = document.getElementById(cityVar);
+		var length = obj.length = 0;
+		var depLocName;
+		obj.options[length++] = new Option("请选择库位", "");
+		for(var m=0; m<count; m++){
+			if(depLocationList[m][1] == code){
+				depLocName = depLocationList[m][2] + depLocationList[m][3];
+				obj.options[length] = new Option();
+				obj.options[length].value = depLocationList[m][0];
+				obj.options[length].innerHTML = depLocName;
+				length++;
+			}
+		}
+	}
+</script>

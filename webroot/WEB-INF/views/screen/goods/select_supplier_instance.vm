@@ -1,0 +1,208 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<form name="searchform" id="searchform" action="/instance/select_suppliler_instance.html" method="post">
+	#springBind("instance.supplierId")
+	<input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+	#springBind("instance.shoppingOriCount")
+	<input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+	<div class="searchBox">
+		<h2 ><span >搜索产品</span></h2>
+    	<table>
+			<tr >
+                <th>名称：</th>
+    			<td>
+    				#springBind("instance.instanceName")
+    				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+    			</td>
+    			<th>编码：</th>
+    			<td>
+    				#springBind("instance.code")
+    				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+    			</td>
+                <th>拼音码：</th>
+    			<td>
+    				#springBind("instance.pyCode")
+    				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp"/>
+    			</td>
+    			<th>商品类目：</th>
+    			<td>
+    				#springBind("instance.catCode")
+    			<select name="${status.expression}" class="select">
+    				<option value="">-=请选择=-</option>
+    				#foreach($cat in $catList)
+    				<option value="$cat.catCode" #if("$cat.catCode"=="$!{status.value}") selected #end>$cat.catName</option>
+    				#end
+    			</select>
+    			</td>
+            </tr>
+			<tr >
+    		    <th></th>
+    		    <td><button type="button" onclick="formSubmit();" class="btn">查询产品</button></td>
+            </tr>
+    	</table>
+    </div>
+	<div class="listBox">
+		<h3><span>产品列表</span></h3>
+		<table>
+				<tr>
+					<th><input type="checkbox" id="allbox" />全选</th>
+					<th>
+						产品名称
+					</th>
+					<th>
+						编码
+					</th>
+					<th>
+						拼音码
+					</th>
+					<th>
+						类目
+					</th>
+					<th>
+						属性
+					</th>
+				</tr>
+				#if($query && $query.items.size()>0)
+		         #foreach($gi in $query.items)
+					<input type="hidden" id="gigoodsid_${velocityCount}" name="gigoodsid_${velocityCount}" value="$!{gi.goodsId}" />
+					<input type="hidden" id="gicatCode_${velocityCount}" name="gicatCode_${velocityCount}" value="$!{gi.catCode}" />
+					<input type="hidden" id="gisellPrice_${velocityCount}" name="gisellPrice_${velocityCount}" value="$!{gi.sellPrice}" />
+					<input type="hidden" id="gimarketPrice_${velocityCount}" name="gimarketPrice_${velocityCount}" value="$!{gi.marketPrice}" />
+					<input type="hidden" id="gisalesProPrice_${velocityCount}" name="gisalesProPrice_${velocityCount}" value="$!{gi.salesProPrice}" />
+					<input type="hidden" id="giwholesalePrice_${velocityCount}" name="giwholesalePrice_${velocityCount}" value="$!{gi.wholesalePrice}" />
+					<input type="hidden" id="gimaxNum_${velocityCount}" name="gimaxNum_${velocityCount}" value="$!{gi.maxNum}" />
+					<input type="hidden" id="giminNum_${velocityCount}" name="giminNum_${velocityCount}" value="$!{gi.minNum}" />
+					<input type="hidden" id="giisPresent_${velocityCount}" name="giisPresent_${velocityCount}" value="$!{gi.isPresent}" />
+					<input type="hidden" id="gigoodsUnit_${velocityCount}" name="gigoodsUnit_${velocityCount}" value="$!{gi.goodsUnit}" />
+					<input type="hidden" id="giagentPrice_${velocityCount}" name="giagentPrice_${velocityCount}" value="$!{gi.agentPrice}" />
+				<tr>
+						<td>
+							<input type="checkbox" name="ids" id="gi_${velocityCount}" value="${gi.id}"/>
+						</td>
+						<td id="giname_${velocityCount}">$!{gi.instanceName}</td>
+						<td id="gicode_${velocityCount}">$!{gi.code}</td>
+						<td id="gipycode_${velocityCount}">$!{gi.pyCode}</td>
+						<td>
+							$categoryManager.getCatFullNameByCatcodeSimple($gi.catCode, '>')
+						</td>
+						<td>
+							#foreach($pro in $gi.properties.entrySet())
+								$!{attributeManager.getAttributeByAttrCode($pro.key).attrName}=$!{pro.value}
+							#end
+						</td>
+					</tr>
+				 #end
+				#end
+		</table>
+		<table cellpadding="4" cellspacing="0">
+            <tr>
+              <td><input type="button" id="btnSubmit" value="确定" class="button" onclick="cmt();"/></td>
+			  <td><input type="button" id="btnSubmit" value="关闭" class="button" onclick="cl();"/></td>
+            </tr>
+      </table>
+	</div>
+	</form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/instance/select_suppliler_instance.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+
+	function cmt(){
+		var sCount = 0;
+		#if($shoppingOriCount && $shoppingOriCount != "")
+			sCount = $shoppingOriCount;
+		#end
+
+		var back = [];
+		var good;
+
+		#if($!query.items)
+		   var size = $!query.items.size();
+		#else
+		   var size = 20;
+        #end
+		for(var i=1;i<=size;i++){
+			var cid = 'gi_'+i;
+			var one = document.getElementById(cid);
+			if(one && one.checked){
+				var gi = buildGi(i);
+				back.push(gi);
+			}
+		}
+		#if($selectList && $selectList.size() > 0)
+			#foreach($sid in $selectList)
+    			good = new Object();
+    			good.id = $sid;
+    			back.push(good);
+			#end
+		#end
+		if(back.length==0){
+			alert('请选择产品!');
+		} else if(back.length + sCount > 100){
+			alert('每张采购订单的产品数量不能超过100条！');
+		}else {
+			window.opener.backGoodsInstance(back);
+			self.close();
+		}
+	}
+
+	function buildGi(count){
+		var back = new Object();
+		back.id = document.getElementById('gi_'+count).value;
+		back.instanceName = document.getElementById('giname_'+count).innerHTML;
+		back.code = document.getElementById('gicode_'+count).innerHTML;
+		back.pyCode = document.getElementById('gipycode_'+count).innerHTML;
+		back.goodsId = document.getElementById('gigoodsid_'+count).value;
+		back.catCode=document.getElementById('gicatCode_'+count).value;
+		back.sellPrice=document.getElementById('gisellPrice_'+count).value;
+		back.marketPrice=document.getElementById('gimarketPrice_'+count).value;
+		back.salesProPrice=document.getElementById('gisalesProPrice_'+count).value;
+		back.wholesalePrice=document.getElementById('giwholesalePrice_'+count).value;
+		back.maxNum=document.getElementById('gimaxNum_'+count).value;
+		back.minNum=document.getElementById('giminNum_'+count).value;
+		back.isPresent=document.getElementById('giisPresent_'+count).value;
+		back.goodsUnit=document.getElementById('gigoodsUnit_'+count).value;
+		return back;
+	}
+	function cl(){
+		window.opener.backGoodsInstance();
+		window.close();
+	}
+
+	function f() {
+	    var pageclick = document.getElementById("clickchoose").value;
+		if(pageclick == "false"){
+		   cl();
+		}else{
+		   document.getElementById("clickchoose").value = "false";
+		}
+	}
+	window.onbeforeunload = f;
+
+	function seme(count){
+		var back =  buildGi(count);
+		window.returnValue = back;
+		cl();
+	}
+	
+	function formSubmit(){
+	   var clickchoose = document.getElementById("clickchoose");
+	   if(clickchoose != null){
+	      clickchoose.value = "true";
+	   }
+	   document.searchform.submit();
+	}
+</script>

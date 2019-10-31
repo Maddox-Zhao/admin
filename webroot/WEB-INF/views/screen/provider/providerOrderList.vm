@@ -1,0 +1,293 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>推送成功后订单详情</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+<style type="text/css">
+    .redRow
+    {
+        background:red;
+    }
+	.yellowRow
+    {
+        background:yellow;
+    }
+#set($isAdmin = false)
+#if($!adminAccess.has('A_PRODUCT_SHOPPINGCAR_ADD'))
+		#set($isAdmin = true)
+#end
+</style>
+</head>
+<body>
+	<!--导出Excel相关HTML-->
+     <form id="excelForm"  action="/product/exportProduct.html" method="post" target="excelIFrame">
+         #if($!adminAccess.has('A_PRODUCT_COST_SHOW'))
+			 <input name="showCost" class="mini-textbox" value="yes" style="display:none"/>
+		#else
+			 <input name="showCost" class="mini-textbox" value="no" style="display:none"/>
+		#end
+ 
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">订单号：</td>
+                    <td style="width:100px">
+                        <input id="orderId" name="orderId" class="mini-textbox"  />
+                    </td>
+					#*
+					
+                    <td class="form-label" style="width:60px;">买家名称：</td>
+                    <td style="width:100px">
+                        <input id="buyname" name="buyname" class="mini-textbox" />
+                    </td>
+                    <td class="form-label" style="width:60px;">手机号：</td>
+                    <td style="width:100px">
+                        <input name="phone" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:60px;"> 商品金额：</td>
+                    <td style="width:100px">
+                        <input name="amount" class="mini-textbox" onenter="search()"/>
+                    </td>
+				
+					<td style="width:60px;">
+                    </td>
+					
+					<td class="form-label" style="width:60px;">订单状态：</td>
+                    <td style="width:100px">
+						<input id="orderstatus" name="orderstatus" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                            data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/> 
+                    </td>
+					*#
+					<td style="width:60px;">
+                    </td>
+                    <td style="width:60px;">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>
+                    </td>
+					
+                </tr>
+                <tr>
+                    
+                </tr>
+               
+                
+            </table>
+			
+        </div>
+    </div>
+	 </form>
+	 <iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+    <div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:100%;">
+						   <a class="mini-button"   iconCls="icon-remove" onclick="cancelOrder()">取消订单</a>
+			
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>	
+
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:400px;" allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        url="getProviderJsonList.html"  idField="idProduct"   pageSize="50" allowAlternating="true" pageIndex="1"  onRowdblclick="edit()" onCellbeginedit="cellbeginedit">
+		<div property="columns">
+            <div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+            <div field="orderId" width="180" headerAlign="center" align="center" allowSort="true">订单号</div>
+			<div field="amount" width="60" headerAlign="center" align="center"  allowSort="true">商品金额</div>
+			<div field="paidamount" width="60" headerAlign="center" align="center"  allowSort="true">支付金额</div>
+			<div field="shipname" width="60" headerAlign="center" align="center"  allowSort="true">快递公司</div>
+            <div field="waybillcode" width="100" headerAlign="center" align="center"  allowSort="true">快递单号</div>
+            <div field="sellPlatform" width="60" headerAlign="center" align="center"  allowSort="true" renderer="ptype">销售平台</div>           
+            <div field="pushPlatform" width="120" headerAlign="center" align="center"  allowSort="true" renderer="pty">推送平台</div>
+            <div field="orderstatus" width="80" headerAlign="center" align="center"  allowSort="true" >订单状态</div>
+			<div field="cancelstatus" width="120" headerAlign="center" align="center"  allowSort="true" >订单取消结果</div>
+            <div field="buyname" width="80" headerAlign="center" align="center"  allowSort="true">买家名称</div>
+            <div field="phone" width="100" headerAlign="center" align="center"  allowSort="true">手机号</div>
+            <div field="address" width="260" headerAlign="center" align="center"  allowSort="true">地址</div>
+			<div field="insertTime" width="150" headerAlign="center" align="center"  allowSort="true" renderer="insertTime">插入时间</div> 
+			<div field="updateTime" width="150" headerAlign="center" dateFormat="yyyy-MM-dd" align="center"  allowSort="true">更新时间</div>
+			
+		</div>
+    </div>
+    <script type="text/javascript">
+		
+ 		var statusData = [{id: 1,value: "可售"  },{ id: "订单取消", value: "订单取消" } ] ;//订单状态
+		var isFlawData = [{id: 'TRUE',value: '是'},{id: 'FALSE',value: '否'}]
+		function ptype(row){
+		 if(row.value =='Mlh') return "魅力惠";
+		 else if (row.value=='xhs') return "小红书";
+		 else if (row.value=='Ofashion') return "Ofashion";
+		 else if (row.value=='weimob') return "weimob";
+		 else if (row.value=='zp') return "珍品";
+		 else if (row.value=='kaola') return "考拉";
+		 else if (row.value=='tmall') return "天猫";
+		 else if (row.value=='fql') return "分期乐";
+		 else if (row.value=='pdd') return "拼多多";
+		 else if (row.value=='siku') return "寺库";
+		 else if (row.value=='yinTai') return "银泰";
+		 else if (row.value=='sikunew') return "寺库香港";
+		 else if (row.value=='shepin') return "天猫奢品";
+		 else return "";
+		}
+		
+		function pty(row){
+		 if(row.value =='xiyou') return "西有银泰";
+		 else if(row.value =='yshang') return "云尚";
+		 else return "";
+		}
+		
+		
+		
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		//单元格单击事件
+		grid.on("cellclick",function(e){
+             var row=e.row;
+             var column=e.column;
+			 copyValue = row[column.field];
+			 
+     	})
+		
+		
+        //绘制单元格时发生
+		grid.on("drawcell", function (e) {
+            var record = e.record,
+            column = e.column,
+            field = e.field,
+            value = e.value;
+
+			if(field == 'isFlaw'  && value == 1)
+			{
+				 e.rowCls = "redRow";
+			}
+			
+			else if(field == 'activePrice' && value > 0)
+			{
+				e.rowCls = "yellowRow";
+			}
+		});
+		search();
+		//查询
+        function search() {
+			var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+            grid.load(data);
+			
+        }
+		
+		
+		function onFlawRenderer(e) {
+		 	var value = e.value;
+			if(value == 0) return "否";
+			else if(value == 1) return "是";
+			else return "";
+        }
+		
+		//插入时间
+		function insertTimess(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return mini.formatDate(value, 'yyyy-MM-dd');
+        }
+		//更新时间
+        function updateTime(row) {
+            if (!row.value) return "";
+            var d = new Date(parseInt(row.value));
+            return formatDate(d, true);
+        }
+        function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() ;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += " " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+        
+       
+		
+		
+		
+		
+		
+		function cancelOrder() {
+             var rows = grid.getSelecteds();
+			 if(rows.length==1){
+                if (confirm("确定取消订单吗？")) {
+				var orderId = rows[0].orderId;
+				var prodId = rows[0].prodId;
+				 mini.mask({
+                                el: document.body,
+                                cls: 'mini-mask-loading',
+                                html: '处理中,请勿刷新...'
+                    });
+                    jQuery.ajax({
+                        url: "/provider/cancelOrder.html",
+						type: 'POST',
+						data: {orderId:orderId},
+                        success: function(data) {
+							mini.unmask();
+							if(data.code == "200")
+							{
+								mini.alert(data.message);
+								grid.reload();
+							}
+							else
+							{
+								mini.alert(data.message);
+							} 
+                        },
+                        error: function() {}
+                    });
+
+				}
+			 
+			 }else{
+			  alert("请选中一条记录");
+			 }
+        }
+		
+		
+		
+		//推送后订单详情
+		function edit() {
+            var row = grid.getSelected();
+    		//alert(row.orderId);
+            if (row) {
+               var win = mini.open({
+                    url: "/provider/toOrderListShow.html",
+                    title: "推送后订单详情",
+                    width: 1100,
+                    height: 500,
+                    onload: function() {
+    				    var iframe = this.getIFrameEl();
+                        iframe.contentWindow.setData(row);
+    					iframe.focus();
+                    },
+                    ondestroy: function(action) {
+                       grid.reload();
+                    }
+                });
+            }
+	}
+		
+		
+</script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShoppingList">
+
+<typeAlias alias="shoppingList" type="com.huaixuan.network.biz.domain.stock.ShoppingList"/>
+<typeAlias alias="shoppingDetail" type="com.huaixuan.network.biz.domain.stock.ShoppingDetail"/>
+<typeAlias alias="v_SupplierShoppingList" type="com.huaixuan.network.biz.domain.stock.V_SupplierShoppingList"/>
+<typeAlias alias="v_SearchShoppingList" type="com.huaixuan.network.biz.domain.stock.V_SearchShoppingList"/>
+<resultMap class="shoppingList" id="shoppingListForRelationResult">
+	<result column="gmt_create" property="gmtCreate"/>
+	<result column="supplier_id" property="supplierId"/>
+</resultMap>
+<resultMap class="shoppingList" id="shoppingListResult">
+	<result column="id" property="id"/>
+	<result column="shopping_num" property="shoppingNum"/>  <!-- 采购单号 -->
+	<result column="primitive_num" property="primitiveNum"/>  <!-- 原始单号 -->
+	<result column="supplier_id" property="supplierId"/>   <!-- 供货商ID -->
+	<result column="supplier_name" property="supplierName"/> <!-- 供货商名称 -->
+	<result column="shopping_time" property="shoppingTime"/>  <!-- 采购时间 -->
+	<result column="arrive_time" property="arriveTime"/>  <!-- 预期到货时间 -->
+	<result column="fact_arrive_time" property="factArriveTime"/> <!-- 实际到货时间 -->
+	<result column="creater" property="creater"/>         <!-- 创建人 -->
+	<result column="stor_type" property="storType"/>         <!-- 库存类型 -->
+	<result column="gmt_create" property="gmtCreate"/>    <!-- 创建时间 -->
+	<result column="relation_shopping_num" property="relationShoppingNum"/>    <!-- 关联单号 -->
+	<result column="remark" property="remark"/>    <!-- 备注 -->
+	<result column="status" property="status"/>    <!-- 订单状态 -->
+	<result column="is_wholesale" property="isWholesale"/>    <!-- 订单类型 -->
+	<result column="tid" property="tid"/>    <!-- 交易订单代码 -->
+	<result column="finance_status" property="financeStatus"/>    <!-- 财务确认状态 -->
+	<result column="dep_first_id" property="depFirstId"/>    <!-- 一级仓库ID -->
+</resultMap>
+
+<resultMap id="dueSearchResult" class="shoppingList" extends="shoppingListResult">
+	<result column="sum_due_fee" property="sumDueFee"/>    <!-- 应收款总和 -->
+	<result column="sum_fact_fee" property="sumFactFee"/>    <!-- 实收款总和 -->
+</resultMap>
+
+<resultMap id="supplierShoppingExportRecord" class="v_SupplierShoppingList">
+    <result column="supplierName" property="supplierName"/>
+    <result column="shoppingNum" property="shoppingNum"/>
+    <result column="status" property="status"/>
+    <result column="goods_sn" property="goodsSn"/>
+    <result column="instance_name" property="instanceName"/>
+    <result column="attr_desc" property="attrDesc"/>
+    <result column="amount" property="amount"/>
+    <result column="unit_price" property="unitPrice"/>
+    <result column="due_fee" property="dueFee"/>
+    <result column="fact_fee" property="factFee"/>
+    <result column="missing_num" property="missingNum"/>
+    <result column="reject_num" property="rejectNum"/>
+    <result column="shoppingTime" property="shoppingTime"/>
+    <result column="arriveTime" property="arriveTime"/>
+</resultMap>
+<typeAlias alias="shoppingDetailSearch" type="com.huaixuan.network.biz.domain.stock.ShoppingDetailSearch"/>
+	<resultMap class="shoppingDetailSearch" id="shoppingDetailSearchRusult">
+		<result column="shopping_id" property="shoppingId"/>  <!-- 采购订单ID -->
+		<result column="shopping_num" property="shoppingNum"/>  <!-- 采购单号 -->
+		<result column="supplier_id" property="supplierId"/>   <!-- 供货商ID -->
+		<result column="supplier_name" property="supplierName"/> <!-- 供货商名称 -->
+		<result column="shopping_time" property="shoppingTime"/>  <!-- 采购时间 -->
+		<result column="goods_id" property="goodsId"/>   <!-- 商品ID -->
+		<result column="goods_instance_id" property="goodsInstanceId"/>   <!-- 商品实例ID -->
+		<result column="goods_instance_code" property="goodsInstanceCode"/>   <!-- 商品实例编码 -->
+		<result column="instance_name" property="instanceName"/>    <!-- 商品实例名称 -->
+		<result column="cat_code" property="catCode"/>    <!-- 类目编码 -->
+		<result column="attrs" property="attrs"/>    <!-- 属性 -->
+		<result column="units" property="units"/>  <!-- 单位 -->
+		<result column="amount" property="amount"/>  <!-- 数量 -->
+		<result column="receive_num" property="receiveNum"/>  <!-- 验收数量 -->
+		<result column="unit_price" property="unitPrice"/>         <!-- 单价 -->
+		<result column="due_fee" property="dueFee"/>    <!-- 应付款 -->
+		<result column="fact_fee" property="factFee"/>    <!-- 实付款 -->
+	</resultMap>
+<typeAlias alias="shoppingGatherSearch" type="com.huaixuan.network.biz.domain.stock.ShoppingGatherSearch"/>
+	<resultMap class="shoppingGatherSearch" id="shoppingGatherSearchRusult">
+		<result column="goods_instance_id" property="goodsInstanceId"/>   <!-- 商品实例ID -->
+		<result column="goods_instance_code" property="goodsInstanceCode"/>   <!-- 商品实例编码 -->
+		<result column="instance_name" property="instanceName"/>    <!-- 商品实例名称 -->
+		<result column="cat_code" property="catCode"/>    <!-- 类目编码 -->
+		<result column="attrs" property="attrs"/>    <!-- 属性 -->
+		<result column="storType" property="storType"/>    <!-- 库存类型 -->
+		<result column="units" property="units"/>  <!-- 单位 -->
+		<result column="amount" property="amount"/>  <!-- 数量 -->
+		<result column="due_fee" property="dueFee"/>    <!-- 应付款 -->
+		<result column="fact_fee" property="factFee"/>    <!-- 实付款 -->
+
+	</resultMap>
+
+<!-- 采购单汇总查询——结果集  -->
+<select id="getShoppingGatherSearchList" resultMap="shoppingGatherSearchRusult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select (select g.code
+          from ioss_goods_instance g
+         where g.id = t.goods_instance_id) as goods_instance_code,
+       t.goods_instance_id,
+       t.instance_name,
+       t.attrs,
+       t.storType,
+       t.cat_code,
+       t.units,
+       sum(t.amount) as amount,
+       sum(t.due_fee) as due_fee,
+       sum(t.fact_fee) as fact_fee
+  from (select a.goods_instance_id as goods_instance_id,
+               b.instance_name     as instance_name,
+               b.cat_code          as cat_code,
+               b.attrs             as attrs,
+               a.units             as units,
+               a.amount            as amount,
+               a.due_fee           as due_fee,
+               a.fact_fee          as fact_fee,
+               d.stor_type		   as storType
+          from ioss_goods_instance          b,
+               ioss_shopping_detail         a,
+               ioss_shopping_list           d
+         where b.id = a.goods_instance_id
+           and d.id = a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="storType">
+            d.stor_type = #storType#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			shopping_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+	         ) t
+             group by t.goods_instance_id,
+          t.instance_name,
+          t.attrs,
+          t.cat_code,
+          t.units,
+          t.storType
+ order by t.goods_instance_id
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购单汇总查询——数量  -->
+<select id="getShoppingGatherSearchCount" resultClass="java.lang.Integer">
+<![CDATA[
+	select count(*) from(
+		select count(DISTINCT(t.goods_instance_id))
+              from (select a.goods_instance_id as goods_instance_id,
+            	           b.instance_name as instance_name,
+            	           b.cat_code as cat_code,
+            			   b.attrs as attrs,
+            			   d.stor_type as storType,
+            	           a.units as units,
+                           a.amount as amount,
+                           a.due_fee as due_fee,
+                           a.fact_fee as fact_fee
+            		from ioss_goods_instance  b,
+            	         ioss_shopping_detail  a,
+            	         ioss_shopping_list  d
+                    where b.id=a.goods_instance_id
+            	          and d.id=a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			d.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="storType">
+            d.stor_type = #storType#
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			shopping_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+	         ) t
+             group by t.goods_instance_id,t.instance_name,t.attrs,t.cat_code,t.units,t.storType) v
+</select>
+
+<!-- 采购单明细采购库存统计查询  -->
+<select id="getShoppingDetailStorageNum" resultClass="shoppingDetailSearch">
+<![CDATA[
+  select a.shopping_id as shoppingId,
+       c.shopping_num as shoppingNum,
+       c.supplier_id as supplierId,
+       c.dep_first_id as depFirstId,
+       (select s.name from ioss_supplier s where s.id = c.supplier_id) supplierName,
+       (select sum(sto.storage_num)
+          from ioss_in_detail     idet,
+               ioss_in_depository idep,
+               ioss_storage       sto
+         where idep.id = idet.in_depository_id
+           and idep.relation_num = c.shopping_num
+           and sto.batch_num = idep.batch_num
+           and sto.goods_instance_id = idet.goods_instance_id
+           AND a.goods_instance_id = idet.goods_instance_id
+           and idep.status = 'in_finished'
+         group by sto.batch_num, sto.goods_instance_id) as existNum,
+       c.shopping_time as shoppingTime,
+       a.goods_instance_id as goodsInstanceId,
+       b.code as goodsInstanceCode,
+       b.goods_id as goodsId,
+       b.instance_name as instanceName,
+       b.cat_code as catCode,
+       b.attrs as attrs,
+       a.units as units,
+       a.amount as amount,
+       a.receive_num as receiveNum,
+       a.unit_price as unitPrice,
+       a.due_fee as dueFee,
+       a.fact_fee as factFee
+  from ioss_goods_instance b, ioss_shopping_detail a, ioss_shopping_list c
+ where a.goods_instance_id = b.id
+   and c.id = a.shopping_id
+]]>
+        <isNotEmpty prepend="and" property="instanceName">
+            b.instance_name like CONCAT('%',#instanceName#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="shoppingNum">
+            c.shopping_num = #shoppingNum#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="supplierId">
+            c.supplier_id = #supplierId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[           shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[           shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+        </isNotEmpty>
+              <isNotEmpty prepend="and" property="status">
+    <![CDATA[           c.status = #status# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId">
+          c.dep_first_id = #depFirstId#
+        </isNotEmpty>
+        order by a.shopping_id desc
+</select>
+
+
+<!-- 采购单明细查询——结果集  -->
+<select id="getShoppingDetailSearchList" resultClass="shoppingDetailSearch">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+        select a.shopping_id as shoppingId,
+       c.shopping_num as shoppingNum,
+       c.supplier_id as supplierId,
+       c.stor_type as storType,
+       (select s.name from ioss_supplier s where s.id = c.supplier_id) supplierName,
+       (select sum(t.storage_num)
+          from ioss_storage t
+         where t.goods_instance_id = a.goods_instance_id
+           and t.supplier_id = c.supplier_id
+           and t.goods_id = a.goods_id
+         group by t.goods_id, t.goods_instance_id, t.supplier_id) as existNum,
+       c.shopping_time as shoppingTime,
+       a.goods_instance_id as goodsInstanceId,
+       b.code as goodsInstanceCode,
+       b.goods_id as goodsId,
+       b.instance_name as instanceName,
+       b.cat_code as catCode,
+       b.attrs as attrs,
+       a.units as units,
+       a.amount as amount,
+       a.receive_num as receiveNum,
+       a.unit_price as unitPrice,
+       a.due_fee as dueFee,
+       a.fact_fee as factFee
+  from ioss_goods_instance b, ioss_shopping_detail a, ioss_shopping_list c
+ where a.goods_instance_id = b.id
+   and c.id = a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			c.shopping_num = #shoppingNum#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			c.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			c.stor_type = #storType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			shopping_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		      <isNotEmpty prepend="and" property="status">
+    <![CDATA[           c.status = #status# ]]>
+        </isNotEmpty>
+		order by a.shopping_id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购单明细查询——数量 -->
+<select id="getShoppingDetailSearchCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(DISTINCT(a.id))
+		from ioss_goods_instance b,
+	         ioss_shopping_detail a,
+	         ioss_shopping_list c
+        where a.goods_instance_id=b.id
+	          and c.id=a.shopping_id
+]]>
+		<isNotEmpty prepend="and" property="instanceName">
+			b.instance_name like CONCAT('%',#instanceName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			c.shopping_num = #shoppingNum#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			c.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			c.stor_type = #storType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceCode">
+            b.code like CONCAT(#instanceCode#,'%')
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+<![CDATA[			shopping_time >= STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+<![CDATA[			shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+	   <isNotEmpty prepend="and" property="status">
+    <![CDATA[           c.status = #status# ]]>
+        </isNotEmpty>
+</select>
+
+  	<!-- 供货商统计供货查询  -->
+<select id="getSupplierShoppingLists"  resultClass="v_SupplierShoppingList">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select a.id,c.name as supplierName, a.shopping_num as shoppingNum,a.status as status,a.shopping_time as shoppingTime,a.arrive_time as arriveTime,sum(b.due_fee) as dueFee,sum(b.fact_fee) as factFee
+        from ioss_shopping_list  a  ,ioss_shopping_detail  b,ioss_supplier c
+        where  (c.id=a.supplier_id and  a.id=b.shopping_id )
+]]>
+        <isNotEmpty prepend="and" property="supplierId">
+			a.supplier_id=#supplierId#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/12/15 started -->
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/12/15 ended -->
+		<isNotEmpty prepend="and" property="startTime">
+		<![CDATA[		a.shopping_time>=STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+		<![CDATA[		a.shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+   group by a.id,c.name, a.shopping_num,a.status,a.shopping_time ,a.arrive_time
+   order by a.shopping_num asc
+   <include refid="pageSQLFoot"/>
+</select>
+
+
+	<!-- 供货商统计供货查询count -->
+<select id="getCountSupplierShoppingLists"  resultClass="java.lang.Integer">
+<![CDATA[
+		select count(DISTINCt(a.id))
+        from ioss_shopping_list a  ,ioss_shopping_detail  b,ioss_supplier  c
+        where  (c.id=a.supplier_id and  a.id=b.shopping_id )
+]]>
+        <isNotEmpty prepend="and" property="supplierId">
+			a.supplier_id=#supplierId#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/12/15 started -->
+		<isNotEmpty prepend="and" property="status">
+			a.status=#status#
+		</isNotEmpty>
+		<!-- added by chenhang 2010/12/15 ended -->
+		<isNotEmpty prepend="and" property="startTime">
+		<![CDATA[		a.shopping_time>=STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+		<![CDATA[		a.shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+
+</select>
+
+<!-- create ShoppingList object -->
+<insert id="addShoppingList" parameterClass="shoppingList">
+<![CDATA[
+		insert into ioss_shopping_list
+		(id,shopping_num,primitive_num,supplier_id,shopping_time,arrive_time,fact_arrive_time,creater,gmt_create,status,relation_shopping_num,remark,tid,IS_WHOLESALE,dep_first_id,stor_type )values( null,
+		#shoppingNum#,
+		#primitiveNum#,
+		#supplierId#,
+		STR_TO_DATE(#shoppingTime_str#,'%Y-%m-%d %H:%i:%s'),
+		STR_TO_DATE(#arriveTime_str#,'%Y-%m-%d %H:%i:%s'),
+	    STR_TO_DATE(#factArriveTime_str#,'%Y-%m-%d %H:%i:%s'),
+		#creater#,
+		sysdate(),
+	    #status#,
+	    #relationShoppingNum#,
+	    #remark#,
+	    #tid#,
+	    #isWholesale#,
+	    #depFirstId#,
+	    #storType#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ShoppingList object -->
+<update id="editShoppingList" parameterClass="shoppingList">
+<![CDATA[
+		update ioss_shopping_list
+		set shopping_num = #shoppingNum#,
+			primitive_num = #primitiveNum#,
+			supplier_id = #supplierId#,
+			creater = #creater#,
+			gmt_create = sysdate(),
+		    status = #status#,
+		    finance_status = #financeStatus#,
+		    relation_shopping_num = #relationShoppingNum#,
+		    remark = #remark#
+]]>
+			<isNotEmpty prepend="" property="depFirstId">
+ 				,dep_first_id = #depFirstId#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="" property="factArriveTime_str">
+<![CDATA[		    ,fact_arrive_time = STR_TO_DATE(#factArriveTime_str#,'%Y-%m-%d %H:%i:%s') ]]>
+		    </isNotEmpty>
+		where id = #id#
+
+</update>
+
+<!-- update ShoppingList object -->
+<update id="editShoppingListAllInfo" parameterClass="shoppingList">
+<![CDATA[
+		update ioss_shopping_list
+		set shopping_num = #shoppingNum#,
+			primitive_num = #primitiveNum#,
+			supplier_id = #supplierId#,
+			stor_type = #storType#,
+			shopping_time = STR_TO_DATE(#shoppingTime_str#,'%Y-%m-%d %H:%i:%s'),
+			arrive_time = STR_TO_DATE(#arriveTime_str#,'%Y-%m-%d %H:%i:%s'),
+			fact_arrive_time = STR_TO_DATE(#factArriveTime_str#,'%Y-%m-%d %H:%i:%s'),
+			creater = #creater#,
+			gmt_create = sysdate(),
+		    status = #status#,
+		    relation_shopping_num = #relationShoppingNum#,
+		    remark = #remark#
+		where id = #id#
+]]>
+</update>
+
+<!-- delete ShoppingList object -->
+<delete id="removeShoppingList" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_shopping_list where ioss_shopping_list.ID = #value#
+]]>
+</delete>
+<!-- search ShoppingList object -->
+<select id="getShoppingList" parameterClass="java.lang.Long" resultMap="shoppingListResult">
+<![CDATA[
+		select ioss_shopping_list.*,(select ioss_supplier.name from ioss_supplier where ioss_supplier.id=ioss_shopping_list.supplier_id) supplier_name
+	    from ioss_shopping_list where ioss_shopping_list.ID = #value#
+]]>
+</select>
+<!-- search ShoppingList object -->
+<select id="getShoppingListByShoppingNum" parameterClass="java.lang.String" resultMap="shoppingListResult">
+<![CDATA[
+		select ioss_shopping_list.*,(select ioss_supplier.name from ioss_supplier where ioss_supplier.id=ioss_shopping_list.supplier_id) supplier_name
+	    from ioss_shopping_list where ioss_shopping_list.shopping_num = #value# LIMIT 1
+]]>
+</select>
+<!--  -->
+<select id="getCountByShoppingNum" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(t.id) from ioss_shopping_list t where t.shopping_num = #value#
+]]>
+</select>
+
+
+<!-- searchAll ShoppingList List -->
+<select id="getShoppingLists" parameterClass="java.util.Map" resultMap="shoppingListResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_shopping_list.*,(select ioss_supplier.name from ioss_supplier where ioss_supplier.id=ioss_shopping_list.supplier_id) supplier_name
+	      from ioss_shopping_list
+	      where 1=1
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			stor_type = #storType#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="sameTeamUsers">
+             creater in
+            <iterate property="sameTeamUsers"  open="(" close=")" conjunction=",">
+             #sameTeamUsers[]#
+            </iterate>
+        </isNotNull>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+			is_wholesale = #isWholesale#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="arriveTimeStart">
+<![CDATA[			arrive_time >= STR_TO_DATE(#arriveTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="arriveTimeEnd">
+<![CDATA[			arrive_time <= STR_TO_DATE(#arriveTimeEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		order by shopping_num desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- searchAll ShoppingList count-->
+<select id="getShoppingListsCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(ioss_shopping_list.id) from ioss_shopping_list where 1=1
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType">
+			stor_type = #storType#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="sameTeamUsers">
+             creater in
+            <iterate property="sameTeamUsers"  open="(" close=")" conjunction=",">
+             #sameTeamUsers[]#
+            </iterate>
+        </isNotNull>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+			is_wholesale = #isWholesale#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="arriveTimeStart">
+<![CDATA[			arrive_time >= STR_TO_DATE(#arriveTimeStart#,'%Y-%m-%d %H:%i:%s')  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="arriveTimeEnd">
+<![CDATA[			arrive_time <= STR_TO_DATE(#arriveTimeEnd#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+
+</select>
+
+<!-- 采购订单实际应付款查询集合 -->
+<select id="getDueSearchList" parameterClass="java.util.Map" resultMap="dueSearchResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_shopping_list.*,
+			   (select ioss_supplier.name from ioss_supplier where ioss_supplier.id=ioss_shopping_list.supplier_id) supplier_name,
+			   (select sum(due_fee) from ioss_shopping_detail where shopping_id=ioss_shopping_list.id) as sum_due_fee,
+			   (select sum(fact_fee) from ioss_in_detail,ioss_in_depository where shopping_num = ioss_in_depository.relation_num and ioss_in_depository.id = ioss_in_detail.in_depository_id) as sum_fact_fee
+	    from ioss_shopping_list
+	    where stor_type = 'f'
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		order by shopping_num desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购订单实际应付款查询记录数 -->
+<select id="getDueSearchListCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(ioss_shopping_list.id) from ioss_shopping_list where stor_type = 'f'
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+</select>
+
+<select id="getSupplierIdByShoppingNum" parameterClass="java.lang.String" resultClass="java.lang.Long">
+	<![CDATA[
+		select supplier_id from ioss_shopping_list where shopping_num = #shoppingNum#
+	]]>
+</select>
+
+	<!-- 根据供货商ID得到实际到货时间小于等于预期到货时间的个数  -->
+<select id="getArreveCountBySupplierId" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+	<![CDATA[
+		select count(id) from ioss_shopping_list where supplier_id = #value# and fact_arrive_time <= arrive_time
+	]]>
+</select>
+
+	<!-- 根据供货商ID得到所有采购单数量  -->
+<select id="getCountBySupplierId" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+	<![CDATA[
+		select count(id) from ioss_shopping_list where supplier_id = #value#
+	]]>
+</select>
+
+<select id="getSupplierIdAndGmtCreateForUpdate" parameterClass="java.lang.Long" resultMap="shoppingListForRelationResult">
+	<![CDATA[
+		SELECT isl.supplier_id,isl.gmt_create
+		FROM ioss_in_depository iid,ioss_shopping_list isl
+		WHERE iid.relation_num = isl.shopping_num AND iid.id= #inDepId#
+	]]>
+</select>
+
+<!-- 采购订单暂估应付款查询集合 -->
+<select id="getDueEstimateSearchListsByParameterMap" parameterClass="java.util.Map" resultMap="dueSearchResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_shopping_list.*,
+			   (select ioss_supplier.name from ioss_supplier where ioss_supplier.id=ioss_shopping_list.supplier_id) supplier_name,
+			   (select sum(due_fee) from ioss_shopping_detail where shopping_id=ioss_shopping_list.id) as sum_due_fee,
+			   (select sum(fact_fee) from ioss_in_detail,ioss_in_depository where shopping_num = ioss_in_depository.relation_num and ioss_in_depository.id = ioss_in_detail.in_depository_id) as sum_fact_fee
+	    from ioss_shopping_list
+	    where stor_type = 'v'
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+		order by shopping_num desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 采购订单暂估应付款查询记录数 -->
+<select id="getDueEstimateSearchCountByParameterMap" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(ioss_shopping_list.id) from ioss_shopping_list where stor_type = 'v'
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_num like CONCAT('%',#shoppingNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="primitiveNum">
+			primitive_num like CONCAT('%',#primitiveNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+			creater = #creater#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="financeStatus">
+			finance_status = #financeStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeStart">
+<![CDATA[			shopping_time >= STR_TO_DATE(#shoppingTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="shoppingTimeEnd">
+<![CDATA[			shopping_time <= STR_TO_DATE(#shoppingTimeEnd#,'%Y-%m-%d %H:%i:%s')]]>
+		</isNotEmpty>
+</select>
+
+<!-- modifed by chenhang 2010/12/15 started -->
+<select id="getSupplierShoppingExportList"  resultClass="v_SupplierShoppingList" resultMap="supplierShoppingExportRecord">
+<![CDATA[
+select c.name as supplierName,
+       a.shopping_num as shoppingNum,
+       a.status as status,
+       g.goods_sn,
+       gi.instance_name,
+       gi.attr_desc,
+       b.amount,
+       b.unit_price,
+       b.due_fee,
+       b.fact_fee,
+       b.missing_num,
+       b.reject_num,
+       a.shopping_time as shoppingTime,
+       a.arrive_time as arriveTime
+  from ioss_shopping_list a, ioss_shopping_detail b, ioss_supplier c, emall_goods g,ioss_goods_instance gi
+ where c.id = a.supplier_id and a.id = b.shopping_id and g.id = b.goods_id and b.goods_instance_id = gi.id
+]]>
+        <isNotEmpty prepend="and" property="supplierId">
+			a.supplier_id=#supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			a.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="startTime">
+		<![CDATA[		a.shopping_time>=STR_TO_DATE(#startTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="endTime">
+		<![CDATA[		a.shopping_time <= STR_TO_DATE(#endTime#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		order by a.shopping_num asc
+</select>
+</sqlMap>
+<!-- modifed by chenhang 2010/12/15 ended -->

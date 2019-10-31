@@ -1,0 +1,109 @@
+#set($layout = "layout/default.vm")
+<font color="red">#if($!message)$!message#end</font>
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<div class="searchBox">
+		<h3><span>库存预警查询</span></h3>
+        <form action="/storage/list_storage_warn.html" id="singleForm" name="singleForm" method="post">
+			<table>
+				<tr>
+                	<th>产品名称：</th>
+					<td>
+						#springBind("search.instanceName")
+						<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp"/>
+                    </td>
+                	<th>产品编码：</th>
+					<td>
+						#springBind("search.code")
+						<input type="text" id="code" name="${status.expression}" value="$!{status.value}" class="inp" />
+						#springBind("search.id")
+						<input  type="hidden" id="id" name="${status.expression}" value="$!{status.value}"/>
+					</td>
+					<th> 商品类目：</th>
+					<td>
+						#springBind("search.catCode")
+						<select name="${status.expression}" id="catCode" class="select">
+                			<option value="">-=请选择=-</option>
+                			#foreach($cat in $catList)
+                			<option value="$cat.catCode" #if("$cat.catCode"==${status.value}) selected #end>$cat.catName</option>
+                			#end
+                		</select>
+                    </td>
+					<th> 预警种类：</th>
+					<td>
+						<select name="type" id="type" class="select">
+                			<option value="">-=请选择=-</option>
+                            <option value="min" #if($type=="min") selected #end>小于预警数量</option>
+                            <option value="max" #if($type=="max") selected #end>大于预警数量</option>
+                        </select>
+                    </td>
+					<th>
+						<input name="chaxun" value=" 查询 " class="btn" type="button" onclick ="submit();" />
+                    </th>
+					<td>
+						<input name="reset" value=" 重置 " class="btn"  type="button" onclick="clearSearch();" />
+                    </td>
+				</tr>
+			</table>
+		</form>
+    </div>
+
+<!-- 查询列表 -->
+  <div class="listBox" id="listDiv">
+	<h3><span>库存预警列表</span></h3>
+    <table  id="listTable" name="listTable">
+		<tr>
+    		<th>产品名称</th>
+    		<th>编码</th>
+            <th>类目</th>
+            <th>属性</th>
+            <th>单位</th>
+            <th>可用库存</th>
+            <th>实际库存</th>
+    		<th>最大库存数量</th>
+            <th>最小库存数量</th>
+		</tr>
+
+	#if($query && $query.items.size()>0)
+	  #foreach($goodsInstance in $query.items)
+		<tr #if($goodsInstance.min=="min") style="background:#ff6682;" #elseif($goodsInstance.max=="max") style="background:#ffbc17;" #else #if($velocityCount%2==0) class="bg" #end #end>
+				<td>$!goodsInstance.instanceName</td>
+				<td>$!goodsInstance.code</td>
+				<td>$categoryManager.getCatFullNameByCatcodeSimple($!goodsInstance.catCode, '>')</td>
+				<td>
+				#foreach($pro in $!goodsInstance.properties.entrySet())
+                   $!{attributeManager.getAttributeByAttrCode($pro.key).attrName}=$!{pro.value}
+                #end
+				</td>
+				<td>$!goodsInstance.goodsUnit</td>
+				<td>$!goodsInstance.existNum</td>
+				<td>$!goodsInstance.storageNum</td>
+				<td>$!goodsInstance.maxNum</td>
+				<td>$!goodsInstance.minNum</td>
+		</tr>
+		#end
+	#end
+
+	</table>
+	<!-- 分页 -->
+    #if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_storage_warn.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+ </div>
+<script language="javascript" type="text/javascript">
+    function clearSearch(){
+        document.getElementById('id').value='';
+        document.getElementById('instanceName').value='';
+        document.getElementById('code').value='';
+    }
+
+	function submit(){
+	    document.getElementById('instanceName').value=jQuery.trim(document.getElementById('instanceName').value);
+		document.getElementById('code').value=jQuery.trim(document.getElementById('code').value);
+		document.forms[0].submit();
+	}
+</script>
+</div>

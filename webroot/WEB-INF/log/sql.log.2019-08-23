@@ -1,0 +1,40 @@
+2019-08-23 13:35:22,403 DEBUG [java.sql.Connection] - {conn-100000} Connection
+2019-08-23 13:35:22,417 DEBUG [java.sql.Connection] - {conn-100000} Preparing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:35:22,458 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Executing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:35:22,458 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Parameters: []
+2019-08-23 13:35:22,459 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Types: []
+2019-08-23 13:36:08,398 DEBUG [java.sql.Connection] - {conn-100002} Connection
+2019-08-23 13:36:08,448 DEBUG [java.sql.Connection] - {conn-100002} Preparing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:36:08,453 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Executing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:36:08,455 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Parameters: [16573273- 404066, 8372013173654, hk]
+2019-08-23 13:36:08,456 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Types: [java.lang.String, java.lang.String, java.lang.String]
+2019-08-23 13:39:35,164 DEBUG [java.sql.Connection] - {conn-100000} Connection
+2019-08-23 13:39:35,174 DEBUG [java.sql.Connection] - {conn-100000} Preparing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:39:35,204 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Executing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:39:35,204 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Parameters: []
+2019-08-23 13:39:35,204 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Types: []
+2019-08-23 13:41:14,153 DEBUG [java.sql.Connection] - {conn-100002} Connection
+2019-08-23 13:41:14,218 DEBUG [java.sql.Connection] - {conn-100002} Preparing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:41:14,224 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Executing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:41:14,225 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Parameters: [16573273-404066,  8372013173654, hk]
+2019-08-23 13:41:14,226 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Types: [java.lang.String, java.lang.String, java.lang.String]
+2019-08-23 13:43:30,014 DEBUG [java.sql.Connection] - {conn-100000} Connection
+2019-08-23 13:43:30,028 DEBUG [java.sql.Connection] - {conn-100000} Preparing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:43:30,057 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Executing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:43:30,058 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Parameters: []
+2019-08-23 13:43:30,058 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Types: []
+2019-08-23 13:44:34,484 DEBUG [java.sql.Connection] - {conn-100002} Connection
+2019-08-23 13:44:34,528 DEBUG [java.sql.Connection] - {conn-100002} Preparing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:44:34,531 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Executing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:44:34,532 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Parameters: [16573273-404066,  8372013173654, hk]
+2019-08-23 13:44:34,533 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Types: [java.lang.String, java.lang.String, java.lang.String]
+2019-08-23 13:46:48,996 DEBUG [java.sql.Connection] - {conn-100000} Connection
+2019-08-23 13:46:49,010 DEBUG [java.sql.Connection] - {conn-100000} Preparing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:46:49,054 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Executing Statement:   update hx_stock_update set kaola_on_sale_status = NULL  
+2019-08-23 13:46:49,054 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Parameters: []
+2019-08-23 13:46:49,055 DEBUG [java.sql.PreparedStatement] - {pstm-100001} Types: []
+2019-08-23 13:47:43,385 DEBUG [java.sql.Connection] - {conn-100002} Connection
+2019-08-23 13:47:43,416 DEBUG [java.sql.Connection] - {conn-100002} Preparing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:47:43,418 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Executing Statement:           update hx_stock_update set kaola_sku =  ?                        where sku =? and type = ?     
+2019-08-23 13:47:43,419 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Parameters: [16573273-404066, 8372013173654, hk]
+2019-08-23 13:47:43,420 DEBUG [java.sql.PreparedStatement] - {pstm-100003} Types: [java.lang.String, java.lang.String, java.lang.String]

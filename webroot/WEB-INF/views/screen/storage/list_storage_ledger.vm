@@ -1,0 +1,263 @@
+#set($layout = "layout/default.vm")
+
+	<div class="main">
+		<h2>管理中心 - 仓库管理</h2>
+		<div class="searchBox">
+		<h3><span>库存台帐查询</span></h3>
+		<form name="searchform" id="searchform" action="/storage/list_storage_ledger.html" method="post">
+			#springBind("inOutDepository.goodsInstanceId")
+			<input type="hidden" id="goodsInstanceId" name="${status.expression}" value="$!{status.value}"/>
+			#springBind("inOutDepository.typea")
+			<input type="hidden" id="typea" name="${status.expression}" value="$!{status.value}"/>
+			<table>
+				<tr>
+                    <th>产品名称：</th>
+					<td>
+						#springBind("inOutDepository.instanceName")
+						<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" />
+                    </td>
+					<th>产品编码：</th>
+					<td>
+						#springBind("inOutDepository.code")
+						<input type="text" id="code" name="${status.expression}" value="$!{status.value}" class="inp" />
+                    </td>
+                    <th>一级仓库：</th>
+						#springBind("inOutDepository.depfirstId")
+					<td>
+    			       <select name="${status.expression}" id="depfirstId" class="select">
+						#if($!depositoryFirstList)
+						  #if($!depositoryFirstList.size()==0)
+							  <option value="">您没有权限</option>
+						  #else
+					         #if($depositoryFirstList.size() > 1 )
+					            <option value="">-=请选择=-</option>
+					         #end
+					         #foreach($depfirst in $depositoryFirstList)
+    				            <option value="$depfirst.id" #if("$depfirst.id"=="$!{status.value}") selected #end>$depfirst.depFirstName</option>
+						     #end
+						  #end
+					   #else
+						   <option value="">您没有权限</option>
+					   #end
+    			      </select>
+                    </td>
+				</tr>
+				<tr>
+					<th>出入库类型：</th>
+					<td >
+						#springBind("inOutDepository.type1")
+						<select id="type1" name="${status.expression}" onchange="selectType2(this.value)" class="select">
+    				        <option value="">-=请选择=-</option>
+                            <option value="$!{instr}" #if("$!{status.value}"=="$!{instr}") selected #end>$!{instr}</option>
+                            <option value="$!{outstr}" #if("$!{status.value}"=="$!{outstr}") selected  #end>$!{outstr}</option>
+    					</select>
+                    </td>
+    				<th id="typeth">单据类型：</th>
+					<td >
+						<select name="notype" id="notype" class="select" style="#if($!inOutDepository.typea == "hiddenIn"||$!inOutDepository.typea == "hiddenOut") display:none; #end">
+    					  <option value="">-=请选择=-</option>
+    					</select>
+						#springBind("inOutDepository.type2")
+    					<select name="${status.expression}" id="type2" class="select" style="#if($!inOutDepository.typea == "hidden"||$!inOutDepository.typea == "hiddenOut") display:none; #end">
+                          <option value="">-=请选择=-</option>
+                          <option value="in_check_more" #if("$!{status.value}"=="in_check_more") selected #end>盘点生溢</option>
+                          <option value="in_sales_change" #if("$!{status.value}"=="in_sales_change") selected #end>销售换货</option>
+                          <option value="in_shopping"  #if("$!{status.value}"=="in_shopping") selected #end>采购入库</option>
+                          <option value="in_sales_refund" #if("$!{status.value}"=="in_sales_refund") selected #end>销售退货</option>
+    					  <option value="in_zero_check_more" #if("$!{status.value}"=="in_zero_check_more") selected #end>零库存盘盈</option>
+    					  <option value="in_move_storage" #if("$!{status.value}"=="in_move_storage") selected #end>移库入库</option>
+    					  <option value="in_borrow_storage" #if("$!{status.value}"=="in_borrow_storage") selected #end>外借入库</option>
+    					  <option value="in_back_storage" #if("$!{status.value}"=="in_back_storage") selected #end>归还入库</option>
+                         </select>
+						 #springBind("inOutDepository.type3")
+    					 <select name="${status.expression}" id="type3"  class="select" style="#if($!inOutDepository.typea == "hidden"||$!inOutDepository.typea == "hiddenIn") display:none; #end">
+    						<option value="">-=请选择=-</option>
+    						<option value="out_sales" #if("$!{status.value}"=="out_sales") selected #end>销售订单</option>
+    						<option value="out_shopping" #if("$!{status.value}"=="out_shopping") selected #end>采购退货</option>
+    						<option value="out_damaged" #if("$!{status.value}"=="out_damaged") selected #end>报残</option>
+    						<option value="out_check_damaged" #if("$!{status.value}"=="out_check_damaged") selected #end>盘点耗损</option>
+    						<option value="out_sales_change" #if("$!{status.value}"=="out_sales_change") selected #end>销售换货</option>
+    					    <option value="out_storage_refund" #if("$!{status.value}"=="out_storage_refund") selected #end>库存退货</option>
+    					    <option value="out_move_storage" #if("$!{status.value}"=="out_move_storage") selected #end>移库出库</option>
+    					    <option value="out_borrow_storage" #if("$!{status.value}"=="out_borrow_storage") selected #end>外借出库</option>
+    					    <option value="out_back_storage" #if("$!{status.value}"=="out_back_storage") selected #end>归还出库</option>
+    					 </select>
+                    </td>
+
+        			<th>出入库时间：</th>
+					<td>
+						#springBind("inOutDepository.optTimeStart")
+						<input id="optTimeStart" size="10" theme="simple" readonly="true" name="${status.expression}" value="$!{status.value}"/>
+						-
+						#springBind("inOutDepository.optTimeEnd")
+            			<input id="optTimeEnd" size="10" theme="simple" readonly="true" name="${status.expression}" value="$!{status.value}"/>
+            			  <script type="text/javascript">
+            			      Calendar.setup({
+            			          inputField : "optTimeStart",
+            			          ifFormat   : "%Y-%m-%d",
+            			          align      : "BR"
+            			      });
+            			      Calendar.setup({
+            			          inputField : "optTimeEnd",
+            			          ifFormat   : "%Y-%m-%d",
+            			          align      : "BR"
+            			      });
+            			</script>
+                    </td>
+                </tr>
+    			<tr>
+					<th></th>
+		            <td><button type="button" class="btn" onclick="formSubmit();">查 询</button></td>
+					<td><button type="button" class="btn" onclick="clearSearch();">重 置</button></td>
+					#if($query && $query.items.size()>0)
+					<td><button type="button" class="btn" onclick="doExport();return false;">Excel导出</button></td>
+					#end
+                </tr>
+            </table>
+		</form>
+     </div>
+				<div class="listBox">
+					<h3><span>台账列表</span></h3>
+					<table>
+							<tr>
+							 <th width="">产品编码</th>
+							 <th width="">产品名称</th>
+							 <th width="">属性</th>
+							 <th width="">一级仓库</th>
+							 <th width="">单据类型</th>
+							 <th width="">单据编号</th>
+							 <th width="">关联单据号</th>
+							 <th width="">出入库类型</th>
+							 <th width="">数量</th>
+							 <th width="">剩余一级库存</th>
+							 <th width="">剩余库存</th>
+							 <th width="">时间</th>
+							</tr>
+							#if($query && $query.items.size()>0)
+							#foreach($InOutDepository in $query.items)
+								<tr #if($velocityCount%2==0) class="bg" #end>
+								    <td>$!{InOutDepository.code}</td>
+								    <td>$!{InOutDepository.name}</td>
+									<td title="$!attributeManager.getFullAttributeStringByAttrs($InOutDepository.attrs)">
+								        $!attributeManager.getFullAttributeStringByAttrsTwo($InOutDepository.attrs)
+							        </td>
+                                    <td>${InOutDepository.depFirstName}</td>
+								    <td align="center">$!inoutDepositoryTypeMap.get("$InOutDepository.type")</td>
+									#if($!inoutThreeDepositoryTypeMap.get("$InOutDepository.type") == "出库")
+									<td align="center"><a href="$appServer/storage/showOutDetail.html?outDepId=$!InOutDepository.outid">$!InOutDepository.billNum</a></td>
+									<td  align="center">
+									#if(!$InOutDepository.tradePackageList || $InOutDepository.tradePackageList.size() == 0)
+    			                          #if($InOutDepository.type == "out_damaged")
+    				                         <a target="_blank" href="$appServer/storage/damaged/searchDamagedDetail.html?damagedCode=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+                                          #elseif($InOutDepository.type == "out_shopping")
+    				                         <a target="_blank" href="$appServer/stock/refund/search_sr_detail_list.html?refNum=$!InOutDepository.relationNum&actType=view&type=ct">$!InOutDepository.relationNum</a>
+                                          #elseif($InOutDepository.type == "out_check_damaged")
+    				                         <a target="_blank" href="$appServer/storage/detail_storage_check.html?checkId=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+                                          #elseif($InOutDepository.type == "out_sales_change")
+    				                         <a target="_blank" href="$appServer/trade/confirmRefund.html?refundId=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+                                          #elseif($InOutDepository.type == "out_storage_refund")
+    				                         <a target="_blank" href="$appServer/storage/searchKTDetail.html?refNum=$!InOutDepository.relationNum&actType=view&type=kt">$!InOutDepository.relationNum</a>
+    			                          #elseif($InOutDepository.type == "out_move_storage" || $InOutDepository.type == "out_borrow_storage" || $InOutDepository.type == "out_back_storage")
+    				                         <a href="$appServer/storage/moveLogReturn.html?moveCode=$!{InOutDepository.relationNum}" target="_blank">$!InOutDepository.relationNum</a>
+    									  #end
+									#else
+                            			#foreach($tradePackage in $InOutDepository.tradePackageList)
+                            			<a target="_blank" href="$appServer/trade/detail.html?tradeId=$tradePackage.tid">$tradePackage.tid</a>
+                            			#end
+                            		#end
+                                   </td>
+									#else
+                                    <td align="center"><a href="$appServer/storage/showInDetail.html?iId=$!InOutDepository.inid">$!InOutDepository.billNum</a></td>
+									<td  align="center">
+           	                           #if($InOutDepository.type == "in_sales_refund" || $InOutDepository.type == "in_sales_change")
+           	                              <a target="_blank" href="$appServer/trade/confirmRefund.html?refundId=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+                                       #elseif($InOutDepository.type == "in_shopping")
+             		                      <a target="_blank" href="$appServer/stock/search_stock_detail.html?shoppingNum=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+                                       #elseif($InOutDepository.type == "in_check_more")
+                                          <a target="_blank" href="$appServer/storage/detail_storage_check.html?checkId=$!InOutDepository.relationNum">$!InOutDepository.relationNum</a>
+									   #elseif($InOutDepository.type == "in_zero_check_more")$!InOutDepository.relationNum
+			                           #elseif($InOutDepository.type == "in_move_storage" || $InOutDepository.type == "in_borrow_storage" || $InOutDepository.type == "in_back_storage")
+				                          <a href="$appServer/storage/moveLogReturn.html?moveCode=$!{InOutDepository.relationNum}" target="_blank">$!InOutDepository.relationNum</a>
+									   #end
+           							</td>
+									#end
+									#if($!inoutThreeDepositoryTypeMap.get("$InOutDepository.type")=="出库")
+									   <td align="right">$!inoutThreeDepositoryTypeMap.get("$InOutDepository.type")</td>
+									#else
+									   <td align="left">$!inoutThreeDepositoryTypeMap.get("$InOutDepository.type")</td>
+									#end
+								    <td>$!{InOutDepository.amount}</td>
+									<td align="center">$!{InOutDepository.leftDepNum}</td>
+									<td align="center">$!{InOutDepository.leftNum}</td>
+									<td>$!date.format('yyyy-MM-dd HH:mm:ss',${InOutDepository.gmtDate})</td>
+								</tr>
+							#end
+						   #end
+                    </table>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_storage_ledger.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+                </div>
+    </div>
+<script type="text/javascript" language="javascript">
+	  function formSubmit(){
+        document.getElementById("instanceName").value = jQuery.trim(document.getElementById("instanceName").value);
+        document.getElementById("code").value = jQuery.trim(document.getElementById("code").value);
+
+		var dateStart1=document.getElementById("optTimeStart").value.replace(/-/g, "/");
+    	var dateEnd1=document.getElementById("optTimeEnd").value.replace(/-/g, "/");
+    	var b_date1=new Date(Date.parse(dateStart1));
+        var e_date1=new Date(Date.parse(dateEnd1));
+
+	   if(!(jQuery.trim(document.getElementById('optTimeStart').value) !=''&& jQuery.trim(document.getElementById('optTimeEnd').value) !='')){
+	      alert("时间不能为空");
+		  return false;
+	   }
+	   if(e_date1<b_date1){
+	    alert("开始时间不能小于结束时间！");
+		return false;
+	   }
+	   document.searchform.submit();
+	  }
+
+	  function selectType2(value){
+	   var obj1=document.getElementById("notype");
+	   var obj2=document.getElementById("type2");
+	   var obj3=document.getElementById("type3");
+	   if(value=="入库"){
+		obj1.style.display='none';
+		obj2.style.display='';
+		obj3.style.display='none';
+
+	   }else if(value=="出库"){
+		obj1.style.display='none';
+		obj2.style.display='none';
+		obj3.style.display='';
+	   }
+	   else{
+		obj1.style.display='';
+		obj2.style.display='none';
+		obj3.style.display='none';
+	   }
+	  }
+
+	function clearSearch(){
+
+    document.getElementById('goodsInstanceId').value='';
+    document.getElementById('instanceName').value='';
+    document.getElementById('optTimeStart').value='';
+    document.getElementById('optTimeEnd').value='';
+    document.getElementById('code').value='';
+
+    }
+
+	function doExport(){
+		var form1=document.getElementById('searchform');
+		form1.action="/storage/doExportStockLedger.html";
+		form1.submit();
+		form1.action="/storage/list_storage_ledger.html";
+	}
+
+    </script>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="historyViewDAO">
+	<typeAlias alias="HistoryView" type="com.huaixuan.network.biz.domain.hy.HistoryView"/>
+	<resultMap id="historyViewResult" class="com.huaixuan.network.biz.domain.hy.HistoryView">
+	  <result column="idHistory" property="idHistory" />
+	  <result column="idproduct" property="idproduct" />
+	  <result column="operation" property="operation" />
+	  <result column="date" property="date" />
+	  <result column="operator" property="operator" />
+	  <result column="site" property="site" />
+	  <result column="supply" property="supply" />
+	  <result column="status" property="status" />
+	  <result column="idSupply" property="idSupply" />
+	  <result column="customer" property="customer" />
+	</resultMap>
+	
+    <select id="getHistoryViewByConditionWithPage" resultMap="historyViewResult" parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*
+	   from historyView t
+	   ]]>
+	   <dynamic prepend="where">
+	   <isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  t.date >= #dateStart# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  t.date <= #dateEnd# ]]>
+       </isNotEmpty>
+       </dynamic>
+       order by t.date desc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+    <select id="getHistoryViewByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(t.idHistory) from historyView t
+		<dynamic prepend="where">
+	    <isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  t.date >= #dateStart# ]]>
+       </isNotEmpty>
+       <isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  t.date <= #dateEnd# ]]>
+       </isNotEmpty>
+        </dynamic>
+	</select>
+
+</sqlMap>

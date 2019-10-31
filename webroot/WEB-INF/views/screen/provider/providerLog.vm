@@ -1,0 +1,239 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+  <div class="main">
+	<form name="form1" id="form1" action="/provider/providerLog.html" method="post">
+		#springBind("provider.id")
+		<input type="hidden" id="id" name="${status.expression}" value ="$!{status.value}" />
+
+		<div class="searchBox">
+			<h3><span>搜索供应商日志</span></h3>
+		 <table>
+            <tr>
+				<th>订单号：</th>
+               <td>
+				 #springBind("providerLog.orderId")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" min="0" />
+               </td>
+			   #*
+			   
+				<th>银泰sku：</th>
+               <td>
+			     #springBind("providerLog.prodId")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   *#
+			   <th>尚上sku：</th>
+               <td>
+				 #springBind("providerLog.sSprodid")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   
+			   <th>推送数量：</th>
+               <td>
+			     #springBind("providerLog.qty")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+            </tr>
+			<tr>
+			   <th>销售平台：</th>
+               <td>
+			     #springBind("providerLog.ptype")
+                 <input  type="text" name="${status.expression}" value ="$!{status.value}" class="inp" />
+               </td>
+               <th>状态:</th>
+			   <td style="width:150px">
+					#springBind("providerLog.status")
+                   <input  name="status" id="statusId" value ="$!{status.value}"  class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                        data="statusData"    allowInput="false" showNullItem="true" nullItemText="请选择..."/>         
+               </td>
+            </tr>	
+			<tr>
+			   <th> </th>
+               <td><button type="button" onclick="javascript:doSearch()" class="btn">查询商品</button></td>
+	        </tr>
+         </table>
+        </div>
+
+ 
+  #if($!errormessage)
+	<div class="mag-t1">
+		$!errormessage
+    </div>
+  #end
+        <div class="clear"></div>
+        <ul class="form-tab">
+            ##<li #if($!pageFlag=="on_sale") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_sale')">出售中的商品</a></span></li>
+            ##<li #if($!pageFlag=="on_depot") class="c" #end><span><a href="$appServer.get('/goods/search.html').addQueryData('pageFlag','on_depot')">仓库中的商品</a></span></li>
+        </ul>
+		<div class="clear"></div>
+		<div class="listBox">
+			<ul class="hover">
+				<h3><span>供应商日志列表</span></h3>
+				<table>
+                    <tr>
+					  <th><input type="checkbox" id="allbox" />全选</th>
+                      ##<th>银泰商品编号</th>
+					  <th>订单号</th>
+					  <th>银泰sku</th>
+					  <th>云尚sku</th>
+					  <th>尚上sku</th>
+					  <th>推送数量</th>
+					  <th>销售平台</th>
+					  <th>供应商</th>
+					  <th>订单推送后状态</th>
+					  <th>订单推送后信息</th>
+					  <th>创建时间</th>
+					</tr>
+					#if($query.items.size()>0)
+						#springBind("provider.id")
+						#foreach($provider in $query.items)
+                            <tr>
+                              <td><input name="ids" type="checkbox" value="$!provider.id"/></td>
+							  ##<td>$!provider.id</td>
+							  <td>$!provider.orderId</td>
+							  <td>$!provider.prodId</td>
+							  <td>$!provider.skuId</td>
+							  <td>$!provider.sSprodid</td>
+							  <td style="text-align:center;">$!provider.qty</td>
+							  <td style="text-align:center;width:62px">$!provider.ptype</td>
+							  <td style="text-align:center;">$!provider.pushPlatform</td>
+							  <td id="status" style="text-align:center;">
+								#if($!provider.status==200)
+									推送成功
+								#elseif($!provider.status==402 || $!provider.status==100)
+									推送失败
+								#else
+									$!provider.status
+								#end
+							  </td>
+							  <td style="text-align:center;">$!provider.message</td>
+							  <td style="text-align:center;">$!provider.createTime
+								##$!dateUtil.convertDateToString("yyyy-MM-dd",$!provider.createTime)
+							  </td>
+							</tr>
+						#end
+					#end
+                </table>
+            </ul>
+        </div>
+    </form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/provider/providerLog.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+  </div>
+</body>
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+	        });
+
+		});
+
+		function checkIds(){
+		     var objs = document.getElementsByName("ids");
+			  for(var i = 0; i < objs.length; i++) {
+	            if(objs[i].type.toLowerCase() == "checkbox" ){
+				   if(objs[i].checked){
+				     return true;
+				   }
+				}
+			  }
+			  alert('至少选择一条商品信息');
+			  return false;
+		}
+
+    function doSearch(){
+        document.getElementById('form1').submit();
+    }
+	var statusData = [{id: 200,value: "推送成功"  },  { id: 402, value: "推送失败" },{ id: 100, value: "推送失败" }] ;	
+	
+	
+function deListGoodsBat(){
+    if(!checkIds())return;
+    document.getElementById('form1').action="/goods/delistinggb.html";
+    document.getElementById('form1').submit();
+}
+
+
+function listingGoodsBat(){
+	if(!checkIds())return;
+    if(!confirm("确实要进行批量上架操作吗？"))
+        return false;
+    document.getElementById('form1').action="/goods/listinggb.html";
+    document.getElementById('form1').submit();
+}
+
+
+#if($!issuccess=="error")
+alert("特价商品不能设置为代销商品");
+#end
+function doagent(id){
+	var url="doagent.html?pageFlag=on_sale&id="+id;
+    window.location.href=url;
+}
+
+
+function downLoadImg(){
+    var form1=document.getElementById('form1');
+    form1.action="/goods/downLoadImg.html";
+    form1.submit();
+    form1.action="/goods/search.html";
+}
+
+function doListing(Id){
+    var url="/goods/listing.html?id="+Id;
+    document.location=url;
+}
+
+
+function doAgentGoods(){
+	if(!isAtLeastOneChecked('ids')){
+        alert("请选择要做批量的商品！");
+        return false;
+    }
+	if(!confirm("确实要进行批量取消代销商品操作吗？"))
+        return false;
+
+	document.getElementById('form1').action="doAgentGoods.html";
+    document.getElementById('form1').submit();
+}
+
+
+function doDelisting(Id){
+    var url="/goods/delisting.html?id="+Id;
+    document.location=url;
+}
+
+function doDeleteGoods(Id){
+    if(!confirm("确实要删除商品吗？"))
+        return false;
+    var url="/goods/deleteg.html?id="+Id;
+    document.location=url;
+}
+
+function isAtLeastOneChecked(checkName){
+    var flag=false;
+
+	var idsArray=jQuery(":input[name="+checkName+"]");
+                jQuery.each(idsArray,function(n,obj) {
+                    if(obj.checked==true){
+                        flag=true;
+                    }
+    			});
+
+    return flag;
+}
+
+</script>

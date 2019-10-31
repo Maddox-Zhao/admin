@@ -1,0 +1,21 @@
+#set($layout = '')
+<html>
+<head>
+	<title>siku更新库存 </title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+	OK<br/>
+	#if($startLogTime)
+		##更新失败  $cnt  条数据
+		最后一条数据的更新时间：($startLogTime)
+	#end
+    #if($cnt)
+		更新失败  $cnt  条数据
+	#end
+
+</body>
+
+</html>

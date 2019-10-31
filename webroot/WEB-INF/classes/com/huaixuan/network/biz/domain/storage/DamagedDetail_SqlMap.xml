@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DamagedDetailSQL">
+<typeAlias alias="damagedDetail" type="com.huaixuan.network.biz.domain.storage.DamagedDetail"/>
+	<resultMap class="damagedDetail" id="damagedDetailResult">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="damaged_id" property="damagedId"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="unit" property="unit"/>
+		<result column="amount" property="amount"/>
+		<result column="unit_cost" property="unitCost"/>
+		<result column="cost_count" property="costCount"/>
+		<result column="remark" property="remark"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="loc_id" property="locId"/>
+		<result column="reason" property="reason"/>
+		<result column="batch_num" property="batchNum"/>
+	</resultMap>
+
+	<resultMap class="damagedDetail" id="damagedDetailCountResult">
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="amount" property="amount"/>
+	</resultMap>
+<typeAlias alias="damagedDetailView" type="com.huaixuan.network.biz.domain.storage.DamagedDetailView"/>
+	<resultMap class="damagedDetailView" id="damagedDetailViewResult">
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="brand_name" property="brandName"/>
+		<result column="dep_name" property="depName"/>
+		<result column="creater" property="creater"/>
+		<result column="agent" property="agent"/>
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="damaged_id" property="damagedId"/>
+		<result column="damaged_code" property="damagedCode"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="goods_code" property="goodsCode"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="unit" property="unit"/>
+		<result column="amount" property="amount"/>
+		<result column="unit_cost" property="unitCost"/>
+		<result column="cost_count" property="costCount"/>
+		<result column="remark" property="remark"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="loc_id" property="locId"/>
+		<result column="loc_name" property="locName"/>
+		<result column="reason" property="reason"/>
+		<result column="gmt_damaged" property="gmtDamaged"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="DEP_FIRST_ID" property="depfirstId"/>
+	</resultMap>
+
+<!-- create DamagedDetail object -->
+<insert id="addDamagedDetail" parameterClass="damagedDetail">
+<![CDATA[
+insert into ioss_damaged_detail
+  (id,
+   goods_id,
+   goods_instance_id,
+   damaged_id,
+   goods_name,
+   supplier_id,
+   unit,
+   amount,
+   unit_cost,
+   cost_count,
+   remark,
+   gmt_create,
+   gmt_modify,
+   loc_id,
+   batch_num,
+   reason)
+values
+  (null,
+   #goodsId#,
+   #goodsInstanceId#,
+   #damagedId#,
+   #goodsName#,
+   #supplierId#,
+   #unit#,
+   #amount#,
+   #unitCost#,
+   #costCount#,
+   #remark#,
+   sysdate(),
+   sysdate(),
+   #locId#,
+   #batchNum#,
+   #reason#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update DamagedDetail object -->
+<update id="editDamagedDetail" parameterClass="damagedDetail">
+<![CDATA[
+update ioss_damaged_detail
+   set goods_id          = #goodsId#,
+       goods_instance_id = #goodsInstanceId#,
+       damaged_id        = #damagedId#,
+       goods_name        = #goodsName#,
+       supplier_id       = #supplierId#,
+       unit              = #unit#,
+       amount            = #amount#,
+       unit_cost         = #unitCost#,
+       cost_count        = #costCount#,
+       remark            = #remark#,
+       gmt_create        = #gmtCreate#,
+       gmt_modify        = sysdate(),
+       loc_id            = #locId#,
+       batch_num         = #batchNum#,
+       reason            = #reason#
+ where id = #id#
+
+]]>
+</update>
+<!-- delete DamagedDetail object -->
+<delete id="removeDamagedDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_damaged_detail where ioss_damaged_detail.ID = #value#
+]]>
+</delete>
+
+
+<select id="getDamagedDetail" parameterClass="java.lang.Long" resultMap="damagedDetailViewResult">
+<![CDATA[
+select a.*,
+       (select brand_name
+          from emall_brand r
+         where r.id =
+               (select brand_id from emall_goods where id = b.goods_id)) as brand_name,
+       (select t.name from ioss_depository as t where t.id = c.dep_id) as dep_name,
+       (select d.loc_name from ioss_dep_location as d where d.id = c.dep_id) as loc_name,
+       (select s.name from ioss_supplier s where s.id = a.supplier_id) supplier_name,
+       b.code as goods_code,
+       c.gmt_damaged,
+       c.creater,
+       c.agent,
+       c.damaged_code,
+       c.DEP_FIRST_ID,
+       b.cat_code,
+       b.attrs
+  from ioss_goods_instance  b,
+       ioss_damaged_detail  a,
+       ioss_damaged         c
+ where b.id = a.goods_instance_id
+   and c.id = a.damaged_id
+   and a.id = #value#
+ order by a.id desc
+
+]]>
+</select>
+
+
+<select id="getDamagedDetailById" parameterClass="java.lang.Long" resultMap="damagedDetailResult">
+<![CDATA[
+		select a.* from ioss_damaged_detail  a where a.id=#value#
+]]>
+</select>
+
+<select id="getGroupCountListByMap" resultMap="damagedDetailCountResult">
+<![CDATA[
+select goods_instance_id,sum(amount) amount
+  from ioss_damaged_detail
+ where 1=1
+]]>
+	<isNotEmpty prepend="and" property="damagedId">
+		damaged_id=#damagedId#
+	</isNotEmpty>
+	group by goods_instance_id
+</select>
+
+
+<select id="getDamagedDetailsByParameterMap" resultMap="damagedDetailViewResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+select a.*,
+       (select brand_name
+          from emall_brand r
+         where r.id =
+               (select brand_id from emall_goods where id = b.goods_id)) as brand_name,
+       (select t.name from ioss_depository  t where t.id = c.dep_id) as dep_name,
+       (select d.loc_name from ioss_dep_location  d where d.id = a.loc_id) as loc_name,
+       (select s.name from ioss_supplier s where s.id = a.supplier_id) supplier_name,
+       b.code as goods_code,
+       c.gmt_damaged,
+       c.creater,
+       c.agent,
+       c.damaged_code,
+       c.DEP_FIRST_ID,
+       b.cat_code,
+       b.attrs
+  from ioss_goods_instance b,
+       ioss_damaged_detail a,
+       ioss_damaged        c
+ where b.id = a.goods_instance_id
+   and c.id = a.damaged_id
+
+]]>
+	    <isNotEmpty prepend="and" property="goodsName">
+			a.goods_name like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reason">
+			a.reason = #reason#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeStart">
+<![CDATA[			c.gmt_damaged >= STR_TO_DATE(#damagedTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeEnd">
+<![CDATA[			c.gmt_damaged < DATE_ADD(STR_TO_DATE(#damagedTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedId">
+		            a.damaged_id=#damagedId#
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsCode">
+			b.code like CONCAT('%',#goodsCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstIds" >
+            c.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId" >
+            c.dep_first_id = #depFirstId#
+        </isNotEmpty>
+		order by a.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getDamagedDetailsCountByParameterMap" resultClass="java.lang.Integer">
+<![CDATA[
+select count(a.id)
+  from ioss_goods_instance  b,
+       ioss_damaged_detail  a,
+       ioss_damaged         c
+ where b.id = a.goods_instance_id
+   and c.id = a.damaged_id
+
+]]>
+	    <isNotEmpty prepend="and" property="goodsName">
+			a.goods_name like CONCAT('%',#goodsName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reason">
+			a.reason = #reason#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeStart">
+<![CDATA[			c.gmt_damaged >= STR_TO_DATE(#damagedTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedTimeEnd">
+<![CDATA[			c.gmt_damaged < DATE_ADD(STR_TO_DATE(#damagedTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="goodsCode">
+			b.code like CONCAT('%',#goodsCode#,'%')
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="depfirstIds" >
+            c.dep_first_id in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		 <isNotEmpty prepend="and" property="depFirstId" >
+            c.dep_first_id = #depFirstId#
+        </isNotEmpty>
+</select>
+
+
+<select id="getCountByParameterMap" resultClass="java.lang.Integer">
+<![CDATA[
+select count(DISTINCT(a.id)) from ioss_damaged_detail  a where 1 = 1
+]]>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			a.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="damagedId">
+			a.damaged_id = #damagedId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			a.supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId">
+			a.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="batchNum">
+			a.batch_num = #batchNum#
+		</isNotEmpty>
+</select>
+</sqlMap>

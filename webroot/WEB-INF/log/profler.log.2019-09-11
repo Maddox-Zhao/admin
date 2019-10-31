@@ -1,0 +1,218 @@
+2019-09-11 11:39:47,232 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1906] in http://www.shangit.com:8077/login.html [returnto=] [type=zy] [userName=1000000] [password=shangshang] [loginSystem=erp] 
+Task:execute web action in:LoginAction with method:login running time(millis)[19->1572]=1553 81%
+--Task:LoginService:login running time(millis)[32->1546]=1514 79%
+----Task:AdminService:getAdminByCondition running time(millis)[32->1289]=1257 65%
+------Task:AdminDao:getAdminByCondition running time(millis)[32->1289]=1257 65%
+--------Trace:prepareStatement: select      id, user_name, password, gmt_create, gmt_modify, status, email, mobile, tel, name, dep_first_id,site,dep_code,function_role,site,higher_user_name        from emall_admin   where         emall_admin.user_name = ?
+----Task:MiniuiBaseService:getSiteByType running time(millis)[1315->1343]=28 1%
+------Task:MiniUiBaseDataDao:querySiteByType running time(millis)[1315->1343]=28 1%
+--------Trace:prepareStatement: select idSite id,name from site where type in ( 1,4 ) order by idSite
+----Task:AdminRoleService:getRoleByAdminId running time(millis)[1344->1351]=7 0%
+------Task:AdminRoleDao:getRoleByAdminId running time(millis)[1344->1351]=7 0%
+--------Trace:prepareStatement: select        admin_id, role_id         from emall_admin_role where admin_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1351->1480]=129 6%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1351->1480]=129 6%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1483->1521]=38 1%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1483->1521]=38 1%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+--Task:LoginLogoService:addLogin running time(millis)[1551->1572]=21 1%
+----Task:LoginLogoDao:insertlogin running time(millis)[1551->1572]=21 1%
+------Trace:prepareStatement: insert into login_logo values(null,?, sysdate(),?)
+------Trace:prepareStatement: SELECT @@IDENTITY AS ID
+Task:write output to servlet outputstream with size:0KB. running time(millis)[1906->1906]=0 0%
+2019-09-11 11:40:05,152 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9468] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[22->9441]=9419 99%
+--Task:OrderService:getOrderList running time(millis)[22->9441]=9419 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[22->27]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[27->843]=816 8%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[844->9441]=8597 90%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9465->9468]=3 0%
+2019-09-11 11:40:11,976 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3500] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[19->3438]=3419 97%
+--Task:OrderService:getProductByidorder running time(millis)[20->3438]=3418 97%
+----Task:OrderDao:getProductListByidorder running time(millis)[20->3438]=3418 97%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3494->3500]=6 0%
+2019-09-11 11:40:39,480 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9209] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[36->9196]=9160 99%
+--Task:OrderService:getOrderList running time(millis)[37->9196]=9159 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[37->43]=6 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[43->677]=634 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[677->9196]=8519 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9207->9209]=2 0%
+2019-09-11 11:41:05,765 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3372] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[47->3366]=3319 98%
+--Task:OrderService:getProductByidorder running time(millis)[47->3366]=3319 98%
+----Task:OrderDao:getProductListByidorder running time(millis)[47->3366]=3319 98%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3369->3372]=3 0%
+2019-09-11 11:41:27,854 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9136] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[27->9129]=9102 99%
+--Task:OrderService:getOrderList running time(millis)[28->9129]=9101 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[28->33]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[33->662]=629 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[662->9129]=8467 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9133->9135]=2 0%
+2019-09-11 11:41:45,974 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3295] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[22->3285]=3263 99%
+--Task:OrderService:getProductByidorder running time(millis)[23->3285]=3262 98%
+----Task:OrderDao:getProductListByidorder running time(millis)[23->3285]=3262 98%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3291->3295]=4 0%
+2019-09-11 11:42:05,737 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9167] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[20->9160]=9140 99%
+--Task:OrderService:getOrderList running time(millis)[21->9160]=9139 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[21->26]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[26->648]=622 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[648->9160]=8512 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9165->9167]=2 0%
+2019-09-11 11:42:14,055 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3281] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[21->3274]=3253 99%
+--Task:OrderService:getProductByidorder running time(millis)[21->3274]=3253 99%
+----Task:OrderDao:getProductListByidorder running time(millis)[21->3274]=3253 99%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3277->3281]=4 0%
+2019-09-11 11:42:35,478 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9149] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[22->9145]=9123 99%
+--Task:OrderService:getOrderList running time(millis)[23->9145]=9122 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[23->29]=6 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[29->652]=623 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[652->9145]=8493 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9147->9149]=2 0%
+2019-09-11 11:42:47,719 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3270] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[19->3261]=3242 99%
+--Task:OrderService:getProductByidorder running time(millis)[20->3261]=3241 99%
+----Task:OrderDao:getProductListByidorder running time(millis)[20->3261]=3241 99%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3265->3270]=5 0%
+2019-09-11 11:43:05,104 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9176] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[15->9171]=9156 99%
+--Task:OrderService:getOrderList running time(millis)[15->9171]=9156 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[15->20]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[20->646]=626 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[646->9171]=8525 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9173->9176]=3 0%
+2019-09-11 11:43:17,306 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3290] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[22->3282]=3260 99%
+--Task:OrderService:getProductByidorder running time(millis)[22->3282]=3260 99%
+----Task:OrderDao:getProductListByidorder running time(millis)[22->3282]=3260 99%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3286->3290]=4 0%
+2019-09-11 11:43:36,101 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9206] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[19->9200]=9181 99%
+--Task:OrderService:getOrderList running time(millis)[19->9200]=9181 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[40->46]=6 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[46->676]=630 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[676->9200]=8524 92%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9203->9206]=3 0%
+2019-09-11 11:45:53,349 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9510] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[36->9483]=9447 99%
+--Task:OrderService:getOrderList running time(millis)[37->9483]=9446 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[37->42]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[42->833]=791 8%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[833->9483]=8650 90%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9507->9510]=3 0%
+2019-09-11 11:46:56,419 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[1182] in http://www.shangit.com:8077/admin_right.html 
+Task:execute web action in:LoginAction with method:index running time(millis)[22->1180]=1158 97%
+--Task:TradeDao:getTradeCountWithStatus running time(millis)[23->1168]=1145 96%
+----Trace:prepareStatement: select status,count(1) as countWithStatus from emall_trade group by status
+--Task:FeedbackService:feedbackCountWithReplyFlag running time(millis)[1168->1176]=8 0%
+----Task:FeedbackDao:feedbackCountWithReplyFlag running time(millis)[1168->1176]=8 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_feedback  where 1=1  and   to_user_type = ?    group by Reply_Flag
+--Task:CommentsService:commentsCountWithReplyFlag running time(millis)[1176->1180]=4 0%
+----Task:CommentsDao:commentsCountWithReplyFlag running time(millis)[1176->1180]=4 0%
+------Trace:prepareStatement: select Reply_Flag,count(1) as countWithReplyFlag from emall_comments group by Reply_Flag
+Task:render screen:screen/admin_right.vm running time(millis)[1181->1181]=0 0%
+Task:merge template:layout\default.vm running time(millis)[1182->1182]=0 0%
+Task:write output to servlet outputstream with size:1KB. running time(millis)[1182->1182]=0 0%
+2019-09-11 11:47:15,742 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9217] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[18->9209]=9191 99%
+--Task:OrderService:getOrderList running time(millis)[19->9209]=9190 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[19->23]=4 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[23->821]=798 8%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[821->9209]=8388 91%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9214->9217]=3 0%
+2019-09-11 11:47:22,663 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[3078] in http://www.shangit.com:8077/orderinformation/getProductByidorder.html [idorder=104495] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderinformationAction with method:getProductByidorder running time(millis)[36->3072]=3036 98%
+--Task:OrderService:getProductByidorder running time(millis)[37->3072]=3035 98%
+----Task:OrderDao:getProductListByidorder running time(millis)[37->3072]=3035 98%
+------Trace:prepareStatement: select * from (   SELECT p.idProduct,   b.name brandName,   s.name seriesName,   p.sku,   p.type type,   p.Material material,   p.Color color,   p.Size size,   l.HXPrice ssPrice,   l.HKHXPrice smPrice,   l.Price salePrice,   l.idPriceCurrency salePriceCurrency   FROM lifecycle l,   series s,   product p,   currency c,   brand b   WHERE ( l.idorder = ? or l.idorder2 = ?)   AND p.idBrand = b.idBrand   AND l.idProduct = p.idProduct   AND p.idSeries = s.idSeries   AND c.idCurrency=l.idCostCurrency   ) ps             order by brandName,type,material,color,size
+Task:write output to servlet outputstream with size:95KB. running time(millis)[3075->3078]=3 0%
+2019-09-11 11:47:35,811 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[9299] in http://www.shangit.com:8077/order1/getorderlist.html [idorder=] [idEmployee=] [idSite=] [status=] [idCustomer=] [deliverystatus=] [idCustomerManager=] [idSellChannel=] [sellDateStart=] [sellDateEnd=2019-9-11] [pageIndex=0] [pageSize=100] [sortField=] [sortOrder=] 
+Task:execute web action in:OrderAction1 with method:orderlist running time(millis)[19->9293]=9274 99%
+--Task:OrderService:getOrderList running time(millis)[20->9293]=9273 99%
+----Task:OrderDao:canSearchAllOrder running time(millis)[20->25]=5 0%
+------Trace:prepareStatement: SELECT count(*) cnt FROM emall_admin WHERE client_role = 9 AND user_name =  1000000
+----Task:OrderDao:getOrderListCount running time(millis)[25->617]=592 6%
+------Trace:prepareStatement: SELECT count(c.idorder)   FROM  customerorder c,customer cus,sellchannel s,employee e,site si,currency cur,payment pay   WHERE   c.idcustomer = cus.idCustomer   AND c.idChannel = s.idSellChannel   AND c.idSite = si.idSite   AND c.idCurrency = cur.idCurrency   AND c.idPayment = pay.idPayment   AND c.operator = e.idEmployee                                               and c.date <= ?
+----Task:OrderDao:getorderList running time(millis)[617->9293]=8676 93%
+------Trace:prepareStatement: SELECT  c.idorder,  c.date,  c.delivery_meno deliverymeno,  c.subTotal, subTotal,  cur.name currencyname,  cur.idCurrency,  pay.name paymentname,   pay.idPayment idPayment,  c.amountCash,  c.amountCard,  cus.name customername,  s.name sellchannelname,  s.idSellChannel idSellChannel,  si.name sitename,  si.idSite idSite,  c.status status,  c.remark,  cus.idCustomer idCustomer,  c.gmt_pay gmtpay,  c.delivery_status deliverystatus,  c.delivery_date deliverydate,  (SELECT `name` FROM employee WHERE idEmployee = c.operator2) empName,  (SELECT `name` FROM employee WHERE idEmployee = c.operator)    employeename,     (SELECT `idEmployee` FROM employee WHERE idEmployee = c.operator)    idEmployee,     (SELECT `name` FROM emall_admin WHERE user_name = cus.customer_operate) customerManager  FROM  customerorder c,  customer cus,  sellchannel s,  site si,  currency cur,  payment pay   WHERE c.idcustomer = cus.idCustomer  AND c.idChannel = s.idSellChannel  AND c.idSite = si.idSite  AND c.idCurrency = cur.idCurrency  AND c.idPayment = pay.idPayment                                             and c.date <= ?                                        ORDER BY c.idorder DESC                 LIMIT 0,100
+Task:write output to servlet outputstream with size:48KB. running time(millis)[9295->9298]=3 0%
+2019-09-11 12:00:34,962 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[19] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->19]=19 100%
+2019-09-11 14:20:35,086 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[13] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->13]=13 100%
+2019-09-11 14:30:35,120 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[11] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->11]=11 100%
+2019-09-11 14:40:35,143 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[12] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->12]=12 100%
+2019-09-11 14:50:35,161 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[10] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->10]=10 100%
+2019-09-11 15:36:35,219 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[36] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->36]=36 100%
+2019-09-11 17:26:35,353 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[12] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->12]=12 100%

@@ -1,0 +1,17 @@
+<head>
+  #set($title = "evard")
+</head>
+
+
+
+<body style="font-size:16px">
+<br/><br/><br/>
+#foreach($user in $list)
+	$user  <br/>
+#end
+<br/><br/><br/>
+<br/><br/><br/>
+<br/><br/><br/>
+	
+</body>
+	 

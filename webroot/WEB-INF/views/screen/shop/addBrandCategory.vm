@@ -1,0 +1,115 @@
+#set($layout = 'layout\default.vm')
+<script>
+   function queryCategory(catCode,depth,catName,isLeaf){
+
+        var url = '$appServer.get("/goods/sel_category.html")';
+		jQuery.ajax ({
+			type		: 'POST',
+			url			:  url,
+			data		: {
+			 			   parentCode : catCode,
+						   depth:parseInt(depth)
+						   },
+			timeout		: 3000,
+			success		: function(data, textStatus, xhr) {
+				if(data){
+
+				    selCatValue(catCode,depth,catName,isLeaf)
+
+				    jQuery.each(data,function(){
+					    var isLeaf=this.isLeaf;
+						if(isLeaf=='0'){
+    					   jQuery("#cat"+depth).append("<li class=\"parent\" id='"+this.catCode+"' onclick=\"javascript:queryCategory('"+this.catCode+"',"+(parseInt(this.depth)+1)+",'"+this.catName+"',"+isLeaf+")\"><span>"+this.catName+"</span></li>");
+    					}else{
+						   jQuery("#cat"+depth).append("<li id='"+this.catCode+"' onclick=\"javascript:selCatValue('"+this.catCode+"',"+(parseInt(this.depth)+1)+",'"+this.catName+"',"+isLeaf+")\"><span>"+this.catName+"</span></li>");
+						}
+					});
+
+				}
+			},
+			error		: function(xhr, textStatus, errorThrown) {
+				operStyle(false, uid);
+				alert('操作失败！');
+				unload();
+			}
+
+		});
+    }
+	function selCatValue(catCode,depth,catName,isLeaf){
+
+	    jQuery("#cat"+depth).empty();
+		for(var i=parseInt(depth);i<=5;i++){
+		   jQuery("#cat"+i).hide();
+		}
+		if(isLeaf==0)
+		 jQuery("#cat"+depth).show();
+		if(catName){
+    	    var dep = parseInt(depth)-1;
+    	    for(var i=dep;i<=5;i++){
+    		   jQuery("#catName"+i).remove();
+    		}
+    		id= "catName"+dep;
+    		if(dep==1){
+    		  jQuery("#selcat").append("<span id="+id+" class=\"root\">"+catName+"</span>");
+    		}else{
+    		  jQuery("#selcat").append("<span id="+id+">"+catName+"</span>");
+    		}
+    		jQuery("#catCode").val(catCode);
+		}
+
+		if(catCode!=''){
+		    var li = document.getElementById("cat"+(parseInt(depth)-1)).getElementsByTagName("li");
+			for(var i=0;i<li.length;i++){
+			    var classstr=li[i].className;
+				index  = classstr.indexOf("selected");
+				if(index!=-1){
+				  li[i].className=classstr.substring(0,index)
+				}
+			}
+		   cname =document.getElementById(catCode).className;
+		   if(cname.indexOf("parent")!=-1){
+		      document.getElementById(catCode).className="parent selected";
+		   }else{
+		      document.getElementById(catCode).className="selected";
+		   }
+		   jQuery("#btn").attr("disabled","");
+		}else{
+		  jQuery("#btn").attr("disabled","true");
+		}
+	}
+
+	jQuery(function(){
+	   jQuery("#btn").attr("disabled","true");
+	   queryCategory('','1','',0);
+	   jQuery("#btn").click( function () {
+              location.href='/shop/addBrandCategory.html?brandId='+$!{brand.id}+'&catCode='+jQuery("#catCode").val();
+            } );
+	});
+
+
+</script>
+<body>
+	#set($title = "品牌管理 - 添加关联商品")
+	<div class="main">
+		<input type="hidden" id="brandId" name="brandId" value="$!brand.id"/>
+	  <h2>您选择的品牌：$!brand.brandName</h2>
+      <div class="formBox">
+          <h3><i></i><span style="width:auto;">添加关联商品</span></h3>
+          <div class="container">
+            <ol id="cat1"></ol>
+            <ol id="cat2"></ol>
+            <ol id="cat3"></ol>
+            <ol id="cat4"></ol>
+            <ol id="cat5"></ol>
+          </div>
+          <div class="container_list" id="selcat"><b></b> 您当前的选择：
+          </div>
+		  <input type="hidden" id="catCode"/>
+          <div class="center">
+			<button id="btn" type="botton" class="button-s8">
+			 添加
+            </button>
+          </div>
+      </div>
+	</div>
+</body>

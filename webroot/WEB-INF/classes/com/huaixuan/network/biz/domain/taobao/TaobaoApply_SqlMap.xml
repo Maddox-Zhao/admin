@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TaobaoApplySQL">
+<typeAlias alias="taobaoApply" type="com.huaixuan.network.biz.domain.taobao.TaobaoApply"/>
+	<resultMap class="taobaoApply" id="taobaoApplyResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="PARAM_ONE" property="paramOne"/>
+		<result column="PARAM_TWO" property="paramTwo"/>
+		<result column="PARAM_THREE" property="paramThree"/>
+		<result column="SHOP_URL" property="shopUrl"/>
+		<result column="POST_ID" property="postId"/>
+		<result column="POST_NORMAL" property="postNormal"/>
+		<result column="POST_EMS" property="postEms"/>
+		<result column="POST_EXPRESS" property="postExpress"/>
+		<result column="STATUS" property="status"/>
+		<result column="TYPE" property="type"/>
+		<result column="MEMO" property="memo"/>
+		<result column="GMT_SYNC" property="gmtSync"/>
+		<result column="own_express_id" property="ownExpressId"/>
+		<result column="interface_express_code" property="interfaceExpressCode"/>
+	</resultMap>
+
+	<resultMap id="taobaoApplyListResult" class="taobaoApply" extends="taobaoApplyResult">
+		<result column="account" property="account"/>
+	</resultMap>
+
+	<sql id="TaobaoApplySQL_dynamicQuery">
+		<dynamic prepend="where" >
+	    	<isNotEmpty prepend="and" property="gmtCreateStart">
+				<![CDATA[	GMT_CREATE >= STR_TO_DATE(#gmtCreateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="gmtCreateEnd">
+				<![CDATA[	GMT_CREATE < DATE_ADD(STR_TO_DATE(#gmtCreateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+			</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="account">
+					USER_ID in (select u.id from emall_users u where u.account like CONCAT('%',#account#,'%'))
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="paramOne">
+				<![CDATA[instr(PARAM_ONE,#paramOne#)>0]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="paramTwo">
+					PARAM_TWO = #paramTwo#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="paramThree">
+					PARAM_THREE = #paramThree#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="status">
+				STATUS = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="type">
+				TYPE = #type#
+			</isNotEmpty>
+    	</dynamic>
+	</sql>
+
+<!-- create TaobaoApply object by jinxx 2010/10/24 start-->
+<insert id="addTaobaoApply" parameterClass="taobaoApply">
+<![CDATA[
+		insert into interface_apply
+		(ID,GMT_CREATE,GMT_MODIFY,USER_ID,PARAM_ONE,PARAM_TWO,PARAM_THREE,SHOP_URL,POST_ID,POST_NORMAL,POST_EMS,POST_EXPRESS,STATUS,TYPE,MEMO,GMT_SYNC )values( null,
+		sysdate(),
+		sysdate(),
+		#userId#,
+		#paramOne#,
+		#paramTwo#,
+		#paramThree#,
+		#shopUrl#,
+		#postId#,
+		#postNormal#,
+		#postEms#,
+		#postExpress#,
+		#status#,
+		#type#,
+		#memo#,
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- create TaobaoApply object by jinxx 2010/10/24 end-->
+<!-- update InterfaceApply object -->
+<update id="editTaobaoApply" parameterClass="taobaoApply">
+<![CDATA[
+		update interface_apply set
+		GMT_MODIFY = sysdate(),
+		PARAM_ONE = #paramOne#,
+		PARAM_TWO = #paramTwo#,
+		PARAM_THREE = #paramThree#,
+		SHOP_URL = #shopUrl#,
+		POST_ID = #postId#,
+		POST_NORMAL = #postNormal#,
+		POST_EMS = #postEms#,
+		POST_EXPRESS = #postExpress#,
+		TYPE = #type#
+		 where ID = #id#
+]]>
+</update>
+<!-- update TaobaoApply object by jinxx 2010/10/24 start-->
+<update id="editGmtSyncTaobao" parameterClass="taobaoApply">
+<![CDATA[
+		update interface_apply set
+		GMT_MODIFY = sysdate(),
+		GMT_SYNC = #gmtSync#
+		 where ID = #id#
+]]>
+</update>
+<!-- update TaobaoApply object by jinxx 2010/10/24 end-->
+<update id="editTaobaoApplyStatus" parameterClass="taobaoApply">
+<![CDATA[
+		update interface_apply set
+		GMT_MODIFY = sysdate(),
+		MEMO = #memo#,
+		STATUS = #status#
+		 where ID = #id#
+]]>
+</update>
+<!-- delete InterfaceApply object -->
+<delete id="removeTaobaoApply" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from interface_apply where interface_apply.ID = #value#
+]]>
+</delete>
+<!-- search InterfaceApply object -->
+<select id="getTaobaoApply" parameterClass="java.lang.Long" resultMap="taobaoApplyResult">
+<![CDATA[
+		select interface_apply.* from interface_apply where interface_apply.ID = #value#
+]]>
+</select>
+
+<select id="getTaobaoApplyByUserId" parameterClass="java.util.Map" resultMap="taobaoApplyResult">
+<![CDATA[
+		select interface_apply.* from interface_apply where 1=1
+]]>
+<isNotEmpty prepend="and" property="userId">
+    interface_apply.user_id = #userId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="type">
+    interface_apply.type = #type#
+</isNotEmpty>
+</select>
+<!-- searchAll InterfaceApply List -->
+<select id="getTaobaoApplys" resultMap="taobaoApplyResult">
+<![CDATA[
+		select interface_apply.* from interface_apply
+]]>
+</select>
+
+<!-- 根据条件查询结果集记录数  interfaceApply List -->
+<select id="getCountByMapTaobao" resultClass="int">
+<![CDATA[
+        select count(1) from interface_apply
+]]>
+<include refid="TaobaoApplySQL_dynamicQuery"/>
+</select>
+
+<!-- 根据条件查询结果集  interfaceApply List -->
+<select id="getListByMapTaobao" resultMap="taobaoApplyListResult">
+<include refid="pageSQLHead"/>
+<![CDATA[
+		select t.*,(select emall_users.account from emall_users where emall_users.ID = t.USER_ID) account
+		 from interface_apply t
+]]>
+<include refid="TaobaoApplySQL_dynamicQuery"/>
+		order by id desc
+<include refid="pageSQLFoot"/>
+</select>
+<update id="modifyOwnExpressIdById" >
+<![CDATA[
+	update interface_apply 
+	set GMT_MODIFY = sysdate(),
+		OWN_EXPRESS_ID = #ownExpressId#
+	where ID = #id#
+]]>
+</update>
+
+<update id="modifyInterfaceExpressCodeById" >
+<![CDATA[
+	update interface_apply 
+	set GMT_MODIFY = sysdate(),
+		INTERFACE_EXPRESS_CODE=#interfaceExpressCode#
+	where ID = #id#
+]]>
+</update>
+</sqlMap>

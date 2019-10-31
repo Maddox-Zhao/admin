@@ -1,0 +1,290 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 移库外借管理</h2>
+
+	<form name="searchform" id="searchform" action="/storage/list_move_storage.html" method="post">
+		<input type="hidden" id="selectedIds" name="selectedIds" value="$!{mapsId}" />
+		<input type="hidden" id="selectIds" name="selectIds" value="$!{selectIds}" />
+		<input type="hidden" name="count" id="count" value="$!count"/>
+		<input type="hidden" name="jump" id="jump" value=""/>
+	<div class="searchBox">
+	<h3><span>搜索移库外借</span></h3>
+    		<table>
+        		<tr>
+                    <th>产品名称：</th>
+    				<td >
+    					#springBind("moveStorageQuery.instanceName")
+    					<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                    </td>
+                    <th>产品编码：</th>
+    				<td >
+    					#springBind("moveStorageQuery.code")
+    					<input type="text" id="code" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                    </td>
+            		<th> 产品一级类目：</th>
+    				<td>
+    					#springBind("moveStorageQuery.catCode")
+    					<select name="${status.expression}" id="catCode" class="inp" onchange="selectTwoCatCode(this.value,'twoCatCode');">
+            				<option value="">-=请选择=-</option>
+            				#foreach($cat in $catList)
+            				<option value="$cat.catCode" #if("$cat.catCode"=="${status.value}") selected #end>$cat.catName</option>
+            				#end
+            			</select>
+                    </td>
+
+    				<th> 产品二级类目：</th>
+    				<td>
+    					#springBind("moveStorageQuery.twoCatCode")
+    					<select name="${status.expression}" id="twoCatCode" class="inp">
+            				<option value="">请选择</option>
+            				#foreach($twocat in $twocatListInit)
+            				<option value="$twocat.catCode" #if("$twocat.catCode"=="${status.value}") selected #end>$twocat.catName</option>
+            				#end
+            			</select>
+                    </td>
+        		</tr>
+        		<tr>
+					<th>类型：</th>
+    				<td >
+    					#springBind("moveStorageQuery.storType")
+    					<select id="storType" name="${status.expression}" >
+                				<option value="">-=请选择=-</option>
+                				<option value="v" #if("$status.value"=="v") selected #end>暂估</option>
+            					<option value="f" #if("$status.value"=="f") selected #end>实际</option>
+                		</select>
+                    </td>
+    				#set($allShow = "1")
+        			$contain.get('/storage/depSelect.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$queryObject)
+					<th >
+						<input type="button" value="查询" class="btn" onclick="document.searchform.submit();"/>
+                    </th>
+                    <td >
+						<input type="reset" value="重置" class="btn"/>
+                    </td>
+                </tr>
+    		</table>
+		</div>
+		<div class="tool">
+			<span><a href="#" onclick="doMoveBat();return false;" hidefocus="true" class="bt_wu">批量移库</a></span>
+			<span><a href="#" onclick="doTransferBat();return false;" hidefocus="true" class="bt_wu">批量外借</a></span>
+			<span><a href="#" onclick="doMoveBySearch();return false;" hidefocus="true" class="bt_wu">根据查询结果全部移库</a></span>
+			<span><a href="#" onclick="doTransferBySearch();return false;" hidefocus="true" class="bt_wu">根据查询结果全部外借</a></span>
+		</div>
+
+			<center ><div id="result" style="color:red;">
+			  #if($!message=="overpage")超过100条不能执行！
+			  #elseif($!message=="no_result") 该记录已不存在,请重新查询！
+			  #elseif($!message=="no_result_one")其中有的记录已经不存在，请重新做选择！
+			  #elseif($!message=="wrongtype")其中有的记录为次品库或批发库记录，不能进行外借，请重新做选择！
+			  #end
+			</div></center>
+
+		<div class="listBox" id="listDiv">
+			<h3><span>移库外借列表</span></h3>
+			<table  id="listTable" name="listTable">
+					 <tr>
+						<th>
+                            <input name="anothercheckall" type="checkbox" onclick="checkAllWithName(this.form,'anothercheckall');"/>全选
+                        </th>
+						<th>产品编码</th>
+						<th>产品名称</th>
+						<th>供应商</th>
+						<th>类目</th>
+						<th>属性</th>
+						<th>单位</th>
+						<th>一级仓库</th>
+						<th>仓库</th>
+						<th>库位</th>
+						<th>类型</th>
+						<th>数量</th>
+						<th>操作</th>
+					</tr>
+				#if($query && $query.items.size()>0)
+					#foreach($gi in $query.items)
+						<tr #if($velocityCount%2==0) class="bg" #end>
+							<td>
+								#if($!{gi.depType}!="out_borrow_dep")
+								<input name="arrIds" type="checkbox" value="$!gi.id"  #if($!selectMap.get("${gi.Id}")=="${gi.Id}") checked="true" #end/>
+								#end
+							</td>
+							<td>
+								$!{gi.code}
+							</td>
+							<td title="$!{gi.instanceName}">
+								$!controlUtil.getNoticesTitle($!{gi.instanceName},15)
+							</td>
+							<td title="$!{gi.supplierName}">
+								<a href="/supplier/viewSupplier.html?sid=$!{gi.supplierId}" target="_blank">$!controlUtil.getNoticesTitle($!{gi.supplierName},10)</a>
+							</td>
+							<td title="$!categoryManager.getCatFullNameByCatcode($gi.catCode)">
+								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($gi.catCode),20)
+							</td>
+							<td title="$!attributeManager.getFullAttributeStringByAttrs($gi.attrs)">
+								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($gi.attrs),20)
+							</td>
+							<td>
+								$!{gi.goodsUnit}
+							</td>
+							<td>
+								$!{gi.depFirstName}
+							</td>
+							<td>
+								$!{gi.depositoryName}
+							</td>
+							<td>
+								$!{gi.depLocationName}
+							</td>
+							<td>
+								#if("$!{gi.storType}" == "v")
+								暂估
+								#else
+								实际
+								#end
+							</td>
+							<td align="center">
+								$!{gi.storageNum}
+							</td>
+							<td align="center">
+								#if($!{gi.depType}!="out_borrow_dep")
+							        <a href="#" onclick="return doMove($!gi.id);">移库</a>
+									#if($!{gi.depType}!="defect_dep"&&$!{gi.depfirstType} =="n")
+										|
+                                    <a href="#" onclick="return doTransfer($!gi.id)">外借</a>
+									#end
+								#else
+									无
+								#end
+							</td>
+						</tr>
+					#end
+                  #end
+             </table>
+        </div>
+	</form>
+</div>
+		 <!-- 分页 -->
+        #if($query.items.size()>0)
+    		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_move_storage.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+        #else
+    		没有结果！
+        #end
+</div>
+<script language="javascript" type="text/javascript">
+	var twocatList = new Array();
+		var k=0;
+        #foreach($twocat in $twocatList)
+            twocatList[k] = new Array("$!{twocat.catCode}","$!{twocat.parentCode}","#direct($!{twocat.catName})");
+            k++;
+        #end
+		var num=k;
+		function selectTwoCatCode(code,twoCatCode){
+            var obj = document.getElementById(twoCatCode);
+            var length = obj.length = 0;
+    		obj.options[length++] = new Option("请选择", "");
+            for(var m=0; m<num; m++){
+                if( twocatList[m][1] == code){
+                    obj.options[length] = new Option(twocatList[m][2], twocatList[m][0]);
+                    length++;
+                }
+            }
+        }
+
+    String.prototype.trim= function()
+    {
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+	function doMove(Id){
+        var url="doMoveAndTransferPage.html?flag=move&jump=move&id="+Id;
+        document.location=url;
+	}
+
+	function doTransfer(Id){
+    var url="doMoveAndTransferPage.html?flag=transfer&jump=move&id="+Id;
+    document.location=url;
+	}
+
+	function doMoveBySearch(){
+	#if($!count>500){
+	 alert("移库记录超过500条，无法操作！");
+	 return false;
+	}#else{
+	document.getElementById("jump").value="movearea";
+	document.searchform.action = "doMoveAndTransferPage.html?flag=move";
+    document.searchform.submit();
+	 }
+	 #end
+	}
+
+	function doTransferBySearch(){
+	#if($!count>500){
+	 alert("外借记录超过500条，无法操作！");
+	 return false;
+	}#else{
+	document.getElementById("jump").value="movearea";
+	document.searchform.action = "doMoveAndTransferPage.html?flag=transfer";
+    document.searchform.submit();
+	}
+	#end
+	}
+
+	function doMoveBat(){
+    if(!isAtLeastOneChecked('arrIds')){
+        alert("请选择要做批量的商品！");
+        return false;
+    }
+    if(!confirm("确实要进行批量移库吗？"))
+        return false;
+
+	document.getElementById('jump').value="movebat";
+    document.getElementById('searchform').action="doMoveAndTransferPage.html?flag=move";
+    document.getElementById('searchform').submit();
+    }
+
+    function doTransferBat(){
+    if(!isAtLeastOneChecked('arrIds')){
+        alert("请选择要做批量的商品！");
+        return false;
+    }
+    if(!confirm("确实要进行批量外借吗？"))
+        return false;
+
+	document.getElementById('jump').value="movebat";
+    document.getElementById('searchform').action="doMoveAndTransferPage.html?flag=transfer";
+    document.getElementById('searchform').submit();
+    }
+
+	function isAtLeastOneChecked(checkName){
+        var flag=false;
+
+        var elementsArray=document.getElementsByName(checkName);
+
+    	for(var i=0;i<elementsArray.length;i++)
+    	{
+    		if(elementsArray[i].checked==true)
+    			flag=true;
+    	}
+        return flag;
+    }
+
+	function checkAllWithName(theForm, allCheckName) { // check all the checkboxes in the list with the name of the all check box
+      var allcheck;
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if(eName==allCheckName){
+            	allcheck=e;
+            }
+        }
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if (eName != allCheckName &&
+                (e.type.indexOf("checkbox") == 0)) {
+                e.checked = allcheck.checked;
+            }
+        }
+	}
+</script>
+</div>

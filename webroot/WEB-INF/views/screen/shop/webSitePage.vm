@@ -1,0 +1,62 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+    function deletead(id){
+        var obj = document.getElementById("id");
+        obj.value = id;
+
+        var mymes=confirm("确定删除站内信？");
+         if(true==mymes){
+            document.listForm.action = "/shop/deleteAdminWebSite.html";
+            document.listForm.submit();
+        }
+
+    }
+
+     function updatePage(id){
+        var obj = document.getElementById("id");
+        obj.value = id;
+		window.location.href = "$appServer/shop/updateAdminWebSite.html?str="+"update&id="+obj.value;
+    }
+
+</script>
+#set($title = "站内信管理 - 站内信列表")
+<div class="tool">
+    <span><a href="/shop/addServerMsg.html" hidefocus="true" class="bt_add">新增站内信</a></span>
+  </div>
+  <div class="clear"></div>
+<form name="listForm" action="/shop/awebmsgist.html" method="post"><!-- start ads list -->
+    <input type="hidden" id="id" name="id" value="" />
+	<div class="main">
+ <div class="listBox">
+          <h3><i></i><span>站内信列表</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+    <tr>
+      <th>标题</th>
+      <th>状态</th>
+      <th>类型</th>
+      <th>创建日期</th>
+      <th>操作</th>
+    </tr>
+       #foreach($emailList in $query.items)
+   <tr  align="center">
+     <td width="177px" title="${emailList.title}">#if($!emailList.title.length()>20) $!controlUtil.getNoticesTitle($!emailList.title,15) #else $!emailList.title #end</td>
+
+     <td>$!emailList.status</td>
+      <td>$!emailList.type</td>
+      <td><!-- #BeginDate format:IS1 -->$!dateUtil.convertDateToString('yyyy-MM-dd',$!emailList.gmtCreate)<!-- #EndDate --></td>
+      <td><a href="javascript:deletead('$!{emailList.id}')">删除</a> <a href="javascript:updatePage('$!{emailList.id}')">修改</a></td>
+    </tr>
+    #end
+  </table>
+</form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/shop/awebmsgist.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+  <p>&nbsp;</p>
+</div>
+	</div>

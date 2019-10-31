@@ -1,0 +1,302 @@
+#set($layout = 'layout\default.vm')
+
+<script src="${imageServer}/scripts/ajaxfileupload.js" type="text/javascript" language="javascript"></script>
+
+
+<style type="text/css">
+    body { 
+    font-family:Arial, Helvetica, sans-serif; 
+    font-size:12px; 
+    margin:0; 
+    } 
+    #main { 
+    padding-top:90px; 
+    text-align:center; 
+    } 
+    #fullbg { 
+    background-color:gray; 
+    left:0; 
+    opacity:0.5; 
+    position:absolute; 
+    top:0; 
+    z-index:3; 
+    filter:alpha(opacity=50); 
+    -moz-opacity:0.5; 
+    -khtml-opacity:0.5; 
+    } 
+    #dialog { 
+    background-color:#fff; 
+    border:5px solid rgba(0,0,0, 0.4); 
+    height:200px; 
+    left:50%; 
+    margin:-200px 0 0 -200px; 
+    padding:1px; 
+    position:fixed !important; /* 浮动对话框 */ 
+    position:absolute; 
+    top:50%; 
+    width:370px; 
+    z-index:5; 
+    border-radius:5px; 
+    display:none; 
+    } 
+    #dialog p { 
+    margin:0 0 12px; 
+    height:24px; 
+    line-height:24px; 
+    background:#CCCCCC; 
+    } 
+    #dialog p.close { 
+    text-align:right; 
+    padding-right:10px; 
+    } 
+    #dialog p.close a { 
+    color:#fff; 
+    text-decoration:none; 
+    } 
+</style>
+
+<div class="main">
+
+<h2>供应商源文件管理</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>搜索文件</span></h3>
+    <form action="/cSupplier/searchSourceFile.html" name="searchForm" id="searchForm" method="post">
+    <table>
+      <tr>
+		 <th>供货商名称：</th>
+        <td>
+			#springBind("supplierFileSource.supplierName")
+			<input  type="text" name="${status.expression}" id="supplierFileSource.supplierName"  value="$!{status.value}" />
+		</td>
+        <th>源文件名称：</th>
+        		
+        <td>
+			#springBind("supplierFileSource.sourceName")
+			<input  type="text" name="${status.expression}" id="supplierFileSource.sourceName"  value="$!{status.value}" />
+		</td>
+        <th>是否删除：</th>
+        <td>
+        #springBind("supplierFileSource.isDelete")
+        <select name="${status.expression}"  >
+			<option value="-1" #if("-1"==$!{status.value}) selected #end>---全部---</option>
+        	<option value="0" #if("0"==$!{status.value}) selected #end>未删除</option>
+        	<option value="1" #if("1"==$!{status.value}) selected #end>后台删除</option>
+			<option value="2" #if("2"==$!{status.value}) selected #end>前台删除</option>
+		</select>
+		</td>
+        <th>是否导入产品：</th>
+        <td>
+        #springBind("supplierFileSource.isDeal")
+        <select name="${status.expression}" >
+        	<option value="" #if(""==$!{status.value}) selected #end>---全部---</option>
+        	<option value="0" #if("0"==$!{status.value}) selected #end>未导入</option>
+        	<option value="1" #if("1"==$!{status.value}) selected #end>已导入</option>
+		</select>
+		</td>
+        <td></td>
+		 <th><a href="/cSupplier/downLoadExcelTemplate.html" target="_blank">下载供货商模板</a></th>
+        <td><button type="submit" class="btn" onclick="formSubmit();">搜 索</button></td>
+      </tr>
+    
+    </table>
+    </form>
+  </div>
+ 
+<div class="clear"></div>
+
+<!-- 订单列表 -->
+<div class="listBox">
+          <h3><span>供应商源文件列表</span></h3>
+    <table>
+      <tr>
+		<th>文件ID</th>
+        <th>供应商名称</th>
+        <th>源文件名称</th>
+        <th>是否导入产品</th>
+        <th>是否删除</th>
+		<th>上传时间</th>
+        <th>操作</th>
+      </tr>
+	  #foreach($supplierSf in $query.items)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+		 <td  style="text-align:center">$!supplierSf.id</td>
+		 <td  style="text-align:center">$!supplierSf.supplierName</td>
+		 <td  style="text-align:center">$!supplierSf.sourceName</td>
+		 <td  style="text-align:center">
+				              #if("0"==$!supplierSf.isDeal)未导入
+			                 #elseif("1"==$!supplierSf.isDeal)已导入
+	                         #end
+	     </td>
+		 <td  style="text-align:center">
+				              #if("0"==$!supplierSf.isDelete)未删除
+			                 #elseif("1"==$!supplierSf.isDelete)后台删除
+							 #elseif("2"==$!supplierSf.isDelete)前台删除
+	                         #end
+	     </td>
+		  <td  style="text-align:center">$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!supplierSf.gmtCreate)</td>
+		  <td  style="text-align:center">
+			<a href="/supplier/searchSupplierGoods.html?idFile=${supplierSf.id}" target="_blank">查看产品</a>&nbsp;&nbsp;&nbsp;
+			#if("0"==$!supplierSf.isDelete)
+			<a href="javascript:void(0)" onclick="deleteSupplierFile($!supplierSf.id)" >删除</a>&nbsp;&nbsp;&nbsp;
+			#end
+			<a href="downLoadSourceFile.html?id=$!{supplierSf.id}"  target="_blank">下载源文件</a>
+			#if("0"==$!supplierSf.isDeal && "0"==$!supplierSf.isDelete)
+				&nbsp;&nbsp;&nbsp; <a href="javascript:void(0)" alt="$!{supplierSf.id}" supplierId="$!{supplierSf.idSupplier}" class="import">导入产品</a>
+		    #end
+		  
+		  </td>
+	  </tr>
+	  #end
+
+    </table>
+
+    <!-- 分页 -->
+<div class="pages-box" >
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/cSupplier/searchSourceFile.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+    </div>
+  </div>
+
+</div>
+
+
+	
+<div id="main">
+<div id="fullbg"></div> 
+<div id="dialog"> 
+<p class="close"><a href="#" onclick="closeBg();">关闭</a></p> 
+<div>
+
+<div id="uploadHtml" style="margin-top:50px;">
+<form id="uploadForm" name="uploadForm"  method="post" action="upLoadSourceFile.html" enctype="multipart/form-data" style="text-align:center"  >
+	<input type="file" name="sourceFile" id="sourceFile"/>
+	<input type="hidden" id="sourceFileId" name="sourceFileId"/>
+	<input type="hidden" id="supplierId" name="supplierId"/>
+	<input type="button" value="上传" id="up" onclick="upload()"/>
+	<div style="color:red;display:none" id="uploading" >上传中,请勿关闭</div>
+</form>
+ 
+</div>
+
+</div> 
+</div> 
+</div> 
+
+<script language="javascript" type="text/javascript">
+
+ //显示灰色 jQuery 遮罩层 
+function showBg() { 
+  
+$("#main").height(1800);
+var bh = $("body").height(); 
+var bw = $("body").width(); 
+$("#fullbg").css({ 
+height:bh, 
+width:bw, 
+display:"block" 
+}); 
+$("#dialog").show(); 
+} 
+//关闭灰色 jQuery 遮罩 
+function closeBg() { 
+$("#main").height(0);
+$("#fullbg,#dialog").hide(); 
+} 
+
+
+$(".import").each(function()
+{
+	$(this).click(function()
+	{
+		var  id = $(this).attr("alt");
+		var  supplierId = $(this).attr("supplierId");
+		$("#sourceFileId").val(id);
+		$("#supplierId").val(supplierId);
+		var html = $("#uploadHtml").html();
+		showBg();
+	})
+
+})
+
+
+function upload()
+{
+	var sourceFileId = $("#sourceFileId").val();
+	var supplierId = $("#supplierId").val();
+	var fileName = $("#sourceFile").val();
+	if(!fileName){alert('请选择文件'); return false}
+	if(fileName.indexOf(".xlsx") < 0){alert('请选择正确模板'); return false}
+	if(confirm("确定上传,即将往产品库到数据"))
+	{
+		showDiv();
+    	jQuery.ajaxFileUpload({  
+                url:'upLoadSourceFile.html',  
+                secureuri:false,  
+                fileElementId:'sourceFile',//file标签的id  
+                dataType: 'text/plain',//返回数据的类型  
+                data:{sourceFileId:sourceFileId,supplierId:supplierId},//一同上传的数据  
+                success: function (data, status) {
+					hideDiv();
+					data = data+"";
+    				if(data.indexOf("_ok_") > 0)
+    				{
+						$("#searchForm").submit();
+    				}
+    				else
+    				{
+    					alert("上传失败:" + data);
+    				}
+                },  
+                error: function (data, status, e) {
+					hideDiv();
+        			data = data+"";
+    				if(data.indexOf("_ok_") > 0)
+    				{
+						$("#searchForm").submit();
+    				}
+    				else
+    				{
+    					alert("上传失败:" + data);
+    				}
+                }  
+            });  
+		}
+}
+
+function showDiv()
+{
+	$("#uploading").css("display","block")
+	$("#up").attr("disabled","disabled");
+}
+function hideDiv()
+{
+	$("#uploading").css("display","none")
+	$("#up").removeAttr("disabled");
+}
+
+
+//删除文件
+function deleteSupplierFile(id)
+{
+	if(confirm("确定删除?对应的产品也会删除"))
+	{
+		 jQuery.post("deleteSourceFile.html",{id:id},function(data)
+		 {
+		 	data = data + "";
+			if("ok" == data)
+			{
+				$("#searchForm").submit();
+			}
+			else
+			{
+				alert(data);
+			}
+		 })
+	}
+
+}
+</script>

@@ -1,0 +1,7 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="r-error">
+    <h3>出错了！$!message</h3>
+</div>

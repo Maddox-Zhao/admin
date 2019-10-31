@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap >
+<typeAlias alias="shoppingRefund" type="com.huaixuan.network.biz.domain.stock.ShoppingRefund"/>
+
+<resultMap class="shoppingRefund" id="shoppingRefundResult">
+	<result column="id" property="id"/>
+	<result column="ref_num" property="refNum"/>
+	<result column="supplier_id" property="supplierId"/>
+	<result column="name" property="supplierName"/>
+	<result column="type" property="type"/>
+	<result column="ref_time" property="refTime"/>
+	<result column="status" property="status"/>
+	<result column="gmt_create" property="gmtCreate"/>
+	<result column="creater" property="creater"/>
+       <result column="dep_first_id" property="depFirstId"/>
+</resultMap>
+
+<typeAlias alias="shoppingRefundD" type="com.huaixuan.network.biz.domain.stock.ShoppingRefundDSearch"/>
+
+<resultMap class="shoppingRefundD" id="shoppingRefundDResult">
+	<result column="shopping_Num" property="shoppingNum"/>
+	<result column="id" property="id"/>
+	<result column="goods_id" property="goods_id"/>
+	<result column="amount" property="amount"/>
+	<result column="unit_price" property="unit_price"/>
+	<result column="goods_instance_id" property="goods_instance_id"/>
+	<result column="code" property="code"/>
+	<result column="way_num" property="way_num"/>
+</resultMap>
+<!-- create ShoppingRefund object -->
+
+<insert id="addShoppingRefund" parameterClass="com.huaixuan.network.biz.domain.stock.ShoppingRefund">
+<![CDATA[
+		insert into ioss_shopping_refund
+		(id,ref_num,supplier_id,type,ref_time,status,gmt_create,creater,dep_first_id )values(null,
+		#refNum#,
+		#supplierId#,
+		#type#,
+		#refTime#,
+		#status#,
+		sysdate(),
+		#creater#,
+		#depFirstId#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<update id="editShoppingRefund" parameterClass="shoppingRefund">
+<![CDATA[
+		update ioss_shopping_refund set ref_num = #refNum#,
+		supplier_id = #supplierId#,
+		type = #type#,
+		ref_time = #refTime#,
+		status = #status#,
+		gmt_create = #gmtCreate#,
+		creater = #creater#,
+		dep_first_id=#depFirstId#
+		 where id = #id#
+
+]]>
+</update>
+
+<update id="editShoppingRefundStatus" parameterClass="shoppingRefund">
+<![CDATA[
+		update ioss_shopping_refund
+		set status = #status#,
+		gmt_create = sysdate()
+		 where ref_num = #refNum#
+]]>
+</update>
+<!-- delete ShoppingRefund object -->
+<delete id="removeShoppingRefund"  parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_shopping_refund where ioss_shopping_refund.ID = #value#
+]]>
+</delete>
+<!-- search ShoppingRefund object -->
+<select id="getShoppingRefund"  parameterClass="java.lang.Long" resultMap="shoppingRefundResult">
+<![CDATA[
+		select ioss_shopping_refund.*,ioss_supplier.name from ioss_shopping_refund , ioss_supplier where ioss_shopping_refund.ID = #value#
+		 and ioss_shopping_refund.supplier_id = ioss_supplier.id
+]]>
+</select>
+<!-- searchAll ShoppingRefund List -->
+
+
+<sql id="SRlistParam">
+<isNotEmpty prepend="and" property="id">
+			id = #id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="refNum">
+			ref_num like CONCAT('%',#refNum#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="creater">
+            creater like CONCAT('%',#creater#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="refTimeStart">
+           <![CDATA[	ref_time >= STR_TO_DATE(#refTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="refTimeEnd">
+          <![CDATA[	ref_time < DATE_ADD(STR_TO_DATE(#refTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)
+ ]]>
+		</isNotEmpty>
+	    <isNotEmpty prepend="and" property="depFirstId">
+            dep_first_id = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            (DEP_FIRST_ID in(
+            	<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            	)
+            or DEP_FIRST_ID is null)
+         </isNotEmpty>
+</sql>
+
+<select id="getShoppingRefunds" resultClass="shoppingRefund" >
+<![CDATA[
+	select 	id as id,
+		ref_num as refNum, supplier_id as supplierId, type as type, ref_time as refTime, status as status,
+		gmt_create as gmtCreate,
+		creater as creater,
+		dealer as dealer,
+        dep_first_id as depFirstId
+		from
+		ioss_shopping_refund
+		where 1=1
+]]>
+<include refid="SRlistParam" />
+</select>
+
+<!-- searchAll ShoppingRefundList List -->
+<select id="getSRlists" resultMap="shoppingRefundResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select ioss_shopping_refund.*,ioss_supplier.name  from ioss_shopping_refund , ioss_supplier where 1=1
+		and ioss_shopping_refund.supplier_id = ioss_supplier.id
+]]>
+	<include refid="SRlistParam" />
+
+		order by ioss_shopping_refund.gmt_create desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+
+<select id="getSRlistCount" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from ioss_shopping_refund where 1=1
+]]>
+	<include refid="SRlistParam" />
+</select>
+
+<select id="getShoppingRefundlistCount" resultMap="shoppingRefundDResult">
+<![CDATA[
+		select distinct a.shopping_num ,
+               a.id,
+               b.goods_id,
+               b.amount,
+               b.unit_price,
+               b.goods_instance_id,
+               c.code,
+               c.way_num
+		from ioss_shopping_list a,
+		     ioss_shopping_detail b,
+		     ioss_goods_instance c
+		where  a.id = b.shopping_id and b.goods_instance_id = c.id
+]]>
+		<isNotEmpty prepend="and" property="shoppingNum">
+			shopping_Num = #shoppingNum#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="attrs">
+            attrs like CONCAT('%',#attrs#,'%')
+		</isNotEmpty>
+</select>
+</sqlMap>

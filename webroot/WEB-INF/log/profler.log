@@ -1,0 +1,33 @@
+2019-10-24 14:15:22,455 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[22] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->22]=22 100%
+2019-10-24 14:15:22,455 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[22] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->22]=22 100%
+2019-10-24 14:17:53,523 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[2785] in http://www.shangit.com:8077/login.html [returnto=] [type=zy] [userName=1000000] [password=shangshang] [loginSystem=erp] 
+Task:execute web action in:LoginAction with method:login running time(millis)[24->2235]=2211 79%
+--Task:LoginService:login running time(millis)[39->2170]=2131 76%
+----Task:AdminService:getAdminByCondition running time(millis)[39->1650]=1611 57%
+------Task:AdminDao:getAdminByCondition running time(millis)[39->1650]=1611 57%
+--------Trace:prepareStatement: select      id, user_name, password, gmt_create, gmt_modify, status, email, mobile, tel, name, dep_first_id,site,dep_code,function_role,site,higher_user_name        from emall_admin   where         emall_admin.user_name = ?
+----Task:MiniuiBaseService:getSiteByType running time(millis)[1694->1736]=42 1%
+------Task:MiniUiBaseDataDao:querySiteByType running time(millis)[1694->1736]=42 1%
+--------Trace:prepareStatement: select idSite id,name from site where type in ( 1,4 ) order by idSite
+----Task:AdminRoleService:getRoleByAdminId running time(millis)[1737->1744]=7 0%
+------Task:AdminRoleDao:getRoleByAdminId running time(millis)[1737->1744]=7 0%
+--------Trace:prepareStatement: select        admin_id, role_id         from emall_admin_role where admin_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1744->1906]=162 5%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1744->1906]=162 5%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+----Task:RoleAuthorityService:getPermissionByRoleId running time(millis)[1908->2142]=234 8%
+------Task:RoleAuthorityDao:getPermissionByRoleId running time(millis)[1908->2142]=234 8%
+--------Trace:prepareStatement: select       role_id, authority_id         from emall_role_authority where role_id = ?
+--Task:LoginLogoService:addLogin running time(millis)[2172->2235]=63 2%
+----Task:LoginLogoDao:insertlogin running time(millis)[2173->2235]=62 2%
+------Trace:prepareStatement: insert into login_logo values(null,?, sysdate(),?)
+------Trace:prepareStatement: SELECT @@IDENTITY AS ID
+Task:write output to servlet outputstream with size:0KB. running time(millis)[2785->2785]=0 0%
+2019-10-24 14:37:22,498 DEBUG [com.hundsun.network.melody.common.profiler.TimeProfiler] - TimeProfiler output:
+Entire running time(millis)=[19] in StockUpdateService:getsyncNowStockStatus
+Task:StockUpdateService:getsyncNowStockStatus running time(millis)[0->19]=19 100%

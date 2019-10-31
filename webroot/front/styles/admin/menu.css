@@ -1,0 +1,66 @@
+body {
+	background: #9DC3E7
+}
+#tabbar-div {
+	padding-left: 10px; background: #3C7DB9; padding-top: 0px; height: 21px
+}
+#tabbar-div p {
+	margin: 1px 0px 0px
+}
+.tab-front {
+	border-right: #3377B6 2px solid; padding-right: 15px; padding-left: 18px; font-weight: bold; background: #9DC3E7; padding-bottom: 4px; line-height: 20px; padding-top: 4px
+}
+.tab-back {
+	padding-right: 15px; padding-left: 18px; padding-bottom: 4px; cursor: pointer; color: #F3F8FF; line-height: 20px; padding-top: 4px
+}
+.tab-hover {
+	padding-right: 15px; padding-left: 18px; background: #2f9db5; padding-bottom: 4px; cursor: pointer; color: #F3F8FF; line-height: 20px; padding-top: 4px
+}
+#top-div {
+	padding-right: 0px; padding-left: 0px; background: #DDF0FE; padding-bottom: 2px; margin: 5px; padding-top: 3px; text-align: center
+}
+#main-div {
+	border-right: #345c65 1px solid; padding-right: 5px; border-top: #345c65 1px solid; padding-left: 5px; background: #fff; padding-bottom: 5px; margin: 5px; border-left: #345c65 1px solid; padding-top: 5px; border-bottom: #345c65 1px solid
+}
+#menu-list {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+}
+#menu-list ul {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; color: #3377B6; padding-top: 0px; list-style-type: none
+}
+#menu-list li {
+	padding-left: 16px; cursor: pointer; line-height: 16px
+}
+#main-div a:visited {
+
+}
+#menu-list a:link {
+
+}
+#menu-list a:hover {
+
+}
+#menu-list a:active {
+	color: #eb8a3d
+}
+.explode {
+	font-weight: bold; background: url(unmht:///file.5/d:/%e5%90%8e%e5%8f%b0%e5%85%b8%e5%9e%8b%e9%a1%b5%e9%9d%a2/2%e3%80%81%e5%90%8e%e5%8f%b0%e6%8e%a7%e5%88%b6%e5%8f%b0.mht/menu_minus.gif) no-repeat 0px 3px
+}
+.collapse {
+	font-weight: bold; background: url(../../images/admin/menu_plus.gif) no-repeat 0px 3px
+}
+.menu-item {
+	font-weight: normal; background: url(../../images/admin/menu_arrow.gif) no-repeat 0px 3px
+}
+#help-title {
+	padding-right: 0px; padding-left: 0px; font-size: 14px; padding-bottom: 0px; margin: 5px 0px; color: #000080; padding-top: 0px
+}
+#help-content {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+}
+.tips {
+	color: #cc0000
+}
+.link {
+	color: #000099
+}

@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="StorageSQL">
+<typeAlias alias="storage" type="com.huaixuan.network.biz.domain.storage.Storage"/>
+<typeAlias alias="outDepositoryStorage" type="com.huaixuan.network.biz.domain.storage.OutDepositoryStorage"/>
+	<resultMap id="storageResult" class="storage">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="exist_num" property="existNum"/>
+		<result column="storage_num" property="storageNum"/>
+		<result column="price" property="price"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="batch_Num" property="batchNum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+	</resultMap>
+	<resultMap id="storageResultForCheck" class="storage">
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="price" property="price" nullValue="0.00"/>
+	</resultMap>
+	<resultMap id="refundStorageResult" class="storage">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="exist_num" property="existNum"/>
+		<result column="storage_num" property="storageNum"/>
+		<result column="price" property="price"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="batch_Num" property="batchNum"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="attrs" property="attrs"/>
+		<result column="depLocationName" property="depLocationName"/>
+		<result column="depository_name" property="depositoryName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="stor_type" property="storType"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="averagePrice" property="averagePrice"/>
+	</resultMap>
+	<resultMap id="storageCheckDetail" class="storage">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="exist_num" property="existNum"/>
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="price" property="price" nullValue="0.00"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="check_num" property="checkNum"/>
+		<result column="batch_Num" property="batchNum"/>
+	</resultMap>
+	<resultMap id="storageDamagedDetail" class="storage">
+		<result column="id" property="id"/>
+		<result column="loc_id" property="locId"/>
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="price" property="price" nullValue="0.00"/>
+		<result column="batch_Num" property="batchNum"/>
+	</resultMap>
+	<resultMap id="storageSearchDetail" class="storage">
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="way_num" property="wayNum" nullValue="0"/>
+		<result column="instance_exist_num" property="instanceExistNum" nullValue="0"/>
+		<result column="average_price" property="averagePrice"/>
+		<result column="storage_cost" property="storageCost"/>
+		<result column="storage_num_sum" property="storageNumSum" nullValue="0"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_code" property="supplier_code"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="goods_id" property="goodsId"/>
+	</resultMap>
+	<resultMap id="selectStorageSearchDetail" class="storage">
+		<result column="id" property="id"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="way_num" property="wayNum" nullValue="0"/>
+		<result column="instance_exist_num" property="instanceExistNum" nullValue="0"/>
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_code" property="supplier_code"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="goods_id" property="goodsId"/>
+	</resultMap>
+	<resultMap id="storageMoveDetail" class="storage">
+		<result column="id" property="id"/>
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="instance_exist_num" property="instanceExistNum" nullValue="0"/>
+		<result column="batch_Num" property="batchNum"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="way_num" property="wayNum" nullValue="0"/>
+		<result column="loc_id" property="locId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap id="storageSearchZeroDetail" class="storage">
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="way_num" property="wayNum" nullValue="0"/>
+		<result column="instance_exist_num" property="instanceExistNum" nullValue="0"/>
+		<result column="supplier_code" property="supplier_code"/>
+	</resultMap>
+	<resultMap id="storageCostDepid" class="storage">
+		<result column="cat_code" property="catCode"/>
+		<result column="storageCost" property="storageCost" nullValue="0"/>
+	</resultMap>
+	<resultMap id="outDepositoryStorageResult" class="outDepositoryStorage">
+		<result column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="exist_num" property="existNum"/>
+		<result column="storage_num" property="storageNum"/>
+		<result column="price" property="price"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="name" property="supplierName"/>
+		<result column="loc_name" property="locName"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="dep_name" property="depName"/>
+		<result column="dep_type" property="depType"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap id="outDetailForDisResult" class="outDepositoryStorage">
+		<result column="amount" property="amount"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="loc_name" property="locName"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="dep_name" property="depName"/>
+		<result column="stor_type" property="storType"/>
+	</resultMap>
+	<resultMap id="storageResultOnce" class="storage">
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="storage_num" property="storageNum"/>
+		<result column="price" property="price"/>
+		<result column="supplier_id" property="supplierId"/>
+	</resultMap>
+	<resultMap id="storageResultWithTrade" class="storage">
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="id" property="depId"/>
+		<result column="storage_num_sum" property="storageNumSum"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap id="stockAgeSearchDetail" class="storage">
+        <result column="code" property="code"/>
+        <result column="id" property="id"/>
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+		<result column="goods_unit" property="goodsUnit"/>
+		<result column="way_num" property="wayNum" nullValue="0"/>
+		<result column="instance_exist_num" property="instanceExistNum" nullValue="0"/>
+		<result column="average_price" property="averagePrice"/>
+		<result column="storage_cost" property="storageCost"/>
+		<result column="storage_num_sum" property="storageNumSum" nullValue="0"/>
+	    <result column="batch_Num" property="batchNum"/>
+	    <result column="supplier_id" property="supplierId"/>
+	    <result column="loc_id" property="locId"/>
+	</resultMap>
+	<resultMap id="stockAmountSearchDetail" class="storage">
+	    <result column="storage_cost" property="storageCost" nullValue="0"/>
+	    <result column="storage_num_sum" property="storageNumSum" nullValue="0"/>
+	</resultMap>
+	<resultMap id="stockGoodsInstanceIds" class="storage">
+	    <result column="goods_instance_id" property="goodsInstanceId"/>
+	</resultMap>
+	<!-- create Storage object -->
+	<insert id="addStorage" parameterClass="storage">
+		insert into ioss_storage
+  (id,
+   goods_id,
+   loc_id,
+   goods_instance_id,
+   exist_num,
+   storage_num,
+   price,
+   supplier_id,
+   gmt_create,
+   gmt_modify,
+   batch_Num,
+   dep_first_id,
+   stor_type,
+   <isNotEmpty prepend="" property="isWholesale">
+   is_wholesale,
+   </isNotEmpty>
+   tid)
+values
+  (null,
+   #goodsId#,
+   #locId#,
+   #goodsInstanceId#,
+   #existNum#,
+   #storageNum#,
+   #price#,
+   #supplierId#,
+   sysdate(),
+   sysdate(),
+   #batchNum#,
+   #depFirstId#,
+   #storType#,
+   <isNotEmpty prepend="" property="isWholesale">
+   		#isWholesale#,
+   </isNotEmpty>
+   #tid#)
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<!-- update Storage object -->
+	<update id="editStorage" parameterClass="storage">
+		<![CDATA[
+		update ioss_storage set goods_id = #goodsId#,
+		loc_id = #locId#,
+		goods_instance_id = #goodsInstanceId#,
+		exist_num = #existNum#,
+		storage_num = #storageNum#,
+		price = #price#,
+		supplier_id = #supplierId#,
+		gmt_modify = sysdate(),
+	batch_Num=#batchNum#
+		 where id = #id#
+
+		]]>
+	</update>
+	<!-- delete Storage object -->
+	<delete id="removeStorage" parameterClass="java.lang.Long">
+		<![CDATA[
+		delete from ioss_storage where ioss_storage.ID = #value#
+		]]>
+	</delete>
+	<!-- search Storage object -->
+	<select id="getStorage" parameterClass="java.lang.Long" resultMap="storageResult">
+		<![CDATA[
+		select ioss_storage.* from ioss_storage where ioss_storage.ID = #value#
+		]]>
+	</select>
+
+	<select id="getStorageByMap" parameterClass="java.util.Map" resultMap="storageResult">
+		<![CDATA[
+		select ioss_storage.*
+	    from ioss_storage
+	    where batch_Num = #batchNum#
+			AND supplier_id = #supplierId#
+			AND goods_instance_id = #goodsInstanceId#
+			AND loc_id = #locId#
+			LIMIT 1
+		]]>
+	</select>
+	<!-- modified by chenhang 2010/11/17 started -->
+
+	<select id="getStorageListsByMap" parameterClass="java.util.Map" resultMap="storageDamagedDetail">
+		<![CDATA[
+		select a.id,a.loc_id,a.storage_num,a.supplier_id,a.price,a.batch_Num,
+			  (select s.name from ioss_supplier s where s.id=a.supplier_id) as supplier_name
+	    from ioss_storage a
+	    where a.storage_num > 0
+		]]>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			 a.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId">
+       		a.dep_first_id = #depfirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId">
+			 a.loc_id in (select d.id from ioss_dep_location d,ioss_depository c where c.id = d.dep_id and c.type!='defect_dep' and d.dep_id=#depId#)
+		</isNotEmpty>
+	</select>
+	<!-- searchAll Storage List -->
+	<select id="getStorages" resultMap="storageResult">
+		<![CDATA[
+		select ioss_storage.* from ioss_storage
+		]]>
+	</select>
+	<!-- modified by chenhang 2010/11/17 ended -->
+
+
+	<select id="getZeroStorageByParameterMap" resultMap="refundStorageResult">
+		<![CDATA[
+    select gi.code,
+           gi.instance_name,
+           gi.cat_code,
+           gi.attrs,
+           gi.goods_unit,
+           b.loc_name as depLocationName,
+           t.name as depository_name,
+           0 as averagePrice,
+           (select s.name from ioss_supplier s where s.id = st.supplier_id) as supplier_name,
+           st.*
+      from ioss_storage st, ioss_goods_instance gi, ioss_depository t, ioss_dep_location b
+      where st.storage_num <= 0
+         and st.goods_instance_id = gi.id
+         and b.id = st.loc_id
+         and b.dep_id = t.id
+         and t.type != 'out_borrow_dep'
+		]]>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId"> st.goods_instance_id = #goodsInstanceId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id = #locId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depFirstId"> st.dep_first_id = #depFirstId#</isNotEmpty>
+		order by st.gmt_create desc
+	</select>
+
+	<select id="getStorageByParameterMap" resultMap="storageResult">
+		<![CDATA[
+		select ioss_storage.* from ioss_storage where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="locId">
+			loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			supplier_id = #supplierId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="batchNum">
+			batch_Num=#batchNum#
+		</isNotEmpty>
+		order by gmt_create desc
+	</select>
+	<select id="getStorageAndCheckDetailByParameterMap" resultMap="storageCheckDetail">
+		<![CDATA[
+		select ioss_storage.*,ioss_storage_check_detail.check_num
+		  from ioss_storage  LEFT    JOIN ioss_storage_check_detail
+		  on  ioss_storage.id=ioss_storage_check_detail.stor_id where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="locId">
+			ioss_storage.loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			ioss_storage.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId">
+			ioss_storage.supplier_id = #supplierId#
+		</isNotEmpty>
+		order by ioss_storage.gmt_create desc
+	</select>
+	<select id="sumStorageByParameterMap" resultClass="java.lang.Integer">
+		<![CDATA[
+		select sum(ioss_storage.storage_num) from ioss_storage where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="locId">
+			loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+	</select>
+
+	<select id="sumStorageResultForCheck" resultMap="storageResultForCheck">
+	<![CDATA[
+	select storage_num,totalPrice/storage_num as price from (
+
+		select sum(ioss_storage.storage_num) as storage_num,
+       sum(ioss_storage.storage_num * ioss_storage.price) as totalPrice
+       from ioss_storage
+        where 1 = 1
+       ]]>
+		<isNotEmpty prepend="and" property="locId">
+			loc_id = #locId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+			goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		<![CDATA[
+		)t where storage_num>0
+		]]>
+	</select>
+
+
+	<select id="getStoragesByCondition" parameterClass="java.util.Map" resultMap="storageSearchDetail">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+    select gi.code,
+       gi.instance_name,
+       gi.cat_code,
+       gi.attrs,
+       gi.goods_unit,
+       gi.way_num,
+       gi.exist_num as instance_exist_num,
+       st.supplier_id,
+       (select t.supplier_code from ioss_goods_instance_supplier t where t.supplier_id = st.supplier_id and t.goods_instance_id = st.goods_instance_id) as supplier_code,
+       st.loc_id,
+       st.dep_first_id,
+       st.goods_instance_id,
+       st.stor_type,
+       sum(st.storage_num) as storage_num_sum,
+       sum(st.price * st.storage_num) / sum(st.storage_num) as average_price,
+       sum(st.price * st.storage_num) as storage_cost,
+       st.goods_id
+     from  ioss_storage        st,
+           ioss_goods_instance gi
+     where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+       group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.supplier_id,st.loc_id,st.goods_instance_id,st.dep_first_id,st.stor_type,st.goods_id
+        HAVING sum(st.storage_num) > 0
+		<isNotEmpty prepend="" property="orderBy">
+		   $orderBy$
+		</isNotEmpty>
+		<isEmpty prepend="" property="orderBy">
+		   order by gi.code
+		</isEmpty>
+		<include refid="pageSQLFoot"/>
+	</select>
+	<select id="getStoragesByConditionCount" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+      select count(1) from
+		( select gi.code,
+             gi.instance_name,
+             gi.cat_code,
+             gi.attrs,
+             gi.goods_unit,
+             gi.way_num,
+             gi.exist_num as instance_exist_num,
+             st.supplier_id,
+             st.loc_id,
+             st.dep_first_id,
+             st.goods_instance_id,
+             st.stor_type,
+             sum(st.storage_num) as storage_num_sum,
+             sum(st.price * st.storage_num) / sum(st.storage_num) as average_price,
+             sum(st.price * st.storage_num) as storage_cost,
+             st.goods_id
+          from ioss_storage        st,
+             ioss_goods_instance gi
+          where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+       group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.supplier_id,st.loc_id,st.goods_instance_id,st.dep_first_id,st.stor_type,st.goods_id
+       HAVING sum(st.storage_num) > 0
+		) aa
+	</select>
+
+	<select id="getStorageListByMap" parameterClass="java.util.Map" resultMap="selectStorageSearchDetail">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+    select gi.code,
+       gi.instance_name,
+       gi.cat_code,
+       gi.attrs,
+       gi.goods_unit,
+       gi.way_num,
+       gi.exist_num as instance_exist_num,
+       st.supplier_id,
+       (select t.supplier_code from ioss_goods_instance_supplier t where t.supplier_id = st.supplier_id and t.goods_instance_id = st.goods_instance_id) as supplier_code,
+       st.loc_id,
+       st.id,
+       st.dep_first_id,
+       st.goods_instance_id,
+       st.stor_type,
+       st.storage_num,
+       st.goods_id
+     from  ioss_storage        st,
+           ioss_goods_instance gi
+     where st.goods_instance_id = gi.id and st.storage_num > 0
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+			<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+			<isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+
+		<isNotEmpty prepend="" property="orderBy">
+		   $orderBy$
+		</isNotEmpty>
+		<isEmpty prepend="" property="orderBy">
+		   order by gi.code
+		</isEmpty>
+		<include refid="pageSQLFoot"/>
+	</select>
+	<select id="getStoragesByMapCount" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+      select count(1) from
+		( select gi.code,
+             gi.instance_name,
+             gi.cat_code,
+             gi.attrs,
+             gi.goods_unit,
+             gi.way_num,
+             gi.exist_num as instance_exist_num,
+             st.supplier_id,
+             st.loc_id,
+             st.dep_first_id,
+             st.goods_instance_id,
+             st.stor_type,
+             st.storage_num,
+             st.goods_id
+          from ioss_storage        st,
+             ioss_goods_instance gi
+          where st.goods_instance_id = gi.id and st.storage_num > 0
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+	    	<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+		) aa
+	</select>
+
+
+
+	<update id="editStorageExistNum" parameterClass="storage">
+		<![CDATA[
+		UPDATE ioss_storage
+		SET gmt_modify = sysdate(), storage_num =  IFNULL(storage_num, 0)+ #storageNum#
+		WHERE loc_id = #locId#
+		AND goods_instance_id = #goodsInstanceId#
+		AND supplier_id = #supplierId#
+		AND batch_num = #batchNum#
+		LIMIT 1
+		]]>
+	</update>
+	<select id="getOutStorageList" parameterClass="java.util.Map" resultMap="outDepositoryStorageResult">
+		<![CDATA[
+			select a.*,b.name as dep_name,b.type as dep_type
+				from (SELECT ise.*, isr.name,idl.loc_name,idl.dep_id
+				FROM   ioss_storage ise,ioss_supplier isr,ioss_dep_location idl
+				WHERE  ise.goods_instance_id = #goodsInstanceId#
+				AND    ise.storage_num > 0
+				AND    ise.supplier_id = isr.id
+				AND    ise.loc_id = idl.id
+				AND    idl.is_check = 'N'
+				AND    idl.id in (select tt.id
+                                         from ioss_depository t,ioss_dep_location tt
+                                         where t.id=tt.dep_id
+                                         and t.type='common_dep')
+		]]>
+		<isNotNull prepend="and" property="supplierId"> ise.supplier_id = #supplierId#</isNotNull>
+		<isNotEmpty prepend="and" property="depFirstId">
+		  ise.dep_first_id=#depFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="batchNums">
+			ise.batch_Num in(
+			<iterate property="batchNums" conjunction=",">#batchNums[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isWholesale">
+			<isEqual property="isWholesale" compareValue="n">
+				(ise.is_wholesale = #isWholesale# or ise.is_wholesale is null)
+			</isEqual>
+			<isEqual property="isWholesale" compareValue="w">
+				ise.is_wholesale = #isWholesale#
+				and (ise.tid = #tid# or ise.tid is null)
+			</isEqual>
+		</isNotEmpty>
+		     )a left join ioss_depository b on (a.dep_id = b.id and a.loc_id is not null)
+			ORDER BY a.gmt_create ASC,a.id asc
+	</select>
+	<update id="updateStorageStorageNumById" parameterClass="java.util.Map">
+		<![CDATA[
+		UPDATE ioss_storage
+		SET gmt_modify = sysdate(), storage_num =  IFNULL(storage_num, 0)+ #storageNum#
+		WHERE id = #id#
+		]]>
+	</update>
+	<update id="updateStorageStoNumByMap" parameterClass="java.util.Map">
+		<![CDATA[
+		UPDATE ioss_storage
+		SET gmt_modify = sysdate(), storage_num =  IFNULL(storage_num, 0)+ #storageNum#
+		WHERE batch_Num = #batchNum#
+			AND supplier_id = #supplierId#
+			AND goods_instance_id = #goodsInstanceId#
+			AND loc_id = #locId#
+			LIMIT 1
+		]]>
+	</update>
+	<select id="getGoodsInstanceIdsByLocId" parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		<![CDATA[
+		select ioss_storage.goods_instance_id
+	    from ioss_storage
+	    where loc_id = #value# group by goods_instance_id
+		]]>
+	</select>
+
+	<select id="listOutDetailForDisByDetailId" parameterClass="java.lang.Long" resultMap="outDetailForDisResult">
+	SELECT a.amount,b.batch_num,c.loc_name,d.name as dep_name,e.name as supplier_name,b.STOR_TYPE
+      FROM ioss_prod_relation_out a, ioss_storage b ,ioss_dep_location c,ioss_depository d,ioss_supplier e
+      WHERE out_detail_id=#outDetailId#
+      AND a.storage_id = b.id
+      AND b.loc_id = c.id
+      AND c.dep_id = d.id
+      AND b.supplier_id = e.id
+    </select>
+
+	<select id="sumStorageCostByDepid" parameterClass="java.lang.Long" resultMap="storageCostDepid">
+	select ioss_goods_instance.cat_code as cat_code,
+       sum(ioss_storage.price * ioss_storage.storage_num) as storageCost
+  from ioss_storage, ioss_goods_instance
+ where ioss_storage.loc_id in
+       (select ioss_dep_location.id
+          from ioss_dep_location
+         where ioss_dep_location.dep_id = #depId#)
+   and ioss_goods_instance.id = ioss_storage.goods_instance_id
+ group by ioss_goods_instance.cat_code
+ </select>
+
+	<select id="getDataForStorageOnce" resultMap="storageResultOnce">
+	select a.goods_id,
+       a.id as goods_instance_id,
+       a.exist_num as storage_num,
+       b.consult_price as price,
+       b.supplier_id
+  from ioss_goods_instance a
+  left join ioss_goods_instance_supplier b on a.id = b.goods_instance_id
+ where b.id is not null
+	</select>
+	<select id="getStorageByGoodsInstanceId" parameterClass="java.lang.Long" resultMap="storageResult">
+		select * from ioss_storage where goods_instance_id=#goodsInstanceId#
+	</select>
+
+	<select id="searchZeroStock" resultMap="storageSearchZeroDetail" parameterClass="java.util.Map">
+	<include refid="pageSQLHead"/>
+		<![CDATA[
+          select
+              gi.code,
+              max(gi.instance_name) as instance_name,
+              max(gi.id) as goods_instance_id,
+              max(gi.cat_code) as cat_code,
+              max(gi.attrs) as attrs,
+              max(gi.goods_unit) as goods_unit,
+              max(gi.way_num) as way_num,
+              max(gi.exist_num) as instance_exist_num,
+              max(cc.gmt_modify) as gmt_modify,
+              max(igis.supplier_code) as supplier_code
+         from (
+              select
+                 st.goods_instance_id,
+                 max(st.gmt_modify) as gmt_modify,
+                 max(st.loc_id) as loc_id
+              from ioss_storage st
+              group by st.goods_instance_id
+              HAVING sum(st.storage_num) = 0
+              ) cc,
+            ioss_goods_instance gi,
+            ioss_goods_instance_supplier igis
+         where cc.goods_instance_id = gi.id and gi.id = igis.goods_instance_id
+	 ]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodStatus"> gi.goods_id in(select eg.id from emall_goods eg where eg.goods_status  = #goodStatus#)</isNotEmpty>
+		  group by gi.code
+          order by gmt_modify desc, gi.code desc
+         <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="searchZeroStockCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		<![CDATA[
+	   select count(1) from
+		 (select
+              gi.code,
+              max(gi.instance_name) as instance_name,
+              max(gi.id) as goods_instance_id,
+              max(gi.cat_code) as cat_code,
+              max(gi.attrs) as attrs,
+              max(gi.goods_unit) as goods_unit,
+              max(gi.way_num) as way_num,
+              max(gi.exist_num) as instance_exist_num,
+              max(cc.gmt_modify) as gmt_modify,
+              max(igis.supplier_code) as supplier_code
+         from (
+              select
+                 st.goods_instance_id,
+                 max(st.gmt_modify) as gmt_modify,
+                 max(st.loc_id) as loc_id
+              from ioss_storage st
+              group by st.goods_instance_id
+              HAVING sum(st.storage_num) = 0
+              ) cc,
+            ioss_goods_instance gi,
+            ioss_goods_instance_supplier igis
+         where cc.goods_instance_id = gi.id and gi.id = igis.goods_instance_id
+	 ]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodStatus"> gi.goods_id in(select eg.id from emall_goods eg where eg.goods_status  = #goodStatus#)</isNotEmpty>
+		  group by gi.code
+		) aa
+	</select>
+
+	<select id="getStoragesCountWithMove" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+      select count(1) from
+		( select gi.code,
+             gi.instance_name,
+             gi.cat_code,
+             gi.attrs,
+             gi.goods_unit,
+             gi.way_num,
+             gi.exist_num as instance_exist_num,
+             st.storage_num,
+             st.id,
+             st.batch_Num,
+             st.supplier_id,
+             st.loc_id,
+             st.dep_first_id,
+             st.stor_type
+          from ioss_storage        st,
+               ioss_goods_instance gi
+         where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="storageids">
+			st.id in(
+			<iterate property="storageids" conjunction=",">#storageids[]#</iterate>
+			)
+		</isNotEmpty>
+		group by gi.code,gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.storage_num,st.id,st.batch_Num,st.supplier_id,st.loc_id,st.dep_first_id,st.stor_type
+         HAVING st.storage_num > 0
+		) aa
+	</select>
+
+	<select id="getStoragesWithMove" resultMap="storageMoveDetail">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+		select gi.code,
+             gi.instance_name,
+             gi.cat_code,
+             gi.attrs,
+             gi.goods_unit,
+             gi.way_num,
+             gi.exist_num as instance_exist_num,
+             st.storage_num,
+             st.id,
+             st.batch_Num,
+             st.supplier_id,
+             st.loc_id,
+             st.dep_first_id,
+             st.stor_type
+          from ioss_storage        st,
+               ioss_goods_instance gi
+         where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code  like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="storageids">
+			st.id in(
+			<iterate property="storageids" conjunction=",">#storageids[]#</iterate>
+			)
+		</isNotEmpty>
+		group by gi.code,gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.storage_num,st.id,st.batch_Num,st.supplier_id,st.loc_id,st.dep_first_id,st.stor_type
+         HAVING st.storage_num > 0
+         order by st.id
+         <include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getStorageByIds" resultMap="storageResult" parameterClass="java.util.Map">
+		<![CDATA[
+    select ioss_storage.* from ioss_storage where 1=1
+		]]>
+		<isNotEmpty prepend="and" property="ids">
+			id in(
+			<iterate property="ids" conjunction=",">#ids[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="id"> id = #id#</isNotEmpty>
+	</select>
+	<select id="getStorageWithTrade" parameterClass="java.util.Map" resultMap="storageResultWithTrade">
+		select a.goods_instance_id,
+		       b.id,
+		       b.dep_first_id,
+		       sum(a.storage_num) as storage_num_sum
+		  from ioss_storage a, ioss_depository b, ioss_dep_location c
+		 where a.loc_id = c.id
+		   and c.dep_id = b.id
+		<isNotEmpty prepend="and" property="goodsInstanceId">
+		       a.goods_instance_id = #goodsInstanceId#
+		</isNotEmpty>
+		 group by goods_instance_id, b.id, b.dep_first_id
+      <isNotEqual compareValue="true" property="showAllStorageNum">
+        having sum(a.storage_num) > 0
+      </isNotEqual>
+	</select>
+
+	<select id="getStoragesCountWithAll" resultClass="int">
+		<![CDATA[
+      select count(1) from
+		( select gi.code,
+               gi.instance_name,
+               gi.cat_code,
+               gi.attrs,
+               gi.goods_unit,
+               gi.way_num,
+               gi.exist_num as instance_exist_num,
+               st.id,
+               st.batch_Num,
+               st.supplier_id,
+               st.loc_id,
+               st.dep_first_id,
+               st.stor_type
+          from ioss_storage        st,
+               ioss_goods_instance gi
+         where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId"> st.goods_instance_id = #goodsInstanceId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="storageids">
+			st.id in(
+			<iterate property="storageids" conjunction=",">#storageids[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		) aa
+	</select>
+
+	<select id="getStoragesWithAll" resultMap="storageMoveDetail">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+		select gi.code,
+               gi.instance_name,
+               gi.cat_code,
+               gi.attrs,
+               gi.goods_unit,
+               gi.way_num,
+               gi.exist_num as instance_exist_num,
+               st.storage_num,
+               st.id,
+               st.batch_Num,
+               st.supplier_id,
+               st.loc_id,
+               st.dep_first_id,
+               st.stor_type
+          from ioss_storage        st,
+               ioss_goods_instance gi
+         where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId"> st.goods_instance_id = #goodsInstanceId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="storageids">
+			st.id in(
+			<iterate property="storageids" conjunction=",">#storageids[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		order by st.id
+		<include refid="pageSQLFoot"/>
+	</select>
+
+
+	<select id="getRefundStoragesByMap" parameterClass="java.util.Map" resultMap="refundStorageResult">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+		select gi.code,
+		       gi.instance_name,
+		       gi.cat_code,
+		       gi.attrs,
+		       gi.goods_unit,
+		       #averagePrice# as averagePrice,
+		       (select b.loc_name from ioss_dep_location b where b.id = st.loc_id) as depLocationName,
+		       (select t.name
+		          from ioss_depository t
+		         where t.id = (select b.dep_id
+		                         from ioss_dep_location b
+		                        where b.id = st.loc_id)) as depository_name,
+		       (select s.name from ioss_supplier s where s.id = st.supplier_id) as supplier_name,
+		       st.*
+		  from ioss_storage st, ioss_goods_instance gi
+		 where st.storage_num > 0
+		   and st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId"> st.goods_instance_id = #goodsInstanceId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id = #locId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="ids">
+			st.goods_instance_id in(
+			<iterate property="ids" conjunction=",">#ids[]#</iterate>
+			)
+		</isNotEmpty>
+		order by st.gmt_create desc
+		<include refid="pageSQLFoot"/>
+	</select>
+	<select id="getRefundStoragesCountByMap" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+      select count(1)
+		from ioss_storage st,ioss_goods_instance gi
+		where st.storage_num > 0 and st.goods_instance_id=gi.id
+		]]>
+		<isNotEmpty prepend="and" property="supplierId"> st.supplier_id = #supplierId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id = #locId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsInstanceId"> st.goods_instance_id = #goodsInstanceId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="ids">
+			st.id in(
+			<iterate property="ids" conjunction=",">#ids[]#</iterate>
+			)
+		</isNotEmpty>
+	</select>
+	<select id="sumStorageByGoodsInstanceId" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		<![CDATA[
+		select IFNULL(sum(ioss_storage.storage_num),0) from ioss_storage
+		where goods_instance_id = #goodsInstanceId#
+		]]>
+		<isNotEmpty prepend="and" property="depFirstId"> DEP_FIRST_ID = #depFirstId#</isNotEmpty>
+	</select>
+	<select id="sumExistNumByGoodsInstanceId" parameterClass="java.util.Map" resultClass="java.lang.Long">
+		<![CDATA[
+		select IFNULL(sum(t.goods_number),0) from emall_available_stock t
+		where goods_instance_id = #goodsInstanceId#
+		]]>
+		<isNotEmpty prepend="and" property="depFirstId"> DEP_FIRST_ID = #depFirstId#</isNotEmpty>
+	</select>
+	<select id="getStockAgeByCondition" parameterClass="java.util.Map" resultMap="stockAgeSearchDetail">
+		<include refid="pageSQLHead"/>
+		<![CDATA[
+		select gi.code,
+            gi.instance_name,
+            gi.cat_code,
+            gi.attrs,
+            gi.goods_unit,
+            gi.way_num,
+            gi.exist_num as instance_exist_num,
+            st.id,
+            st.storage_num,
+            st.batch_num,
+            st.supplier_id,
+            st.loc_id,
+            sum(st.storage_num) as storage_num_sum,
+            sum(st.price * st.storage_num) / sum(st.storage_num) as average_price,
+            sum(st.price * st.storage_num) as storage_cost
+      from ioss_storage        st,
+           ioss_goods_instance gi
+     where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="id"> st.id = #id#</isNotEmpty>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+        <isNotEmpty prepend="and" property="batchNum"> st.batch_Num like concat('%',#batchNum#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="stockAge">
+            exists (select 1 from(
+                    select iiod.goods_instance_id from ioss_in_depository iid,ioss_in_detail iiod
+                    where iiod.in_depository_id = iid.id and iid.status = 'in_finished'
+                    and not exists (select 1 from(
+                            select iood.goods_instance_id from ioss_out_depository iod,ioss_out_detail iood
+                            where iood.out_depository_id = iod.id and iod.status = 'out_finished' and iod.type = 'out_sales'
+                        )b
+                       where b.goods_instance_id = iiod.goods_instance_id
+                      )
+                      <isNotEmpty prepend="and" property="ageDateStart">
+                          <![CDATA[ iid.gmt_in_dep >= STR_TO_DATE(#ageDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+                      </isNotEmpty>
+                      <isNotEmpty prepend="and" property="ageDateEnd">
+                          <![CDATA[ iid.gmt_in_dep < DATE_ADD(STR_TO_DATE(#ageDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+                      </isNotEmpty>
+                   )a
+                   where a.goods_instance_id = st.goods_instance_id
+                )
+		</isNotEmpty>
+     group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.id,st.storage_num,st.batch_num,st.supplier_id,st.loc_id
+     HAVING sum(st.storage_num) > 0
+		<isNotEmpty prepend="" property="orderBy">
+		   $orderBy$
+		</isNotEmpty>
+		<isEmpty prepend="" property="orderBy">
+		   order by gi.code
+		</isEmpty>
+		<include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getStockAgeByConditionCount" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+      select count(1) from
+		( select gi.code,
+            gi.instance_name,
+            gi.cat_code,
+            gi.attrs,
+            gi.goods_unit,
+            gi.way_num,
+            gi.exist_num as instance_exist_num,
+            st.id,
+            st.storage_num,
+            st.batch_num,
+            st.supplier_id,
+            st.loc_id,
+            sum(st.storage_num) as storage_num_sum,
+            sum(st.price * st.storage_num) / sum(st.storage_num) as average_price,
+            sum(st.price * st.storage_num) as storage_cost
+      from ioss_storage        st,
+           ioss_goods_instance gi
+     where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+       	<isNotEmpty prepend="and" property="batchNum"> st.batch_Num like concat('%',#batchNum#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="stockAge">
+            exists (select 1 from(
+                    select iiod.goods_instance_id from ioss_in_depository iid,ioss_in_detail iiod
+                    where iiod.in_depository_id = iid.id and iid.status = 'in_finished'
+                     and not exists (select 1 from(
+                            select iood.goods_instance_id from ioss_out_depository iod,ioss_out_detail iood
+                            where iood.out_depository_id = iod.id and iod.status = 'out_finished' and iod.type = 'out_sales'
+                        )b
+                       where b.goods_instance_id = iiod.goods_instance_id
+                      )
+                      <isNotEmpty prepend="and" property="ageDateStart">
+                          <![CDATA[ iid.gmt_in_dep >= STR_TO_DATE(#ageDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+                      </isNotEmpty>
+                      <isNotEmpty prepend="and" property="ageDateEnd">
+                          <![CDATA[ iid.gmt_in_dep < DATE_ADD(STR_TO_DATE(#ageDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+                      </isNotEmpty>
+                   )a
+                   where a.goods_instance_id = st.goods_instance_id
+                )
+		</isNotEmpty>
+     group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.id,st.storage_num,st.batch_num,st.supplier_id,st.loc_id
+     HAVING sum(st.storage_num) > 0
+		) aa
+	</select>
+
+
+	<select id="getStoragePriceById" parameterClass="java.lang.Long" resultClass="java.lang.Double" >
+	       select max(i.price)
+	       from ioss_storage i,emall_goods eg,ioss_goods_instance io,emall_order eo
+	       where eo.id=#id# and eo.goods_id=eg.id and eg.id=io.goods_id and io.id=i.goods_instance_id
+	</select>
+
+
+	<select id="getStorageAmountByCondition" parameterClass="java.util.Map" resultMap="stockAmountSearchDetail">
+		<![CDATA[
+        select sum(aa.storage_num_sum) as storage_num_sum,
+        	   sum(aa.storage_cost) as storage_cost
+       	from (
+    select gi.code,
+       gi.instance_name,
+       gi.cat_code,
+       gi.attrs,
+       gi.goods_unit,
+       gi.way_num,
+       gi.exist_num as instance_exist_num,
+       st.supplier_id,
+       (select t.supplier_code from ioss_goods_instance_supplier t where t.supplier_id = st.supplier_id and t.goods_instance_id = st.goods_instance_id) as supplier_code,
+       st.loc_id,
+       st.dep_first_id,
+       st.goods_instance_id,
+       st.stor_type,
+       sum(st.storage_num) as storage_num_sum,
+       sum(st.price * st.storage_num) / sum(st.storage_num) as average_price,
+       sum(st.price * st.storage_num) as storage_cost,
+       st.goods_id
+     from  ioss_storage        st,
+           ioss_goods_instance gi
+     where st.goods_instance_id = gi.id
+		]]>
+		<isNotEmpty prepend="and" property="instanceName"> gi.instance_name like concat('%',#instanceName#,'%')</isNotEmpty>
+		<isNotEmpty prepend="and" property="code"> gi.code like concat('%',#code#,'%')</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionOne">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode"> gi.cat_code like concat(#twoCatCode#,'%')</isNotEmpty>
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="conditionTwo">
+		    <isNotEmpty prepend="and" property="catCode"> gi.cat_code like concat(#catCode#,'%')</isNotEmpty>
+		    <isNotEmpty prepend="and" property="twoCatCode">
+		       exists (select 1 from(
+                    select ec.cat_code from emall_category ec
+                     where  ec.parent_code like concat(#twoCatCode#,'%')
+                   )a
+                  where a.cat_code = gi.cat_code
+                )
+		   </isNotEmpty>
+		</isNotEmpty>
+ 		<isNotEmpty prepend="and" property="depfirstIds">
+			st.dep_first_id in(
+			<iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="depfirstId"> st.dep_first_id = #depfirstId#</isNotEmpty>
+		<isNotEmpty prepend="and" property="storType"> st.stor_type = #storType#</isNotEmpty>
+		<isNotEmpty prepend="and" property="depId"> st.loc_id in(select b.id from ioss_dep_location b where b.dep_id = #depId#)</isNotEmpty>
+		<isNotEmpty prepend="and" property="locId"> st.loc_id in(select b.id from ioss_dep_location b where b.id = #locId#)</isNotEmpty>
+	    <isNotEmpty prepend="and" property="supplierName"> st.supplier_id in(select s.id from ioss_supplier s where s.name like concat('%',#supplierName#,'%'))</isNotEmpty>
+		<isNotEmpty prepend="and" property="stockAge">
+            exists (select 1 from(
+                    select iiod.goods_instance_id from ioss_in_depository iid,ioss_in_detail iiod
+                    where iiod.in_depository_id = iid.id and iid.status = 'in_finished'
+                    and not exists (select 1 from(
+                            select iood.goods_instance_id from ioss_out_depository iod,ioss_out_detail iood
+                            where iood.out_depository_id = iod.id and iod.status = 'out_finished' and iod.type = 'out_sales'
+                        )b
+                       where b.goods_instance_id = iiod.goods_instance_id
+                      )
+                      <isNotEmpty prepend="and" property="ageDateStart">
+                          <![CDATA[ iid.gmt_in_dep >=  STR_TO_DATE(#ageDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+                      </isNotEmpty>
+                      <isNotEmpty prepend="and" property="ageDateEnd">
+                          <![CDATA[ iid.gmt_in_dep < DATE_ADD(STR_TO_DATE(#ageDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+                      </isNotEmpty>
+                   )a
+                   where a.goods_instance_id = st.goods_instance_id
+                )
+		</isNotEmpty>
+       group by gi.code, gi.instance_name,gi.cat_code,gi.attrs,gi.goods_unit,gi.way_num,gi.exist_num,st.supplier_id,st.loc_id,st.goods_instance_id,st.dep_first_id,st.stor_type,st.goods_id
+        HAVING sum(st.storage_num) > 0
+		)aa
+	</select>
+
+	<select id="getStockGoodsInstanceIds" resultMap="stockGoodsInstanceIds">
+          select goods_instance_id from ioss_storage where storage_num >0 group by goods_instance_id
+	</select>
+
+<select id="getStorageNumBySend" resultClass="java.lang.Integer">
+<![CDATA[
+       select coalesce(sum(ioss_storage.storage_num), 0) from ioss_storage where 1=1
+]]>
+<isNotEmpty prepend="and" property="goodsInstanceId">
+       ioss_storage.goods_instance_id = #goodsInstanceId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="depfirstId">
+       ioss_storage.dep_first_id = #depfirstId#
+</isNotEmpty>
+</select>
+
+<select id="getLeftStorageNumWithLoc" parameterClass="java.util.Map" resultClass="java.lang.Long" >
+  <![CDATA[
+       select sum(st.storage_num) from ioss_storage st where 1=1
+  ]]>
+  <isNotEmpty prepend="and" property="depfirstId"> 
+    st.dep_first_id = #depfirstId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodsInstanceId"> 
+    st.goods_instance_id = #goodsInstanceId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="goodsId"> 
+    st.goods_id = #goodsId#
+  </isNotEmpty>
+  <isNotEmpty prepend="and" property="locIds">
+      st.loc_id in(
+        <iterate property="locIds" conjunction=",">#locIds[]#</iterate>
+      )
+  </isNotEmpty>
+</select>
+</sqlMap>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AccountTransLogSQL">
+
+	<typeAlias alias="transApp" type="com.huaixuan.network.biz.domain.counter.TransApp"/>
+	<typeAlias alias="transLogApp" type="com.huaixuan.network.biz.domain.TransLogApp"/>
+	<typeAlias alias="accountTransLog" type="com.hundsun.itrans.domain.base.TransLogDO"/>
+
+	<resultMap class="accountTransLog" id="accountTransLogResult">
+		<result column="ID" property="id"/>
+		<result column="TRANS_DATE" property="transDate"/>
+		<result column="OUT_DATE" property="outDate"/>
+		<result column="TRANS_DT" property="transDt"/>
+		<result column="TRANS_CODE" property="transCode"/>
+		<result column="SUB_TRANS_CODE" property="subTransCode"/>
+		<result column="TRANS_AMOUNT" property="transAmount"/>
+		<result column="ACCOUNT_OUT_TYPE" property="accountOutType"/>
+		<result column="TRANS_ACCOUNT_OUT" property="transAccountOut"/>
+		<result column="ACCOUNT_IN_TYPE" property="accountInType"/>
+		<result column="TRANS_ACCOUNT_IN" property="transAccountIn"/>
+		<result column="TRANS_OPERATOR" property="transOperator"/>
+		<result column="TRANS_TERMINAL" property="transTerminal"/>
+		<result column="TRANS_INSTITUTION" property="transInstitution"/>
+		<result column="TRANS_OUT_ORDER_NO" property="transOutOrderNo"/>
+		<result column="BANK_TYPE" property="bankType"/>
+		<result column="FLAG_CANCEL" property="flagCancel"/>
+		<result column="RELATED_TRANS_ID" property="relatedTransId"/>
+		<result column="TRANS_MEMO" property="transMemo"/>
+	</resultMap>
+
+	<resultMap class="transApp" id="managerTransAppResult">
+		<result column="ID" property="id"/>
+		<result column="IN_ACCOUNT_NO" property="inAccountNo"/>
+		<result column="OUT_ACCOUNT_NO" property="outAccountNo"/>
+		<result column="AMOUNT" property="amount"/>
+		<result column="OUT_BIZ_NO" property="outBizNo"/>
+		<result column="INNER_BIZ_NO" property="innerBizNo"/>
+		<result column="TRANS_DATE" property="transDate"/>
+		<result column="OUT_DATE" property="outDate"/>
+		<result column="BANK_TYPE" property="bankType"/>
+		<result column="MEMO" property="memo"/>
+		<result column="STATUS" property="status"/>
+		<result column="SUB_TRANS_CODE" property="subTransCode"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+	</resultMap>
+
+	<resultMap class="transLogApp" id="managerTransLogAppResult">
+		<result column="ID" property="id"/>
+		<result column="TRANS_LOG_ID" property="transLogId"/>
+		<result column="TRANS_MEMO" property="transMemo"/>
+		<result column="STATUS" property="status"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+	</resultMap>
+
+<!-- 根据账务流水ID取得该笔事务流水账务信息 -->
+<select id="transLog-getTransLog-byAccountLogId-query" parameterClass="java.lang.Long" resultMap="accountTransLogResult">
+<![CDATA[
+		select TL.* from ep_account_log AL,ep_trans_log TL where AL.TRANS_LOG_ID=TL.ID AND AL.ID=#value#
+]]>
+</select>
+
+<!-- 根据ID取得MODE -->
+<select id="transLog-getTransLog-byId-query" parameterClass="java.lang.Long" resultMap="accountTransLogResult">
+<![CDATA[
+		select TL.* from ep_trans_log TL where TL.ID=#value#
+]]>
+</select>
+
+<insert id="addTransApp" parameterClass="transApp">
+	<![CDATA[
+	INSERT INTO ioss_trans_app
+	(ID,IN_ACCOUNT_NO,OUT_ACCOUNT_NO,AMOUNT,OUT_BIZ_NO,INNER_BIZ_NO,TRANS_DATE,OUT_DATE,BANK_TYPE,MEMO,STATUS,SUB_TRANS_CODE,GMT_CREATE,GMT_MODIFY )
+	VALUES(null,#inAccountNo#,#outAccountNo#,#amount#,#outBizNo#,#innerBizNo#,#transDate#,#outDate#,#bankType#,#memo#,#status#,#subTransCode#,sysdate(),sysdate())
+	]]>
+	<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<insert id="addTransLogApp" parameterClass="transLogApp">
+	<![CDATA[
+	INSERT INTO ioss_trans_log_app
+	(ID,TRANS_LOG_ID,TRANS_MEMO,STATUS,GMT_CREATE,GMT_MODIFY)
+	VALUES(null,#transLogId#,#transMemo#,#status#,sysdate(),sysdate())
+	]]>
+	<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<sql id="getManagerTransAppWhere">
+	from ioss_trans_app ita where 1=1
+	<isNotEmpty prepend="and" property="innerBizNo">
+		ita.inner_biz_no  like concat ('%',trim(#innerBizNo#),'%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="subTransCode">
+		ita.sub_trans_code = #subTransCode#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+		ita.status = #status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="transDateStart">
+		STR_TO_DATE(ita.trans_date,'%Y-%m-%d %H:%i:%s')  >=  STR_TO_DATE(#transDateStart#,'%Y-%m-%d %H:%i:%s') 
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="transDateEnd">
+		<![CDATA[
+		STR_TO_DATE(ita.trans_date,'%Y-%m-%d %H:%i:%s')  <=  STR_TO_DATE(#transDateEnd#,'%Y-%m-%d %H:%i:%s') 
+		]]>
+	</isNotEmpty>
+</sql>
+
+<!-- 账务补帐申请数量-->
+<select id="getManagerTransAppCount"  resultClass="java.lang.Integer">
+	select count(ita.id) <include refid="getManagerTransAppWhere"/>
+</select>
+
+<!-- 账务补帐申请列表-->
+<select id="getManagerTransApp"  resultMap="managerTransAppResult">
+	<include refid="pageSQLHead"/>
+	select ita.* <include refid="getManagerTransAppWhere"/>
+	order by ita.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getTransAppInfo" resultMap="managerTransAppResult">
+	select ita.* from ioss_trans_app ita where ita.id = #transAppId#
+</select>
+
+<update id="updateTransAppInfo">
+	update ioss_trans_app set status = #status# where id = #transAppId# and status = 'new'
+</update>
+
+<select id="getTransLogAppInfo" resultMap="managerTransLogAppResult">
+	select itla.* from ioss_trans_log_app itla where 1=1
+	<isNotEmpty property="transLogId" prepend="and">
+		itla.trans_log_id = #transLogId#
+	</isNotEmpty>
+	<isNotEmpty property="transLogAppId" prepend="and">
+		itla.id = #transLogAppId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="statusList">
+			itla.status in (
+	  		<iterate property="statusList" conjunction=",">
+                #statusList[]#
+            </iterate>
+			)
+	</isNotEmpty>
+</select>
+
+
+<!-- shlin -->
+<sql id="getManagerTransLogAppWhere">
+	from ioss_trans_log_app itla where 1=1
+	<isNotEmpty prepend="and" property="status">
+		itla.status = #status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="transDateStart">
+		STR_TO_DATE(DATE_FORMAT(itla.gmt_create,'%Y-%m-%e'),'%Y-%m-%d %H:%i:%s') >=  STR_TO_DATE(#transDateStart#,'%Y-%m-%d %H:%i:%s') 
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="transDateEnd">
+		<![CDATA[
+		STR_TO_DATE(DATE_FORMAT(itla.gmt_create,'%Y-%m-%e'),'%Y-%m-%d %H:%i:%s') <=  STR_TO_DATE(#transDateEnd#,'%Y-%m-%d %H:%i:%s') 
+		]]>
+	</isNotEmpty>
+</sql>
+
+<!-- 账务补帐申请数量-->
+<select id="getManagerTransLogAppCount"  resultClass="java.lang.Integer">
+	select count(itla.id) <include refid="getManagerTransLogAppWhere"/>
+</select>
+
+<!-- 账务补帐申请列表-->
+<select id="getManagerTransLogApp"  resultMap="managerTransLogAppResult">
+	<include refid="pageSQLHead"/>
+	select itla.* <include refid="getManagerTransLogAppWhere"/>
+	order by itla.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+<update id="updateTransLogAppInfo">
+	update ioss_trans_log_app set status = #status# where id = #transLogAppId# and status = 'new'
+</update>
+
+</sqlMap>

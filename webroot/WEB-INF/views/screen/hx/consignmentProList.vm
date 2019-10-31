@@ -1,0 +1,67 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>寄卖产品管理</h2>
+		 <div class="tool">
+			<span><a href="/consignmentPro/addInput.html?conId=$!{conId}&conCode=$!{conCode}" hidefocus="true" class="bt_add">添加产品</a></span>
+		 </div>
+		 
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "updatesuccess")
+					修改产品信息成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+		 
+	
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>寄卖产品管理</span></h3>
+            <table >
+                <tr>
+					<th>品牌</th>
+					<th>品名</th>
+					<th>材质</th>
+					<th >型号</th>
+					<th >颜色</th>
+					<th>产品图片</th>
+					<th>创建时间</th>
+					<th>操作</th>
+                </tr>
+				
+				#if($list)
+				 #foreach($consignmentPro in $list)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td>$!consignmentPro.brandId</td>
+					<td>$!consignmentPro.idSeries</td>
+					<td>$!consignmentPro.material</td>
+					<td>$!consignmentPro.type</td>
+					<td>$!consignmentPro.color</td>
+					<td><img src='${upServer}$imgUtil.changeLargeImgToSmal($!consignment.pic)' width="50"/></td>
+					<td>$date.format($!consignmentPro.gmtCreate)</td>
+					<td>
+							<a href="updateInput.html?id=$!consignmentPro.proId">详情</a>&nbsp;&nbsp;
+							<a href="#" onclick="javascript:if(confirm('确定删除？')){ location.href = 'delete.html?proId=$!consignmentPro.proId&conId=${consignmentPro.conId}&conCode=${consignmentPro.conCode}'}">删除</a> &nbsp;&nbsp;
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+
+	#if($list.size()==0)
+		没有结果！		
+    #end
+</div> <!-- 列表模块 END -->
+
+    </div>

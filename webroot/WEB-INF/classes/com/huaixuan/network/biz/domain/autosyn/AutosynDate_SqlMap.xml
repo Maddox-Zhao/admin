@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="AutoSyncDataNameSpace">
+	<resultMap class="com.huaixuan.network.biz.domain.autosyn.AutoSynDate" id="autoSynData">
+		<result column="sku" property="sku"/>
+		<result column="hk_exist_num" property="hkNumber"/>
+		<result column="sh_exist_num" property="shNumber"/>
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.autosyn.StockData" id="stockData">
+		<result column="brandName" property="brandName"/>
+		<result column="seriesName" property="seriesName"/>
+		<result column="idBrand" property="idBrand"/>
+		<result column="idSeries" property="idSeries"/>
+		<result column="type" property="type"/>
+		<result column="material" property="material"/>
+		<result column="color" property="color"/>
+		<result column="size" property="size"/>
+		<result column="sku" property="sku"/>
+		<result column="num" property="num"/>
+	</resultMap>
+	
+	
+	<resultMap class="com.huaixuan.network.biz.domain.autosyn.PlatformData" id="platformData">
+		<result column="id" property="id"/>
+		<result column="idProduct" property="idProduct"/>
+		<result column="sku" property="sku"/>
+		<result column="type" property="type"/>
+		<result column="skuShangpinHk" property="skuShangpinHk"/>
+		<result column="skuShangpinSh" property="skuShangpinSh"/>
+		<result column="skuKaolaHk" property="skuKaolaHk"/>
+		<result column="skuKaolaSh" property="skuKaolaSh"/>
+	</resultMap>
+	
+	
+
+
+<!-- 通过instances查询当前库存   暂时没用到   -->
+<select id="getStockByInstances" parameterClass="java.lang.String" resultMap="autoSynData">
+<![CDATA[
+		SELECT   (SELECT sku FROM product WHERE instance_id = i.id LIMIT 1 ) sku,i.exist_num,i.hk_exist_num,(i.exist_num-i.hk_exist_num) sh_exist_num
+		FROM  ioss_goods_instance i
+		WHERE i.id IN
+		(
+		 	$instances$
+		)
+]]>
+</select>
+
+
+<!-- 通过skus查询对应的ioss_goods_instance  instanceid  暂时没用到 -->
+<select id="getInstanceidsBySkus" parameterClass="java.lang.String" resultClass="java.lang.String">
+<![CDATA[
+		SELECT  DISTINCT instance_id FROM product    WHERE  sku in ($skus$)
+]]>
+</select>
+
+
+
+
+
+<!-- 通过skus查询上海库存   尚上总仓 臻革坊 状态为可售 -->
+<select id="getShStockySkus" parameterClass="java.lang.String"  resultMap="autoSynData">
+<![CDATA[
+		  SELECT
+		  t.sku_shangpin_sh sku,
+		  COUNT(t.sku_shangpin_sh) sh_exist_num,
+		  0 hk_exist_num
+		  FROM Product t,
+		  LifeCycle q
+		  WHERE t.idProduct = q.idProduct
+		    AND q.idStatus = 1 
+		    AND t.sku_shangpin_sh IN ($skus$)
+		    AND (q.idLocation = '101')
+		    AND q.isFlaw = 0
+		    GROUP BY t.sku_shangpin_sh
+]]>
+</select>
+
+
+
+<!-- 通过skus查询香港库存  去掉恒隆 102 -->
+<select id="getHkStockySkus" parameterClass="java.lang.String" resultMap="autoSynData">
+<![CDATA[
+	SELECT
+  	t.sku_shangpin_hk sku,
+   	COUNT(t.sku_shangpin_hk) hk_exist_num,
+   	0 sh_exist_num
+	FROM Product t,
+ 	 LifeCycle q
+	WHERE t.idProduct = q.idProduct
+    AND q.idStatus = 1
+    AND t.sku_shangpin_hk IN ($skus$)
+    AND q.idLocation in(103,104)  
+    AND q.isFlaw = 0
+    GROUP BY t.sku_shangpin_hk
+]]>
+</select>
+
+
+
+<!-- 通过型号 材质 颜色查询本地sku   -->
+<select id="getSupplierSkuByinfo" parameterClass="java.util.Map" resultClass="java.lang.String">
+<![CDATA[
+	  SELECT sku  FROM product where 1=1
+]]>
+<isNotEmpty prepend="and" property="type">
+		 type = #type#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="material">
+		 material = #material#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="color">
+		 color = #color#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="size">
+		 size = #size#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="brandId">
+		 idBrand = #brandId#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="idProduct">
+		 idProduct != #idProduct#
+</isNotEmpty>
+AND sku IS NOT NULL
+limit 1
+</select>
+ 
+
+
+
+
+
+
+<!--全量更新sku  先清空对应平台的sku   在全部从新更新下来-->
+<update id="clearPlatformSku2Null" parameterClass="java.lang.String">
+			update product set $field$ = null  
+</update>
+
+
+
+<!--记录更新成功和失败日志-->
+<insert id="addUpdatePlatformStockLog" parameterClass="java.util.Map">
+	 insert into hx_stock_update_log values(#sku#,#location#,#psku#,#name#,#stock#,sysdate(),#type#,#error#)
+</insert>
+
+
+
+<!--根据站点查询可售库存-->
+<select id="searchStockBySites" parameterClass="java.util.List"  resultMap="stockData">
+			SELECT
+			  b.name    brandName,
+			  s.name    seriesName,
+			  t.*
+			FROM (SELECT
+			        idBrand,
+			        idSeries,
+			        TYPE,
+			        material,
+			        color,
+			        size,
+			        sku,
+			        COUNT(TYPE)    num
+			      FROM Product t,
+			        LifeCycle q
+			      WHERE t.idProduct = q.idProduct
+			          AND q.idStatus = 1
+			          AND q.isFlaw = 0
+			          AND sku IS NOT NULL
+			          AND q.idLocation in
+			          <iterate conjunction="," open="(" close=")" >
+			            	#idSite[]#  
+			          </iterate>
+			      GROUP BY idBrand,idSeries,TYPE,Material,color,size,sku
+			) t,
+			  brand b,
+			  series s
+			WHERE t.idSeries = s.idSeries
+			    AND t.idBrand = b.idBrand
+			ORDER BY TYPE,num
+</select>
+
+
+<!--根据站点 和SKU 查询可售库存-->
+<select id="searchStockBySitesAndSku" parameterClass="java.util.Map"  resultMap="stockData">
+			SELECT
+			  b.name    brandName,
+			  s.name    seriesName,
+			  t.*
+			FROM (SELECT
+			        idBrand,
+			        idSeries,
+			        TYPE,
+			        material,
+			        color,
+			        size,
+			        sku,
+			        COUNT(TYPE)    num
+			      FROM Product t,
+			        LifeCycle q
+			      WHERE t.idProduct = q.idProduct
+			          AND q.idStatus = 1
+			          AND q.isFlaw = 0
+			          AND q.idLocation in ($idSite$)
+			          AND t.sku = '$sku$'
+			      GROUP BY sku
+			) t,
+			  brand b,
+			  series s
+			WHERE t.idSeries = s.idSeries
+			    AND t.idBrand = b.idBrand
+			ORDER BY TYPE,num
+</select>
+
+
+<!--根据我们的sku获取对应平台的sku-->
+<select id="getPlatformSkuByOurSku" parameterClass="java.util.Map"  resultClass="java.lang.String">
+			SELECT $field$ platformSku FROM  product WHERE sku = '$sku$'  and $field$ is not null  LIMIT 1
+</select>
+
+<!-- 根据sku获取货号 -->
+<select id="getHuoHaoByOurSku" parameterClass="java.util.Map"  resultClass="java.lang.String">
+<![CDATA[
+	SELECT  CONCAT(CONCAT(CONCAT(TYPE,' ',material),' ',color),' ',size)  huohao
+	FROM product WHERE sku = #sku# LIMIT 1
+]]>
+</select>
+
+
+
+
+
+
+<!--  通过sku查询库存 -->
+<select id="getSupplierStockByOurSku" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+	SELECT
+   	COUNT(t.sku) 
+	FROM Product t,
+ 	 LifeCycle q
+	WHERE t.idProduct = q.idProduct
+    AND q.idStatus = 1
+    AND t.sku = #sku#
+    AND q.idLocation IN ($location$)
+    GROUP BY t.sku
+</select>
+
+ 
+
+
+
+  
+
+
+<!-- 插入需要同步库存的数据-->
+<insert id="insertAutosyncPlatformStock" parameterClass="com.huaixuan.network.biz.domain.autosyn.PlatformData">
+	insert into hx_atuo_syncstock values(null,#idProduct#,#type#,sysdate(),default)
+</insert>
+
+</sqlMap>

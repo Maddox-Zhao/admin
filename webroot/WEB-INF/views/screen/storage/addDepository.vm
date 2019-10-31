@@ -1,0 +1,233 @@
+#set($layout = "layout/default.vm")
+
+#set($t_title = "新增")
+#if("$!actionType" == "edit")
+	#set($t_title = "编辑")
+#end
+
+#set($title = "管理中心 - ${t_title}仓库")
+
+#if("$!actionType" == "edit")
+	#foreach($df in $depositoryFirstList)
+		#if(${depository.depFirstId} == ${df.id})
+			#set($depFirst = $df)
+		#end
+	#end
+#end
+
+<body>
+<div class="main">
+	<h2>管理中心 - ${t_title}仓库</h2>
+
+	#if($message)
+		<div class="mag-t1">${message}</div>
+	#end
+
+	<div class="tool">
+		<span><a href="searchDepository.html" hidefocus="true" class="bt_ren">仓库列表</a></span>
+	</div>
+
+	<!-- 表单模块 -->
+	<form name="form1" action="addDepository.html" method="post">
+		<input type="hidden" id="actionType" name="actionType" value="$!actionType" />
+		#if("$!actionType" == "edit")
+    		#springBind("depository.id")
+    		<input type="hidden" id="depository.id" name="${status.expression}" value="$!{status.value}" />
+			#springBind("depository.status")
+			<input type="hidden" id="depository.status" name="${status.expression}" value="$!{status.value}"/>
+		#end
+		<div class="formBox">
+			<h3><i></i><span>仓库信息</span></h3>
+			<div class="content">
+				<table class="c2">
+					<tr>
+						<th>一级仓库名称</th>
+						<td>
+							#if("$!actionType" == "edit")
+								#springBind("depository.depFirstId")
+								<input type="hidden" name="${status.expression}" id="depFirstId" value="$!{status.value}" />
+								$!depFirst.depFirstName
+							#else
+								#springBind("depository.depFirstId")
+								<select name="${status.expression}" id="depFirstId" onchange="checkDepFirstType(this.value)" class="select" style="width:205px;">
+									<option value="">-=请选择=-</option>
+									#foreach($df in $depositoryFirstList)
+    									<option value="$!{df.id}" #if("$!{status.value}" == "${df.id}") selected="selected" #end>$!{df.depFirstName}</option>
+									#end
+								</select>
+								<span class="red">*</span>
+							#end
+						</td>
+					</tr>
+					<tr>
+						<th>仓库名称</th>
+						<td>
+							#springBind("depository.name")
+							<input type="text" name="${status.expression}" id="depName" value="$!{status.value}" onchange="checkDepNameIsExist(this.value);" class="inp" maxlength="50"/>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>仓库类型</th>
+						<td>
+							#springBind("depository.type")
+							<select name="${status.expression}" id="depository.type" class="select" style="width:205px;">
+    							#if("$!actionType" == "edit" && "${depFirst.type}" == "w")
+    								<option value="common_dep">普通仓库</option>
+    							#else
+									#foreach($t in $enumDepositoryType.entrySet())
+										<option value="$!t.key" #if("$status.value" == "$t.key") selected="selected" #end>$!t.value</option>
+									#end
+    							#end
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>负责人</th>
+						<td>
+							#springBind("depository.leader")
+							<select name="${status.expression}" id="depository.leader" class="select" style="width:205px;">
+								<option value="">-=请选择=-</option>
+								#foreach($userInfo in $adminUsers)
+									<option value="$!{userInfo.userName}" #if("$!{status.value}" == "${userInfo.userName}") selected="selected" #end>$!{userInfo.userName}</option>
+								#end
+							</select>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>联系电话</th>
+						<td>
+							#springBind("depository.tel")
+							<input type="text" name="${status.expression}" id="depository.tel" value="$!{status.value}" class="inp" maxlength="20"/>
+						</td>
+					</tr>
+					<tr>
+						<th>仓库地址</th>
+						<td>
+							#springBind("depository.address")
+							<input type="text" name="${status.expression}" id="depository.address" value="$!{status.value}" class="inp" maxlength="100"/>
+						</td>
+					</tr>
+					<tr>
+						<th>备注</th>
+						<td>
+							#springBind("depository.remark")
+							<textarea cols="50" rows="3" id="depository.remark" name="${status.expression}" onkeyup="textLimitCheck(this,200);">$!{depository.remark}</textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+			<!-- 表单按钮区 -->
+			<div class="form-but">
+				<button type="button" class="button-s4" onclick="javascript:formSubmit();">保存</button>
+				<button type="reset" class="button-s4">重置</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	//校验电话号码
+	function isTel(str){
+       	var reg=/^([0-9]|[\-])+$/g ;
+
+		if(str != ""){
+			if(str.length<7 || str.length>18){
+    	   		alert ("电话号码位数不对！");
+            	return false;
+           	}
+         	if(reg.exec(str)){
+         		return true;
+       		}else{
+				alert ("电话号码只能为数字或短线！");
+				return false;
+			}
+       	}
+		return true;
+	}
+
+		function formSubmit(){
+            var depFirstId=document.getElementById("depFirstId").value.replace(/-/g, "/");
+
+			var name=document.getElementById("depName").value.replace(/-/g, "/");
+			var leader=document.getElementById("depository.leader").value.replace(/-/g, "/");
+			var tel=document.getElementById("depository.tel");
+			var phoneNumber=tel.value.trim();
+            if(depFirstId==""){
+                alert("一级仓库必须填写！");
+                return false;
+            }
+
+			if(name==""){
+				alert("仓库名称必须填写！");
+    			return false;
+			}
+			if(leader==""){
+				alert("负责人必须选择！");
+    			return false;
+			}
+			if(!isTel(phoneNumber)){
+    			return false;
+			}
+
+			name=name.trim();
+			tel.value=tel.value.trim();
+
+        	document.form1.submit();
+	    }
+
+	//DWR的方式验证仓库名称是否存在
+	function checkDepNameIsExist(name){
+		var name=name.replace(/-/g, "/");
+		if(name != ""){
+			jQuery.get('checkDepIsExistByDwr.html',{param1:name},function(message){callBackCheckDepository(message);});
+		}
+	}
+
+	function callBackCheckDepository(msg){
+		var name=document.getElementById("depName");
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+
+		if (msgType == 'false') {
+			alert("仓库名称重复，请重新填写！");
+			name.value="";
+			name.select();
+            name.focus();
+		}
+	}
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+
+	function checkDepFirstType(depfirstId){
+		if(depfirstId!=""){
+			var obj = document.getElementById("depository.type");
+			jQuery.post('checkDepFirstType.html',{param:depfirstId},function(message){
+				if(message.indexOf("pifa") > -1){
+					var length = obj.length = 0;
+					obj.options[0] = new Option("普通仓库", "common_dep");
+				}else if(message.indexOf("putong") > -1){
+					var length = obj.length = 0;
+					obj.options[0] = new Option("普通仓库", "common_dep");
+					obj.options[1] = new Option("外借仓库", "out_borrow_dep");
+					obj.options[2] = new Option("次品仓库", "defect_dep");
+				}
+			});
+		}
+	}
+</script>

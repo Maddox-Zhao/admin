@@ -1,0 +1,107 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>类别订单统计</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+ <h3><span>一级类目销售金额统计</span></h3>
+  <form action="catalogAnalysis.html" id="singleForm" name="singleForm" method="post">
+    <table>
+    <th>统计日期&nbsp;&nbsp;</th>
+    <td><input name="dateStart" id="dateStart" value="" style="width: 80px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="dateStartIco"/>
+    到&nbsp;&nbsp;
+    <input name="dateEnd" id="dateEnd" value="" style="width: 80px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="dateEndIco"/>
+    <input name="flashName" value="${imageServer}/fusionCharts/swf/Pie2D.swf" type="hidden" id="flashName">
+    <input name="chartWidth" value="900" type="hidden" id="chartWidth">
+    <input name="chartHeight" value="500" type="hidden" id="chartHeight"></td>
+    <th><input name="submit" value="查询" class="button" type="button" onClick="return doCheckSingle(singleForm)"/></th>
+    <td>&nbsp;</td>
+    </table>
+  </form>
+
+</div>
+<div class="tab-div">
+  <div id="tabbar-div">
+    <p> <span class="tab-front" id="order_circs-tab">一级类目销售金额概况</span> </p>
+  </div>
+  <div id="tabbody-div">
+	<div id="report-div">
+  	</div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    Calendar.setup({
+        inputField : "dateStart",
+        ifFormat   : "%Y-%m-%d",
+        align      : "T1" ,
+        button	: "dateStartIco"
+    });
+    Calendar.setup({
+        inputField : "dateEnd",
+        ifFormat   : "%Y-%m-%d",
+        align      : "T1",
+        button	: "dateEndIco"
+    });
+    Calendar.setup({
+        inputField : "yearMonth1",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth1Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth2",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth2Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth3",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth3Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth4",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth4Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth5",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth5Ico"
+    });
+
+	function doCheckSingle(singleForm){
+		var dateStart=document.getElementById("dateStart").value.replace(/-/g, "/");
+		var dateEnd=document.getElementById("dateEnd").value.replace(/-/g, "/");
+		var b_date=new Date(Date.parse(dateStart));
+    	var e_date=new Date(Date.parse(dateEnd));
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		var dateStart=document.getElementById('dateStart').value;
+		var dateEnd=document.getElementById('dateEnd').value;
+		var flashName=document.getElementById('flashName').value;
+		var chartWidth=document.getElementById('chartWidth').value;
+		var chartHeight=document.getElementById('chartHeight').value;
+		
+									jQuery.ajax({
+            			type: "POST",
+            			url:"$appServer.get('/statistics/getCatalogAnalysis.html')",            			
+            			data :{param1:dateStart,param2:dateEnd,param3:flashName,param4:chartWidth,param5:chartHeight},
+    			        success:function(data){
+    			          document.getElementById('report-div').innerHTML = data;
+    			   }
+			});
+
+	}
+
+</script>
+</body>

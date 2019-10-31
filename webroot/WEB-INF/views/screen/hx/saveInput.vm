@@ -1,0 +1,92 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<script type="text/javascript"> 
+function check()
+{
+	var form = document.saveConsignment;
+	if(form.conCode.value == "")
+	{
+		alert("寄卖编号不能为空");
+		return false;
+	}
+	else if(form.conCode.value.substr(0,2) != "GM")
+	{
+		alert("寄卖编号必须以JM开头")
+	}
+	else if(form.name.value == "")
+	{
+		alert("姓名不能为空");
+		return false;
+	}
+	else if(form.phone.value == "")
+	{
+		alert("手机号码不能为空")
+		return false;
+	}
+	else if(!IDCardCheck(form.idcards.value))
+	{
+		//alert("客户身份证不能为空")
+		return false;
+	}
+	return true;
+}
+</script>
+
+<style type="text/css">
+.red{color:red}
+	
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>添加寄卖凭证</h2>
+		
+		 	
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				$!message
+		</div>
+		 #end
+		 
+		 <center>
+		 <form action="save.html" name="saveConsignment" method="post"  enctype="multipart/form-data" onsubmit="return check()">
+				寄卖编号:
+				#springBind("consignmentView.conCode")
+			  <input type="text" name="$!{status.expression}" value="$!{status.value}"  id="conId" maxlength="10" class="inp inp-w105" onblur="javascript:if(this.value.substr(0,2) != 'GM') alert('编号必须以GM开头')" /><span class="red">*</span><br/><br/>
+			  
+			  客户名字：
+			  #springBind("customer.name")
+			  <input type="text" name="${status.expression}" value="$!{status.value}" id="name" maxlength="10" class="inp inp-w105" /><span class="red">*</span><br/><br/>
+			  
+			  客户联系方式：
+			  #springBind("customer.phone")
+			  <input type="text" name="${status.expression}" value="$!{status.value}" id="phone"  maxlength="14" class="inp inp-w105"  onkeyup="value=value.replace(/[^\d]/g,'')"/><span class="red">*</span><br/><br/>
+
+			  客户身份证号:
+			  #springBind("consignmentView.idcards")
+			  <input type="text"  style="width:150px" name="${status.expression}" value="$!{status.value}" id="idcards"  class="inp inp-w105"  maxlength="18"/> <span class="red">*</span><br/><br/>
+			  
+			  寄卖凭证图片:
+			  #springBind("consignmentView.conImage")
+			  <input type="file" name="img1" ><br/><br/>
+			  
+			  客户身份证图片:
+			  #springBind("consignmentView.idcardsImage")
+			<input type="file" name="img2" ><br/><br/>
+			  
+			  备注：
+				#springBind("consignmentView.note")
+				<textarea cols="30" rows="3" name="${status.expression}" id="note">$!{status.value}</textarea><br/><br/>				 
+				
+		<div class="form-but">
+    		<button type="submit" id="allcheckbutton" class="button-s4">添加</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.saveConsignment.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='consignmentViewList.html?isFirst=true';">返回 </button>
+		</div>
+		 
+		 </form>
+
+		 </center>
+    </div>

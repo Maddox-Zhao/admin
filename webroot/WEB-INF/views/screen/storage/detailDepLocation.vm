@@ -1,0 +1,54 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 库位详情")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 库位详情</h2>
+
+	<div class="tool">
+		<span><a href="searchDepLocation.html" hidefocus="true" class="bt_ren">返回</a></span>
+		<span><a href="editDepLocationPage.html?depLocationId=$!{loc.id}" hidefocus="true" class="bt_edit">编辑</a></span>
+	</div>
+
+	#if("$!message" != "")
+		<div class="mag-t1">${message}</div>
+	#end
+
+	<div class="formBox">
+		<h3><i></i><span>库位信息</span></h3>
+		<div class="content">
+			<table class="c6">
+				<tr>
+					<th>仓库</th>
+					<td>$!{loc.depName}</td>
+					<th>库位名称</th>
+					<td>$!{loc.locName}</td>
+				</tr>
+				<tr>
+					<th>库位编号</th>
+					<td>$!{loc.locCode}</td>
+					<th>库位大小</th>
+					<td>$!{loc.locSize}</td>
+				</tr>
+				<tr>
+					<th>创建时间</th>
+					<td>$!date.format('yyyy-MM-dd',$!{loc.gmtCreate})</td>
+					<th>修改时间</th>
+					<td>$!date.format('yyyy-MM-dd',$!{loc.gmtModify})</td>
+				</tr>
+				<tr>
+					<th>是否盘点</th>
+					<td>#if("Y"=="$!{loc.isCheck}") 是 #else 否 #end</td>
+					<th></th>
+					<td></td>
+				</tr>
+				<tr>
+					<th>库位描述</th>
+					<td colspan="3"><textarea cols="70" rows="3" id="loc.locDescription" name="loc.locDescription" readonly="readonly">$!{loc.locDescription}</textarea></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	
+</div>
+</body>

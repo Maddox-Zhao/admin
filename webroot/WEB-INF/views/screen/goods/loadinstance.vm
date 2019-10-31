@@ -1,0 +1,244 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>产品修改</h2>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>商品名称:</th>
+           <td>$!{goods.title}</td>
+		   <th>编码:</th>
+           <td>$!{goods.goodsSn}</td>
+		   <th>品牌:</th>
+           <td>$!{goods.brandName}</td>
+		   <th>单位:</th>
+           <td>$!{goods.goodsUnit}</td>
+           <th>类目:</th>
+           <td>$!{goods.catName}</td>
+        </tr>
+    </table>
+  </div>  
+  <div class="formBox">
+	<h3><i></i><span>修改产品信息</span></h3>
+	<form action="/instance/update_instance.html"  method="post" name="form1" id="form1">
+		#springBind("instance.goodsId")
+        <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+		#springBind("instance.catCode")
+        <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+		#springBind("instance.id")
+        <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+		
+		
+		<div class="content">
+			<div class="form">
+				<ol>
+					
+          <li>
+            <label>产品名称：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.instanceName")
+                <input type="text" name="${status.expression}" class="inp inp-w300" value="$!{status.value}"/>
+              </li>
+              <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>产品编码：</label>
+            <span class="con">
+            <ul>
+              <li> 
+				#springBind("instance.code")
+                <input type="text" name="${status.expression}" class="inp"  value="$!{status.value}"/>
+              </li>
+			  <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span> 
+		  </li>
+		  
+          <li>
+            <label>拼音码：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.pyCode")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>销售价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.sellPrice")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+			  <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>促销价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.salesProPrice")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>市场指导价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.marketPrice")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>最小库存：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.minNum")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>最大库存：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.maxNum")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>是否赠品：</label>
+            <span class="con">
+            <ul>
+              <li>
+				   #springBind("instance.isPresent")
+                   <input type="radio" name="${status.expression}" value="1" #if("$!{status.value}" == "1") checked #end>是</input>
+                   #springBind("instance.isPresent")
+				   <input type="radio" name="${status.expression}" value="0" #if("$!{status.value}" == "0") checked #end>否</input>
+              </li>
+            </ul>
+            </span>
+		  </li>		  
+
+          <li>
+            <label>产品属性：</label>
+            <span class="con">
+            <div class="skin"> 
+              <table class="c5" id="attrs">					                        
+                #foreach($attr in $!attrs)
+				 #if($attr.isInstance == 1)
+                <tr>
+                  <th>$!attr.attrName<span style="color:red">*</span></th>
+				  <td>
+				  #foreach($v in $attr.attrValueMap.entrySet())
+					<input type="radio" name="isattr_${attr.attrCode}" value="$!v.key"  #if( "$!v.value" == "1") checked #end >$!v.key</input>
+				  #end
+				  </td>
+                </tr>
+				 #end
+				#end
+              </table>
+            </div>
+            </span>
+		 </li>
+
+	  #if($!skuMap)
+          <li>
+            <label>关联淘宝产品：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.taobaoSkuProperty")				
+                  <select name="${status.expression}" class="select">
+					<option value="">请选择</option>
+					#foreach($entry in $skuMap.entrySet())
+						<option value="$!entry.getKey()" #if("$!{status.value}"=="$!entry.getKey()") selected #end>$entry.getValue()</option>
+					#end
+				  </select>
+              </li>
+            </ul>
+            </span> 
+          </li>
+	  #end
+		 
+		 
+          <li>
+            <label>备注</label>
+            <span class="con">
+              <div class="skin-con">
+                <ul>
+                  <li class="ck"> #springBind("instance.remark")
+                    <textarea name="${status.expression}" cols="40" rows="10">$!{status.value}</textarea>
+                  </li>
+                  <li>
+                    <label class="red">${status.errorMessage}</label>
+                  </li>
+                </ul>
+            </div>
+            </span>
+		  </li>
+		  
+                </ol>
+            </div>
+        </div>
+    </form>
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onclick="check();">确定</button>
+		<button type="reset" id="allcheckbutton" class="button-s4" onClick="resetForm();">重置</button>
+		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1);">返回 </button>
+    </div>
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+     function check(){
+	   	  document.form1.submit();
+	 }
+	 
+	function resetForm(){
+	  document.form1.reset();
+	}
+</script>

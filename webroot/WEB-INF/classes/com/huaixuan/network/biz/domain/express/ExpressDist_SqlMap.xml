@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="expressDist">
+<typeAlias alias="expressDist" type="com.huaixuan.network.biz.domain.express.ExpressDist"/>
+	<resultMap class="expressDist" id="expressDistResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="region_code_start" property="regionCodeStart"/>
+		<result column="region_code_end" property="regionCodeEnd"/>
+		<result column="express_id" property="expressId"/>
+		<result column="spend_time" property="spendTime"/>
+		<result column="weight_first" property="weightFirst"/>
+		<result column="weight_first_money" property="weightFirstMoney"/>
+		<result column="weight_next" property="weightNext"/>
+		<result column="weight_next_money" property="weightNextMoney"/>
+		<result column="payment" property="payment"/>
+		<result column="memo" property="memo"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	<resultMap class="expressDist" id="expressDistForDisResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="region_code_start" property="regionCodeStart"/>
+		<result column="region_code_end" property="regionCodeEnd"/>
+		<result column="express_id" property="expressId"/>
+		<result column="express_name" property="expressName"/>
+		<result column="spend_time" property="spendTime"/>
+		<result column="weight_first" property="weightFirst"/>
+		<result column="weight_first_money" property="weightFirstMoney"/>
+		<result column="weight_next" property="weightNext"/>
+		<result column="weight_next_money" property="weightNextMoney"/>
+		<result column="payment" property="payment"/>
+		<result column="memo" property="memo"/>
+		<result column="status" property="status"/>
+	</resultMap>
+	<resultMap class="expressDist" id="expressDistByCondResult">
+		<result column="id" property="id"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="region_code_start" property="regionCodeStart"/>
+		<result column="region_code_end" property="regionCodeEnd"/>
+		<result column="express_id" property="expressId"/>
+		<result column="express_name" property="expressName"/>
+		<result column="spend_time" property="spendTime"/>
+		<result column="weight_first" property="weightFirst"/>
+		<result column="weight_first_money" property="weightFirstMoney"/>
+		<result column="weight_next" property="weightNext"/>
+		<result column="weight_next_money" property="weightNextMoney"/>
+		<result column="payment" property="payment"/>
+		<result column="memo" property="memo"/>
+		<result column="status" property="status"/>
+		<result column="region_code_start_name" property="regionCodeStartName"/>
+		<result column="region_code_end_name" property="regionCodeEndName"/>
+	</resultMap>
+	<resultMap id="expressDistForTradeResult" class="expressDist">
+		<result column="id" property="id"/>
+		<result column="region_code_start" property="regionCodeStart"/>
+		<result column="region_code_end" property="regionCodeEnd"/>
+		<result column="express_id" property="expressId"/>
+		<result column="express_name" property="expressName"/>
+		<result column="weight_first_money" property="weightFirstMoney"/>
+		<result column="payment" property="payment"/>
+		<result column="spend_time" property="spendTime"/>
+		<result column="weight_first" property="weightFirst"/>
+		<result column="weight_next" property="weightNext"/>
+		<result column="weight_next_money" property="weightNextMoney"/>
+		<result column="express_desc" property="expressDesc"/>
+	</resultMap>
+<!-- create ExpressDist object -->
+<insert id="addExpressDist" parameterClass="expressDist">
+<![CDATA[
+		insert into ioss_express_dist
+		(id,gmt_create,gmt_modify,region_code_start,region_code_end,express_id,spend_time,weight_first,weight_first_money,weight_next,weight_next_money,payment,memo,status )values(
+		null,
+		sysdate(),
+		sysdate(),
+		#regionCodeStart#,
+		#regionCodeEnd#,
+		#expressId#,
+		#spendTime#,
+		#weightFirst#,
+		#weightFirstMoney#,
+		#weightNext#,
+		#weightNextMoney#,
+		#payment#,
+		#memo#,
+		#status#
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update ExpressDist object -->
+<update id="editExpressDist" parameterClass="expressDist">
+<![CDATA[
+		update ioss_express_dist set
+		gmt_modify = sysdate(),
+		spend_time = #spendTime#,
+		weight_first = #weightFirst#,
+		weight_first_money = #weightFirstMoney#,
+		weight_next = #weightNext#,
+		weight_next_money = #weightNextMoney#,
+		memo = #memo#,
+		status = #status#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete ExpressDist object -->
+<delete id="removeExpressDist" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_express_dist where ioss_express_dist.ID = #value#
+]]>
+</delete>
+<!-- search ExpressDist object -->
+<select id="getExpressDist" parameterClass="java.lang.Long" resultMap="expressDistResult">
+<![CDATA[
+		select ioss_express_dist.* from ioss_express_dist where ioss_express_dist.ID = #value#
+]]>
+</select>
+<!-- searchAll ExpressDist List -->
+<select id="getExpressDists" resultMap="expressDistResult">
+<![CDATA[
+		select ioss_express_dist.* from ioss_express_dist
+]]>
+</select>
+
+<select id="getExpressDistById" parameterClass="java.lang.Long" resultMap="expressDistForDisResult">
+	SELECT ied.*, ies.express_name
+  FROM ioss_express_dist ied, ioss_express ies
+ WHERE ied.express_id = ies.id
+   and ied.ID = #expressDistId#
+</select>
+
+<delete id="removeExpressDistByRegion">
+	delete from ioss_express_dist
+ where region_code_start = #regionCodeStart#
+   and region_code_end = #regionCodeEnd#
+   and express_id = #expressId#
+</delete>
+
+<select id="getExpressDistByRegion" resultClass="int">
+	select count(*) from ioss_express_dist
+	where region_code_start=#regionCodeStart# and region_code_end=#regionCodeEnd#
+			and express_id=#expressId#
+			<isNotEmpty prepend="and" property="payment">
+				payment=#payment#
+			</isNotEmpty>
+</select>
+
+<select id="getExpressDistCountByCond" resultClass="int">
+	select count(ied.id)
+	from emall_region a,emall_region b,
+	<isNotEmpty property="payment">
+		<isEqual property="payment" compareValue="all">
+			(SELECT b.* FROM ioss_express_dist b ,
+			(SELECT region_code_start, region_code_end, express_id, COUNT(*) as countNum
+  					FROM ioss_express_dist
+ 			        GROUP BY region_code_start, region_code_end, express_id)a
+			WHERE a.countNum >1
+			AND b.express_id = a.express_id
+			AND b.region_code_start=a.region_code_start
+			AND b.region_code_end=a.region_code_end) ied
+		</isEqual>
+		<isNotEqual property="payment" compareValue="all">
+			ioss_express_dist ied
+		</isNotEqual>
+	</isNotEmpty>
+	<isEmpty property="payment">
+		ioss_express_dist ied
+	</isEmpty>
+	left JOIN ioss_express ies on ied.express_id = ies.id
+	where ied.region_code_start=a.code
+	and ied.region_code_end = b.code
+	<isNotEmpty prepend="and" property="regionCodeStartList">
+		ied.region_code_start in (
+	  		<iterate property="regionCodeStartList" conjunction=",">
+				#regionCodeStartList[]#
+			</iterate>
+		)
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="regionCodeEndList">
+		ied.region_code_end in (
+	  		<iterate property="regionCodeEndList" conjunction=",">
+				#regionCodeEndList[]#
+			</iterate>
+		)
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="expressId">
+		ied.express_id=#expressId#
+	</isNotEmpty>
+	<isNotEmpty property="payment">
+		<isNotEqual prepend="and" property="payment" compareValue="all">
+			ied.payment=#payment#
+		</isNotEqual>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+		ied.status=#status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			ied.gmt_modify > STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			ied.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</select>
+
+<select id="getExpressDistByCond" resultMap="expressDistByCondResult">
+	<include refid="pageSQLHead"/>
+	select a.region_name as region_code_start_name,b.region_name as region_code_end_name,ied.*,ies.express_name
+	from emall_region a,emall_region b,
+	<isNotEmpty property="payment">
+		<isEqual property="payment" compareValue="all">
+			(SELECT b.* FROM ioss_express_dist b ,
+			(SELECT region_code_start, region_code_end, express_id, COUNT(*) as countNum
+  					FROM ioss_express_dist
+ 			        GROUP BY region_code_start, region_code_end, express_id)a
+			WHERE a.countNum >1
+			AND b.express_id = a.express_id
+			AND b.region_code_start=a.region_code_start
+			AND b.region_code_end=a.region_code_end) ied
+		</isEqual>
+		<isNotEqual property="payment" compareValue="all">
+			ioss_express_dist ied
+		</isNotEqual>
+	</isNotEmpty>
+	<isEmpty property="payment">
+		ioss_express_dist ied
+	</isEmpty>
+	left JOIN ioss_express ies on ied.express_id = ies.id
+	where ied.region_code_start=a.code
+	and ied.region_code_end = b.code
+	<isNotEmpty prepend="and" property="regionCodeStartList">
+		ied.region_code_start in (
+	  		<iterate property="regionCodeStartList" conjunction=",">
+				#regionCodeStartList[]#
+			</iterate>
+		)
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="regionCodeEndList">
+		ied.region_code_end in (
+	  		<iterate property="regionCodeEndList" conjunction=",">
+				#regionCodeEndList[]#
+			</iterate>
+		)
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="expressId">
+		ied.express_id=#expressId#
+	</isNotEmpty>
+	<isNotEmpty property="payment">
+		<isNotEqual prepend="and" property="payment" compareValue="all">
+			ied.payment=#payment#
+		</isNotEqual>
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="status">
+		ied.status=#status#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="optTimeStart">
+<![CDATA[			ied.gmt_modify > STR_TO_DATE(#optTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="optTimeEnd">
+<![CDATA[			ied.gmt_modify < DATE_ADD(STR_TO_DATE(#optTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	order by ied.gmt_modify desc,ied.id desc
+	<include refid="pageSQLFoot"/>
+</select>
+
+<select id="listExpressDistForTrade" resultMap="expressDistForTradeResult">
+	SELECT  a.id,
+			region_code_start,
+	       	region_code_end,
+	       	express_id,
+	       	express_name,
+	       	weight_first_money,
+	       	payment,
+	       	spend_time,
+	        weight_next,
+	       	weight_next_money,
+	       	weight_first,
+			express_desc
+	  FROM ioss_express_dist a, ioss_express b
+	 WHERE a.express_id = b.id
+	   AND a.status = 'enabled'
+	   AND b.status = 'enabled'
+</select>
+
+<select id="getCountByRegionCodeEnd" resultClass="int">
+	select count(*) from ioss_express_dist where region_code_end=#regionCodeEnd# and payment=#payment# and status = 'enabled'
+</select>
+
+<select id="listExpressDistByRegionCodeEnd" resultMap="expressDistForTradeResult">
+	SELECT  a.id,
+			region_code_start,
+	       	region_code_end,
+	       	express_id,
+	       	express_name,
+	       	weight_first,
+	       	weight_first_money,
+	       	weight_next,
+	       	weight_next_money,
+	       	payment,
+	       	spend_time,
+			express_desc
+	  FROM ioss_express_dist a, ioss_express b
+	 WHERE a.express_id = b.id
+	   AND a.status = 'enabled'
+	   AND b.status = 'enabled'
+	   AND a.region_code_start=#regionCodeStart#
+	   AND a.region_code_end=#regionCodeEnd#
+	   AND a.payment=#payment#
+	   <isNotEmpty prepend="and" property="expressId">
+		a.express_id=#expressId#
+	   </isNotEmpty>
+</select>
+
+<select id="getCountByFourForUpdate" resultClass="int">
+	SELECT COUNT(*)
+	FROM ioss_express_dist
+	WHERE region_code_start = #regionCodeStart#
+	AND region_code_end = #regionCodeEnd#
+	AND express_id = #expressId#
+	AND id &lt;&gt; #id#
+	AND payment = #payment#
+</select>
+
+<update id="editExpressDistByFourCond" parameterClass="expressDist">
+	update ioss_express_dist set
+		gmt_modify = #gmtModify#,
+		spend_time = #spendTime#,
+		weight_first = #weightFirst#,
+		weight_first_money = #weightFirstMoney#,
+		weight_next = #weightNext#,
+		weight_next_money = #weightNextMoney#,
+		memo = #memo#,
+		status = #status#
+	where express_id = #expressId#
+	and	region_code_start = #regionCodeStart#
+	and	region_code_end = #regionCodeEnd#
+	and	payment = #payment#
+</update>
+
+<select id="getExpressDistByRegionCodeEnd" resultMap="expressDistForTradeResult">
+	SELECT  a.id,
+			region_code_start,
+	       	region_code_end,
+	       	express_id,
+	       	express_name,
+	       	weight_first,
+	       	weight_first_money,
+	       	weight_next,
+	       	weight_next_money,
+	       	payment,
+	       	spend_time,
+			express_desc
+	  FROM ioss_express_dist a, ioss_express b
+	 WHERE a.express_id = b.id
+	   AND a.status = 'enabled'
+	   AND b.status = 'enabled'
+	   AND a.region_code_start=#regionCodeStart#
+	   AND a.region_code_end=#regionCodeEnd#
+	   AND a.payment=#payment#
+	   AND a.express_id = #expressId#
+</select>
+<!-- bath update status -->
+<update id="bathUpdateStatus">
+
+		update ioss_express_dist set
+		status = #status#,
+		gmt_modify =sysdate()
+		 where id in (
+		  		<iterate property="ids" conjunction=",">
+	                #ids[]#
+	            </iterate>
+		  )
+
+</update>
+
+</sqlMap>

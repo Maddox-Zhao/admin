@@ -1,0 +1,504 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+  <div class="main">
+    <h3><span>选择商品</span></h3>
+<form name="listForm" id="listForm" action="/goods/addsalegoods.html" method="post">
+	<input type="hidden" name="pageFlag" id="pageFlag" value="$!pageFlag"/>
+	<input type="hidden" name="chtype" id="chtype" value="$!chtype"/>
+			#springBind("goods.returnPointId")
+	<input type="hidden" id="returnPointId" name="${status.expression}" value ="$!{status.value}" />
+
+	<div class="searchBox">
+		
+		 #* 
+		<table>	
+            <th>商品编码：</th>
+			<td>
+				#springBind("goods.goodsSn")
+				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" id="codeSearch"/>
+			</td>		
+			<th>商品名称：</th>
+			<td>
+				#springBind("goods.title")
+				<input type="text" name="${status.expression}" value="$!{status.value}" class="inp" id="titleSearch"/>
+			</td>
+			<th>商品类目：</th>
+			<td>
+				#springBind("goods.catCode")
+			<select name="${status.expression}" class="select" id="catCodeSearch">
+				<option value="">-=请选择=-</option>
+				#foreach($cat in $catList)
+				<option value="$cat.catCode" #if("$cat.catCode"=="$!{status.value}") selected #end>$cat.catName</option>
+				#end
+			</select>
+			</td>
+		    <td><button type="button" class="btn" onclick="doSearch();">查询商品</button></td>
+	</table>		
+			*#
+		 
+		 		 <table>
+            <tr>
+				<th>商品编码：</th>
+               <td>
+			     #springBind("goods.goodsSn")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>商品名称：</th>
+               <td>
+			     #springBind("goods.title")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>品牌:</th>
+                <td>
+			        #springBind("goods.brandId")
+                    <select class="select" name="${status.expression}" value ="$!{status.value}" >
+                       <option value="">-=请选择=-</option>
+                       #foreach($brandTemp in $brandList)
+					      <option #if("$!{status.value}"=="$!brandTemp.id") selected #end value="$!brandTemp.id">$!brandTemp.brandName</option>
+                       #end
+                    </select>
+				</td>
+			</tr>
+			<tr>
+			   <th>商品型号：</th>
+               <td>
+			     #springBind("goods.type")
+				 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>商品材质：</th>
+               <td>
+			     #springBind("goods.material")
+                 <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+               </td>
+			   <th>商品颜色:</th>
+                <td>
+			        #springBind("goods.color")
+                    <input type="text" name="${status.expression}" value ="$!{status.value}"  class="inp" />
+				</td>
+			</tr>
+			<tr>
+			   <th>总库存大于：</th>
+               <td>
+			     #springBind("goods.goodsNumberStr")
+				 <input type="text" name="${status.expression}"  value ="$!{status.value}"  class="inp" />
+			   </td>
+			   <th>香港库存大于：</th>
+               <td>
+			     #springBind("goods.hkGoodsNumberStr")
+                 <input type="text" name="${status.expression}"  value ="$!{status.value}" class="inp" />
+               </td>
+			   <th>品类:</th>
+				   <td>
+			        #springBind("goods.idSeries")
+                    <select class="select" name="${status.expression}" value ="$!{status.value}" >
+                       <option value="">-=请选择=-</option>
+					   
+					   #foreach($seriesTemp in $seriesList)
+					      <option #if("$!{status.value}"=="$!seriesTemp.id") selected #end value="$!seriesTemp.id">$!seriesTemp.name</option>
+                       #end
+                    </select>		
+				</td>
+			</tr>
+            <tr>
+				<th>上架时间：</th>
+					<td style="width:170px;">
+					#*			*#
+						#springBind("goods.gmtListingStart")
+						<input type="text" id="goods.gmtListingStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						-
+				     	#springBind("goods.gmtListingEnd")
+						<input type="text" id="goods.gmtListingEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "goods.gmtListingStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "goods.gmtListingEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>		
+					</td>
+				
+				
+				<th>价格区间：</th>
+			   <td>
+				#*				 *#
+			     #springBind("goods.goodsPriceStart")
+				 <input type="text" name="${status.expression}"  value ="$!{status.value}" style="width:50px;"  class="inp" /> 元 &nbsp; &nbsp;   --
+			  
+			     #springBind("goods.goodsPriceEnd")
+				 &nbsp; &nbsp;
+				 <input type="text" name="${status.expression}"  value ="$!{status.value}" style="width:50px;"  class="inp" />元
+			  
+			   </td>
+
+			   
+			   <th>促销价：</th>
+               <td>
+			     #springBind("goods.salePriceStart")
+                 <input type="text" name="${status.expression}"  value ="$!{status.value}" style="width:50px;" class="inp" />元 &nbsp; &nbsp;~
+				 #springBind("goods.salePriceEnd")
+				 <input type="text" name="${status.expression}"  value ="$!{status.value}" style="width:50px;" class="inp" />元
+               </td>
+			</tr>
+            <tr>
+			   <th></th>
+				#springBind("goods.noPicture")
+                <td>无图片<input name="${status.expression}" type="checkbox" value="1" #if("$!{status.value}"=="1") checked="true" #end/></td>
+			</tr>
+			<tr>
+               <th></th>
+               <td><button type="button" onclick="javascript:doSearch()" class="btn">查询商品</button></td>
+	        </tr>
+         </table>
+		 
+</div>
+			<div class="listBox">
+				#*
+				<h3><span>商品列表</span></h3>
+				<table>
+						<tr>
+							<th><input type="checkbox" id="allbox" />全选</th>
+							<th>
+								商品编码
+							</th>
+							<th>
+							          商品名称
+							</th>
+    						<th>
+    							商品价格（元）
+    						</th>
+						</tr>
+						#if($query && $query.items.size()>0)
+				         #foreach($goods in $query.items)
+						<tr>
+								<td>
+									#if("$!chtype"=="setActivityValue")
+										<input name="ids" type="checkbox"  id="goodsId_$!goods.id" onclick="javascript:checkgoods('$!goods.id');" value="$!goods.id"/>
+									#else
+										<input name="ids" type="checkbox" id="goodsId_$!goods.id" value="$!goods.id~!~$!goods.goodsPrice~!~$!goods.title~!~$!goods.imgSmall"/>
+									#end
+								</td>
+								<td>$!goods.goodsSn</td>
+								<td>
+									<a href="$!{liangpin99Server}/l/gdetail_$!{goods.id}.htm" target="blank">$!goods.title</a>
+								</td>
+								<td>
+									$!number.format('####0.00',$goods.goodsPrice)
+								</td>
+							</tr>
+						 #end
+						#end
+				</table>
+				*#
+				
+			<ul class="hover">
+				<h3><span>商品列表</span></h3>
+				<table>
+                    <tr>
+					  <th><input type="checkbox" id="allbox" />全选</th>
+                      <th>商品编码</th>
+					  <th>商品图片</th>
+					  <th>商品名称：</th>
+					  <th>品牌:</th>	
+					  <th>商品型号:</th>	
+					  <th>商品材质:</th>
+					  <th>商品颜色:</th>
+					  <th>品类:</th>
+					  <th>上架时间:</th>
+					  <th>可用库存</th>
+					  <th>香港库存</th>
+					  <th>已售数量</th>
+					  <th>促销价</th>
+					  <th style="text-align:center;">尚上价(RMB)</th>
+					  <th>香港价(HKD)</th>
+					  <th style="text-align:center;">欧洲价(EU)</th>
+					  <th style="text-align:center;">大陆价(RMB)</th>					  
+					</tr>
+					#if($query.items.size()>0)		
+						#foreach($goods in $query.items)
+                            <tr>
+							  <td>
+									#if("$!chtype"=="setActivityValue")
+										<input name="ids" type="checkbox"  id="goodsId_$!goods.id" onclick="javascript:checkgoods('$!goods.id');" value="$!goods.id"/>
+									#else
+										<input name="ids" type="checkbox" id="goodsId_$!goods.id" value="$!goods.id~!~$!goods.goodsPrice~!~$!goods.title~!~$!goods.imgSmall"/>
+									#end
+							  </td>							  
+							  <td>$!goods.goodsSn</td>
+							  <td style="text-align:center;"><a href="$upServer/$goods.imgLarge" target="blank"  ><img alt="$goods.title" src="$upServer/$goods.imgMiddle" title="$goods.title" style="width:80px;height:80px;"/></a> </td>
+							  <td>$!goods.title</td>
+							  <td>$!goods.brandName</td>
+							  <td>$!goods.type</td>
+							  <td>$!goods.material</td>
+							  <td>$!goods.color</td>
+							  <td>$!goods.seriesName</td>
+							  <td>	$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!goods.gmtListing) &nbsp;</td>							 
+							  <td style="text-align:center;">$!goods.goodsNumber</td>
+							  <td style="text-align:center;">$!goods.hkGoodsNumber</td>
+							  <td style="text-align:center;">$!goods.saleNumber</td>
+							  <td style="text-align:center;">$!goods.salesProPrice</td>
+							  <td style="text-align:center;color:red;">$!moneyUtil.getFormatMoney($!goods.goodsPrice,'0.00')</td>
+							  <td style="text-align:center;color:red;">$!moneyUtil.getFormatMoney($!goods.hkhxPrice,'0.00')</td>
+							  <td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.euPrice,'0.00')</td>
+							  <td style="text-align:center;">$!moneyUtil.getFormatMoney($!goods.marketPrice,'0.00')</td>
+							##  <td style="text-align:center;">
+							##		<span id='gmt_listing_$!goods.id'>$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!goods.gmtListing)</span>
+							##  </td>
+							</tr>
+						#end
+					#end
+                </table>
+            </ul>	
+			
+				
+				<table cellpadding="4" cellspacing="0">
+                <tr>
+                  <td>
+					#if("$!chtype"=="setActivityValue" || "$!chtype" == "")
+						<input class="button" value="选择商品" type="button" onclick="javascript:cmt('$!chtype');">
+					#else
+						<input class="button" value="选择商品" type="button" onclick="javascript:goback('$!chtype');">
+					#end
+				  </td>
+				  <td><input type="button" id="btnSubmit" value="关闭" class="button" onclick="cl();"/></td>
+                </tr>
+              </table>
+			</div>
+</form>
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/goods/addsalegoods.html?chtype=$!chtype&selectids=$!selectids").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+      </div>
+<script language="javascript" type="text/javascript">
+        jQuery(function(){
+			jQuery("#allbox").click(function(){
+		     	jQuery('[name=ids]:checkbox').attr("checked", this.checked );
+				
+				var selectids=document.getElementById("selectIds");
+        		var prama=selectids.value;
+        		var chek = document.getElementsByName("ids");
+        		
+        		//点击事件是选中就把id加上，是没选中就把id移除
+				for(var m=0;m<chek.length;m++){
+            		if(chek[m].checked){
+						
+            			if(prama==""){
+            				prama= chek[m].value;
+            			}else{
+            				prama = prama+","+chek[m].value;
+            			}
+            		}else{
+            			var strs= new Array();
+            			strs=prama.split(",");
+            			prama = "";
+            			for (i=0;i<strs.length ;i++ ) {
+            				if(strs[i]!=chek[m].value){
+            					if(prama==""){
+                    				prama= strs[i];
+                    			}else{
+                    				prama = prama+","+strs[i];
+                    			}
+            				}
+            			}
+            		}
+				}
+				
+        		selectids.value=prama;
+	        });
+
+		});
+
+function goback(type)
+{
+	alert("gobao");
+	var prama = isgoodsChecked(type);
+	if(!prama){
+		return false;
+	}else{
+    	window.opener.$chtype(prama);
+        self.close();
+	}
+}
+
+
+function isgoodsChecked(type){
+	var prama = "";
+	if(type=='setCpidValue'){
+		var num=0;
+    	var elements=document.getElementsByName("ids");
+		for(var i=0 ; i<elements.length ; i++){
+			if(elements[i].checked == true){
+				num = num+1;
+			}
+		}
+		if(num>5){
+			alert("组合销售最多只能拥有5个商品");
+		}
+		var j=0;
+    	 for( var i=0 ; i<elements.length && j<5; i++){
+    		if(elements[i].checked == true){
+    			if(prama==""){
+    				prama = elements[i].value;
+    			}else{
+    				prama = prama +"~@~"+ elements[i].value;
+    			}
+				j=j+1;
+    		}
+    	 }
+	}
+	if(type=='setgifts'||type=='setbuygoods' ||type=='fullGive' ||type=='upFullGive'){
+
+		var num=0;
+		var elements=document.getElementsByName("ids");
+		for(var i=0 ; i<elements.length ; i++){
+			if(elements[i].checked == true){
+				num = num+1;
+			}
+		}
+
+		if(num>1){
+        	alert("不能选者2个或者2个以上的商品");
+			return false;
+		 }
+		 if(num==1){
+		 	 for( var i=0 ; i<elements.length ; i++){
+        		if(elements[i].checked == true){
+        			if(prama==""){
+        				prama = elements[i].value;
+        			}else{
+        				prama = prama +"~@~"+ elements[i].value;
+        			}
+        		}
+        	 }
+		 }
+		 if(num<1){
+		 	alert("必须选择一个商品");
+			return false;
+		 }
+
+	}
+
+	if(type=='setActivityValue'){
+    	alert("专场");
+    	var num=0;
+    	var elements=document.getElementsByName("ids");
+		for(var i=0 ; i<elements.length ; i++){
+			if(elements[i].checked == true){
+				num = num+1;
+			}
+		}
+		if(num<1){
+			alert("必须选择1个商品");
+			return
+		}
+		var j=0;
+    	 for( var i=0 ; i<elements.length && j<5; i++){
+    		if(elements[i].checked == true){
+    			if(prama==""){
+    				prama = elements[i].value;
+    			}else{
+    				prama = prama +"~@~"+ elements[i].value;
+    			}
+				j=j+1;
+    		}
+    	 }
+	}
+
+
+	if(type=='setActivityValue1'||type=='setActivityValue2'||type=='setActivityValue3'||type=='setActivityValue4'||type=='setActivityValue5'){
+	var num=0;
+    	var elements=document.getElementsByName("ids");
+		for(var i=0 ; i<elements.length ; i++){
+			if(elements[i].checked == true){
+				num = num+1;
+			}
+		}
+	 var j=0;
+    	 for( var i=0 ; i<elements.length; i++){
+    		if(elements[i].checked == true){
+    			if(prama==""){
+    				prama = elements[i].value;
+    			}else{
+    				prama = prama +"~@~"+ elements[i].value;
+    			}
+				j=j+1;
+    		}
+    	 }
+	}
+
+
+	return prama;
+}
+
+	function cmt(type){
+	    var num=0;
+		//分页情况，保留不同页面id
+		var selectids=document.getElementById("selectIds");
+		var prama=selectids.value;
+		
+		if(prama == ""){
+			alert("必须选择1个商品");
+			return
+		}
+
+		window.opener.$chtype(prama);
+		self.close();
+	}
+
+	function cl(){
+		self.close();
+	}
+	
+	function checkgoods(goodsId){
+		var selectids=document.getElementById("selectIds");
+		var prama=selectids.value;
+		var chek = document.getElementById("goodsId_"+goodsId);
+		
+		//点击事件是选中就把id加上，是没选中就把id移除
+		if(chek.checked){
+			if(prama==""){
+				prama= goodsId;
+			}else{
+				prama = prama+","+goodsId;
+			}
+		}else{
+			var strs= new Array();
+			strs=prama.split(",");
+			prama = "";
+			for (i=0;i<strs.length ;i++ ) {
+				if(strs[i]!=goodsId){
+					if(prama==""){
+        				prama= strs[i];
+        			}else{
+        				prama = prama+","+strs[i];
+        			}
+				}
+			}
+		}
+		
+		selectids.value=prama;
+	}
+	
+
+function doSearch(){
+ document.getElementById('listForm').submit();
+
+}
+</script>
+	#*
+  document.getElementById('form1').submit();
+	var form1=document.getElementById('listForm');
+	document.getElementById("titleSearch").value = jQuery.trim(document.getElementById("titleSearch").value);
+	document.getElementById("codeSearch").value = jQuery.trim(document.getElementById("codeSearch").value);
+	document.getElementById("catCodeSearch").value = jQuery.trim(document.getElementById("catCodeSearch").value);
+	form1.action="/goods/addsalegoods.html";
+	form1.submit();
+	*#

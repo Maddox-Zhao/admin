@@ -1,0 +1,259 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>收购凭证详情</h2>
+		 
+		 <script type="text/javascript">
+		 	function check()
+			{
+				document.updateConsignment.submit();
+			};
+			
+			function resetForm()
+			{
+				document.updateConsignment.reset();
+			};
+			
+
+			function deleteById(id,status,acqId)
+			{
+				if(status == "sold")
+				{
+					alert("已售产品不能删除");
+					return false;
+				}
+				if(confirm('确定删除？'))
+				{
+				  	location.href = '/acquisitionPro/delete.html?id='+ id +'&acqId=' + acqId;
+			    }
+				 return false;
+			}
+			
+			function draw(proId,id)
+			{
+			
+				var kequ = jQuery("#kequ_" + id).val();
+				
+				/*
+				var qukuan = jQuery("#qukuan_" + proId).val();
+				if(qukuan == "")
+				{
+					alert("取款金额不能为空！")
+					return false;
+				}
+				if(isNaN(qukuan))
+				{
+					alert("取款金额必须为数字!");
+					return false;
+				}
+				if(parseInt(qukuan) > parseInt(kequ))
+				{
+					alert("取款金额不能大于可取金额");
+					return false;
+				}
+				if(confirm('确定取款？'))
+				{
+				  	location.href = '/acquisition/draw.html?id='+ id +'&proId=' + proId+"&money="+qukuan;
+			    }
+				*/
+				location.href = '/acquisition/drawInput.html?id='+ id +'&acqId=' + proId+"&money="+kequ;
+				return false;
+			}
+			
+		 </script>		
+		 
+		  #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+				#if($!message == "updatesuccess")
+					更新成功！
+				#end
+				#if($!message == "qukuansuccess")
+					取款成功！
+				#end
+				#if($!message == "uploadFile")
+					照片格式不正确或者大于200K!
+				#end
+				#if($!message == "drawsuccess")
+					取款成功！
+				#end
+		</div>
+		 #end
+    </div>
+
+	##收购凭证信息
+	<form name="form1" id="form1" method="post" action="update.html" enctype="multipart/form-data">
+		<span id="print">
+    	<div class="formBox">
+    		<h3><i></i><span>收购凭证信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>收购编号：</th>
+        			    <td style="width:240px;">$!{acquisition.acpCode}</td>
+        			    <th>总计金额：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{acquisition.amount}</span></td>
+    				</tr>
+    				<tr>
+    					<th>订单状态：</th>
+        			    <td>$!{acquisition.status}</td>
+        			    <th>已取金额：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{acquisition.paidAmount}</span></td>
+    				</tr>
+    				<tr>
+						<th>收购时间：  </th>
+    					<td>$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{acquisition.gmtCreate})</td>
+    					<th>修改时间： </th>
+    					<td>
+							$!dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{acquisition.gmtModify})
+						</td>
+    				</tr>
+					<tr>
+    					<th>客户ID：</th>
+    					<td>$!{acquisition.customerId}</td>
+    					<th>操作者ID：</th>
+    					<td>$!{acquisition.operatorId}</td>
+    				</tr>
+					<tr>
+						<th>客户身份证图片：</th>
+    					<td>
+							#if($!{acquisition.idcardsImage})
+								<a href="/daigou/showimg.html?url=$!{acquisition.idcardsImage}">
+									<img src='${upServer}$imgUtil.changeLargeImgToSmal($!{acquisition.idcardsImage})' width="80"/>
+								</a>
+							#end
+								 <input type="file" name="cardId"/>
+					  </td>
+    					<th>收购凭证图片：</th>
+    					<td>
+							#if($!{acquisition.acqImage})
+							<a href="/daigou/showimg.html?url=$!{acquisition.acqImage}">
+								<img src='${upServer}$imgUtil.changeLargeImgToSmal($!{acquisition.acqImage})' width="80"/>
+							</a>
+							#end
+							 <input type="file" name="con"/>
+						</td>
+					</tr>
+					<tr colspan="4"> <div class="mag-t3"><span>图片应小于200k,格式为jpg,jpeg,bmp,gif中的一种</span></div></tr>
+					<tr>
+						<th >
+							备注：
+						</th>
+						#springBind("acquisition.id")
+						<input type="hidden" name="id" value="$!{acquisition.id}"/>
+						<td colspan="3">
+							#springBind("acquisition.note")
+							<textarea cols="70" rows="5" name="note" id="note">$!{acquisition.note}</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<div class="form-but">
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.form1.submit()">保存</button>
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/acquisitionPro/addInput.html?acqCode=$!{acquisition.acpCode}'">添加产品</button>
+   							</div>
+							
+
+						</td>
+	
+					</tr>
+					
+    			</table>
+    		</div>					
+			
+			</div>
+		</div>
+		</span>
+	</form>
+	<br/>
+##收购单的产品信息
+	<div class="formBox">
+	<h4><span>产品信息</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+					<tr> 
+    					<th style="text-align:center;">品牌id</th>
+    					<th style="text-align:center;">品名id</th>
+    					<th style="text-align:center;">材质</th>
+    					<th style="text-align:center;" >型号</th>
+    					<th  style="text-align:center;">颜色</th>
+    					<th style="text-align:center;">产品图片</th>
+    					<th style="text-align:center;">产品状态</th>
+    					<th style="text-align:center;">可取金额</th>
+    					<th style="text-align:center;">操作</th>
+					</tr>
+				#if($acquisitionProList)
+				 #foreach($acquisitionPro in $acquisitionProList)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+						#set($String = 'a')
+					<td style="text-align:center;">$!brandMap.get($!String.valueOf($!acquisitionPro.brandId))</td>
+					<td style="text-align:center;">$!seriesMap.get($!String.valueOf($!acquisitionPro.seriesId))</td>
+					<td style="text-align:center;">$!acquisitionPro.material</td>
+					<td style="text-align:center;">$!acquisitionPro.type</td>
+					<td style="text-align:center;">$!acquisitionPro.color</td>
+					<td style="text-align:center;"><a href="/daigou/showimg.html?url=$!acquisitionPro.pic"><img src='${upServer}$!acquisitionPro.pic' width="50" />  </a></td>
+					<td style="text-align:center;">
+						#if($!acquisitionPro.status.equals("wait_sell"))
+							未售
+						#elseif($!acquisitionPro.status.equals("sold"))
+							确认出售
+						#elseif($!acquisitionPro.status.equals("back"))
+							客户取回
+						#end
+					</td>
+					<td   style="text-align:center;">
+						$!acquisitionPro.amount.subtract($!acquisitionPro.paidAmount)
+						<input type="hidden" id="kequ_$!acquisitionPro.id" value="$!acquisitionPro.amount.subtract($!acquisitionPro.paidAmount)"/>
+					</td>
+					#*
+					<td   style="text-align:center;">
+						#if($!acquisitionPro.amount.equals($!acquisitionPro.paidAmount))
+							已取完
+						#else
+							输入取款金额:<input type="text"  size="15" id="qukuan_$!acquisitionPro.id" onKeyPress="javascript:if(event.keyCode == 13) draw($!acquisitionPro.id,$!acquisitionPro.acqId)"  onkeyup="value=value.replace(/[^\d]/g,'')"  />
+						#end
+					</td>
+					*#
+					<td style="text-align:center;">
+						<a href="/acquisitionPro/updateInput.html?id=$!acquisitionPro.id">查看</a>
+						#if($!acquisitionPro.amount.subtract($!acquisitionPro.paidAmount) > 0)
+							<a href="#" onclick="return draw($!acquisitionPro.acqId,$!acquisitionPro.id)">取款</a> &nbsp;&nbsp;
+						#end
+						
+						
+						#*
+						#if($!acquisitionPro.status.equals("wait_sell"))
+						<a href="#" onclick="return deleteById($!acquisitionPro.id,'$!acquisitionPro.status',$!acquisitionPro.acqId)">删除</a> &nbsp;&nbsp;
+						#end
+						*#
+						
+					</td>
+                 </tr>
+				 #end
+				#end
+				</table>
+				
+			#if($!proList.size() == 0)
+				没有结果
+			#end
+			
+			</div>
+
+	</div>
+
+##产品查询完毕

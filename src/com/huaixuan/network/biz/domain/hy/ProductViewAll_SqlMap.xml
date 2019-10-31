@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="productViewAllDAO">
+	<typeAlias alias="productViewAll" type="com.huaixuan.network.biz.domain.hy.ProductViewAll"/>
+	<resultMap id="productViewAllResult" class="com.huaixuan.network.biz.domain.hy.ProductViewAll">
+	  <result column="idLifeCycle" property="idLifeCycle" />
+	  <result column="idProduct" property="idProduct" />
+	  <result column="cost" property="cost" />
+	  <result column="costCurrency" property="costCurrency" />
+	  <result column="idBrand" property="idBrand" />
+	  <result column="brand" property="brand" />
+	  <result column="idSeries" property="idSeries" />
+	  <result column="series" property="series" />
+	  <result column="type" property="type" />
+	  <result column="color" property="color" />
+	  <result column="material" property="material" />
+	  <result column="Size" property="size" />
+	  <result column="hasValidCard" property="hasValidCard" />
+	  <result column="idPurchase" property="idPurchase" />
+	  <result column="HXPrice" property="hXPrice" />
+	  <result column="HKHXPrice" property="hKHXPrice" />
+	  <result column="curSiteId" property="curSiteId" />
+	  <result column="lastSiteId" property="lastSiteId" />
+	  <result column="site" property="site" />
+	  <result column="city" property="city" />
+	  <result column="status" property="status" />
+	  <result column="idStatus" property="idStatus" />
+	  <result column="price" property="price" />
+	  <result column="priceCurrency" property="priceCurrency" />
+	  <result column="inDate" property="inDate" />
+	  <result column="idsupply" property="idsupply" />
+	  <result column="idchannel" property="idchannel" />
+	  <result column="sellchannel" property="sellchannel" />
+	  <result column="idlastoperator" property="idlastoperator" />
+	  <result column="selldate" property="selldate" />
+	  <result column="EUPrice" property="euPrice" />
+	  <result column="idOrder" property="idOrder" />
+	  <result column="customername" property="customerName" />
+	</resultMap>
+	
+	<resultMap id="productHistoryResult" class="com.huaixuan.network.biz.domain.hy.ProductViewAll" extends="productViewAllResult">
+	  <result column="hkGoodsNumber" property="hkGoodsNumber" />
+	  <result column="imgLarge" property="imgLarge" />
+	  <result column="imgMiddle" property="imgMiddle" />
+	</resultMap>
+	
+	<resultMap id="productViewTodayMap" class="com.huaixuan.network.biz.domain.hy.ProductViewAll">
+	  <result column="idProduct" property="idProduct" />
+	  <result column="idStatus" property="idStatus" />
+	</resultMap>
+	
+	<resultMap id="productViewAllSumValue" class="com.huaixuan.network.biz.domain.hy.ProductViewAll">
+	  <result column="hxPSum" property="hxPSum" />
+	  <result column="hkhxPSum" property="hkhxPSum" />
+	  <result column="priceCurrencySum" property="priceCurrencySum" />
+	  <result column="priceSum" property="priceSum" />
+	</resultMap>
+	
+	
+	<resultMap id="productViewCostSumValueMap" class="com.huaixuan.network.biz.domain.hy.ProductViewAll">
+	  <result column="costAll" property="costAll" />
+	  <result column="costCurrency" property="costCurrency" />
+	</resultMap>
+	
+    <select id="getProductViewAllByConditionWithPage" resultMap="productViewAllResult" parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*
+	   from productViewAll t
+	   ]]>
+	  <dynamic prepend="where">
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idStatus" prepend="and">
+		<![CDATA[  t.idStatus = #idStatus# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+        </dynamic>
+       order by t.inDate,t.idLifeCycle asc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+    <select id="getProductViewAllByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		<![CDATA[ select count(t.idLifeCycle) from productViewAll t  ]]>
+		<dynamic prepend="where">
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idStatus" prepend="and">
+		<![CDATA[  t.idStatus = #idStatus# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<select id="getProductViewAllSumValue" resultMap="productViewAllSumValue" >
+		<![CDATA[ 
+		SELECT 
+		SUM(t.HXPrice) as hxPSum,
+		SUM(t.HKHXPrice) as hkhxPSum,
+		t.priceCurrency as priceCurrencySum,
+		SUM(t.price)  as priceSum
+		FROM productViewAll t ]]>
+		<dynamic prepend="where">
+		<isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+		<isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idStatus" prepend="and">
+		<![CDATA[  t.idStatus = #idStatus# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+        </dynamic>
+        GROUP BY t.priceCurrency  
+	</select>
+	
+	<select id="productViewCostSumValue" resultMap="productViewCostSumValueMap" >
+		<![CDATA[ 
+		SELECT 
+		SUM(t.cost) as costAll,
+		t.costCurrency as costCurrency
+		FROM productViewAll t ]]>
+		<dynamic prepend="where">
+		<isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idLocation" prepend="and">
+		<![CDATA[  t.idLocation = #idLocation# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+		<isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idStatus" prepend="and">
+		<![CDATA[  t.idStatus = #idStatus# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+        </dynamic>
+        GROUP BY t.costCurrency  
+	</select>
+	
+	<select id="productViewToday" resultMap="productViewTodayMap" >
+		SELECT l.* FROM lifecycle l WHERE l.idStatus != 7 AND l.idStatus != 6 AND l.idStatus != 5 AND l.idStatus != 4 
+	</select>
+	
+	<!-- create Goods object -->
+		<insert id="addProductHistory" parameterClass="productViewAll">
+		<![CDATA[
+			insert into hx_product_history
+		  (id,
+		   idProduct,
+		   idStatus,
+		   date)
+		values
+		  (null,
+		   #idProduct#,
+		   #idStatus#,
+		   #date#
+		   )
+		]]>
+		<selectKey resultClass="java.lang.Integer" keyProperty="idProductHistory" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+		</insert>
+		
+		
+		<select id="getProductHistoryByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		<![CDATA[ select count(t.idLifeCycle) 
+					from productViewAll t,hx_product_history h
+					where t.idProduct = h.idProduct 
+					and h.idStatus = #idStatus#
+					and h.date = #date# 
+					and t.curSiteId = 102 and t.idStatus != 7
+					]]>
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+	</select>
+	
+	<select id="getProductHistoryByConditionWithPage" resultMap="productHistoryResult" parameterClass="java.util.Map">
+       <![CDATA[ 
+	   select
+	   t.*,
+	   (SELECT e.hk_goods_number FROM emall_goods e,product p WHERE p.goods_id = e.id and p.idProduct = t.idProduct) as hkGoodsNumber,
+	   (SELECT e.img_large FROM emall_goods e,product p WHERE p.goods_id = e.id and p.idProduct = t.idProduct ) as imgLarge,
+	   (SELECT e.img_middle FROM emall_goods e,product p WHERE p.goods_id = e.id and p.idProduct = t.idProduct ) as imgMiddle
+	   
+	   from productViewAll t,hx_product_history h
+					where t.idProduct = h.idProduct 
+					and h.idStatus = #idStatus#
+					and h.date = #date# 
+					and t.curSiteId = 102 and t.idStatus != 7
+	   ]]>
+	    <isNotEmpty property="idBrand" prepend="and">
+		<![CDATA[  t.idBrand = #idBrand# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idSeries" prepend="and">
+		<![CDATA[  t.idSeries = #idSeries# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="targetCustomers" prepend="and">
+		<![CDATA[  t.targetCustomers = #targetCustomers# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="idchannel" prepend="and">
+		<![CDATA[  t.idchannel = #idchannel# ]]>
+        </isNotEmpty>
+        <isNotEmpty property="costCurrency" prepend="and">
+		<![CDATA[  t.costCurrency = #costCurrency# ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="dateStart">
+<![CDATA[			t.selldate >= STR_TO_DATE(#dateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="dateEnd">
+<![CDATA[			t.selldate < DATE_ADD(STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) and t.selldate is not null ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateStart">
+<![CDATA[			t.inDate >= STR_TO_DATE(#storeDateStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="storeDateEnd">
+<![CDATA[			t.inDate < DATE_ADD(STR_TO_DATE(#storeDateEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+       order by t.inDate,t.brand,t.type,t.material,t.color asc
+       <isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+
+</sqlMap>

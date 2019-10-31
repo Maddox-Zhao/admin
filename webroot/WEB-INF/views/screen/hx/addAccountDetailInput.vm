@@ -1,0 +1,76 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<script type="text/javascript"> 
+
+</script>
+
+<style type="text/css">
+.red{color:red}
+	
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>添加现金账户详情</h2>
+		
+		 	
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				$!message
+		</div>
+		 #end
+		 
+		 <center>
+		 <form action="addDetail.html" name="saveAcccountDetail" method="post"  onsubmit="return check()">
+			  
+			  #springBind("accountDetail.accountId")
+			  <input type="hidden" name="$!{status.expression}" value="$!{status.value}"/>
+			
+			 账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户：
+			#springBind("accountDetail.accountType")
+			  <select name="$!{status.expression}">
+				<option value="3">人民币账户</option>
+				<option value="1">欧元账户</option>
+				<option value="2">港元账户</option>
+				<option value="4">美元账户</option>
+			  </select><span class="red">*</span><br/><br/>
+			  
+			  金&nbsp;&nbsp;额:
+			  #springBind("accountDetail.tradePrice")
+			  <input type="text" size="15"  maxlength="8" name="$!{status.expression}" value="$!{status.value}" onkeyup="value=value.replace(/[^\d]/g,'')"/><span class="red">*</span><br/><br/>
+			 
+			类&nbsp;&nbsp;型:
+			#springBind("accountDetail.type")
+			  <select name="$!{status.expression}" style="width:120px">
+				<option value="0">&nbsp;&nbsp;&nbsp;收&nbsp;&nbsp;入</option>
+				<option value="1">&nbsp;&nbsp;&nbsp;支&nbsp;&nbsp;出</option>
+			  </select><span class="red">*</span><br/><br/>
+			  
+			 业务归类属性：
+			 #springBind("accountDetail.operationType")
+			  <select name="$!{status.expression}">
+				<option value="">--请选择--</option>
+				<option value="销售收入">&nbsp;销售收入&nbsp; </option>
+				<option value="退货支出">&nbsp;退货支出&nbsp;</option>
+				<option value="冲正补帐">&nbsp;冲正补帐&nbsp;</option>
+				<option value="初始入账">&nbsp;初始入账&nbsp;</option>
+				<option value="管理费用">&nbsp;管理费用&nbsp; </option>
+			  </select><span class="red">*</span><br/><br/>
+			  
+			  
+			  备&nbsp;&nbsp;注：
+			#springBind("accountDetail.note")
+			<textarea cols="30" rows="3" name="${status.expression}" id="note">$!{status.value}</textarea><br/><br/>
+			
+		<div class="form-but">
+    		<button type="submit" id="allcheckbutton" class="button-s4">添加</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.saveAcccountDetail.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1)">返回 </button>
+
+		</div>
+		 </form>
+
+		 </center>
+    </div>

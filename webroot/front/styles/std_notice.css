@@ -1,0 +1,128 @@
+.warning, .attention, .tips, .success, .warning_min, .attention_min, .tips_min, .success_min{
+	padding: .67em 1em .67em 2.5em;
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 1.3em;
+	text-align: left;
+}
+/* 小图标有边 */
+.success{
+	background: #ddffdd url(../images/icon/ico_success_16.png) no-repeat .5em .67em;
+	border: 1px solid #009900;
+	color: #009900;
+}
+
+.warning{
+	background: #ffe9c8 url(../images/icon/tips_warning_16.png) no-repeat .5em .67em;
+	border: 1px solid #FF6600;
+	color: #FF6600;
+}
+
+.tips{
+	background: #e8f1ff url(../images/icon/ico_tips_16.png) no-repeat .5em .67em;
+	border: 1px solid #c5e1f7;
+}
+
+.tips ul, .tips ul li{
+	list-style-type: square;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.tips ul{
+	margin: .5em 1em;
+	padding: 0;
+}
+
+.attention{
+	background: #ffffcc url(../images/icon/ico_attention_16.png) no-repeat .5em .67em;
+	border: 1px solid #ffcc00;
+}
+/* 大图标无边 */
+.warning_big h2, .attention_big h2, .tips_big h2, .success_big h2{
+	padding: 1.7em 1em 1.2em 4.5em;
+	font-size: 16px;
+	line-height: 28px;
+	text-align: left;
+}
+.success_big h2{
+	background: #fff url(../images/icon/ico_success_48.png) no-repeat .5em .67em;
+	color: #009900;
+
+}
+.warning_big h2{
+	background: #fff url(../images/icon/tips_warning_48.png) no-repeat .5em .67em;
+	color: #FF6600;
+}
+
+.tips_big h2{
+	background: #fff url(../images/icon/ico_tips_48.png) no-repeat .5em .67em;
+}
+.attention_big h2{
+	background: #fff url(../images/icon/ico_attention_48.png) no-repeat .5em .67em;
+
+}
+.warning_big, .attention_big, .tips_big, .success_big{
+margin:10px auto 20px;
+padding-bottom: 2px;
+width:420px;
+text-align: center;
+}
+.window-btn{
+text-align:center;
+	height:25px;
+	_height:18px;
+	padding:4px 0px 2px 0px;
+	_padding-top:5px;
+	}
+.warning_big ul li i, .attention_big ul li i, .tips_big ul li i, .success_big ul li i{
+	width:6px;
+	height:6px;
+	float:left;
+	margin-top:7px;
+	margin-right:5px;
+}
+.warning_big ul li, .attention_big ul li, .tips_big ul li, .success_big ul li{
+	font-size: 14px;
+	line-height:20px;
+	#float:none;
+	_float:none;
+	#height:20px;
+	_height:20px;
+	font-weight: normal;
+	text-align:left;
+}
+.warning_big ul, .attention_big ul, .tips_big ul, .success_big ul{
+	margin: -.5em 1em 0em 6.5em;
+	padding: 0px;
+}
+
+/* 小图标无边 */
+.success_min{
+	background: #fff url(../images/icon/ico_success_16.png) no-repeat .5em .67em;
+
+	color: #009900;
+}
+
+.warning_min{
+	background: #fff url(../images/icon/tips_warning_16.png) no-repeat .5em .67em;
+
+	color: #FF6600;
+}
+
+.tips_min{
+	background:  #fff url(../images/icon/ico_tips_16.png) no-repeat .5em .67em;
+
+}
+
+
+.attention_min{
+	background:  #fff url(../images/icon/ico_attention_16.png) no-repeat .5em .67em;
+}
+
+.warning a, .attention a, .tips a, .success a, .warning_big h2 a, .attention_big h2 a, .tips_big h2 a, .success_big h2 a, .warning_big ul a, .attention_big ul a, .tips_big ul a:link, .tips_big ul a:visited, .success_big ul a{
+text-decoration:underline;
+font-weight: bold;
+margin-left:10px;
+}
+

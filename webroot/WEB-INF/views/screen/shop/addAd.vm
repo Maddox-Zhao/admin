@@ -1,0 +1,195 @@
+#set($layout = "layout/default.vm")
+
+<script language="javascript" type="text/javascript">
+	function selectid(){
+ 		var id = document.getElementById("adPositionId");
+	  	var obj = document.getElementById("adPositionIdstr");
+		obj.value=id;
+	}
+
+	function addad(){
+ 			var dateStart1str = document.getElementById("startTimeStr").value;
+		    var dateEnd1str = document.getElementById("endTimeStr").value;
+		    var dateStart1 = dateStart1str.replace(/-/g, "/");
+		    var dateEnd1 = dateEnd1str.replace(/-/g, "/");
+    		var b_date=new Date(Date.parse(dateStart1));
+            var e_date=new Date(Date.parse(dateEnd1));
+			var pi=document.getElementById("images").value;
+			var obj=document.getElementById("adPositionId").value;
+			if(dateStart1str==""||dateEnd1str==""){
+				alert("请选择时间");
+				return  false;
+			}else if(obj==""){
+				alert("请选择广告位");
+				return  false;
+			}else if(e_date < b_date){
+    				   alert("起始时间不能大于结束时间！");
+    			   return false;
+    		}else if(pi==""){
+				alert("上传文件不能为空！");
+    			   return false;
+			}else{
+			document.theForm.submit();
+		}
+	}
+
+	function resetad(){
+	document.theForm.reset();
+	}
+</script>
+	<script src="images/calendar" type="text/javascript"></script>
+	<link href="styles/calendar.css" type="text/css" rel="stylesheet">
+		#set($title = "广告管理 - 新增广告")
+		<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>新增广告</span></h3>
+	<div class="content">
+		<form __unmht_action="#" name="theForm"  action="/shop/addad.html" method="post" enctype="multipart/form-data">
+			#springBind("ad.adPositionIdstr")
+			<input type="hidden" id="adPositionIdstr" name="${status.expression}" value="" />
+			<input type="hidden" id="flag" name="flag" value="add" />
+			<table class="c2" id="general-table" width="100%">
+			<tbody>
+				<div class="form">
+				<ol>
+          <li>
+			<label>广告分类：</label>
+					<span class="con">
+					<ul>
+              <li>
+							#springBind("ad.adType")
+							<select name="${status.expression}"  id="adType" >
+							<option value="">请选择</option>
+							<option value="d" #if($!{ad.adType} == 'd') selected #end>代销</option>
+							<option value="w" #if($!{ad.adType} == 'w') selected #end>批发</option>
+                        </select></li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+          <li>
+			<label>广告位：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("ad.adPositionId")
+					<select name="${status.expression}" id="adPositionId"  onChange="javascript:selectid();">
+                        <option value=''>请选择</option>
+            			#foreach($adPosition in $adPositions)
+                        <option value="$!{adPosition.id}" #if($!{ad.adPositionId} == $!{adPosition.id}) selected #end>$!{adPosition.positionName} ($!{adPosition.width}*$!{adPosition.height})</option>
+                        #end
+					</select></li>
+					<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+          <li>
+			<label>广告名称：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("ad.adName")
+					<input  type="text"  id="adName" name="${status.expression}"  value="$!{ad.adName}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>开始时间：</label>
+    				<span class="con">
+					<ul>
+              <li>#springBind("ad.startTimeStr")
+						<input type="text" name="${status.expression}" id="startTimeStr" size="10" theme="simple" readonly="true" value="$!{ad.startTimeStr}"/>
+    			    <script type="text/javascript">
+    			      Calendar.setup({
+    			          inputField : "${status.expression}",
+    			          ifFormat   : "%Y-%m-%d",
+    			          align      : "BR"
+    			      });
+    				</script>
+    			</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>结束时间：</label>
+    				<span class="con">
+					<ul>
+              <li>#springBind("ad.endTimeStr")
+						<input type="text" name="${status.expression}"  id="endTimeStr" size="10" theme="simple" readonly="true" value="$!{ad.endTimeStr}"/>
+    			    <script type="text/javascript">
+    			      Calendar.setup({
+    			          inputField : "${status.expression}",
+    			          ifFormat   : "%Y-%m-%d",
+    			          align      : "BR"
+    			      });
+    				</script>
+    				</li>
+							<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+				<li>
+			<label>广告链接：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("ad.link")
+					<input  type="text" size="30" name="${status.expression}" id="link" value="$!{status.value}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>类型：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("ad.mediaType")
+					<select name="${status.expression}" id="mediaType">
+					<option value="">请选择</option>
+                    <option value="picture" #if($!{ad.mediaType} == 'picture') selected  #end>图片</option>
+				<!--	<option value="text" #if($!{adDetail.mediaType} == 'text') selected  #end>鏂囨湰</option>
+					<option value="flash" #if($!{adDetail.mediaType} == 'flash') selected  #end>flash</option>  -->
+                  </select></li>
+				  		<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+<li>
+			<label>选择文件：</label>
+				<span class="con">
+					<ul>
+              <li><input type="file" name="images" id="images" size="35" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		</table></form></div>
+  <div class="form-but">
+	<input class="btn" value="确定" type="button" onClick="javascript:addad();"> <input class="btn" value="重置" type="reset" onclick="javascript:resetad();"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>

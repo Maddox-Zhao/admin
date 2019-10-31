@@ -1,0 +1,350 @@
+#set($layout = "layout/default.vm")
+
+#if($optType == "update")
+	#set($t_title = "修改")
+#elseif($optType == "batch")
+	#set($t_title = "批量修改")
+#else
+	#set($t_title = "添加")
+#end
+
+#set($title = "管理中心 - 物流范围$t_title")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 物流范围$t_title</h2>
+
+	#if($!message)
+		<div class="mag-t2">$!message</div>
+	#end
+	#if($successInfo && $successInfo != "")
+		<div class="mag-t2" id="modifySuccess">$!successInfo #if($isAddOpt)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="$appServer.get("/express/add_express_dist_page.html").addQueryData("eid", $!{eid})">点击继续添加</a>#end</div>
+	#end
+	#if($errorInfo && $errorInfo != "")
+		<div class="mag-t2" id="modifyError">$!errorInfo</div>
+	#end
+	<form name="addForm" action="/express/add_express_dist.html" method="post">
+		<input type="hidden" name="optType" id="optType" value="$!optType"/>
+		#springBind("expressDist.expressId")
+		<input type="hidden" name="${status.expression}" id="expressId" value="$!{eid}"/>
+		#springBind("expressDist.id")
+		<input type="hidden" name="${status.expression}" id="expressId" value="$!{edid}"/>
+
+		<div class="formBox">
+			<h3><i></i><span>物流公司范围信息</span></h3>
+			<div class="content">
+				<table class="c2">
+					<tr>
+						<th>物流名称：</th>
+						<td>
+							#if("batch"=="$optType")
+								<select id="selExpressId" name="selExpressId">
+    								#foreach($expressInfo in $expressInfoList)
+    									<option value="$!{expressInfo.id}" #if(${expressInfo.id}==$!{expressDist.expressId}) selected #end>$!{expressInfo.expressName}</option>
+    								#end
+    							</select>
+							#else
+								$!expressDist.expressName
+							#end
+						</td>
+					</tr>
+					<tr>
+						<th><span class="red">*</span>物流始发地：</th>
+						<td>
+            				#if($optType == "update")
+            					#foreach($province in $provinceList)
+            						#if(${expressDist.regionCodeProvinceStart} && ${expressDist.regionCodeProvinceStart}==$!{province.code}) $!{province.regionName} #end
+            			        #end
+            					#foreach($city in $cityListInit)
+            		                #if(${expressDist.regionCodeCityStart} && ${expressDist.regionCodeCityStart}==$!{city.code}) $!{city.regionName} #end
+            		            #end
+            					#foreach($district in $distincListInit)
+            		                #if(${expressDist.regionCodeDistinctStart} && ${expressDist.regionCodeDistinctStart}==$!{district.code}) $!{district.regionName} #end
+								#end
+								#springBind("expressDist.regionCodeProvinceStart")
+            					<input type="hidden" name="${status.expression}" id="s1" value="$!{status.value}" />
+								#springBind("expressDist.regionCodeCityStart")
+            					<input type="hidden" name="${status.expression}" id="cityStart" value="$!{status.value}" />
+								#springBind("expressDist.regionCodeDistinctStart")
+            					<input type="hidden" name="${status.expression}" id="districtStart" value="$!{status.value}" />
+            				#else
+								#springBind("expressDist.regionCodeProvinceStart")
+            					<select id="s1" name="${status.expression}" onchange="selectCity(this.value,'cityStart','districtStart');">
+                			        <option value="">-=请选择=-</option>
+                			        #foreach($province in $provinceList)
+                			          <option value="$!{province.code}" #if(${status.value} && ${status.value}==$!{province.code}) selected #end>$!{province.regionName}</option>
+                			        #end
+                				</select>
+								#springBind("expressDist.regionCodeCityStart")
+                				<select id="cityStart" name="${status.expression}" onchange="selectDistinc(this.value,'districtStart');">
+                					<option value="">-=请选择=-</option>
+                		            #foreach($city in $cityListInit)
+                		                <option value="$!{city.code}" #if(${status.value} && ${status.value}==$!{city.code}) selected #end>$!{city.regionName}</option>
+                		            #end
+                		        </select>
+								#springBind("expressDist.regionCodeDistinctStart")
+                		        <select id="districtStart" name="${status.expression}">
+                		            <option value="">-=请选择=-</option>
+                		            #foreach($district in $distincListInit)
+                		                <option value="$!{district.code}" #if(${status.value} && ${status.value}==$!{district.code}) selected #end>$!{district.regionName}</option>
+                		            #end
+                		        </select>
+            				#end
+						</td>
+					</tr>
+            		<tr>
+            	        <th><span class="red">*</span>物流目的地：</th>
+        				<td>
+        					#if($optType == "update")
+        						#foreach($provinceEnd in $provinceList)
+        							#if(${expressDist.regionCodeProvinceEnd} && ${expressDist.regionCodeProvinceEnd}==$!{provinceEnd.code}) $!{provinceEnd.regionName} #end
+        						#end
+        						#foreach($cityEnd in $cityEndListInit)
+            		                #if(${expressDist.regionCodeCityEnd} && ${expressDist.regionCodeCityEnd}==$!{cityEnd.code}) $!{cityEnd.regionName} #end
+        						#end
+        						#foreach($districtEnd in $distincEndListInit)
+        							#if(${expressDist.regionCodeDistinctEnd} && ${expressDist.regionCodeDistinctEnd}==$!{districtEnd.code}) $!{districtEnd.regionName} #end
+								#end
+								#springBind("expressDist.regionCodeProvinceEnd")
+        						<input type="hidden" name="${status.expression}" id="s2" value="$!{status.value}" />
+								#springBind("expressDist.regionCodeCityEnd")
+        						<input type="hidden" name="${status.expression}" id="cityEnd" value="$!{status.value}" />
+								#springBind("expressDist.regionCodeDistinctEnd")
+        						<input type="hidden" name="${status.expression}" id="districtEnd" value="$!{status.value}" />
+        					#else
+								#springBind("expressDist.regionCodeProvinceEnd")
+                				<select id="s2" name="${status.expression}" onchange="selectCity(this.value,'cityEnd','districtEnd');">
+                			        <option value="">-=请选择=-</option>
+                			        #foreach($provinceEnd in $provinceList)
+                			          <option value="$!{provinceEnd.code}" #if(${status.value} && ${status.value}==$!{provinceEnd.code}) selected #end>$!{provinceEnd.regionName}</option>
+                			        #end
+                				</select>
+								#springBind("expressDist.regionCodeCityEnd")
+                				<select id="cityEnd" name="${status.expression}" onchange="selectDistinc(this.value,'districtEnd');">
+                					<option value="">-=请选择=-</option>
+                		            #foreach($cityEnd in $cityEndListInit)
+                		                <option value="$!{cityEnd.code}" #if(${status.value} && ${status.value}==$!{cityEnd.code}) selected #end>$!{cityEnd.regionName}</option>
+                		            #end
+                		        </select>
+								#springBind("expressDist.regionCodeDistinctEnd")
+                		        <select id="districtEnd" name="${status.expression}">
+                		            <option value="">-=请选择=-</option>
+                		            #foreach($districtEnd in $distincEndListInit)
+                		                <option value="$!{districtEnd.code}" #if(${status.value} && ${status.value}==$!{districtEnd.code}) selected #end>$!{districtEnd.regionName}</option>
+                		            #end
+                		        </select>
+        					#end
+						</td>
+					</tr>
+            		<tr>
+            			<th>支付方式：</th>
+            			<td>
+							#springBind("expressDist.payment")
+							<select id="addDistMap.payment" name="${status.expression}">
+								#foreach($en in $expressDistPaymentPartMap.entrySet())
+									#if($optType == "update")
+										#if($en.key == $expressDistPaymentAll.key || $en.key == $status.value)
+											<option value="$!{en.key}" #if("${status.value}" == "$!{en.key}") selected="selected" #end>$!{en.value}</option>
+										#end
+									#else
+										<option value="$!{en.key}" #if("${status.value}" == "$!{en.key}") selected="selected" #end>$!{en.value}</option>
+									#end
+								#end
+							</select>
+            			</td>
+            		</tr>
+            		<tr>
+                        <th>送货时间：</th>
+            			<td>
+							#springBind("expressDist.spendTimeFrom")
+            				<input id="addDistMap.spendTimeFrom" size="10" name="${status.expression}" type="text" value="$!{status.value}"/>-
+							#springBind("expressDist.spendTimeTo")
+            				<input id="addDistMap.spendTimeTo" size="10" name="${status.expression}" type="text" value="$!{status.value}"/>天
+            			</td>
+                    </tr>
+            		<tr>
+                        <th>首重重量(千克)：</th>
+            			<td>
+							#springBind("expressDist.weightFirst")
+							<input id="addDistMap.weightFirst" size="20" name="${status.expression}" type="text" value="$!doubleUtil.format(${status.value}, 3)"/>
+						</td>
+            		</tr>
+            		<tr>
+            			<th>首重费用(元)：</th>
+            			<td>
+							#springBind("expressDist.weightFirstMoney")
+							<input id="addDistMap.weightFirstMoney" size="20" name="${status.expression}" type="text" value="$!doubleUtil.format(${status.value}, 2)"/>
+						</td>
+            		</tr>
+            		<tr>
+                        <th>续重重量(千克)：</th>
+            			<td>
+							#springBind("expressDist.weightNext")
+							<input id="addDistMap.weightNext" size="20" name="${status.expression}" type="text" value="$!doubleUtil.format(${status.value}, 3)"/>
+						</td>
+            		</tr>
+            		<tr>
+            			<th>续重费用(元)：</th>
+            			<td>
+							#springBind("expressDist.weightNextMoney")
+							<input id="addDistMap.weightNextMoney" size="20" name="${status.expression}" type="text" value="$!doubleUtil.format(${status.value}, 2)"/>
+						</td>
+            		</tr>
+            		<tr>
+                        <th>备注：</th>
+            			<td>
+							#springBind("expressDist.memo")
+							<textarea id="addDistMap.memo" name="${status.expression}" rows="5" cols="62">$!{status.value}</textarea>
+						</td>
+                    </tr>
+            		<tr>
+                        <th>状态：</th>
+            			<td>
+							#springBind("expressDist.status")
+							<select id="addDistMap.status" name="${status.expression}">
+								#foreach($en in $expressDistStatusMap.entrySet())
+									<option value="$!{en.key}" #if("${status.value}" == "$!{en.key}") selected="selected" #end>$!{en.value}</option>
+								#end
+							</select>
+            			</td>
+                    </tr>
+				</table>
+			</div>
+		</div>
+	</form>
+
+	<div class="form-but">
+		<button type="button" class="button-s4" #if($isAddOpt) disabled="disable" #end onclick="javascript:return valid_from('$!optType');">确 定</button>
+		#if($optType == "update")
+            <button type="button" class="button-s4" onclick="window.history.back(-1);">返回</button>
+		#end
+	</div>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	var objCityList = new Array();
+    var objDistincList = new Array();
+	var j=0;
+    var i=0;
+    #foreach($objCity in $cityList)
+        objCityList[j] = new Array("$!{objCity.code}","$!{objCity.parentCode}","#direct($!{objCity.regionName})");
+        j++;
+    #end
+	#foreach($objDistinc in $distincList)
+        objDistincList[i] = new Array("$!{objDistinc.code}","$!{objDistinc.parentCode}","#direct($!{objDistinc.regionName})");
+        i++;
+    #end
+	var count=j;
+	var num=i;
+	function selectCity(code,cityVar,districtVar){
+        var obj = document.getElementById(cityVar);
+        var length = obj.length = 0;
+		obj.options[length++] = new Option("-=请选择=-", "");
+        for(var m=0; m<count; m++){
+            if( objCityList[m][1] == code){
+                obj.options[length] = new Option(objCityList[m][2], objCityList[m][0]);
+                length++;
+            }
+        }
+        var obj2 = document.getElementById(districtVar);
+        var length2 = obj2.length = 0;
+        obj2.options[length2] = new Option("-=请选择=-", "");
+    }
+    function selectDistinc(code,districtVar){
+        var obj = document.getElementById(districtVar);
+        var length = obj.length = 0;
+		obj.options[length++] = new Option("-=请选择=-", "");
+        for(var m=0; m<num; m++){
+            if( objDistincList[m][1] == code){
+                obj.options[length] = new Option(objDistincList[m][2], objDistincList[m][0]);
+                length++;
+            }
+         }
+     }
+
+	String.prototype.trim = function() {
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function isNumberNoDot(val)
+	{
+	  var reg = /^\+?[1-9][0-9]*$/;
+	  return reg.test(val);
+	}
+	function isNumber(val)
+	{
+	  var reg = /^[0-9]+.?[0-9]?[0-9]?[0-9]?$/;
+	  return reg.test(val);
+	}
+	function isPriceNumber(val)
+	{
+	  var reg = /^[0-9]+.?[0-9]?[0-9]?$/;
+	  return reg.test(val);
+	}
+    function valid_from(typeOpt){
+    	document.getElementById("optType").value = typeOpt;
+    	document.getElementById("s1").value=document.getElementById("s1").value.trim();
+    	document.getElementById("s2").value=document.getElementById("s2").value.trim();
+    	document.getElementById("addDistMap.spendTimeFrom").value=document.getElementById("addDistMap.spendTimeFrom").value.trim();
+    	document.getElementById("addDistMap.spendTimeTo").value=document.getElementById("addDistMap.spendTimeTo").value.trim();
+    	document.getElementById("addDistMap.weightFirst").value=document.getElementById("addDistMap.weightFirst").value.trim();
+    	document.getElementById("addDistMap.weightFirstMoney").value=document.getElementById("addDistMap.weightFirstMoney").value.trim();
+    	document.getElementById("addDistMap.weightNext").value=document.getElementById("addDistMap.weightNext").value.trim();
+    	document.getElementById("addDistMap.weightNextMoney").value=document.getElementById("addDistMap.weightNextMoney").value.trim();
+    	document.getElementById("addDistMap.memo").value=document.getElementById("addDistMap.memo").value.trim();
+    	if(document.getElementById("s1").value.length == 0) {
+    		alert("请选择物流始发地");
+    		return false;
+    	} else if(document.getElementById("s2").value.length == 0){
+    		alert("请选择物流目的地");
+    		return false;
+    	} else if(document.getElementById("addDistMap.spendTimeFrom").value.length > 0 && !isNumberNoDot(document.getElementById("addDistMap.spendTimeFrom").value)){
+    		alert("送货时间请输入正整数");
+    		return false;
+    	} else if(document.getElementById("addDistMap.spendTimeTo").value.length > 0 && !isNumberNoDot(document.getElementById("addDistMap.spendTimeTo").value)){
+    		alert("送货时间请输入正整数");
+    		return false;
+    	} else if(document.getElementById("addDistMap.spendTimeFrom").value > 1000){
+    		alert("送货时间过长，请确认后重新输入");
+    		return false;
+    	} else if(document.getElementById("addDistMap.spendTimeTo").value > 1000){
+    		alert("送货时间过长，请确认后重新输入");
+    		return false;
+    	} else if(document.getElementById("addDistMap.spendTimeFrom").value.length > 0 && document.getElementById("addDistMap.spendTimeTo").value.length > 0
+    			&& document.getElementById("addDistMap.spendTimeFrom").value * 1 > document.getElementById("addDistMap.spendTimeTo").value){
+
+    		alert("送货时间输入错误");
+    		return false;
+    	} else if(document.getElementById("addDistMap.weightFirst").value.length > 0 &&
+    			(!isNumber(document.getElementById("addDistMap.weightFirst").value) || document.getElementById("addDistMap.weightFirst").value > 100000)){
+    		alert("首重重量输入错误");
+    		return false;
+    	} else if(document.getElementById("addDistMap.weightFirstMoney").value.length > 0 &&
+    			(!isPriceNumber(document.getElementById("addDistMap.weightFirstMoney").value) || document.getElementById("addDistMap.weightFirstMoney").value > 100000)){
+    		alert("首重费用输入错误");
+    		return false;
+    	} else if(document.getElementById("addDistMap.weightNext").value.length > 0 &&
+    			(!isNumber(document.getElementById("addDistMap.weightNext").value) || document.getElementById("addDistMap.weightNext").value > 100000)){
+    		alert("续重重量输入错误");
+    		return false;
+    	} else if(document.getElementById("addDistMap.weightNextMoney").value.length > 0 &&
+    			(!isPriceNumber(document.getElementById("addDistMap.weightNextMoney").value) || document.getElementById("addDistMap.weightNextMoney").value > 100000)){
+    		alert("续重费用输入错误");
+    		return false;
+    	} else if(document.getElementById("addDistMap.memo").value.length > 0 && document.getElementById("addDistMap.memo").value.length > 200){
+    		alert("备注输入过长，请控制在200字以下");
+    		return false;
+    	} else {
+    		if(document.getElementById("addDistMap.payment").value == 'all'){
+    			if(confirm('确认支付方式为全部支持？将先删除原有其他支付方式记录再添加。')){
+    				document.forms[0].submit();
+    			}
+    		} else {
+    			document.forms[0].submit();
+    		}
+    	}
+    	document.getElementById("optType").value = "";
+    }
+</script>

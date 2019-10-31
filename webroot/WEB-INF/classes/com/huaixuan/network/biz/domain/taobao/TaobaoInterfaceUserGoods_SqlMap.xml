@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TaobaoInterfaceUserGoodsSQL">
+	<typeAlias alias="taobaointerfaceUserGoods" type="com.huaixuan.network.biz.domain.taobao.TaobaoInterfaceUserGoods" />
+	<resultMap class="taobaointerfaceUserGoods" id="interfaceUserGoodsResult">
+	    <result property="id" column="id"/>
+	    <result property="gmtCreate" column="gmt_create"/>
+	    <result property="gmtModify" column="gmt_modify"/>
+	    <result property="userId" column="user_id"/>
+	    <result property="goodsId" column="goods_id"/>
+	    <result property="type" column="type"/>
+	    <result property="status" column="status"/>
+	    <result property="taobaoItemId" column="taobao_item_id" nullValue="0"/>
+	</resultMap>
+	<resultMap class="taobaointerfaceUserGoods" id="interfaceUserGoodsSearchResult">
+	    <result property="id" column="id"/>
+	    <result property="goodsId" column="goods_id"/>
+	    <result property="goodsSn" column="goods_sn"/>
+	    <result property="title" column="title"/>
+	    <result property="goodsPrice" column="goods_price"/>
+	    <result property="gmtModify" column="gmt_modify"/>
+	    <result property="goodsNumber" column="goods_number"/>
+	    <result property="goodsStatus" column="goods_status"/>
+	    <result property="imgSmall" column="img_small"/>
+	</resultMap>
+
+
+	<insert id="addInterfaceUserGoodsTaobao" parameterClass="taobaointerfaceUserGoods">
+	   <![CDATA[
+	      insert into interface_user_goods(id,gmt_create,gmt_modify,user_id,goods_id,type,status)
+	      values(null,sysdate(),sysdate(),#userId#,#goodsId#,#type#,#status#)
+	   ]]>
+	   <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+	<update id="updateInterfaceUserGoodsStatusTaobao" parameterClass="taobaointerfaceUserGoods">
+	  <![CDATA[
+	     update interface_user_goods set status = #status#,
+	     gmt_modify = sysdate()
+	      ]]>
+	     <isNotEmpty prepend="," property="taobaoItemId">
+           taobao_item_id = #taobaoItemId#
+       </isNotEmpty>
+        <![CDATA[
+	     where id = #id#
+	  ]]>
+	</update>
+
+    <select id="getInterfaceUserGoodsTaobao" resultMap="interfaceUserGoodsResult" parameterClass="java.util.Map">
+       <![CDATA[
+         select interface_user_goods.* from interface_user_goods where 1=1
+       ]]>
+       <isNotEmpty prepend="and" property="userId">
+           interface_user_goods.user_id = #userId#
+       </isNotEmpty>
+       <isNotEmpty prepend="and" property="goodsId">
+           interface_user_goods.goods_id = #goodsId#
+       </isNotEmpty>
+       <isNotEmpty prepend="and" property="type">
+           interface_user_goods.type = #type#
+       </isNotEmpty>
+       <isNotEmpty prepend="and" property="status">
+           interface_user_goods.status = #status#
+       </isNotEmpty>
+       <isNotEmpty prepend="and" property="id">
+           interface_user_goods.id = #id#
+       </isNotEmpty>
+    </select>
+
+    <select id="getInterfaceUserGoodsByConditionTaobao" parameterClass="java.util.Map" resultMap="interfaceUserGoodsSearchResult">
+    <include refid="pageSQLHead"/>
+      <![CDATA[
+         select
+                a.id,
+                a.goods_id,
+                b.goods_sn,
+                b.title,
+                b.goods_price,
+                a.gmt_modify,
+                b.goods_number,
+                b.goods_status,
+                b.img_small
+         from interface_user_goods a, emall_goods b
+         where a.goods_id = b.id
+      ]]>
+      <isNotEmpty prepend="and" property="userId">
+         a.user_Id = #userId#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="type">
+         a.type = #type#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="status">
+         a.status = #status#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="goodName">
+         b.title like concat('%',#goodName#,'%')
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="catCode">
+         b.cat_code like concat('%',#catCode#,'%')
+      </isNotEmpty>
+     <include refid="pageSQLFoot"/>
+    </select>
+
+    <select id="getInterfaceUserGoodsCountByConditionTaobao" parameterClass="java.util.Map" resultClass="int">
+      <![CDATA[
+      select count(1) from
+        (select
+                a.id,
+                a.goods_id,
+                b.goods_sn,
+                b.title,
+                b.goods_price,
+                a.gmt_modify,
+                b.goods_number,
+                b.goods_status,
+                b.img_small
+         from interface_user_goods a, emall_goods b
+         where a.goods_id = b.id
+      ]]>
+      <isNotEmpty prepend="and" property="userId">
+         a.user_Id = #userId#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="type">
+         a.type = #type#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="status">
+         a.status = #status#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="goodName">
+         b.title like concat('%',#goodName#,'%')
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="catCode">
+         b.cat_code like concat('%',#catCode#,'%')
+      </isNotEmpty>
+      ) aa
+    </select>
+
+    <update id="updateTaobaoStatusById" parameterClass="java.util.Map">
+     <![CDATA[
+        update interface_user_goods set status=#status#,
+        gmt_modify = sysdate()
+         where id=#id#
+     ]]>
+    </update>
+
+    <select id="getInterfaceUserGoodsListTaobao" parameterClass="java.util.Map" resultMap="interfaceUserGoodsResult">
+     <![CDATA[
+        select interface_user_goods.* from interface_user_goods where 1=1
+     ]]>
+     <isNotEmpty prepend="and" property="goodsId">
+        interface_user_goods.goods_id = #goodsId#
+     </isNotEmpty>
+     <isNotEmpty prepend="and" property="status">
+        interface_user_goods.status = #status#
+     </isNotEmpty>
+     <isNotEmpty prepend="and" property="type">
+        interface_user_goods.type = #type#
+     </isNotEmpty>
+    </select>
+
+    <!-- 根据interface_user_goods表中id查询列表 -->
+	<select id="getInterfaceUserGoodsListByIdsTaobao" resultMap="interfaceUserGoodsResult">
+		select t.* from interface_user_goods t
+		<dynamic prepend=" where ">
+			<iterate prepend="AND" property="ids" open="(" close=")"
+				conjunction="or">
+				t.id =#ids[]#
+			</iterate>
+		</dynamic>
+		order by t.id desc
+
+	</select>
+</sqlMap>

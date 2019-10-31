@@ -1,0 +1,47 @@
+/*��ݰ�����*/
+
+.xl-wrapper{ height:auto; float:left;}
+.line{ height:1px; background:#d5d5d5; font-size:1px; overflow:hidden; clear:both;}
+.hide { display: none;}
+.leftside_service {	 border: #d5d5d5 1px solid; border-right: none;  float: left; width: 178px; margin:10px 0;}
+
+.leftside-phone {background: url(../../images/download/message-bg-download.gif) no-repeat; border-bottom: #d5d5d5 1px; height: 90px;}
+
+.help-list {background: #e7e7e7; padding-bottom: 5px}
+.help-list dt.first {	background: url(../../images/download/message-bg-download.gif) no-repeat left -87px; height:33px; line-height:31px; position:relative;}
+.help-list dt {border-TOP: #d5d5d5 1px solid; font-weight: bold; font-size: 13px; background: url(../../images/download/message-bg-download.gif) no-repeat 12px -130px; cursor: pointer; color: #404040; text-indent: 31px; line-height: 32px; height: 32px}
+.help-list dt a{ font-size:13px; }
+.help-list dt a:hover{ color:#404040; text-decoration:none;}
+.help-list dt.selected a{ color:#f60;}
+.help-list dd {padding-right: 0px; padding-left: 0px; background: #fff; padding-bottom: 5px; margin: auto; width: 168px; padding-TOP: 5px}
+.help-list dd ul li {display: block; font-size: 12px; background: url(../../images/service/d.gif) no-repeat 11px center; text-indent: 20px; line-height:20px;}
+.help-list dd ul li.selected{}
+.help-list dd ul li.selected a{color:#f60;}
+
+
+.xl-main-service{ border: #d5d5d5 1px solid;  padding:10px 19px 50px 19px; float: left; width: 735px; color: #333; text-indent: 0; margin:10px 0;  *height: auto !important;  *height:350px; min-height:350px;}
+.xl-main-service h1{ font-size:16px; line-height:30px; color:#f60; margin:20px 0 0px 0;}
+.xl-main-service h2{ font-size:12px; line-height:25px; margin:0 0 0px 0; padding:0;}
+.xl-main-service p{ margin:5px 0; line-height:20px; text-indent:0;}
+.xl-main-service .hlep-line{ height:3px; width:735px; font-size:0px; background:url(../../images/service/hlep_line.gif) no-repeat;}
+.xl-main-service .help_pic{ width:215px; height:34px; background: url(../../images/download/datadownload.gif) no-repeat; position: relative; top:-45px; left:512px; border:0;}
+.xl-main-service-c{ width:735px; position:relative; top:-20px;}
+
+
+
+.data_download_wrap{width:680px; float:left; margin:0 0 0 20px;}
+
+.data_download{width:100%; height:auto; float:left; margin:10px 0 0 0; border:#ccc 1px solid;}
+.data_download_title{height:26px; width:678px; background:#eee; border:#fff 1px solid; line-height:26px; font-size:14px; font-weight:bold;  padding:0; text-align:left; text-align:center;}
+.data_download_title .name{ width:300px; float:left; border-right:#fff 1px solid;}
+.data_download_title .download{ width:150px; float:left;}
+
+.data_download_list{width:640px; height:auto; float:left; margin:10x 0; padding:0 10px;}
+.data_download_list .fontcolor_blue{color:#00f;}
+
+.data_download_list ul{margin:10px 0;}
+.data_download_list ul li{height:20px; line-height:20px; padding: 0 0 5px 0; border-bottom:#ccc 1px dashed;}
+.data_download_list ul li .data_l{ width:300px; float:left;}
+.data_download_list ul li .data_r{ width:150px; float:left;}
+.data_download_img{ vertical-align:middle; padding-right:3px;}
+

@@ -1,0 +1,376 @@
+#set($layout = "layout/default.vm")
+
+#set($canSeeAll=$!adminAccess.has("A_CRM_SEE_ALL_USER"))
+#if("$!{user.isScrap}"=="1")
+	#set($name="废弃")
+#else
+	#set($name="维护中")
+#end
+
+<div class="main">
+	<h2>买家帐户管理 - ${name}用户</h2>
+<div class="searchBox">
+	<h3><span>搜索用户</span></h3>
+<form id="form1" name="form1" action="/crm/crmRegusers.html" method="post" >
+    <input id = "isHasAgentManager" type="hidden" name="isHasAgentManager" value="$!{user.isHasAgentManager}"/>
+	<input id = "apply_stauts" type="hidden" name="apply_stauts" value="$!{user.apply_stauts}"/>
+	<input id = "type" type="hidden" name="type" value="$!{user.type}"/>
+	<input id = "isScrap" type="hidden" name="isScrap" value="$!{user.isScrap}"/>
+	<input id = "actionType" type="hidden" name="actionType" value="$!{actionType}"/>
+    	<table>
+    		<tr>
+				<th>用户名：</th>
+				<td><input type="text" id="account" name="account" value="$!user.account"/></td>
+                <th>E-mail：</th>
+				<td><input type="text" id="email" name="email" value="$!user.email"/></td>
+                <th>真实姓名：</th>
+				<td><input type="text" id="realName" name="realName" value="$!user.realName"/></td>
+			</tr>
+			<tr>
+                <th>主营类目：</th>
+				<td><select name="catCode" id="catCode" style="width:100px;">
+        				<option value="">-=请选择=-</option>
+        				#foreach($cat in $catList)
+        				<option value="$cat.catCode" #if("$cat.catCode"==$user.catCode) selected #end>$cat.catName</option>
+        				#end
+        			</select>
+				</td>
+                <th>状态：</th>
+				<td>
+    				<select name="stauts" id="status">
+    					<option value="">-=请选择=-</option>
+    					<option value="1" #if("$user.stauts"=="1")  selected #end>正常使用</option>
+    					<option value="2" #if("$user.stauts"=="2")  selected #end>冻结</option>
+    					<option value="0" #if("$user.stauts"=="0")  selected #end>未激活</option>
+    				</select>
+        		</td>
+
+				#if($canSeeAll)
+                <th>维护人：</th>
+				<td><select name="agentManagerId" id="agentManagerId">
+                        <option value="">全 部</option>
+                		#foreach($temp in $adminUsers)
+                			  <option value="$!temp.id" #if("$temp.id"=="$user.agentManagerId") selected #end>$!{temp.userName}</option>
+                		#end
+                    </select>
+                </td>
+				#end
+        		<th></th>
+				<td><input type="button" value="查询" onclick="doSubmit();" class="button"/></td>
+			</tr>
+    	</table>
+	</form>
+</div>
+<center ><div id="result" style="color:red;">$!message</div></center>
+<div class="tab-div">
+	<div class="tool">
+        #if($name=="维护中")
+			<span class="action-span"><a href="" onclick="backRegister();return false;" hidefocus="true" class="bt_add">后台注册会员</a></span>
+		#end
+	</div>
+    <div id="tabbar-div">
+        <p>
+            <ul class="form-tab">
+                <li #if("$user.type"=="d") class="c" #end><span onclick="javascript:tabSubmit('d')">代销会员</span></li>
+                <li #if("$user.type"=="w") class="c" #end><span onclick="javascript:tabSubmit('w')">VIP批发会员</span></li>
+            </ul>
+		</p>
+    </div>
+<div class="listBox" id="listDiv">
+	<table >
+		<tbody>
+			<tr>
+			<th width="10%">
+				用户名
+			</th><th width="10%">
+				真实姓名
+			</th><th width="15%">
+				email
+			</th><th width="5%">
+				性别
+			</th><th width="10%">
+				注册时间
+			</th>
+			<th width="5%">
+			代销
+			</th>
+			<th>
+			主营类目
+			</th>
+			<th width="5%">
+			维护人
+			</th>
+			<th width="10%">
+				最后登录时间
+			</th><th width="5%">
+				状态
+			</th><th width="10%">
+				操作
+			</th></tr>
+				#foreach($user in $query.items)
+					##拥有查看权限，可以查看与修改任何客户(若客户的维护人为空,则无此限制)
+					#if($canSeeAll || ""==($!user.agentManagerName))
+						<td>
+                            <a href="crmUserDetail.html?userId=$!user.id">$!user.account</a>
+                            </td><td>
+                            	$!user.realName
+                            </td><td>
+                            	$!user.email
+                            </td><td align="center">
+                            	#if($user.sex==0)
+                            		保密
+                            	#elseif($user.sex==1)
+                            		女
+                            	#else
+                            		男
+                            	#end
+                            </td><td align="center">
+                            	$date.format('yyyy-MM-dd',$!{user.gmtCreate})
+                            </td>
+                            <td align="center">
+                            #if($user.type=="d")
+                            	是
+                            #else
+                            	否
+                            #end
+                            </td>
+                            <td>
+                            	#if($user.taobaoMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.taobaoMainBusiness),20)|
+                            	#end
+                            	#if($user.paipaiMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.paipaiMainBusiness),20)|
+                            	#end
+                            	#if($user.youaMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.youaMainBusiness),20)|
+                            	#end
+                            	#if($user.ebayMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.ebayMainBusiness),20)|
+                            	#end
+                            	#if($user.otherMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.otherMainBusiness),20)|
+                            	#end
+                            	#if($user.entityMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.entityMainBusiness),20)|
+                            	#end
+                            	#if($user.selfshopMainBusiness)
+                            		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.selfshopMainBusiness),20)
+                            	#end
+                            </td>
+                            <td>
+                            	#if($!adminAccess.has("A_CRM_USER_MODIFY_EXPAND_USER"))
+                            	<select id="agent_manager_id_$!user.id" onchange="doModify($!user.id);">
+                            		<option value="">请选择</option>
+                            		#foreach($obj in $adminUsers)
+                            		  <option value="$!obj.id" #if("$!user.agentManagerName"=="$!obj.userName") selected #end>$!{obj.userName}</option>
+                            		#end
+                                </select>
+                            	#else
+                            		$!user.agentManagerName
+                            	#end
+                            </td>
+                            <td align="center">
+                            	$date.format('yyyy-MM-dd',$!{user.gmtLast})
+                            </td><td>
+                            	<span id="${user.id}userStatus">
+                            	#if(${user.stauts}==2)
+                            		冻结
+                            	#elseif(${user.stauts}==0)
+                            		未激活
+                            	#else
+                            		正常使用
+                            	#end
+                            	</span>
+                            	<input type="hidden" id="${user.id}statusText" value="${user.stauts}"/>
+                            	<input type="hidden" id="${user.id}isScrapText" value="${user.isScrap}"/>
+                            </td><td align="center">
+                            	<input id="${user.id}opbutton" name="${user.id}opbutton" type="button" value="#if(${user.stauts}==2) 解冻 #else 冻结 #end" onclick="chooseOperate('$user.id');" #if(!$!adminAccess.has("A_CRM_USER_MODIFY_USER"))disabled #end />
+                            	<input id="${user.id}isScrap" name="${user.id}isScrap" type="button" value="#if(${user.isScrap}==1) 维护 #else 废弃 #end" onclick="doScrap('$user.id');" #if(!$!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER"))disabled #end />
+                            </td>
+						</tr>
+
+					#else
+						##没有查看全部权限，仅可以查看自己维护的用户
+						#if($!user.agentManagerName==$!adminAgent.username)
+							<tr>
+                                <td>
+                                	<a href="crmUserDetail.html?userId=$!user.id">$!user.account</a>
+                                </td><td>
+                                	$!user.realName
+                                </td><td>
+                                	$!user.email
+                                </td><td align="center">
+                                	#if($user.sex==0)
+                                		保密
+                                	#elseif($user.sex==1)
+                                		女
+                                	#else
+                                		男
+                                	#end
+                                </td><td align="center">
+                                	$date.format('yyyy-MM-dd',$!{user.gmtCreate})
+                                </td>
+                                <td align="center">
+                                #if($user.type=="d")
+                                	是
+                                #else
+                                	否
+                                #end
+                                </td>
+                                <td>
+                                	#if($user.taobaoMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.taobaoMainBusiness),20)|
+                                	#end
+                                	#if($user.paipaiMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.paipaiMainBusiness),20)|
+                                	#end
+                                	#if($user.youaMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.youaMainBusiness),20)|
+                                	#end
+                                	#if($user.ebayMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.ebayMainBusiness),20)|
+                                	#end
+                                	#if($user.otherMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.otherMainBusiness),20)|
+                                	#end
+                                	#if($user.entityMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.entityMainBusiness),20)|
+                                	#end
+                                	#if($user.selfshopMainBusiness)
+                                		$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($user.selfshopMainBusiness),20)
+                                	#end
+                                </td>
+                                <td>
+                            		$!user.agentManagerName
+                                </td>
+                                <td align="center">
+                                	$date.format('yyyy-MM-dd',$!{user.gmtLast})
+                                </td><td>
+                                	<span id="${user.id}userStatus">
+                                	#if(${user.stauts}==2)
+                                		冻结
+                                	#elseif(${user.stauts}==0)
+                                		未激活
+                                	#else
+                                		正常使用
+                                	#end
+                                	</span>
+                                	<input type="hidden" id="${user.id}statusText" value="${user.stauts}"/>
+                                	<input type="hidden" id="${user.id}isScrapText" value="${user.isScrap}"/>
+                                </td><td align="center">
+                                	<input id="${user.id}opbutton" name="${user.id}opbutton" type="button" value="#if(${user.stauts}==2) 解冻 #else 冻结 #end" onclick="chooseOperate('$user.id');" #if(!$!adminAccess.has("A_CRM_USER_MODIFY_USER"))disabled #end   />
+                                	<input id="${user.id}isScrap" name="${user.id}isScrap" type="button" value="#if(${user.isScrap}==1) 维护 #else 废弃 #end" onclick="doScrap('$user.id');" #if(!$!adminAccess.has("A_CRM_USER_SCRAP_REASSERT_USER"))disabled #end />
+                                </td></tr>
+						#end
+					#end
+				#end
+		</tbody>
+	</table>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/crm/crmRegusers.html?actionType=$actionType").put("apply_stauts","success").put("isHasAgentManager","y").put("type","d").put("isScrap","$user.isScrap").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div>
+</div>
+</div>
+<script language="javascript" type="text/javascript">
+	var statusTextId;
+	var opbuttonId;
+	var userStatusId;
+
+	function doModify(userId){
+        var flag=document.getElementById("agent_manager_id_"+userId).options[0].selected;
+        var agentManagerId=document.getElementById("agent_manager_id_"+userId).value
+
+        if(flag){
+            alert("请选择维护人");
+        } else if(confirm("确定要更换维护人吗？")){
+            jQuery.post('crmAgentManagerUpdateByJson.html',{param1:agentManagerId,param2:userId},function(message){
+                if(message.indexOf("success") > -1){
+    			   alert("修改维护人成功！");
+    		    }else if(message.indexOf("failed") > -1){
+    			   alert("修改维护人失败，此用户不存在！");
+    		    }
+    		},'json');
+		}
+    }
+
+    function chooseOperate(id){
+    	statusTextId=id+"statusText";
+		opbuttonId=id+"opbutton";
+		userStatusId=id+"userStatus";
+    	var status= document.getElementById(statusTextId).value;
+		var op;
+    	if(status!='2'){
+		    op = "freeze";
+    	}else if(status=='2'){
+    		op = "release";
+    	}
+		jQuery.post('crmFreezeOrRelease.html',{param1:id,param2:op},function(message){
+            if(message.indexOf("freeze") > -1){
+			   document.getElementById(opbuttonId).value = " 解冻 ";
+			   var userStatus = document.getElementById(userStatusId);
+			   userStatus.innerHTML = "冻结";
+			   document.getElementById(statusTextId).value = "2";
+			   jQuery("#result").html("冻结成功！");
+		    }else if(message.indexOf("release") > -1){
+			   document.getElementById(opbuttonId).value = " 冻结 ";
+			   var userStatus = document.getElementById(userStatusId);
+			   userStatus.innerHTML = "正常使用";
+			   document.getElementById(statusTextId).value = "1";
+			   jQuery("#result").html("解冻成功！");
+		    }
+		},'');
+    }
+
+	function doScrap(id){
+    	isScrapTextId=id+"isScrapText";
+		isScrapId=id+"isScrap";
+		userStatusId=id+"userStatus";
+    	var isScrap= document.getElementById(isScrapTextId).value;
+		var op;
+    	if(isScrap=='1'){
+		    op = "reassert";
+    	}else if(isScrap=='0'){
+    		op = "scrap";
+    	}
+		jQuery.post('crmScrapOrReassert.html',{param1:id,param2:op},function(message){
+            if(message.indexOf("reassert") > -1){
+			   document.getElementById(isScrapId).value = " 废弃 ";
+			   document.getElementById(isScrapTextId).value = "0";
+			   jQuery("#result").html("重新维护成功！");
+		    }else if(message.indexOf("scrap") > -1){
+			   document.getElementById(isScrapId).value = " 维护 ";
+			   document.getElementById(isScrapTextId).value = "1";
+			   jQuery("#result").html("废弃成功！");
+		    }
+		},'');
+    }
+
+	function doSubmit(){
+		document.getElementById('account').value=document.getElementById('account').value.trim();
+		document.getElementById('email').value=document.getElementById('email').value.trim();
+		document.getElementById('realName').value=document.getElementById('realName').value.trim();
+		document.form1.submit();
+	}
+
+	String.prototype.trim=function()
+	{
+		return this.replace(/(^\s*)|(\s*$)/g, '');
+	}
+
+	function backRegister(){
+	   document.form1.action = "/crm/crmBackRegister.html";
+	   document.form1.submit();
+	}
+
+	function tabSubmit(type)
+	{
+		document.getElementById('type').value=type;
+		document.getElementById('isHasAgentManager').value='y';
+		document.form1.submit();
+	}
+</script>

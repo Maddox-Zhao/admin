@@ -1,0 +1,65 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>新增职务</h2>
+        <div class="formBox">
+         <form id="form1" action="/role/insertRole.html" method="post">
+        	<h3><i></i><span>新增职务</span></h3>
+			#springBind("role.type")
+			<input type="hidden" name="type" value="$!type"/>
+        	<div class="content">
+        		<table class="c2">
+            	  <tr>
+                    <th>职务名称：</th>
+                    <td>
+					   #springBind("role.name")
+                       <input name="${status.expression}" type="text" class="inp" value="$!{status.value}" />
+                       <span class="red">*</span> <span class="error">$!{status.errorMessage}</span>
+					</td>
+
+          	    </tr>
+		    ##   添加职务时，不添加部门
+				 <tr>
+            	    <th>所属部门：</th>
+            	    <td>
+						#springBind("role.depCode")
+						<select name="${status.expression}" >
+							<option value=""> ---请选择-------</option>
+							#foreach($department in $list)
+								<option value="$!department.depCode">$!department.name</option>
+							#end
+						</select>
+						<span class="error">$!{status.errorMessage}</span>
+            	    </td>
+          	    </tr>
+				
+            	  <tr>
+            	    <th>描述：</th>
+            	    <td>
+						#springBind("role.display")
+						<textarea name="${status.expression}" class="textarea">$!{status.value}</textarea>
+						<span class="error">$!{status.errorMessage}</span>
+            	    </td>
+          	    </tr>
+        	    <tr>
+        		   <th>状态:</th>
+        		   <td>
+					  #springBind("role.status")
+        			  <input type="checkbox" name="${status.expression}" value="1" />启用
+        		   </td>
+        	    </tr>
+              </table>
+    </div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="submit" class="button-s4">添加</button>
+                <button type="button" class="button-s4" onclick="javascript:history.back(-1);">取消</button>
+
+
+          	</div><!-- 表单按钮区 END -->
+
+         </form>
+        </div> <!-- 表单模块 END -->
+	

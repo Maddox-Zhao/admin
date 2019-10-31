@@ -1,0 +1,247 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>添加客户</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+          <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+#set($chooseManager = false)
+ #if($!adminAccess.has('A_CUSTOMER_MANAGER_CHOOSEMANAGER'))
+	#set($chooseManager = true)
+ #end
+ 
+<body>
+   <div id="form1"  style="margin-left:auto;margin-center:auto;margin-left:100px">
+        <table>
+            
+            <tr>
+                <td>
+                    <label >VIPnum：</label>
+                </td>
+                <td>
+					<input id="idCustomer"  name="idCustomer" style="display:none" class="mini-textbox"   />
+                    <input id="vipNum"  name="vipNum" style="width:120px" class="mini-textbox"   />
+                </td>
+            </tr>
+			<tr>
+                <td>
+                    <label>姓名：</label>
+                </td>
+                <td>
+                      <input id="name"  name="name" style="width:120px" class="mini-textbox"   required="true"  vtype=""  />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label >电话：</label>
+                </td>
+                <td>
+                    <input id="phone"  name="phone" style="width:120px" class="mini-textbox"  required="true"  vtype="float;maxLength:11;minLength:11" />
+                </td>
+            </tr>
+            <tr id="paymentTr">
+                <td>
+                    <label >省份：</label>
+                </td>
+                <td>
+                       <input id="province" name="province"  class="mini-combobox"   style="width:120px" textField="regionName" valueField="code" emptyText="请选择..." 
+						url="/customer/getRegion.html"  allowInput="false"   required="true"  />  
+                </td>
+            </tr>
+            <tr id="cashTr">
+                <td>                   
+                    <label>地址：</label>
+                </td>
+                <td>
+                    <input id="address" name="address" style="width:120px;height:100px" class="mini-textarea"    required="true" />
+                </td>
+            </tr>
+			
+			  <tr>
+                <td>                   
+                    <label>email：</label>
+                </td>
+                <td>
+                   <input id="email"  name="email" style="width:120px" class="mini-textbox"  vtype="email" />
+                </td>
+            </tr>
+			
+            <tr>
+                <td>
+						类型：
+                </td>
+                <td>
+					 <input id="type" name="type"  class="mini-combobox"   style="width:120px;" textField="name" valueField="id" emptyText="请选择..." 
+						data="typeStatus" allowInput="false"   required="true"  />  
+                </td>
+            </tr>
+			  <tr>
+                <td>
+						客户经理：
+                </td>
+                <td>
+					#if($chooseManager)
+						<input id="managerId" name="managerId" style="width:120px"  class="mini-buttonedit" text="admin" value="1000000" emptyText="请选择..."  onbuttonclick="onButtonEdit" selectOnFocus="true" required="true"  />
+					#else
+						<input id="managerId" name="managerId" style="width:120px" value="$!admin.userName" text="$!admin.name" class="mini-buttonedit" emptyText="请选择..."  onbuttonclick="onButtonEdit" selectOnFocus="true"  readOnly="true"  />
+					 #end
+                </td>
+            </tr>
+			<tr>
+                <td>
+						备注：
+                </td>
+                <td>
+                      <input id="remark" name="remark" style="width:120px" class="mini-textarea"   />
+                </td>
+            </tr>
+			
+             <tr>
+					<td>
+						  <a class="mini-button" id="submit" iconCls="icon-ok" onclick="submit()">添加</a>
+						  <a class="mini-button" id="edit" iconCls="icon-edit"  style="display:none" onclick="update()">修改</a> 
+					</td>
+					<td>
+						  <a class="mini-button" iconCls="icon-close" onclick="CloseWindow('close')">取消</a>
+					</td>
+			 </tr>
+			 
+			 
+		</table>
+   </div>
+    
+<script type="text/javascript">
+	var typeStatus = [{id:1,name:'零售客户'},{id:2,name:'批发客户'},{id:3,name:'代销客户'}];
+	
+
+	function submit()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		mini.confirm("确定添加,电话不能修改？", "提示", function(action) {
+				 if (action == "ok") {
+        				var formData = form.getData();//form表单填写的数据
+                		mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '提交中,请勿关闭...'
+                        });
+                		jQuery.post("/customer/addCustomer.html",formData,function(text)
+                		{
+                		 	mini.unmask(document.body);
+                			if("ok" == text)
+                			{
+                				CloseWindow('close');
+                			}
+                			else if("phone_exists" == text)
+                			{
+                				mini.alert("电话已存在");
+                			}
+                			else if("email_exists" == text)
+                			{
+                				mini.alert("邮件已存在");
+                			}
+                			else
+                			{
+                				mini.alert("提交出错,联系管理员");
+                			}
+                		});
+				 }
+			
+		});
+		
+		
+	}
+	
+	
+	function update()
+	{
+		var form = new mini.Form("#form1");
+		form.validate();
+		if(form.isValid() == false) return;
+		mini.confirm("确定修改？", "提示", function(action) {
+				 if (action == "ok") {
+        				var formData = form.getData();//form表单填写的数据
+                		mini.mask({
+                            el: document.body,
+                            cls: 'mini-mask-loading',
+                            html: '提交中,请勿关闭...'
+                        });
+                		jQuery.post("/customer/updateCustomer.html",formData,function(text)
+                		{
+                		 	mini.unmask(document.body);
+                			if("ok" == text)
+                			{
+                				mini.alert("更新成功")
+                			}
+                			else
+                			{
+                				mini.alert("更新出错,联系管理员");
+                			}
+                		});
+				 }
+			
+		});
+		
+		
+	}
+	
+	 function setData(data) 
+	 {
+	 	var form = new mini.Form("#form1");
+		form.setData(data);
+		//设置客户经理
+		var managerObj = mini.get("managerId");
+		managerObj.setText(data.manager);
+		managerObj.setValue(data.managerId);
+		//隐藏添加按钮 显示更新按钮
+		jQuery("#submit").hide();
+		jQuery("#edit").show();
+		
+		//电话不能修改
+		mini.get("phone").setEnabled(false);
+		
+	 }
+	
+	
+	//选中客户
+	function onButtonEdit()
+	{
+		mini.open({
+            url: "/admin/toGgetAdmin2Json.html",
+            title: "选择客户经理",
+            width: 700,
+            height: 300,
+            onload: function() {
+                 var iframe = this.getIFrameEl();
+             	 iframe.contentWindow.setData();
+            },
+            ondestroy: function(action) {
+               var iframe = this.getIFrameEl();
+               var data = iframe.contentWindow.getData(data);
+			   data = mini.clone(data);
+			   if(data)
+			   {
+			   		mini.get("managerId").setText(data.name);
+					mini.get("managerId").setValue(data.userName);
+				 
+			   }
+            }
+        });
+	}
+	
+	
+	function CloseWindow(action) 
+	{            
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();            
+	}
+	
+</script>
+</body>
+</html>

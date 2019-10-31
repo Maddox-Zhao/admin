@@ -1,0 +1,209 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>代购凭证详情</h2>
+		 
+		 <script type="text/javascript">
+		 	function check()
+			{
+				document.updateConsignment.submit();
+			};
+			
+			function resetForm()
+			{
+				document.updateConsignment.reset();
+			};
+			
+
+			function deleteById(id,status,daigouId)
+			{
+				if(status == "sold")
+				{
+					alert("已售产品不能删除");
+					return false;
+				}
+				if(confirm('确定删除？'))
+				{
+				  	location.href = '/daigouPro/delete.html?id='+ id + '&daigouId=' + daigouId;
+			    }
+				 return false;
+			}
+			
+		 </script>		
+		 
+		  #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+				#if($!message == "updatesuccess")
+					更新成功！
+				#end
+				#if($!message == "qukuansuccess")
+					支付定金成功！
+				#end
+				
+				#if($!message == "imgerror")
+					图片格式不正确,必须为jpg,jpeg,gif,bmp类型的,并且小于200K
+				#end
+		</div>
+		 #end
+    </div>
+
+	##代购凭证信息
+	<form name="form1" id="form1" method="post" action="update.html" enctype="multipart/form-data">
+		<span id="print">
+    	<div class="formBox">
+    		<h3><i></i><span>代购凭证信息</span></h3>
+    		<div class="content">
+    			<table class="c6">
+    				<tr>
+    					<th>代购号：</th>
+        			    <td style="width:240px;">$!{daigou.daigouCode}</td>
+        			    <th>总计金额：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{daigou.amount}</span></td>
+    				</tr>
+    				<tr>
+    					<th>订单状态：</th>
+        			    <td>$!{daigou.status}</td>
+        			    <th>已付定金：</th>
+        			    <td style="width:240px;">￥<span id="amountFirstSpan">$!{daigou.paidAmount}</span></td>
+    				</tr>
+    				<tr>
+						<th>代购时间：  </th>
+    					<td>$dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{daigou.gmtCreate})</td>
+    					<th>修改时间： </th>
+    					<td>$dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!{daigou.gmtModify})</td>
+    				</tr>
+					<tr>
+    					<th>客户ID：</th>
+    					<td>$!{daigou.customerId}</td>
+    					<th>操作者ID：</th>
+    					<td>$!{daigou.operatorId}</td>
+    				</tr>
+					<tr>
+						<th>客户身份证图片：</th>
+    					<td>
+							#if($!{daigou.idcardsImage})
+								<a href="showimg.html?url=$!{daigou.idcardsImage}" taget="_blank"><img src='${upServer}$imgUtil.changeLargeImgToSmal($!{daigou.idcardsImage})' width="100" /></a>
+							#end
+							<input type="file" name="img2"/>
+					  </td>
+    					<th>代购凭证图片：</th>
+    					<td>
+							#if($!{daigou.daigouImage})
+							<a href="showimg.html?url=$!{daigou.daigouImage}" taget="_blank"><img src='${upServer}$imgUtil.changeLargeImgToSmal($!{daigou.daigouImage})' width="100" height="80"/></a>
+							#end
+							<input type="file" name="img"/>
+						</td>
+					</tr>
+					<tr colspan="4"> <div class="mag-t3"><span>图片应小于200k,格式为jpg,jpeg,bmp,gif中的一种</span></div></tr>
+					<tr>
+						<th >
+							备注：
+						</th>
+						#springBind("daigou.id")
+						<input type="hidden" name="id" value="$!{daigou.id}"/>
+						<td colspan="3">
+							#springBind("daigou.note")
+							<textarea cols="70" rows="5" name="note" id="note">$!{daigou.note}</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<div class="form-but">
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:document.form1.submit()">保存</button>
+								<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:location.href='/daigouPro/addInput.html?daigouCode=$!{daigou.daigouCode}'">添加产品</button>
+   							</div>
+							
+
+						</td>
+	
+					</tr>
+					
+    			</table>
+    		</div>					
+			
+			</div>
+		</div>
+		</span>
+	</form>
+	<br/>
+	
+##代购单的产品信息
+	<div class="formBox">
+	<h4><span>产品信息</span></h4>
+    		<div class="content">
+    			<table id="sc_tr_table" class="c6">
+					<tr> 
+    					<th style="text-align:center;">品牌id</th>
+    					<th style="text-align:center;">品名id</th>
+    					<th style="text-align:center;">材质</th>
+    					<th style="text-align:center;" >型号</th>
+    					<th  style="text-align:center;">颜色</th>
+						<th  style="text-align:center;">价钱</th>
+    					<th  style="text-align:center;">已付定金</th>
+    					<th style="text-align:center;">产品图片</th>
+    					##<th style="text-align:center;">状态</th>
+    					<th style="text-align:center;">操作</th>
+					</tr>
+				#if($daigouProList)
+				 #foreach($daigouPro in $daigouProList)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+						#set($String = 'a')
+					<td style="text-align:center;">$!brandMap.get($String.valueOf($!daigouPro.brandId))</td>
+					<td style="text-align:center;">$!seriesMap.get($String.valueOf($!daigouPro.seriesId))</td>
+					<td style="text-align:center;">$!daigouPro.material</td>
+					<td style="text-align:center;">$!daigouPro.type</td>
+					<td style="text-align:center;">$!daigouPro.color</td>
+					<th  style="text-align:center;">$!daigouPro.price</th>
+					<td style="text-align:center;">$!daigouPro.paidAmount</td>
+					<td style="text-align:center;">
+						#if($!daigouPro.pic)
+						<a href="/daigou/showimg.html?url=$!daigouPro.pic">
+						<img src='${upServer}$imgUtil.changeLargeImgToSmal($!daigouPro.pic)' width="50" />
+						</a>
+						#end
+					</td>
+				##	<td   style="text-align:center;">
+					##	#if($!daigouPro.status.equals("wait_sell"))
+				##			未售
+				##		#else
+				##			已售	
+				##		#end
+				##	</td>
+					<td style="text-align:center;">
+						
+						<a href="/daigouPro/drawInput.html?id=$!daigouPro.id">付定金</a>
+						<a href="/daigouPro/updateInput.html?id=$!daigouPro.id">查看</a>
+						#if($!daigouPro.status.equals("wait_sell"))
+						<a href="#" onclick="return deleteById($!daigouPro.id,'$!daigouPro.status',$!daigouPro.daigouId)">删除</a> &nbsp;&nbsp;
+						#end
+					</td>
+                 </tr>
+				 #end
+				#end
+				</table>
+				
+			#if($!proList.size() == 0)
+				没有结果
+			#end
+			
+			</div>
+
+	</div>
+
+##产品查询完毕

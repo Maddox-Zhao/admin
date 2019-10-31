@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BaseSql">
+<sql id="pageSQLHead" >
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[
+         ]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</sql>
+
+<sql id="pageSQLFoot" >
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+		<![CDATA[ limit #startRow#,#endRow#
+		]]>
+		</isNotEmpty>
+	</isNotEmpty>
+</sql>
+</sqlMap>

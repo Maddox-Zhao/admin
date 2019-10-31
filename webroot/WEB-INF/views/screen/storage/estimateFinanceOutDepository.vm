@@ -1,0 +1,164 @@
+#set($layout = "layout/default.vm")
+#set($title = "财务管理 - 暂估出库单管理")
+<div class="main">
+<h2>财务管理 - 暂估出库单管理</h2>
+<div class="searchBox">
+    <h3><span>搜索暂估出库单</span></h3>
+
+  <form action="$appServer/storage/estimateFinanceOutDepository.html" name="searchForm" method="post">
+		<table >
+			<tr>
+				<th>单据编号：</th>
+                <td>
+					<input value="$!queryObject.billNum"  type="text" name="billNum" id="billNum" size="18" theme="simple" )
+				</td>
+				<th>财务状态：</th>
+    			<td >
+    				<select name="financeStatus" id="financeStatus" >
+    					<option value="">-=请选择=-</option>
+    					<option value="y" #if($!{queryObject.financeStatus} == "y") selected="true" #end>已确认</option>
+						<option value="n" #if($!{queryObject.financeStatus} == "n") selected="true" #end>未确认</option>
+    				</select>
+                </td>
+            </tr>
+			<tr >
+    			<th>出库时间：从</th>
+    			<td >
+    				<input type="text" name="startTime" id="startTime" value="$!queryObject.startTime" size="10" theme="simple" readonly="true" />
+                </td>
+    			<th>到</th>
+    			<td >
+    				<input type="text" name="endTime" id="endTime" value="$!queryObject.endTime" size="10" theme="simple" readonly="true" />
+                </td>
+        		  <script type="text/javascript">
+        		      Calendar.setup({
+        		          inputField : "startTime",
+        		          ifFormat   : "%Y-%m-%d",
+        		          align      : "BR"
+        		      });
+        		      Calendar.setup({
+        		          inputField : "endTime",
+        		          ifFormat   : "%Y-%m-%d",
+        		          align      : "BR"
+        		      });
+        		</script>
+            </tr>
+
+			<tr >
+				<th></th>
+    			<td >
+    				<input type="button" value=" 查询 " class="button"  onclick="formSubmit();"/>
+					<input type="button" value="Excel导出" class="button" onclick="doExport();"/>
+                </td>
+            </tr>
+    	</table>
+	</form>
+</div>
+
+<!-- 暂估出库单列表 -->
+<center ><div id="result" style="color:red;">$!message</div></center>
+  <div class="listBox" id="listDiv">
+    <table  id="listTable" name="listTable"  class="list-table">
+        <div align="right"><font size='4'><strong><label>【 汇总: </label></strong></font><font size='4' color="red"><strong><label>$!count</label></strong></font><font size='4'><strong><label>笔&nbsp;&nbsp;&nbsp;总金额: </label></strong></font><font size='4' color="red"><strong><label>$!moneyUtil.getFormatMoney($!totalSum,'0.00')</label></strong></font><font size='4'><strong><label>元 】</label></strong></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <tr>
+        <th>单据编号</th>
+        <th>出库时间</th>
+		<th>金额（￥）</th>
+		<th>财务状态</th>
+		<th>操作</th>
+      </tr>
+      #foreach($obj in $query.items)
+	  <tr #if($velocityCount%2==0) class="bg" #end>
+           <td  align="center">&nbsp;<a href="showOutDetail.html?outDepId=$!obj.outDepositoryId" target="_blank">$!obj.billNum</a></td>
+		   <td  align="center">$!date.format("yyyy-MM-dd",$!obj.gmtOutDep)</td>
+           <td align="center">$!moneyUtil.getFormatMoney($!obj.sumMoney,'0.00')</td>
+           <td  align="center">
+			 <span id="${obj.outDepositoryId}financeStatus">
+				#if("$obj.financeStatus" == "n")
+					未确认
+				#elseif("$obj.financeStatus" == "v")
+					未确认(暂估确认)
+				#elseif("$obj.financeStatus" == "f")
+					未确认(实际确认)
+				#else
+					全部确认
+				#end
+			 </span>
+		   </td>
+           <td  align="center">
+			#if(${obj.financeStatus}=='n'||${obj.financeStatus}=='f')
+			<input type="button" id="${obj.outDepositoryId}opbutton" name="${obj.outDepositoryId}opbutton" onclick="estimateConfirm($!obj.outDepositoryId);" value="确认"/>
+			#end
+		</td>
+
+      </tr>
+	  #end
+    </table>
+
+    <!-- 分页 -->
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/estimateFinanceOutDepository.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+    var opbuttonId;
+	var financeStatusId;
+
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="$appServer/storage/exportEstimateFinanceOut.html";
+		form1.submit();
+		form1.action="estimateFinanceOutDepository.html";
+	}
+
+    function estimateConfirm(outid){
+		var answer = confirm("确认此订单?")
+		if (answer){
+		  opbuttonId=outid+"opbutton";
+		  financeStatusId=outid+"financeStatus";
+		  jQuery.post('estimateConfirm.html',{param:outid},function(message){
+		    if(message.indexOf("easure") > -1){
+			  jQuery("#result").html("此记录已经暂估确认！");
+			}else if(message.indexOf("allsure") > -1){
+			  jQuery("#result").html("此记录已经全部确认！");
+			}else if(message.indexOf("allsuccess") > -1){
+			  document.getElementById(opbuttonId).style.display = "none";
+			  var financeStatus = document.getElementById(financeStatusId);
+			  financeStatus.innerHTML = "全部确认";
+			  jQuery("#result").html("全部确认成功！");
+			}else if(message.indexOf("easuccess") > -1){
+			  document.getElementById(opbuttonId).style.display = "none";
+			  var financeStatus = document.getElementById(financeStatusId);
+			  financeStatus.innerHTML = "未确认(暂估确认)";
+			  jQuery("#result").html("暂估确认成功！");
+			}else{
+			  jQuery("#result").html("此条记录不存在！");
+			}
+		  },'json');
+		}
+	}
+
+		function formSubmit(){
+		    var inDepDateStart1=document.getElementById("startTime").value.replace(/-/g, "/");
+    		var inDepDateEnd1=document.getElementById("endTime").value.replace(/-/g, "/");
+    		var bb_date1=new Date(Date.parse(inDepDateStart1));
+    		var ee_date1=new Date(Date.parse(inDepDateEnd1));
+
+    		if(ee_date1 < bb_date1){
+    				   alert("入库起始时间不能大于结束时间！");
+    			   return false;
+    		}
+			document.getElementById("billNum").value=document.getElementById("billNum").value.trim();
+        	document.forms[0].submit();
+	    }
+</script>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 表名:site -->
+<sqlMap namespace="site">
+	<typeAlias alias="Site" type="com.huaixuan.network.biz.domain.base.Site"/>
+	<resultMap id="SiteResult" class="Site">
+		<result property="idSite" column="idSite"/>
+		<result property="name" column="name"/>
+		<result property="city" column="city"/>
+		<result property="idCurrency" column="idCurrency"/>
+		<result property="currencyName" column="currencyName"/>
+		<result property="idSellChannel" column="idSellChannel"/>
+		<result property="sellChannelName" column="sellChannelName"/>
+		<result property="manager" column="manager"/>
+		<result property="address" column="address"/>
+		<result property="zip" column="zip"/>
+		<result property="phone" column="phone"/>
+		<result property="balance" column="balance"/>
+		<result property="type" column="type"/>
+	</resultMap>
+	
+	<sql id="SiteFields">
+			idSite,name,city,idCurrency,idSellChannel,manager,address,zip,phone,balance,type
+	</sql>
+	
+	<sql id="SITE.SEARCHSITE">
+		<isNotEmpty property="name">
+		     and  s.name like '%$name$%'
+		</isNotEmpty>
+		<isNotEmpty property="type">
+		     and  s.type = #type#
+		</isNotEmpty>
+	</sql>
+	<!-- 根据ID获取 -->
+	<select id="selectSitesByPage" parameterClass="java.util.Map" resultMap="SiteResult">
+		SELECT s.*,sc.name sellChannelName,c.name currencyName
+		FROM site s,sellchannel sc,currency c
+		WHERE s.idCurrency = c.idCurrency
+		AND s.idSellChannel =sc.idSellChannel
+		<include refid="SITE.SEARCHSITE"  />
+		order by s.type,s.idSite
+		<isNotEmpty property="startRow" >
+			<isNotEmpty property="endRow" >
+				<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+	         </isNotEmpty>
+       </isNotEmpty>
+       
+	</select>
+	
+	<select id="selectSitesByPageCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		SELECT count(s.idSite)
+		FROM site s,sellchannel sc,currency c
+		WHERE s.idCurrency = c.idCurrency
+		AND s.idSellChannel =sc.idSellChannel
+		<include refid="SITE.SEARCHSITE"  />
+		
+	</select>
+	
+	
+	
+	<!-- 根据ID获取 -->
+	<select id="selectSiteByIdSite" parameterClass="java.lang.String" resultMap="SiteResult">
+		select <include refid="SiteFields"/>,'' as currencyName, '' as sellChannelName
+		  from site
+		 where idSite = #idSite#
+	</select>
+	
+	
+	<!-- 根据获取idSite -->
+	<select id="getMaxIdSiteByType" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		SELECT MAX(idSite)+1 idSite
+		FROM
+		site
+		WHERE TYPE = #type#
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insertSite" parameterClass="Site">
+		insert into Site(
+ 			idSite,
+			name,
+			city,
+			idCurrency,
+			idSellChannel,
+			manager,
+			address,
+			zip,
+			phone,
+			balance,
+			type
+		) values (
+ 			#idSite#,
+			#name#,
+			#city#,
+			#idCurrency#,
+			#idSellChannel#,
+			#manager#,
+			#address#,
+			#zip#,
+			#phone#,
+			#balance#,
+			#type#
+		)
+		 
+	</insert>
+	<!-- 修改站点 -->
+	<update id="updateSite" parameterClass="Site">
+	  update site
+	   <dynamic prepend="set">
+	   <isNotNull prepend="," property="name">
+	      name=#name#
+	   </isNotNull>
+	   <isNotNull prepend="," property="address">
+	      address=#address#
+	   </isNotNull>
+	     where idSite=#idSite#
+	   </dynamic>
+	
+	</update>
+	
+	
+	<!-- 更新 -->
+	<update id="updateSiteByNotNull" parameterClass="Site">
+		update site
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="idSite">
+				idSite=#idSite#
+			</isNotNull>
+			<isNotNull prepend="," property="name">
+				name=#name#
+			</isNotNull>
+			<isNotNull prepend="," property="city">
+				city=#city#
+			</isNotNull>
+			<isNotNull prepend="," property="idCurrency">
+				idCurrency=#idCurrency#
+			</isNotNull>
+			<isNotNull prepend="," property="idSellChannel">
+				idSellChannel=#idSellChannel#
+			</isNotNull>
+			<isNotNull prepend="," property="manager">
+				manager=#manager#
+			</isNotNull>
+			<isNotNull prepend="," property="address">
+				address=#address#
+			</isNotNull>
+			<isNotNull prepend="," property="zip">
+				zip=#zip#
+			</isNotNull>
+			<isNotNull prepend="," property="phone">
+				phone=#phone#
+			</isNotNull>
+			<isNotNull prepend="," property="balance">
+				balance=#balance#
+			</isNotNull>
+			<isNotNull prepend="," property="type">
+				type=#type#
+			</isNotNull>
+		 where id = #id#
+		</dynamic>
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deleteSiteById" parameterClass="java.lang.Long">
+		delete from site
+		 where id = #id#
+	</delete>
+</sqlMap>
+

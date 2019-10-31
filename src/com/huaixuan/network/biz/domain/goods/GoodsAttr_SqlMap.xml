@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GoodsAttrSQL">
+<typeAlias alias="goodsAttr" type="com.huaixuan.network.biz.domain.goods.GoodsAttr"/>
+	<resultMap class="goodsAttr" id="goodsAttrResult">
+		<result column="id" property="id"/>
+		<result column="attr_code" property="attrCode"/>
+		<result column="attr_name" property="attrName"/>
+		<result column="attr_value" property="attrValue"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="price" property="price" nullValue="0"/>
+		<result column="attr_id" property="attrId"/>
+		<result column="is_use" property="isUse"/>
+	</resultMap>
+<!-- create GoodsAttr object -->
+
+<insert id="addGoodsAttr" parameterClass="goodsAttr">
+<![CDATA[
+insert into emall_goods_attr
+  (id, attr_code, attr_name, attr_value, goods_id, price, attr_id, is_use)
+values
+  (null,
+   #attrCode#,
+   #attrName#,
+   #attrValue#,
+   #goodsId#,
+   #price#,
+   #attrId#,
+   #isUse#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<!-- update GoodsAttr object -->
+<update id="editGoodsAttr" parameterClass="goodsAttr">
+<![CDATA[
+		update emall_goods_attr set attr_code = #attrCode#,
+		attr_name = #attrName#,
+		attr_value = #attrValue#,
+		goods_id = #goodsId#,
+		attr_id = #attrId#,
+		price = #price#,
+		is_use=#isUse#
+		 where id = #id#
+
+]]>
+</update>
+<!-- delete GoodsAttr object -->
+<delete id="removeGoodsAttrByGoods" parameterClass="java.lang.Long">
+<![CDATA[
+		update emall_goods_attr set is_use=1  where emall_goods_attr.goods_id = #value#
+]]>
+</delete>
+
+<delete id="removeGoodsAttr" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_goods_attr where emall_goods_attr.ID = #value#
+]]>
+</delete>
+
+
+
+<select id="getGoodsAttr" parameterClass="java.lang.Long" resultMap="goodsAttrResult">
+<![CDATA[
+		select emall_goods_attr.* from emall_goods_attr where emall_goods_attr.ID = #value#
+]]>
+</select>
+<!-- search GoodsAttr by goodsId object -->
+<select id="getGoodsAttrByGoodSId" parameterClass="java.lang.Long" resultMap="goodsAttrResult">
+<![CDATA[
+		select emall_goods_attr.* from emall_goods_attr where emall_goods_attr.goods_id = #value# and emall_goods_attr.is_use=0 order by emall_goods_attr.attr_code,emall_goods_attr.id
+]]>
+</select>
+<!-- searchAll GoodsAttr List -->
+<select id="getGoodsAttrs" resultMap="goodsAttrResult">
+<![CDATA[
+		select emall_goods_attr.* from emall_goods_attr
+]]>
+</select>
+
+
+<select id="getGoodsAttrByGoodsIdAndAttrId" resultMap="goodsAttrResult">
+<![CDATA[
+		select emall_goods_attr.* from emall_goods_attr
+		where emall_goods_attr.id = #goodsAttrId#
+]]>
+</select>
+
+<select id="getGoodsAttrByMap" parameterClass="java.util.Map" resultMap="goodsAttrResult">
+<![CDATA[
+        select emall_goods_attr.* from emall_goods_attr where emall_goods_attr.is_use = 0
+]]>
+<isNotEmpty prepend="and" property="attrCode">
+        emall_goods_attr.attr_code = #attrCode#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="attrValue">
+        emall_goods_attr.attr_value = #attrValue#
+</isNotEmpty>
+<isNotEmpty prepend="and" property="goodsId">
+        emall_goods_attr.goods_id = #goodsId#
+</isNotEmpty>
+</select>
+</sqlMap>

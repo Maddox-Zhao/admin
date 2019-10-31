@@ -1,0 +1,109 @@
+#set($layout = '')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>尚上后台管理首页</title>
+  <!-- Sets initial viewport load and disables zooming  -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+   <link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet.min.css">
+  <link rel="stylesheet" href="${imageServer}/wap/bower_components/ratchet/dist/css/ratchet-theme-ios.css">
+  <link rel="stylesheet" href="${imageServer}/wap/style/index.css">
+  <script src="${imageServer}/wap/bower_components/ratchet/dist/js/ratchet.min.js"></script>
+</head>
+<body>
+  <header class="bar bar-nav">
+    <h1 class="title">尚上后台管理首页</h1>
+  </header>
+
+  <div class="container bgwrite">
+  
+  
+    <ul class="table-view mb10">
+      <li class="table-view-cell pr30">
+        <div class="fl">
+          <span class="iconfont icon-daizhifu"></span> 我的订单</div>
+        <a href="" class="fr">
+			查看全部订单
+          <span class="icon icon-right-nav"></span>
+        </a>
+      </li>
+	  
+      <li class="table-view-cell text-center">
+        <div class="col-3">
+          <span class="iconfont icon-qianbao"></span> <br>
+          <span class="tab-label">待付款</span>
+        </div>
+        <div class="col-3">
+          <span class="iconfont icon-qianbao"></span><br>
+          <span class="tab-label">当天</span>
+        </div>
+ 
+      </li>
+	  <!-- 
+      <li class="table-view-cell"></li>
+      <li class="table-view-cell pr30">
+        <div class="fl">
+          <span class="iconfont icon-qianbao"></span>
+          我的钱包
+        </div>
+        <a href="" class="fr">
+          小金库，白条
+          <span class="icon icon-right-nav"></span>
+        </a>
+      </li>
+      <li class="table-view-cell text-center">
+        <div class="col-3">
+          0.00
+          <br>
+          <span class="tab-label">帐户余额</span>
+        </div>
+        <div class="col-3">
+          0
+          <br>
+          <span class="tab-label">优惠券</span>
+        </div>
+        <div class="col-3">
+          0
+          <br>
+          <span class="tab-label">礼品卡</span>
+        </div>
+      </li>
+      <li class="table-view-cell"></li>
+	  -->
+    </ul>
+
+  </div>
+  <nav class="bar bar-tab nav-ss">
+    <a class="tab-item" href="#">
+      <span class="icon-nav">
+        <img src="${imageServer}/wap/image/nav1.png" alt=""></span>
+      <span class="tab-label">产品</span>
+    </a>
+    <a class="tab-item" href="#">
+      <span class="icon-nav">
+        <img src="${imageServer}/wap/image/nav2.png" alt=""></span>
+      <span class="tab-label">订单</span>
+    </a>
+    <a class="tab-item" href="#">
+      <span class="icon-nav">
+        <img src="${imageServer}/wap/image/nav3.png" alt=""></span>
+      <span class="tab-label">客户</span>
+    </a>
+    <a class="tab-item" href="#">
+      <span class="icon-nav">
+        <img src="${imageServer}/wap/image/nav4.png" alt=""></span>
+      <span class="tab-label">采购</span>
+    </a>
+    <a class="tab-item active" href="#">
+      <span class="icon-nav">
+        <img src="${imageServer}/wap/image/nav5-h.png" alt=""></span>
+      <span class="tab-label">我的</span>
+    </a>
+  </nav>
+</body>
+</html>

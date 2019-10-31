@@ -1,0 +1,158 @@
+#set($layout = "layout/default.vm")
+
+#set($t_title = "退换货")
+#if($refundApply.type == "g" || $refundApply.type == "a")
+	#set($t_title = "退货")
+#end
+#if($refundApply.type == "c")
+	#set($t_title = "换货")
+#end
+#if($refundApply.type == "f")
+	#set($t_title = "退款")
+#end
+
+#set($title = "管理中心 - ${t_title}申请")
+
+<body>
+<div class="main">
+	<h2>管理中心 - ${t_title}申请</h2>
+
+	#if($message)
+		<div class="mag-t2">${message}</div>
+	#end
+
+	<form action="$appServer.get("/igc/refundApplyDetail.html")" name="searchForm" id="searchForm" method="post">
+		<input type="hidden" name="applyId" value="$!refundApply.id"/>
+
+		<div class="formBox">
+			<div class="content">
+    			<table class="c6">
+					<tr>
+						<th>订单号</th>
+						<td>
+							<a href="$appServer.get("/trade/detail.html").addQueryData("tradeId", ${refundApply.tid})">$!{refundApply.tid}</a>
+						</td>
+						<th>申请状态</th>
+						<td>
+							$!enumRefundApplyStatusMap.get($!refundApply.status)
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<!-- 订单列表 -->
+			<h4><span>退换货商品</span></h4>
+			<div class="content">
+    			<table class="c6">
+					<tr>
+						<th>商品名称</th>
+						<th>选购属性</th>
+						<th>购买数量</th>
+						<th>类型</th>
+						<th>退换货数量</th>
+					</tr>
+				#foreach($applyOrder in $refundApply.refundApplyOrder)
+					<tr>
+						<td>
+							<input type="hidden" name="orderId" value="$!{applyOrder.orderId}"/>
+							<a href="$!{liangpin99Server}/l/gdetail_$!{applyOrder.goodsId}.htm" target="_blank">$stringUtils.abbreviate($applyOrder.goodsTitle, 15)</a>
+						</td>
+						<td>$!applyOrder.buyAttr</td>
+						<td>$!applyOrder.goodsNumber</td>
+						<td>
+							#if($!applyOrder.type=="h")
+								换货
+							#end
+							#if($!applyOrder.type=="t")
+								退货
+							#end
+						</td>
+						<td>$!applyOrder.refAmount</td>
+					</tr>
+				#end
+				</table>
+            </div>
+
+			<div class="content">
+    			<table class="c6">
+					<tr>
+						<th>买家留言：</th>
+						<td>
+							<textarea name="buyNote" cols="80" rows="5" readonly>$!refundApply.note</textarea>
+						</td>
+					</tr>
+					<tr>
+						<th>凭证</th>
+						<td>
+						#foreach($picurl in $!refundApply.applyPicsForPage)
+							<a href="$!{upServer}/$!picurl" target="_blank">凭证$velocityCount</a>
+						#end
+						</td>
+					</tr>
+				#if($!refundApply.status == "n")
+            		<tr>
+            			<td>&nbsp;</td>
+            			<td>
+            				<label><input type="radio"  name="agreeTag" id="agreeTag" value="p" #if("$!agreeTag" == "p" || "$!agreeTag" == "") checked="true" #end/> 同意申请</label>
+            				<label><input type="radio" name="agreeTag" id="agreeTag" value="u" #if("$!agreeTag" == "u") checked="true" #end/> 拒绝申请</label>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>客服备注：</td>
+            			<td>
+            				<textarea name="serviceNote" id="serviceNote" cols="70" rows="5">$!refundApply.serviceNote</textarea>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>&nbsp;</td>
+            			<td>
+            				<input type="hidden" name="isApply" value="isApply"/>
+            				<input type="button" value="审批完成" class="button"  onclick="formSubmit();"/>
+            				<input type="reset" value=" 重置 " class="button" />
+            			</td>
+            		</tr>
+        		#else
+            		<tr>
+            			<td>操作员：</td>
+            			<td>$!refundApply.creater</td>
+            		</tr>
+            		<tr>
+            			<td>审批时间：</td>
+            			<td>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss", $refundApply.gmtApply)</td>
+            		</tr>
+            		<tr>
+            			<td>客服备注：</td>
+            			<td><textarea name="serviceNote" id="serviceNote" cols="70" rows="5" readonly="readonly">$!refundApply.serviceNote</textarea></td>
+            		</tr>
+        		#end
+				</table>
+			</div>
+        </div>
+    </form>
+
+</div>
+</body>
+
+<script type="text/javascript">
+String.prototype.trim = function() {
+	// 用正则表达式将前后空格
+	// 用空字符串替代。
+	return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+
+function formSubmit(){
+	var note = document.getElementById("serviceNote").value.trim();
+	if(note==""){
+		alert("客服备注必须填写！");
+		return false;
+	}else if(note.length>150){
+		alert("客服备注最长为150个字，请重新填写！");
+		return false;
+	}
+
+	if(confirm("确认审批完成操作？")){
+		document.getElementById('searchForm').submit();
+	}
+}
+
+</script>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="acquisition" >
+  <resultMap id="HxAcquisitionResult" class="com.huaixuan.network.biz.domain.hx.Acquisition" >
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="acq_code" property="acpCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="operator_id" property="operatorId" jdbcType="BIGINT" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="paid_amount" property="paidAmount" jdbcType="DECIMAL" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="idcards" property="idcards" jdbcType="BIGINT" />
+    <result column="idcards_image" property="idcardsImage" jdbcType="VARCHAR" />
+    <result column="acq_image" property="acqImage" jdbcType="VARCHAR" />
+    <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
+    <result column="gmt_modify" property="gmtModify" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="acquisitionFiled">
+  	 id, acq_code, status, note, operator_id, amount, paid_amount, customer_id, idcards, idcards_image, acq_image, gmt_create, gmt_modify
+  </sql>
+  
+  <select id="selectAcquisitionById" resultMap="HxAcquisitionResult" parameterClass="java.lang.Long" >
+    select  <include refid="acquisitionFiled"/>
+    from hx_acquisition
+    where id = #id:BIGINT#
+  </select>
+  
+  <select id="selectAcquisitionByAcpCode" resultMap="HxAcquisitionResult" parameterClass="java.lang.String" >
+    select  <include refid="acquisitionFiled"/>
+    from hx_acquisition
+    where acq_code = #acpCode#
+  </select>
+  
+  
+  <select id="AcquisitionViewByConditionWithPage" resultMap="HxAcquisitionResult" parameterClass="java.util.Map">
+	   select
+	   <include refid="acquisitionFiled"/>
+	   from hx_acquisition c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[ c.gmt_create <= #dateEnd# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+				c.status = #status#
+			</isNotEmpty>
+		</dynamic>
+		order by gmt_create desc
+		<isNotEmpty property="startRow">
+			<isNotEmpty property="endRow">
+				<![CDATA[ LIMIT #startRow#,#endRow# ]]>
+			</isNotEmpty>
+		</isNotEmpty>
+	</select>
+
+	<select id="getAcquisitionViewByConditionWithPageCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(c.id) from hx_acquisition c
+		<dynamic prepend="where">
+			<isNotEmpty property="dateStart" prepend="and">
+		<![CDATA[  c.gmt_create >= #dateStart# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="dateEnd" prepend="and">
+		<![CDATA[  c.gmt_create <= #dateEnd#]]>
+			</isNotEmpty>
+			<isNotEmpty property="status" prepend="and">
+				c.status = #status#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="theAcpCodeIsExits" parameterClass="java.lang.String" resultClass="java.lang.Integer" >
+		select count(id)
+		from hx_acquisition
+		where acq_code = #acpCode#
+	</select>
+	
+  <delete id="deleteAcquisitionByPrimaryKey" parameterClass="java.lang.Long" >
+    delete from hx_acquisition
+    where id = #id:BIGINT#
+  </delete>
+  
+  
+  <insert id="insertAcquisition" parameterClass="com.huaixuan.network.biz.domain.hx.Acquisition" >
+    insert into 
+    hx_acquisition
+     (id, acq_code, status, note, operator_id, amount, paid_amount, customer_id, idcards, idcards_image, acq_image, gmt_create, gmt_modify)
+    values
+     (null, #acpCode#, default, #note#, #operatorId#,0, 0, #customerId#, #idcards#,#idcardsImage#, #acqImage#, sysdate(), sysdate())
+  </insert>
+  <update id="updateAcquisitionByPrimaryKey" parameterClass="com.huaixuan.network.biz.domain.hx.Acquisition" >
+    update hx_acquisition
+    set acq_code = #acpCode:VARCHAR#,
+      status = #status:VARCHAR#,
+      note = #note:VARCHAR#,
+      operator_id = #operatorId:BIGINT#,
+      amount = #amount:DECIMAL#,
+      paid_amount = #paidAmount:DECIMAL#,
+      customer_id = #customerId:INTEGER#,
+      idcards = #idcards:BIGINT#,
+      idcards_image = #idcardsImage:VARCHAR#,
+      acq_image = #acqImage:VARCHAR#,
+      gmt_create = #gmtCreate:TIMESTAMP#,
+      gmt_modify = #gmtModify:TIMESTAMP#
+    where id = #id:BIGINT#
+  </update>
+  <update id="updateAcquisitionByNotNull" parameterClass="com.huaixuan.network.biz.domain.hx.Acquisition" >
+    update hx_acquisition
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="acpCode" >
+        acq_code = #acpCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="status" >
+        status = #status:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="note" >
+        note = #note:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="operatorId" >
+        operator_id = #operatorId:BIGINT#
+      </isNotNull>
+      <isNotNull prepend="," property="amount" >
+        amount = #amount:DECIMAL#
+      </isNotNull>
+      <isNotNull prepend="," property="paidAmount" >
+        paid_amount = #paidAmount:DECIMAL#
+      </isNotNull>
+      <isNotNull prepend="," property="customerId" >
+        customer_id = #customerId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="idcards" >
+        idcards = #idcards:BIGINT#
+      </isNotNull>
+      <isNotNull prepend="," property="idcardsImage" >
+        idcards_image = #idcardsImage:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="acqImage" >
+        acq_image = #acqImage:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="gmtModify" >
+        gmt_modify = sysdate()
+      </isNotNull>
+    </dynamic>
+    where id = #id:BIGINT#
+  </update>
+  
+  <update id="acquisition_uploadIdcardImage" parameterClass="java.util.Map">
+		update
+			 hx_acquisition 
+		set 
+			idcards_image = #idcardImage# 
+		where 
+			id =#id#
+	</update>
+	
+	<update id="acquisition_uploadAcqImage" parameterClass="java.util.Map">
+		update
+			 hx_acquisition 
+		set 
+			acq_image = #acqImage#
+		where 
+			id =#id#
+	</update>
+  
+  
+</sqlMap>

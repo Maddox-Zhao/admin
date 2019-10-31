@@ -1,0 +1,27 @@
+#set($layout = 'layout\default.vm')
+
+
+<script language=JavaScript>
+function logout(){
+	if (confirm("您确定要退出管理平台吗？"))
+	top.location = "/exit.html";
+	return false;
+}
+</script>
+<body>
+	<div class="admin-top">
+    	<p>
+        	<a href="#" target="_self" onClick="logout();"><img src="${imageServer}/images/admin/out.gif" alt="安全退出"></a>
+            <span>$!adminAgent.name 
+				##代销客户不显示站点
+				#if($!adminAccess.has("A_DX_PRODUCT_MANAGER"))
+ 
+				#else
+					-  $!adminAgent.siteName
+				#end
+				：您好,欢迎使用！</span>
+        </p>
+        <img src="${imageServer}/images/admin/logo.png" width="262" height="64">
+        
+    </div>
+</body>

@@ -1,0 +1,57 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>类目库存成本汇总</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+ <h3><span>类目库存成本汇总</span></h3>
+   <form action="searchStorageCost.html" name="searchForm" method="post">
+    <table>
+ 
+    <th> 仓库：</th><td>
+			<select name="depId" id="catCodeSearch" style="width:100px;">
+				<option value="">请选择</option>
+				#foreach($depository in $query.items)
+				<option value="$!depository.id" #if(${parMap.depId}=="$!depository.id")selected#end>$!depository.name</option>
+				#end
+			</select>
+			<td>
+			<th>
+	<input name="search" value="查询" class="button" type="submit" /></th>
+	<td>&nbsp;</td>
+	 </table>
+  </form>
+
+</div>
+ #set( $storageCostsum =0)
+<!-- 订单列表 -->
+<div class="clearing"></div>
+		#if($!message)<div class="mag-t2"> $!message </div>#end
+<div class="listBox"> 
+          <h3><span>类目库存成本汇总</span></h3> 
+    <table>
+    
+      <tr>
+		<th>类目</th>
+        <th>仓库</th>
+        <th>库存总成本</th>
+      </tr>
+  
+	  #foreach($storage in $storages)
+	  <tr    #if($velocityCount%2==0) class="bg" #end>
+		 <td  align="left">$!storage.catName</td>
+		 <td  align="left">$!storage.depositoryName</td>
+		 <td  align="center">$!storage.storageCost元</td>
+		 #set( $storageCostsum = $moneyUtil.add( $storageCostsum,$!storage.storageCost))
+	</tr>
+	  #end
+	  <tr><td></td><td></td><td align="center"><font size='4'>合计:$!storageCostsum 元</font>&nbsp;&nbsp;&nbsp;&nbsp;</td></tr> 
+      
+    </table>	 
+  </div>
+
+	</div>
+

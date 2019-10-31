@@ -1,0 +1,258 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+	<h2>新增产品</h2>
+  <div class="container_list">
+    <table>
+        <tr>
+           <th>商品名称:</th>
+           <td>$!{goods.title}</td>
+		   <th>编码:</th>
+           <td>$!{goods.goodsSn}</td>
+		   <th>品牌:</th>
+           <td>$!{goods.brandName}</td>
+		   <th>单位:</th>
+           <td>$!{goods.goodsUnit}</td>
+           <th>类目:</th>
+           <td>$!{goods.catName}</td>
+        </tr>
+    </table>
+  </div>  
+  <div class="formBox">
+	<h3><i></i><span>填写产品信息</span></h3>
+	<form action="/instance/create_instance.html"  method="post" name="form1" id="form1">
+		#springBind("instance.goodsId")
+        <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+		#springBind("instance.catCode")
+        <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+		#springBind("instance.goodsUnit")
+        <input type="hidden" name="${status.expression}" value="$!{goods.goodsUnit}"/>
+		
+		<div class="content">
+			<div class="form">
+				<ol>
+					
+          <li>
+            <label>产品名称：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.instanceName")
+                <input type="text" name="${status.expression}" class="inp inp-w300" value="#if($instance.instanceName)${instance.instanceName}#else$!{goods.title}#end"/>
+              </li>
+              <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>产品编码：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.code")
+                <input type="text" name="${status.expression}" class="inp"  value="#if($instance.code)${instance.code}#else$!{goods.goodsSn}#end"/>
+              </li>
+			  <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span> 
+		  </li>
+		  
+          <li>
+            <label>拼音码：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.pyCode")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>销售价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.sellPrice")
+                <input type="text" name="${status.expression}" class="inp" value="#if($instance.sellPrice)${instance.sellPrice}#else$!{goods.goodsPrice}#end" />
+              </li>
+			  <li><em>*</em></li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>促销价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.salesProPrice")
+                <input type="text" name="${status.expression}" class="inp" value="#if($instance.salesProPrice)${instance.salesProPrice}#else$!{goods.salesProPrice}#end" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>市场指导价格：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.marketPrice")
+                <input type="text" name="${status.expression}" class="inp" value="#if($instance.marketPrice)${instance.marketPrice}#else$!{goods.marketPrice}#end" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>最小库存：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.minNum")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>最大库存：</label>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.maxNum")
+                <input type="text" name="${status.expression}" class="inp" value="$!{status.value}" />
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		  
+          <li>
+            <label>是否赠品：</label>
+            <span class="con">
+            <ul>
+              <li>
+				   #springBind("instance.isPresent")
+                   <input type="radio" name="${status.expression}" value="1" #if("$!{status.value}" == "1") checked #end>是</input>
+                   #springBind("instance.isPresent")
+				   <input type="radio" name="${status.expression}" value="0" #if(!("$!status.value" && "$!status.value" == '1')) checked #end>否</input>
+              </li>
+            </ul>
+            </span>
+		  </li>		  
+
+		 #if($!attrs&&$!attrs.size() > 0)
+          <li>
+            <label>产品属性：</label>
+            <span class="con">
+            <div class="skin"> 
+              <table class="c5" id="attrs">					                        
+                #foreach($attr in $!attrs)
+				## #if($attr.isInstance == 1)
+                <tr>
+                  <th>$!attr.attrName<span style="color:red">*</span></th>
+				  <td>
+				  #foreach($v in $attr.attrValueMap.entrySet())
+					<input type="radio" name="isattr_${attr.attrCode}" value="$!v.key"  #if("$!v.value" == "1") checked #end  >$!v.key</input>
+				  #end
+				  </td>
+                </tr>
+				 #end
+				###end
+              </table>
+            </div>
+            </span>
+		 </li>
+		 #end
+		 
+          <li>
+            <span class="con">
+            <ul>
+              <li> #springBind("instance.attrs")
+                <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+              </li>
+              <li>
+                <label class="red">${status.errorMessage}</label>
+              </li>
+            </ul>
+            </span>
+		  </li>
+		 
+		 
+		 
+          <li>
+            <label>备注</label>
+            <span class="con">
+              <div class="skin-con">
+                <ul>
+                  <li class="ck"> #springBind("instance.remark")
+                    <textarea name="${status.expression}" cols="40" rows="10">$!{status.value}</textarea>
+                  </li>
+                  <li>
+                    <label class="red">${status.errorMessage}</label>
+                  </li>
+                </ul>
+            </div>
+            </span>
+		  </li>
+		  
+                </ol>
+            </div>
+        </div>
+    </form>
+	<div class="form-but">
+		<button type="button" id="allcheckbutton" class="button-s4" onClick="checkattrs()">确定</button>
+		<button type="reset" id="allcheckbutton" class="button-s4" onClick="resetForm();">重置</button>
+    </div>
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+  function checkattrs(){
+    var attradios, oneradio;
+    var clicked = false;
+    #foreach($attr in $attrs)
+        #if($attr.isInstance == 1)
+            clicked = false;
+            attradios = document.getElementsByName("isattr_${attr.attrCode}");
+            for(var i=0;i<attradios.length;i++ ){
+                oneradio =  attradios[i];
+                if(oneradio.checked == true){
+                    clicked = true;
+                }
+            }
+            if( !clicked ){
+                alert("请选择#direct(${attr.attrName})");
+                return false;
+            }
+        #end
+    #end
+
+	document.getElementById('form1').submit();
+  }
+  
+	function resetForm(){
+	  document.form1.reset();
+	}
+</script>

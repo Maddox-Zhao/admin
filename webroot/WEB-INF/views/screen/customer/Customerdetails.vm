@@ -1,0 +1,172 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>客户信息</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+    <form id="form1" method="post">
+        <div style="width:25%;height:50%;float:left" id="form1">
+            <div class="mini-toolbar" style="border-bottom:0;padding:0px; height:430px;" >
+                <form id="form1" method="post" >
+                    <table class="form-table" border="0" cellpadding="0" cellspacing="2" >
+                        <tr>
+                            <td>
+                 VIP号:
+                            </td>
+                            <td>
+                                <input id="vipNum" name="vipNum" class="mini-textbox" emptyText="vipNum" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                姓名:
+                            </td>
+                            <td>
+                                <input  name="name" class="mini-textbox" emptyText="name" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                电话:
+                            </td>
+                            <td>
+                                <input name="phone" id="phone" class="mini-textbox" emptyText="" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                               省份:
+                            </td>
+                            <td>
+                              <input name="address" id="combobox" required="true" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..."
+                                    url="/sell/getProvince.html"  allowInput="false" showNullItem="true" nullItemText="请选择..." />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                地址:
+                            </td>
+                            <td>
+                                <input id="address" name="address" 	class="mini-textbox"  enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                Email:
+                            </td>
+                            <td>
+                                <input id="email" name="email" class="mini-textbox" emptyText="email"  enabled="false"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                类型:
+                            </td>
+                            <td>
+                                <input name="type"  required="true" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..."
+                                    data="type"  allowInput="false" showNullItem="true" nullItemText="请选择..."/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                备注
+                            </td>
+                            <td>
+								<textarea name="remark" class="mini-textarea" >
+								</textarea>
+
+                            </td>
+                        </tr>
+						    <tr>
+                            <td>
+                                客户经理:
+                            </td>
+                            <td>
+                                <input  name="manager" id="manager" class="mini-textbox" emptyText="manager" readonly="readonly" enabled="false"/>
+                            </td>
+                        </tr>
+						<tr>
+                            <td>
+                                经理姓名:
+                            </td>
+                            <td>
+                                <input  name="managerId" class="mini-textbox"/>
+                            </td>
+                        </tr>	
+                        <tr>
+                            <td colspan="2">
+                                 <a style="width:200px;" id="update" class="mini-button"   onclick="update()">更新</a> 
+                            </td>
+                        </tr>
+						<tr>
+							<td colspan="2" >
+								 
+								  <a style="width:200px" class="mini-button"   onclick="CloseWindow('canel')">  取消</a>
+                            </td>
+                        </tr>
+                    </table>
+</div>
+            </div>
+</form>
+<div id="datagrid" class="mini-datagrid" style="width:75%;height:430px;float:right" allowResize="true"  allowCellEdit="true" allowCellSelect="true"
+	idField="idProduct" multiSelect="false"  pageSize="50" allowAlternating="true" onRowdblclick="edit()" onCellbeginedit="cellbeginedit">
+    <div property="columns">
+        <div field="idorder" width="120" headerAlign="center" align="center" allowSort="true">订单号</div>
+        <div field="date" width="80" headerAlign="center" align="center"  allowSort="true" >订单日期</div>
+        <div field="subTotal" width="60" headerAlign="center" align="center"  allowSort="true">订单总价</div>
+        <div field="currencyname" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderCurrency">订单货币单位</div>
+    </div>
+</div>
+<script type="text/javascript">
+var form = new mini.Form("form1");
+var type = [{id:0,value:"普通客户"},{id:1,value:"零售客户"},{id:2,value:"批发客户"},{id:3,value:"代销客户"}]
+		function renderCurrency(row){
+		  if(!row.value) return "";
+		  if(row.value == '1') return "RMB";
+		  if(row.value == '2') return "EU";
+		  if(row.value == '3') return "HKD";
+		  if(row.value == '4') return "US";
+	}
+	function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += "   " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		function SetData(data) {
+            data = mini.clone(data);
+			//获取数据
+            jQuery.ajax({
+                    url: "/customer/getCustomerByidCustomer.html?idCustomer="+data.id,
+                    cache: false,
+                    success: function (text) {
+                        var o = mini.decode(text);
+            			var j = new Date(parseInt(o.date));
+            			var p = formatDate(j, false);
+            			o.date = p; //设置时间
+						
+                        form.setData(o);
+						
+						//加载该订单产品
+            			var grid = mini.get("datagrid");
+            			grid.setUrl("/customer/getOrderbyidCustomer.html?idCustomer="+data.id);
+            			grid.load();
+                    }
+                });
+            }
+</script>
+</body>
+</html>

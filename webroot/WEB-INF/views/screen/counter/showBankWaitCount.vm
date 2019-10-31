@@ -1,0 +1,48 @@
+#set($layout = 'layout\default.vm')
+<div class="main">
+
+<h2>意外数据恢复</h2>
+        <!-- 搜索模块 -->
+<div class="searchBox">
+    <h3><span>意外数据恢复</span></h3>
+		     <form name="inputFileForm" action="doBankRecover.html"  method="post"> 
+<title>管理中心 - 意外数据恢复</title>
+
+
+ 	
+ 	<input type="hidden" name="bankType" value="$!inputFileSearchBean.bankType" />
+ 	<input type="hidden" name="createDate" value="$!inputFileSearchBean.createDate" /> 	       
+
+  <table>
+	<tr>
+	<td>  
+              待处理条数:$!inputFileSearchBean.compareNotSuccessCount
+        </td>
+	</tr>
+
+</table>
+<input name="" value="意外数据恢复" type="button" class="button" onclick="javascript:this.form.submit();"/>
+</div>
+</form>	
+#if($!recovery)   
+<div class="tab-div">
+  <table cellpadding="0" cellspacing="0">
+	<tr>
+	  <td>  
+               #if($inputFileSearchBean.failMessageList.size>0) 	                 
+                失败明细:
+                   #foreach($failDescription in $inputFileSearchBean.failMessageList) 
+                   	      $!failDescription<br>
+                   #end 
+               #else
+                   恢复成功
+               #end        
+        </td>
+	</tr>
+
+</table>
+ <input name="" value="返回" type="button" class="button" onclick="window.location.href='openBankRecoverPage.html'"/>
+</div>
+#end
+</div>
+

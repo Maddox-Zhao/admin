@@ -1,0 +1,164 @@
+                        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/treeview/assets/skins/sam/treeview.css" />
+                        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css" />
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/event/event-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/dom/dom-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/treeview/treeview-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+                        <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/button/button-min.js"></script>
+                <div id="treeDiv1"></div>
+                <script type="text/javascript">
+
+                   var hightLightNodeIndex='';
+
+					function lableClick(index){
+						if(hightLightNodeIndex==null|| hightLightNodeIndex==""){
+							hightLightNodeIndex = index;
+						}
+						if(document.getElementById("ygtvlabelel"+hightLightNodeIndex)!=null){
+    						document.getElementById("ygtvlabelel"+hightLightNodeIndex).style.background="";
+						}
+    					document.getElementById("ygtvlabelel"+index).style.background="#77DDFF";
+
+						var tree=YAHOO.widget.TreeView.getTree("treeDiv1");
+    					var node=tree.getNodeByProperty ("index",index);
+    					while(node.depth!=-1){
+    						node.expand();
+    						node = node.parent;
+    					}
+    					hightLightNodeIndex = index;
+						parent.content. window.location.href="getci.html?catCode=" + index;
+					}
+
+					YAHOO.example.treeExample = function() {
+						var tree, currentIconMode;
+						function changeIconMode() {
+							var newVal = parseInt(this.value);
+							if (newVal != currentIconMode) {
+							currentIconMode = newVal;
+							}
+							buildTree();
+							parent.content.window.getData(node.index)
+						}
+
+
+						function loadNodeData(node, fnLoadComplete)  {
+
+							var nodeLabel = encodeURI(node.label);
+							var nodeNow=tree.getNodeByProperty ("index",node.index);
+							var sUrl = "catpcode.html?catCode=" + nodeNow.index;
+							var callback = {
+							success: function(oResponse) {
+								var oResults = eval(oResponse.responseText);
+								if(YAHOO.lang.isArray(oResults)) {
+									for (var i=0, j=oResults.length; i<j; i++) {
+										var tempNode = new YAHOO.widget.TextNode(oResults[i], node, false);
+									}
+								} else {
+									var tempNode = new YAHOO.widget.TextNode(oResults, node, false)
+								}
+								// parent.content.window.getData(nodeNow.index);
+								oResponse.argument.fnLoadComplete();
+								},
+								failure: function(oResponse) {
+								YAHOO.log("Failed to process XHR transaction.", "info", "example");
+								oResponse.argument.fnLoadComplete();
+								},
+								argument: {
+								"node": node,
+								"fnLoadComplete": fnLoadComplete
+								},
+								timeout: 7000
+							};
+							YAHOO.util.Connect.asyncRequest('POST', sUrl, callback);
+						}
+
+						function buildTree() {
+							tree = new YAHOO.widget.TreeView("treeDiv1");
+							var root = tree.getRoot();
+							var treeParent=new Array();
+							var i=0;
+							#foreach($treeparent in $cateGoryTree)
+								var jsonObj={"index":"$!{treeparent.catCode}","label":"$!{treeparent.catName}","href":"javascript:parent.index.window.lableClick('$!{treeparent.catCode}')","target":"content"};
+								treeParent[i]=jsonObj;
+								i++;
+							#end
+							for (var i=0, j=treeParent.length; i<j; i++) {
+								var tempNode = new YAHOO.widget.TextNode(treeParent[i], root, false);
+							}
+							tree.subscribe("labelClick", function(node)
+								{
+									alert(node.index)
+									tree.onEventToggleHighlight
+									parent.content.window.getData(node.index);
+								}
+							);
+							tree.draw();
+							tree.setDynamicLoad(loadNodeData, currentIconMode);
+							tree.render();
+						}
+						return {
+							init: function() {
+								YAHOO.util.Event.on(["mode0", "mode1"], "click", changeIconMode);
+								var el = document.getElementById("mode1");
+								if (el && el.checked) {
+									currentIconMode = parseInt(el.value);
+								} else {
+									currentIconMode = 0;
+								}
+								buildTree();
+							}
+						}
+				} ();
+
+
+							function modifyTree(index,nameNew)
+							{
+							var tree=YAHOO.widget.TreeView.getTree("treeDiv1");
+							var nodeOld=tree.getNodeByProperty ("index",index);
+							var nodeParent=nodeOld.parent
+							if(nodeOld.label!=nameNew.label)
+							{
+							tree.removeNode(nodeOld,true);
+							new YAHOO.widget.TextNode(nameNew, nodeParent, true);
+							}
+							nodeParent.refresh();
+							lableClick(index)
+							}
+
+							// 当父节点的名字是 root的时候 标志这是一级类目
+							function addNode(newName,sourceCode)
+							{
+								var tree=YAHOO.widget.TreeView.getTree("treeDiv1");
+								if(sourceCode=="-1")
+    							{
+    								var root = tree.getRoot();
+    								new YAHOO.widget.TextNode(newName, root, true);
+    								root.refresh();
+    								return;
+    							}
+    							var oldNode=tree.getNodeByProperty ("index",sourceCode);
+    							new YAHOO.widget.TextNode(newName, oldNode, true);
+    							var newNode=tree.getNodeByProperty ("label",newName.label);
+    							oldNode.refresh();
+    							newNode.refresh();
+    							lableClick(newName.index)
+							}
+
+							function removeNode(index)
+							{
+    							var tree=YAHOO.widget.TreeView.getTree("treeDiv1");
+    							var node=tree.getNodeByProperty ("index",index);
+    							tree.removeNode(node,true);
+    							if(node.parent==null)
+    							{
+    								var root = tree.getRoot();
+    								root.refresh();
+    							}
+							}
+
+
+
+							YAHOO.util.Event.onDOMReady(YAHOO.example.treeExample.init, YAHOO.example.treeExample,true);
+</script>

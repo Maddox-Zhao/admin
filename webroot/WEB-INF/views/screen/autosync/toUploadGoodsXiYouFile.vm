@@ -1,0 +1,17 @@
+#set($layout = '')
+<html>
+<head>
+	<title>银泰老数据导入</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+		<iframe name="iframeName" style="display:none;"></iframe>  
+		<form target="iframeName" action="/timetask/uploadGoodsXiYouFile.html"  enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+			老数据Excel:<input type="file" name="xiyou" /><br/>
+			<input type="submit" value="上传"/>
+		</form>
+</body>
+
+</html>

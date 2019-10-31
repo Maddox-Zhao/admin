@@ -1,0 +1,192 @@
+#set($layout = '')
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="loading">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta name="viewport" content="width=device-width, initial-scale=0.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+<meta name="keywords" content="产品列表" />
+<link rel="stylesheet" type="text/css" href="/phone/css/style1.css" />
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta content="telephone=no" name="format-detection">
+<script>
+var logined = 0
+</script>
+<title>产品列表</title>
+</head>
+
+<body>
+<script>
+var now_page = 1,
+search_value = '';
+</script>
+
+		<div id="menu">
+ 
+		<ul>
+			<li class="nav_index"><a href="/m/index.html"><i></i><span>首页</span><b></b><div class="clear"></div></a></li>
+			<li class="nav_site menu_cur"><a href="/m/product/productList.html"><i></i><span>产品</span><b></b><div class="clear"></div></a></li>
+			<li class="nav_help"><a href="/index.html"><i></i><span>订单</span><b></b><div class="clear"></div></a></li>
+			<li class="nav_about"><a href="/index.html"><i></i><span>采购</span><b></b><div class="clear"></div></a></li>
+		</ul>
+	</div>
+ 
+	<div id="header">
+		<div class="wrap">
+			<i class="menu_open"></i>
+			<div class="logo"><a href="/m/index.html"><img src="/phone/css/logo.png" /></a></div>
+			 
+		</div>
+		<div class="logo_msk"></div>
+	</div>
+	<div id="container">
+		<div id="sort">
+			<table width="100%" border="0" cellspacing="0">
+				<tr>
+					<td class="sort_left">
+						<div class="sort_cate">
+							<div class="sort_b"><a href="#" onclick="return false;"><div class="sort_b_inner"><i class="cate_default"></i><span>查询条件</span><div class="clear"></div></div></a></div>
+						</div>
+					</td>
+					 
+				</tr>
+			</table>
+		</div>
+		<div id="content">	
+			<div id="list">
+				<ul>
+				</ul>
+				<div class="list_loading" style="display:none"><i></i><span>努力加载中...</span></div>
+			</div>
+		</div>
+		
+		<div class="push_msk"></div>
+	</div>
+
+	<div id="sort_content">
+		<div class="asort">
+			<div class="hd">
+				<div class="wrap">
+					<div class="fl"><span>查询条件</span><div class="clear"></div></div>
+					<div class="fr"></div>
+					<div class="clear"></div>
+				</div>
+			</div>
+			<div class="ct">
+				<div class="wrap">
+					<ul class="choose_cate"> 
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>idProduct:</span>
+							<input name="idProduct" class="form" style="border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text"/>   
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>sku:</span>
+							<input name="sku" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text"/>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>品牌:</span>
+							<select name="brandID" class="form" style="width:140px;float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text">
+								<option value="">全部</option>
+								#foreach($brand in $brandList)
+									<option value="$brand.id">$brand.brandName</option>
+								#end
+							</select>
+							</select>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>品名:</span>
+							<select name="seriesId" class="form" style="width:140px;float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text">
+								<option value="">全部</option>
+								#foreach($series in $sereisList)
+									<option value="$series.id">$series.name</option>
+								#end
+							</select>
+						</li>
+						
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>型号:</span>
+							<input name="type" class="form" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text"/>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>材质:</span>
+							<input name="material" class="form" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text"/>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>颜色:</span>
+							<input name="color" class="form" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text"/>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>状态:</span>
+							<select name="status" class="form" style="width:140px;float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text">
+								<option value="">全部</option>
+								<option value="1">可售</option>
+								<option value="2">运输在途</option>
+								<option value="3">预订</option>
+								<option value="4">已售</option>
+								<option value="5">寄卖已售未结算</option>
+								<option value="6">准入库</option>
+							</select>
+						</li>
+						
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>当前位置:</span>
+							<select name="idLocation" class="form" style="width:140px;float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px" type="text">
+								<option value="">全部</option>
+						 		#foreach($site in $siteList)
+									<option value="$site.id">$site.name</option>
+								#end
+							</select>
+						</li>
+						
+						
+						
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>入库开始时间:</span>
+							<input name="inStockDateStart" class="form" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px;width:120px" type="date"/>
+						</li>
+						<li ><i style="background:none;width:10px;margin-right:0;" class="s"></i><span>入库结束时间:</span>
+							<input name="inStockDateEnd" class="form" style="float:right;border: 2px solid #ccc;vertical-align: middle;margin-top: 17px;height: 20px;width:120px" type="date"/>
+						</li>
+						<li > 
+							<div style="align:center;vertical-align: middle;text-align:center;display:inline;margin-top:20px">
+								 <input type="submit" style="width:50px;height:50px" class="submit" value="确定"/>
+								  <input id="resetBtn" type="button" style="width:50px;height:50px" value="重置"    value="重置"/>
+								  <input type="button" style="width:50px;height:50px" value="取消" class="cancel" value="取消"/> 
+							</div>
+						</li>
+					 
+					</ul>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+				
+		 
+
+ 
+	</div>
+	
+	<div id="newwrap_t" class="newwrap">
+		<div class="newwrap_msk"></div>
+		<iframe id="newwrap" frameborder="0" width="100%" height="100%"></iframe>
+	</div>
+ 
+	<div class="loading_dark"></div>
+	<div id="loading_mask">
+		<div class="loading_mask">
+			<ul class="anm">
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul>
+		</div>
+	</div>
+	<script language="javascript" src="/phone/js/zepto.min.js"></script>
+	<script language="javascript" src="/phone/js/fx.js"></script>
+	<script language="javascript" src="/phone/js/script1.js"></script>
+	
+ <script type="text/javascript">
+ 	$("#resetBtn").click(function()
+	{		
+		$(".form").each(function()
+		{
+			$(this).val("");
+		});
+	});
+ </script>
+ 
+</body>
+</html>

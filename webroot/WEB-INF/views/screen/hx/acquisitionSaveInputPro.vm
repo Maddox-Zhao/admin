@@ -1,0 +1,147 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<style type="text/css">
+.red{ color:red}
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>添加收购产品</h2>
+		#if($!message)
+			<div class="mag-t2">
+					图片格式不正确或大于了200K！
+			</div>
+		#end
+		
+		 <center>
+		 <form action="add.html" name="saveAcquisitionPro"  id="saveAcquisitionPro"  method="post" enctype="multipart/form-data">
+			  收购编号：
+			  #springBind("acquisitionPro.acqCode")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" readonly="true" class="inp inp-w105" /><br/><br/>
+			  #springBind("acquisitionPro.acqId")
+			  <input type="hidden" name="${status.expression}" value="$!{status.value}"/>
+			  
+			  
+			  
+			     
+			    品牌：
+			  #springBind("acquisitionPro.brandId")
+			  <select name="${status.expression}" style="width:150px">
+					#foreach($brand  in $brandList)
+							<option value="$!brand.id" class="inp inp-w105" size="35" style="width:150px">$!brand.brandName</option>
+					#end
+			  </select><br/><br/>
+			  
+			  
+			   品&nbsp;&nbsp;名：
+			  #springBind("acquisitionPro.seriesId")
+			  <select name="${status.expression}">
+					#foreach($series in ${seriesList.entrySet()})
+							<option value="$!series.key" class="inp inp-w105" size="10">&nbsp;&nbsp;$!{series.value}&nbsp;&nbsp;</option>
+					#end
+			  </select><br/><br/>
+			
+			 型号：
+			  #springBind("acquisitionPro.type")
+			  <input type="text" name="${status.expression}" id="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  /><br/><br/>
+			  
+			  材质：
+			  #springBind("acquisitionPro.material")
+			  <input type="text" name="${status.expression}"  id="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  /><br/><br/>
+
+			  
+			  颜色：
+			  #springBind("acquisitionPro.color")
+			  <input type="text" name="${status.expression}"  id="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  maxlength="7"/><br/><br/>
+			  
+			 
+			  
+			    
+			  价钱：
+			  #springBind("acquisitionPro.amount")
+			  <input type="text" name="${status.expression}"  id="${status.expression}"  value="$!{status.value}" class="inp inp-w105"  onkeyup="value=value.replace(/[^\d]/g,'')" /><br/><br/>
+			  
+			 ##  已取金额：
+			  #springBind("acquisitionPro.paidAmount")
+			  <input type="hidden" name="${status.expression}"  id="${status.expression}"  value="0" class="inp inp-w105"  onkeydown="value=value.replace(/[^\d]/g,'')" />
+			  
+			 
+			  uuid：
+			  #springBind("acquisitionPro.uuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105" maxlength="7" /><br/><br/>
+			  
+			    
+			  auuid：
+			  #springBind("acquisitionPro.auuid")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105" maxlength="7" /><br/><br/>
+			  
+			    
+			  等级：
+			  #springBind("acquisitionPro.level")
+			  <input type="text" name="${status.expression}"  value="$!{status.value}" class="inp inp-w105" maxlength="3" /><br/><br/>
+			  
+			  图片：
+			  <input type="file" name="img"/><br/><br/>
+			    
+		<div class="form-but">
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="check()">确定</button>
+    		<button type="reset" id="allcheckbutton" class="button-s4" onClick="javascript:document.saveAcquisitionPro.reset()">重置</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1)">返回 </button>
+		</div>
+		
+</form>
+		 
+		 
+		 <br/>
+
+		 </center>
+    </div>
+<script type="text/javascript"> 
+function check()
+{
+	var material = jQuery("#material").val();
+	var type = jQuery("#type").val();
+	var color = jQuery("#color").val();
+	var price = jQuery("#amount").val();
+	var paidAmount = jQuery("#paidAmount").val();
+	if(material == "")
+	{
+		alert("材质不能为空!");
+		return false;
+	}
+	if(type == "")
+	{
+		alert("型号不能为空！");
+		return false;
+	}
+	if(color == "")
+	{
+		alert("颜色不能为空！");
+		return false;
+	}
+	if(price == "")
+	{
+		alert("价钱不能为空！");
+		return false;
+	}
+	if(isNaN(price))
+	{
+		alert("价钱必须为数字!")
+		return false;
+	}
+	if(isNaN(paidAmount))
+	{
+		alert("以取金额的必须为数字！")
+		return false;
+	}
+	if(parseInt(paidAmount) > parseInt(price))
+	{
+		alert("已取金额不能大于商品价钱！");
+		return false;
+	}
+	document.getElementById("saveAcquisitionPro").submit();
+}
+
+
+</script>

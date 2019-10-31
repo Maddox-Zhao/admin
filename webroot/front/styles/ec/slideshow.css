@@ -1,0 +1,35 @@
+.slides {
+	OVERFLOW: hidden; width:1000px; POSITION: relative;  height:320px;
+}
+.slides UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+.slide-pic {
+	OVERFLOW: hidden; width:1000px;
+}
+.slide-pic IMG {
+	BORDER-RIGHT: #c9c9c9 0px solid; BORDER-TOP: #c9c9c9 0px solid; BORDER-LEFT: #c9c9c9 0px solid; WIDTH:1000px; BORDER-BOTTOM: #c9c9c9 0px solid; HEIGHT: 320px
+}
+.slide-pic LI {
+	DISPLAY: none
+}
+.slide-pic LI.cur {
+	DISPLAY: block
+}
+.slide-li {
+	LEFT: 880px; BOTTOM: 5px; POSITION: absolute
+}
+.slide-li LI {
+	FLOAT: left; width:17px; height:17px; margin-right:2px; background:url(../../images/ec/icon_round.png) no-repeat; cursor:pointer;
+}
+.slide-li A {
+	DISPLAY: block; FONT-SIZE: 16px; WIDTH: 162px; COLOR: #fff; HEIGHT: 30px; TEXT-DECORATION: none
+}
+.slide-txt SPAN {
+	DISPLAY: none
+}
+.slide-li .cur {BACKGROUND: url(../../images/ec/icon_round_selected.png) }
+.slide-li .cur1 {BACKGROUND: url(../../images/ec/icon_round_selected.png) }
+.slide-li .cur2 {BACKGROUND: url(../../images/ec/icon_round_selected.png) }
+.slide-li .cur3 {BACKGROUND: url(../../images/ec/icon_round_selected.png) }
+.slide-li .cur4 {BACKGROUND: url(../../images/ec/icon_round_selected.png) }

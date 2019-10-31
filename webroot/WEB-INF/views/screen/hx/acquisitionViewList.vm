@@ -1,0 +1,129 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+	<div class="main">
+    	 <h2>收购管理</h2>
+		 <div class="tool">
+			<span><a href="/acquisition/saveInput.html" hidefocus="true" class="bt_add">添加收购凭证</a></span>
+		 </div>
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				#if($!message == "addsuccess")
+					添加成功！
+				#end
+				#if($!message == "editsuccess")
+					修改产品成功！
+				#end
+				#if($!message == "deletesuccess")
+					删除成功！
+				#end
+		</div>
+		 #end
+		 <form action="list.html" name="searchForm" method="post">
+		<div class="searchBox">
+			<h3><span>搜索</span></h3>
+			<table>
+    			<tr>
+        			<th>开单日期：从</th>
+        			<td >
+						#springBind("acquisitionView.dateStart")
+        				<input type="text" name="${status.expression}" id="dateStart" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105" />
+                    
+        			&nbsp; 到  &nbsp; 
+        			
+						#springBind("acquisitionView.dateEnd")
+        				<input type="text" name="${status.expression}" id="dateEnd" value="$!{status.value}" size="10" theme="simple" readonly="true" class="inp inp-w105"  />
+                    </td>
+            		  <script type="text/javascript">
+            		      Calendar.setup({
+            		          inputField : "dateStart",
+            		          ifFormat   : "%Y-%m-%d ",
+            		          align      : "BR"
+            		      });
+            		      Calendar.setup({
+            		          inputField : "dateEnd",
+            		          ifFormat   : "%Y-%m-%d",
+            		          align      : "BR"
+            		      });
+            		</script>
+					<th >&nbsp;</th>
+					<td>
+						状态：
+						#springBind("acquisitionView.status")
+						#set($status = ${status.value} )
+						<select name="status">
+							<option value="">---请选择---</option>
+							<option value="no_pay" #if($status.equals("no_pay")) selected #end>未取</option>
+							<option value="part_paid" #if($status.equals("part_paid")) selected #end>已取部分</option>
+							<option value="paid" #if($status.equals("paid")) selected #end>已结清</option>
+						</select>
+                    </td>
+					<th>&nbsp;</th>
+        			<td>
+        				<input type="submit" value=" 查询 " class="button" />
+                    </td>
+                </tr>
+    		</table>
+		</div>
+	</form>
+
+	
+        <!-- 列表模块 -->
+        <div class="listBox">
+          <h3><span>收购管理</span></h3>
+            <table >
+                <tr>
+					<th>收购编号</th>
+					<th>状态</th>
+					<th>总计金额</th>
+					<th >已取金额</th>
+					<th >操作人</th>
+					<th >客户身份证图片</th>
+					<th>收购凭证图片</th>
+					<th>收购时间</th>
+					<th>操作</th>
+                </tr>
+				
+				#if($query && $query.items.size()>0)
+				 #foreach($acquisition in $query.items)
+                 <tr #if($velocityCount%2 == 0) class="bg" #end>
+					<td style="text-align:center;">$!acquisition.acpCode</td>
+					<td style="text-align:center;">#if($!acquisition.status.equals("no_pay")) 未取钱 #end 
+						    #if($!acquisition.status.equals("part_paid")) 已取部分 #end
+							#if($!acquisition.status.equals("paid")) 已结清 #end
+					</td>
+					<td style="text-align:center;">$!acquisition.amount</td>
+					<td style="text-align:center;">$!acquisition.paidAmount</td>
+					<td style="text-align:center;">$!acquisition.operatorId</td>
+					<td style="text-align:center;">
+						#if($!acquisition.idcardsImage)
+						<img src='${upServer}$imgUtil.changeLargeImgToSmal($!acquisition.idcardsImage)' width="50"/>
+						#end
+					</td>
+					
+					<td style="text-align:center;">
+						#if($!acquisition.acqImage)
+						<img src='${upServer}$imgUtil.changeLargeImgToSmal($!acquisition.acqImage)' width="50"/>
+						#end
+					</td>
+					<td style="text-align:center;">$dateUtilHX.convertDateToString("yyyy-MM-dd HH:mm:ss",$!acquisition.gmtCreate) </td>
+					<td style="text-align:center;">
+						<a href="#" onclick="javascript:if(confirm('确定删除？')){ location.href = 'delete.html?id=$!acquisition.id'}">删除</a> &nbsp;&nbsp;
+							<a href="detail.html?id=$!acquisition.id">查看</a>&nbsp;&nbsp;
+					</td>
+                 </tr>
+				 #end
+                #end
+            </table>
+
+
+	#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/acquisition/list.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+    #else
+		没有结果！
+    #end
+</div> <!-- 列表模块 END -->
+</div>
+	

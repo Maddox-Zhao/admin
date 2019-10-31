@@ -1,0 +1,70 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script>
+$(document).ready(function(){
+	$('#save').click(function(){
+		$('input[type="checkbox"]').each(function(){
+			if(this.checked) {
+				$('#id').val(this.value);
+			}
+		});
+    	$('#form1').submit();
+	});
+	
+	$("input[type='checkbox']").each(function()
+	{
+		$(this).change(function()
+		{
+			var status = $(this).attr("checked");
+			$("input[type='checkbox']").attr("checked","")
+			if(status == true)
+				$(this).attr("checked","checked");
+			else
+				$(this).attr("checked","");
+		});
+	});
+});  
+</script>
+    <div class="main">
+        <!-- 表单模块 -->
+      <div class="formBox">
+		 <form action="$appServer.get('/admin/modifyClientUserRole.html')" name="form1" id="form1" method="post">
+        	<h3><i></i><span>编辑员工职务 ------  $!admin.name</span></h3>
+
+        	<div class="content">
+        		<table class="c5">
+					<tr>
+	                    <input type="hidden" id="id" name="id" value=""/>
+	                    <input type="hidden" id="adminId" name="adminId" value="$!admin.id"/>
+					</tr>
+                           	<tbody>
+								<tr>
+                                	<th>职务: </th>
+                                	<td>
+										#foreach($role in $roles)
+											#if($!role.status == 1)
+    											#set($checked = false)
+    											#if($!{admin.functionRole} == $!{role.id})
+    												#set($checked = true)
+    											#end
+    											<input type="checkbox"  value="$!{role.id}" #if($checked) checked #end> $!{role.display}
+    											#if($velocityCount%4 == 0) <br> <br> #end
+											#end
+										#end
+									</td>   
+                                </tr>
+                            </tbody>
+              </table>
+			</div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="button" class="button-s4" id="save">保存</button>
+                <button type="button" class="button-s4" onclick="#if(!$!{url})history.go(-1)#else javascript:location.href= '$!{appServer}/$!{url}' #end">取消</button>
+
+          	</div>
+
+         </form>
+        </div> 
+    </div>

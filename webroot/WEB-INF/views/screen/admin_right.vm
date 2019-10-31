@@ -1,0 +1,59 @@
+#set($layout = 'layout\default.vm')
+<body>
+    <div class="welcome">
+    	<ul>
+			
+        	<li>你好，<strong>$!adminAgent.name</strong>！ 欢迎你使用尚上系统管理平台</li>
+			#*
+			#if($adminAccess.has("A_ORDER_MODIFY_USER") || $adminAccess.has("A_ORDER_REF_CHA_USER") ||
+            	$adminAccess.has("A_ORDER_ASSORT_USER") || $adminAccess.has("A_ORDER_VIEW_USER") ||
+            	$adminAccess.has("A_REF_MODIFY_USER") || $adminAccess.has("A_REF_GOODS_VIEW_USER") ||
+            	$adminAccess.has("A_REF_FINANCE_USER") || $adminAccess.has("A_WHOLESALE_APPLY_VIEW_USER") ||
+            	$adminAccess.has("A_ORDER_DEPFIRST_MODIFY"))
+            <li>
+              <th><strong>订单统计信息</strong></th>
+			  <table>
+                <tr>
+				  <th align="left" style="width:100px;"><a href="$appServer/trade/showl.html">&nbsp;&nbsp;所有订单</a></th>
+				  <td style="width:60px;">$!allTrade</td>
+				  <th align="left" style="width:120px;"><a href="$appServer/trade/showl.html?status=wait_seller_confirm">&nbsp;&nbsp;等待卖家确认</a></th>
+				  <td style="width:40px;">$!waitSellerConfirm</td>
+				</tr>
+                <tr>
+				  <th align="left"><a href="$appServer/trade/showl.html?status=wait_buyer_confirm">&nbsp;&nbsp;等待买家确认</a></th>
+				  <td >$!waitBuyerConfirm</td>
+				  <th align="left"><a href="$appServer/trade/showl.html?status=wait_distribution">&nbsp;&nbsp;等待配货</a></th>
+				  <td >$!waitDistribution</td>
+				</tr>
+                <tr>
+				  <th align="left"><a href="$appServer/trade/showl.html?status=wait_buyer_pay">&nbsp;&nbsp;等待买家付款</a></th>
+				  <td>$!wait_buyer_pay</td>
+				  <th align="left"><a href="$appServer/trade/showl.html?status=trade_finish">&nbsp;&nbsp;交易完成</a></th>
+				  <td>$!tradeFinish</td>
+				</tr>
+              </table>
+			</li>
+	
+   ##         <li>
+   ##         <th><strong>留言，评论统计</strong></th>
+##			  <table>
+##				
+##				<tr>
+##				  <th align="left" style="width:100px;"><a href="$appServer/feedback/showfb.html">&nbsp;&nbsp;收到留言</a></th>
+##				  <td style="width:60px;">$!allFeedback</td>
+##				  <th align="left" style="width:120px;"><a href="$appServer/feedback/showfb.html?toUserType=shop&replyFlag=no">&nbsp;&nbsp;未回复</a></th>
+##				  <td style="width:40px;">$!notReply</td>
+##				</tr>
+##				
+ ##               <tr>
+##				  <th align="left" style="width:100px;"><a href="$appServer/comment/scomments.html">&nbsp;&nbsp;收到评论</a></th>
+##				  <td style="width:60px;">$!allComments</td>
+##				  <th align="left" style="width:120px;"><a href="$appServer/comment/scomments.html?replyFlag=no">&nbsp;&nbsp;未回复</a></th>
+##				  <td style="width:40px;">$!notReplyComments</td>
+##				</tr>
+  ##            </table>
+	##		</li>
+			#end*#
+        </ul>
+    </div>
+</body>

@@ -1,0 +1,19 @@
+/*
+ * Naming convention:
+ * 1、No uppercase for class and id name
+ * 2、Use English words as a class and id name as much as possible
+ * 3、As a class or id name, use "-" dash (“_” underscore) as separators instead of white spaces, but it is not mandatory to use the separators.
+ * 4、Multi styles shall be separated by a comma followed by a white space (", ")
+
+ *关于命名的一些约定：
+ * 1、不使用大写形式的类名和id名
+ * 2、尽可能使用描述性的英文单词的组合作为类名和id名
+ * 3、类名或者id名的多个英文单词之间使用“-”短横线（下划线）分隔，并且不要求多个英文单词之间一定要使用间隔符
+ * 4、多个样式名之间为逗号+空格，即“, ”
+
+ */
+
+/*
+ * @overlay *
+ * @desc	通用标签默认设定
+ */

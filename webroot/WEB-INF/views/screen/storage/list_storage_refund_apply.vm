@@ -1,0 +1,193 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+	<form name="searchform" id="searchform" action="/storage/list_storage_refund_apply.html" method="post">
+	<div class="searchBox">
+		<h3><span>库存退货申请单管理</span></h3>
+		<table>
+			<tr>
+        		<th>申请单编号：</th>
+				<td >
+					#springBind("storageRefundApplyQuery.relationNum")
+					<input type="text" id="relationNum" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+        		<th>申请时间：</th>
+				<td colspan="3">
+					#springBind("storageRefundApplyQuery.applyTimeStart")
+					<input type="text" id="applyTimeStart" name="${status.expression}" value="$!{status.value}" class="inp inp-w70" readonly="readonly"/>
+					-
+					#springBind("storageRefundApplyQuery.applyTimeEnd")
+					<input type="text" id="applyTimeEnd" name="${status.expression}" value="$!{status.value}" class="inp inp-w70" readonly="readonly"/>
+					<script type="text/javascript">
+						Calendar.setup({
+							inputField : "applyTimeStart",
+							ifFormat   : "%Y-%m-%d",
+							align      : "BR"
+						});
+						Calendar.setup({
+							inputField : "applyTimeEnd",
+							ifFormat   : "%Y-%m-%d",
+							align      : "BR"
+						});
+					</script>
+				</td>
+			</tr>
+			<tr>
+        		<th>申请人：</th>
+				<td>
+					#springBind("storageRefundApplyQuery.applyUserName")
+					<input type="text" id="applyUserName" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+        		<th>处理人：</th>
+				<td >
+					#springBind("storageRefundApplyQuery.disposeUserName")
+					<input type="text" id="disposeUserName" name="${status.expression}" value="$!{status.value}" class="inp" />
+                </td>
+				<th>申请单状态：</th>
+				<td >
+					#springBind("storageRefundApplyQuery.status")
+					<select name="${status.expression}" id="status">
+        				<option value="">-=请选择=-</option>
+        				#foreach($obj in $storageRefundApplyStatusMap.entrySet())
+        				<option value="$obj.key" #if("$obj.key"=="${status.value}") selected #end>$obj.value</option>
+        				#end
+        			</select>
+                </td>
+            </tr>
+			<tr>
+        		#springBind("storageRefundApplyQuery.depfirstId")
+    			#springBind("storageRefundApplyQuery.depId")
+    			#springBind("storageRefundApplyQuery.locId")
+				#set($allShow = "1")
+    			$contain.get('/storage/depSelect.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$queryObject)
+				<th >
+					<input type="button" value=" 查询 " class="btn" onclick="formSubmit();"/>
+                </th>
+			</tr>
+		</table>
+    </div>
+	</form>
+#if($message)
+	#if("$message"=="closeSuccess")
+		<div class="mag-t2">库存退货申请关闭成功！</div>
+	#else
+		<div class="mag-t2">$message</div>
+	#end
+#end
+		<div class="listBox" id="listDiv">
+			<h3><span>库存退货申请单列表</span></h3>
+			<table  id="listTable" name="listTable">
+				<tbody>
+					<tr>
+                        <th width="">
+						    申请单编号
+						</th>
+						<th width="">
+							一级仓库
+						</th>
+						<th width="">
+							仓库
+						</th>
+						<th width="">
+							库位
+						</th>
+                        <th width="">
+							申请人
+						</th>
+						<th width="">
+							处理人
+						</th>
+						<th width="">
+							申请时间
+						</th>
+						<th width="">
+							申请状态
+						</th>
+						<th width="">
+							操作
+					    </th>
+					</tr>
+				#if($query && $query.items.size()>0)
+					#foreach($sa in $query.items)
+						<tr #if($velocityCount % 2 == 0) class="bg" #end>
+							<td>
+								$!{sa.relationNum}
+							</td>
+							<td>
+								$!{sa.depFirstName}
+							</td>
+							<td>
+								$!{sa.depositoryName}
+							</td>
+							<td>
+								$!{sa.depLocationName}
+							</td>
+							<td>
+								$!{sa.applyUserName}
+							</td>
+							<td>
+								$!{sa.disposeUserName}
+							</td>
+							<td>
+								$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!sa.gmtCreate)
+							</td>
+							<td>
+								$!storageRefundApplyStatusMap.get("$sa.status")
+							</td>
+							<td align="center">
+								<a href="detail_storage_refund_apply.html?falg=detail&applyRelationNum=$!sa.relationNum">查看</a>
+								#if($adminAccess.has("A_STORAGE_REFUND_APPLY_DEPOSITORY"))
+								   #if($!storageRefundApplyStatusMap.get("$sa.status") == "新建")
+								     <a href="detail_storage_refund_apply.html?flag=check&applyRelationNum=$!sa.relationNum">审核</a>
+								   #end
+								#end
+								#if($adminAccess.has("A_STORAGE_REFUND_APPLY_PROCURE"))
+								   #if($!storageRefundApplyStatusMap.get("$sa.status") == "退回")
+								     <a href="detail_storage_refund_apply.html?flag=repeat&applyRelationNum=$!sa.relationNum">重新提交</a>
+								   #end
+								#end
+								#if($!storageRefundApplyStatusMap.get("$sa.status") == "新建" || $!storageRefundApplyStatusMap.get("$sa.status") == "退回")
+								<a href="#" onclick="javascript:closeApply('$!sa.relationNum');">关闭</a>
+								#end
+							</td>
+						</tr>
+					#end
+				#end
+				</tbody>
+			</table>
+			<!-- 分页 -->
+            #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/list_storage_refund_apply.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+		</div>
+
+<script language="javascript" type="text/javascript">
+function closeApply(relationNum){
+      if(confirm("确认关闭此申请？")){
+		document.forms[0].action = "refundApplyClose.html?applyRelationNum="+relationNum;
+		document.forms[0].submit();
+	}
+}
+
+		function formSubmit(){
+			var dateStart1=document.getElementById("applyTimeStart").value.replace(/-/g, "/");
+    		var dateEnd1=document.getElementById("applyTimeEnd").value.replace(/-/g, "/");
+    		var b_date1=new Date(Date.parse(dateStart1));
+            var e_date1=new Date(Date.parse(dateEnd1));
+
+    		if(e_date1 < b_date1){
+    			alert("申请起始时间不能大于结束时间！");
+    			return false;
+    		}
+
+			document.getElementById("relationNum").value=document.getElementById("relationNum").value.replace(/-/g, "/");
+			document.getElementById("applyUserName").value=document.getElementById("applyUserName").value.replace(/-/g, "/");
+			document.getElementById("disposeUserName").value=document.getElementById("disposeUserName").value.replace(/-/g, "/");
+        	document.forms[0].submit();
+	    }
+</script>
+</div>
+</body>

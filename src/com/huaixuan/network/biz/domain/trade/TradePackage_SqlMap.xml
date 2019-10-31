@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TradePackageSQL">
+	<typeAlias alias="tradePackage" type="com.huaixuan.network.biz.domain.trade.TradePackage"/>
+	<resultMap class="tradePackage" id="tradePackageResult">
+		<result column="ID" property="id"/>
+		<result column="TID" property="tid"/>
+		<result column="MERGE_TID" property="mergeTid"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+	</resultMap>
+	<resultMap class="tradePackage" extends="tradePackageResult" id="tradePackageResult2">
+		<result column="actual_inventory" property="actualInventory"/>
+		<result column="receiver" property="receiver"/>
+		<result column="express_id" property="expressId"/>
+		<result column="goodsWeight"   property="goodsWeight"/>
+	</resultMap>
+<!-- create TradePackage object -->
+<insert id="addTradePackage" parameterClass="tradePackage">
+<![CDATA[
+		insert into emall_trade_package
+		(ID,TID,MERGE_TID,GMT_CREATE,GMT_MODIFY )values( null,
+		#tid#,
+		#mergeTid#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update TradePackage object -->
+<update id="editTradePackage" parameterClass="tradePackage">
+<![CDATA[
+		update emall_trade_package set TID = #tid#,
+		MERGE_TID = #mergeTid#,
+		GMT_MODIFY = sysdate()
+		 where ID = #id#
+
+]]>
+</update>
+<!-- delete TradePackage object -->
+<delete id="removeTradePackage" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_trade_package where emall_trade_package.ID = #value#
+]]>
+</delete>
+<!-- search TradePackage object -->
+<select id="getTradePackage" parameterClass="java.lang.Long" resultMap="tradePackageResult">
+<![CDATA[
+		select emall_trade_package.* from emall_trade_package where emall_trade_package.ID = #value#
+]]>
+</select>
+<!-- searchAll TradePackage List -->
+<select id="getTradePackages" resultMap="tradePackageResult">
+<![CDATA[
+		select emall_trade_package.* from emall_trade_package
+]]>
+</select>
+
+<select id="getTradePackagesByMergeTid" resultMap="tradePackageResult2" parameterClass="java.lang.String">
+	select p.*, t.*, x.weight goodsWeight
+	  from emall_trade_package p
+	  left join emall_trade t on p.tid = t.tid
+	  left join (select o.tid, sum(o.goods_number * o.good_weight) weight
+	               from emall_order o
+	              group by o.tid) x on t.tid = x.tid
+	 where p.MERGE_TID = #value#
+</select>
+</sqlMap>

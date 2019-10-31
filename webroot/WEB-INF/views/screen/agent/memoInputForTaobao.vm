@@ -1,0 +1,73 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<head>
+    <title>请输入审核不通过的原因</title>
+	<base target="_self">
+</head>
+<form id="memoInputForTaobaoForm" name="memoInputForTaobaoForm">
+	<span class="action-span1">请输入审核不通过的原因(最多1000个字符)：</span>
+    <textarea id="memoInput" rows="12" style="width:360px;"></textarea>
+    <div style="display:none;" id="fontcount_div">您已经输入<font id="fontcount" color="red" style="padding-left:5px;padding-right:5px;">0</font>个字符</div>
+	<div style="text-align:center;width:360px;"><input type="button" id="btnSubmit" value="确定" class="button" onclick="cmt();"/>
+    <input type="button" id="btnSubmit" value="关闭" class="button" onclick="cl();"/></div>
+</form>
+<script language="javascript" type="text/javascript">
+var obj = window.dialogArguments;
+var deal = false;
+if(obj && obj.msg){
+   document.getElementById("memoInput").value=obj.msg;
+}
+function font(obj)
+{
+   if(deal) return;
+   deal = true;
+   if(div=document.getElementById("fontcount_div")){
+      if(div.style.display=="none")div.style.display="";
+   }
+   var fontlength=reallength(trim(obj.value));
+    document.getElementById("fontcount").innerHTML=fontlength;
+
+   deal = false;
+}
+function substr(str, len)
+{
+	if(!str || !len) { return ''; }
+	var a = 0;
+	var i = 0;
+	var temp = '';
+	for (i=0;i<str.length;i++)
+	{
+		if (str.charCodeAt(i)>255)
+		{
+		    a+=3;//数据库中中文字符为3字节
+		}else{
+		    a++;
+		}
+		if(a > len) { return temp; }
+		temp += str.charAt(i);
+	}
+}
+function reallength(s){
+	return s.replace(/[^\x00-\xff]/gi,'xil').length;//数据库中中文字符为3字节
+}
+
+function trim(inputString){
+ 	return inputString.replace(/(^\s*)|(\s*$)/g, "");
+}
+function cmt(){
+	var back = document.getElementById("memoInput").value;
+	if(reallength(back)>1000){
+		alert("您已经输入了"+reallength(back)+"个字符!字数过多了！")
+		return;
+	}
+	window.returnValue =  back;
+	cl();
+}
+
+function cl(){
+	window.close();
+}
+
+</script>

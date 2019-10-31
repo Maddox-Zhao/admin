@@ -1,0 +1,295 @@
+#set($layout = "layout/default.vm")
+#set($title = "CRM系统 - 订单列表")
+
+<body>
+
+<div class="main">
+    <h2>CRM系统 - 订单列表</h2>
+
+	#if($errorMessage && $errorMessage != "")<div class="mag-t1" id="exportError">sfds上的方式大幅所大发</div>#end
+
+	<form action="$appServer.get("/crm/crmShowl.html")" name="searchForm" method="post" id="searchForm">
+    	<div class="searchBox">
+			<h3><span>搜索CRM订单</span></h3>
+
+			<table>
+				<tr>
+					<th>订单编号：</th>
+					<td>
+						#springBind("tradeListQuery.tid")
+						<input type="text" id="tradeListQuery.tid" name="${status.expression}" value="$!{status.value}" class="inp inp-w80" />
+					</td>
+					<th>买家昵称：</th>
+					<td>
+						#springBind("tradeListQuery.buyNick")
+						<input type="text" id="tradeListQuery.buyNick" name="${status.expression}" value="$!{status.value}" class="inp inp-w80" />
+					</td>
+					<th>下单时间：</th>
+					<td>
+						#springBind("tradeListQuery.gmtCreateStart")
+						<input type="text" id="tradeListQuery.gmtCreateStart" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />-
+						#springBind("tradeListQuery.gmtCreateEnd")
+						<input type="text" id="tradeListQuery.gmtCreateEnd" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "tradeListQuery.gmtCreateStart",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "tradeListQuery.gmtCreateEnd",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+				</tr>
+				<tr>
+					<th>订单状态：</th>
+					<td>
+						#springBind("tradeListQuery.status")
+						<select id="tradeListQuery.status" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($entsm in $enumTradeStatusMap.entrySet())
+                                <option value="$entsm.key" #if("$!{status.value}" == "$!{entsm.key}") selected="selected" #end title="$entsm.value">$entsm.value</option>
+							#end
+						</select>
+					</td>
+                    <th>相反订单状态：</th>
+					<td>
+						#springBind("tradeListQuery.opp")
+						<input type="checkbox" id="tradeListQuery.opp" name="${status.expression}" value="1" #if("$!{status.value}" != "") checked="true" #end />
+					</td>
+
+					<th>仓库名称：</th>
+					<td>
+						#springBind("tradeListQuery.depFirstId")
+						<select id="tradeListQuery.depFirstId" name="${status.expression}" class="select" style="width:160px;">
+							<option value="">-=请选择=-</option>
+							#foreach($depFirst in $depositoryFirstList)
+                                <option value="$!{depFirst.id}" #if("$!{status.value}" == "${depFirst.id}") selected="selected" #end title="$!{depFirst.depFirstName}">$!{depFirst.depFirstName}</option>
+							#end
+						</select>
+					</td>
+					<th>订单类型：</th>
+					<td>
+						#springBind("tradeListQuery.isWholesale")
+						<select id="tradeListQuery.isWholesale" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($enok in $enumOrderKindMap.entrySet())
+								<option value="$enok.key" #if("$!{status.value}" == "${enok.key}") selected="selected" #end title="$enok.value">$enok.value</option>
+							#end
+						</select>
+					</td>
+                </tr>
+				<tr>
+					<th>付款状态：</th>
+					<td>
+						#springBind("tradeListQuery.payStatus")
+						<select id="tradeListQuery.payStatus" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							<option value="no_pay" #if("$!{status.value}" == "no_pay") selected="selected" #end>未付款</option>
+							<option value="paid" #if("$!{status.value}" == "paid") selected="selected" #end>已付款</option>
+						</select>
+					</td>
+					<th>维护人：</th>
+					<td>
+						#springBind("tradeListQuery.agentManagerId")
+						<select id="tradeListQuery.agentManagerId" name="${status.expression}" class="select" style="width:95px;">
+							<option value="">-=请选择=-</option>
+							#foreach($tempAU in $adminUsers)
+                    			  <option value="$!tempAU.id" #if("$tempAU.id"=="$!{status.value}") selected #end>$!{tempAU.userName}</option>
+                    		#end
+						</select>
+					</td>
+					<th>付款时间：</th>
+					<td>
+						#springBind("tradeListQuery.payStartTime")
+						<input type="text" id="tradeListQuery.payStartTime" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />-
+						#springBind("tradeListQuery.payEndTime")
+						<input type="text" id="tradeListQuery.payEndTime" name="${status.expression}" value="$!{status.value}" readonly="readonly" class="inp inp-w70" onclick="WdatePicker()" />
+						<script type="text/javascript">
+							Calendar.setup({
+								inputField : "tradeListQuery.payStartTime",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+							Calendar.setup({
+								inputField : "tradeListQuery.payEndTime",
+								ifFormat   : "%Y-%m-%d",
+								align      : "BR"
+							});
+						</script>
+					</td>
+
+				</tr>
+
+				<tr>
+					<td colspan="10">
+						<button type="button" class="btn" onclick="formSubmit();">查询</button>
+						<button type="button" class="btn" onclick="clean();">重置</button>
+					#if($tradeListQuery)
+						<button type="button" class="btn" onclick="doExportOrder();">Excel导出</button>
+						<button type="button" class="btn" onclick="doExportOrderTwo();">订单商品Excel</button>
+					#end
+					</td>
+				</tr>
+            </table>
+        </div>
+	</form>
+
+	#if($trade)
+    <div align="right">
+		<font size="4"><strong><label>【 汇总: </label></strong></font>
+		<font size="4" color="red"><strong><label>$!{trade.id}</label></strong></font>
+		<font size="4"><strong><label>笔&nbsp;&nbsp;&nbsp;总金额: </label></strong></font>
+		<font size="4" color="red"><strong><label>$!moneyUtil.getFormatMoney(${trade.goodsAmountSum}, '0.00')</label></strong></font>
+		<font size="4"><strong><label>元 】</label></strong></font>
+	</div>
+	#end
+
+	<!-- 订单列表 -->
+	<div class="listBox">
+		<h3><span>订单列表</span></h3>
+		<table>
+			<tr>
+                <th>订单号</th>
+        		<th>产品名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数量&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;金额</th>
+                <th>下单时间</th>
+                <th>买家昵称</th>
+                <th>总金额(元)</th>
+                <th>付款时间</th>
+                <th>订单状态</th>
+                <th>货运单号</th>
+                <th>仓库名称</th>
+        		<th>订单类型</th>
+              </tr>
+
+		#foreach($trade in $page.items)
+			<tr #if($velocityCount % 2 == 0) class="bg" #end>
+				<td align="center">
+				#if(${trade.tradeType} == 2)
+					<img title="拍拍同步订单" alt="拍拍同步订单" src="$imageServer/images/icon/paipai.png" width="15" height="15"/>
+				#elseif(${trade.tradeType} == 3)
+					<img title="淘宝同步订单" alt="淘宝同步订单" src="$imageServer/images/icon/taobao.png" width="15" height="15"/>
+				#end
+					<a href="$appServer.get("/crm/crmTradeDetail.html").addQueryData("tradeId", $trade.tid)">$!trade.tid</a>
+				</td>
+				<td align="center">
+        			#foreach($orderTemp in $trade.orderList)
+        				<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:0px;">
+                        	<tr>
+                        		 <td width="73%" style="line-height:18px; text-align:left;"><a href="$!{liangpin99Server}/l/gdetail_$!{orderTemp.goodsId}.htm" target="_blank">$emallStringUtils.abbreviate($orderTemp.goodsTitle,15)</a></td>
+                        		 <td width="10%"><strong>$!orderTemp.goodsNumber</strong></td>
+                        		 <td width="17%"  style="color:red;">$!moneyUtil.getFormatMoney($math.mul($orderTemp.goodsPrice,$!orderTemp.goodsNumber))</td>
+                        	</tr>
+        				</table>
+        			#end
+                </td>
+				<td>
+					$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!trade.gmtCreate)&nbsp;
+				</td>
+				<td>
+					<a href="$appServer/user/userDetail.html?userId=$!trade.buyId">$!trade.buyNick</a>
+				</td>
+				<td align="right">
+					￥
+					<span id='trade_amount_$!trade.id'>
+						$!moneyUtil.getFormatMoney($math.add($trade.goodsAmount, $trade.shippingAmount), '0.00')
+					</span>
+				</td>
+				<td>
+					<span id='pay_time_$!trade.id'>$!dateUtil.convertDateToString("yyyy-MM-dd HH:mm:ss",$!trade.payTime)</span>
+				</td>
+				<td>
+					<span id='trade_status_$!trade.id'>
+					#if("$!trade.status" == "trade_close" && ${trade.tradeType} == 3 && "$trade.stockoutStatus" == "y")
+						缺货
+					#else
+						$!enumTradeStatusMap.get($!trade.status)
+					#end
+					</span>
+				</td>
+				<td>
+					$!trade.expressCode
+				</td>
+
+				<td>
+					<span id='trade_dep_first_id'>$!depositoryNameMap.get($!trade.depFirstId)</span>
+				</td>
+				<td>
+					$!enumOrderKindMap.get($trade.isWholesale)
+				</td>
+
+			</tr>
+		#end
+		</table>
+		#if($page.items.size() > 0)
+			$contain.get('/contain/formPageSlider.html').put('slider_query',$page).put('slider_target',"/crm/crmShowl.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+		#else
+			没有结果！
+		#end
+	</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+	function formSubmit(){
+        var dateStart= document.getElementById('tradeListQuery.gmtCreateStart').value.replace(/-/g, "/");
+        var dateEnd= document.getElementById('tradeListQuery.gmtCreateEnd').value.replace(/-/g, "/");
+        var payStart= document.getElementById('tradeListQuery.payStartTime').value.replace(/-/g, "/");
+        var payEnd= document.getElementById('tradeListQuery.payEndTime').value.replace(/-/g, "/");
+        var b_date=new Date(Date.parse(dateStart));
+        var e_date=new Date(Date.parse(dateEnd));
+        var pb_date=new Date(Date.parse(payStart));
+        var pe_date=new Date(Date.parse(payEnd));
+        if(e_date < b_date){
+        	alert("起始时间不能大于结束时间！");
+        	return false;
+        }
+        if(pe_date < pb_date){
+            alert("付款起始时间不能大于付款结束时间！");
+        	return false;
+        }
+
+        jQuery('#tradeListQuery.tid').val(jQuery.trim(jQuery('#tradeListQuery.tid').val()));
+        jQuery('#tradeListQuery.buyNick').val(jQuery.trim(jQuery('#tradeListQuery.buyNick').val()));
+        jQuery('#tradeListQuery.gmtCreateStart').val(jQuery.trim(jQuery('#tradeListQuery.gmtCreateStart').val()));
+        jQuery('#tradeListQuery.gmtCreateEnd').val(jQuery.trim(jQuery('#tradeListQuery.gmtCreateEnd').val()));
+        jQuery('#tradeListQuery.payStartTime').val(jQuery.trim(jQuery('#tradeListQuery.payStartTime').val()));
+        jQuery('#tradeListQuery.payEndTime').val(jQuery.trim(jQuery('#tradeListQuery.payEndTime').val()));
+
+        document.forms[0].submit();
+	}
+
+	function clean(){
+		document.getElementById('tradeListQuery.tid').value='$!tradeListQuery.tid';
+		document.getElementById('tradeListQuery.buyNick').value='$!tradeListQuery.buyNick';
+		document.getElementById('tradeListQuery.gmtCreateStart').value='$!tradeListQuery.gmtCreateStart';
+		document.getElementById('tradeListQuery.gmtCreateEnd').value='$!tradeListQuery.gmtCreateEnd';
+		document.getElementById('tradeListQuery.status').value='$!tradeListQuery.status';
+		document.getElementById('tradeListQuery.opp').value='$!tradeListQuery.opp';
+		document.getElementById('tradeListQuery.depFirstId').value='$!tradeListQuery.depFirstId';
+		document.getElementById('tradeListQuery.isWholesale').value='$!tradeListQuery.isWholesale';
+		document.getElementById('tradeListQuery.payStatus').value='$!tradeListQuery.payStatus';
+        document.getElementById('tradeListQuery.agentManagerId').value='$!tradeListQuery.agentManagerId';
+        document.getElementById('tradeListQuery.payStartTime').value='$!tradeListQuery.payStartTime';
+        document.getElementById('tradeListQuery.payEndTime').value='$!tradeListQuery.payEndTime';
+	}
+
+	function doExportOrder(){
+		var form1=document.getElementById('searchForm');
+		form1.action='$appServer.get("/crm/exportOrder.html")';
+		form1.submit();
+	    form1.action='$appServer.get("/crm/crmShowl.html")';
+	}
+
+	function doExportOrderTwo(){
+		var form1=document.getElementById('searchForm');
+		form1.action='$appServer.get("/trade/exportOrderTwo.html")';
+		form1.submit();
+		form1.action='$appServer.get("/crm/crmShowl.html")';
+	}
+</script>
+
+</body>

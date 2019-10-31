@@ -1,0 +1,202 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 库存退货明细")
+<div class="main">
+#set($message = $request.getParameter('message'))
+ #if($!message)
+	 <div class="mag-t1">
+		$!message
+	 </div>
+ #end
+#set($succFlag = $request.getParameter('succFlag'))
+ #if($!succFlag)
+	 <div class="mag-t2">
+		库存退货成功！
+	 </div>
+ #end
+
+#if($aType && $aType=="view")
+	#set($name="")
+#else
+	#set($name="新增")
+#end
+
+<script language="javascript" type="text/javascript">
+	function preview(){
+		var shopNum = document.getElementById("s1");
+		var shoppingNum = document.getElementById("shopNum");
+		if(shopNum!= null){
+		   window.showModalDialog("$appServer/stock/refund/printRefundBill.html?id=$!{shoppingRefund.id}&type=$!{shoppingRefund.type}&shoppingNum="+shopNum.value,null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+		}else if(shoppingNum.value != ""){
+		   window.showModalDialog("$appServer/stock/refund/printRefundBill.html?id=$!{shoppingRefund.id}&type=$!{shoppingRefund.type}&shoppingNum="+shoppingNum.value,null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+		}else{
+		   window.showModalDialog("$appServer/stock/refund/printRefundBill.html?id=$!{shoppingRefund.id}&type=$!{shoppingRefund.type}",null,"dialogWidth:1000px;dialogHeight:800px;help:no;status:no");
+		}
+	}
+
+    function selectid(){
+        var id = document.getElementById("idstr").value;
+        var obj = document.getElementById("adPositionIdstr");
+        obj.value=id;
+    }
+
+    function doDelete(refid,id){
+
+        if(!confirm('确认要删除吗?')){
+            return false;
+        }
+        document.location="rmSRDetail.html?refid="+refid+"&shoppingRefId="+id;
+
+    }
+
+</script>
+
+<div class="tool">
+		<span><a href="$appServer/stock/refund/search_shopping_refund_list.html" class="bt_wu" hidefocus="true">返回</a></span>
+        #if("${shoppingRefund.status}"=="stock_new" && "refund_storage"!="${shoppingRefund.type}")
+			<span class="action-span")><a href="$ctx/igc/ios/addOutDep.html?shoppingRefId=$!shoppingRefund.id" class="bt_wu" >生成出库单</a></span>
+			<span class="action-span"><a href="$ctx/igc/ios/addSRDetail.html?id=$!shoppingRefund.id&&depFirstId=$!shoppingRefund.depFirstId" class="bt_add" >新增退货明细</a></span>
+		#elseif("${shoppingRefund.status}"=="stock_close")
+
+		#else
+			<span><a href="javascript:preview();" class="bt_wu" hidefocus="true">打印$!enumShoppingRefundMap.get("${shoppingRefund.type}")单</a></span>
+			#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+				    <span class="action-span"><select id="s1" tabindex="8" name="parMap.shoppingNum">
+                        #foreach($shoppingNum in $shoppingNumSet)
+                            <option value="$!shoppingNum" #if($!{parMap.shoppingNum}==$!shoppingNum) selected #end>$!shoppingNum</option>
+                        #end
+                    </select>
+                    </span>
+			#end
+        #end
+</div>
+#set($errorMsg = $request.getParameter('errorMsg'))
+ #if($!errorMsg)
+	 <div class="mag-t1">
+		$!{errorMsg}
+	 </div>
+ #end
+    <form  name="addSRefund"  action="$ctx/ios/searchSRDetail.html" method="post">
+     <input  type="hidden" name="shoppingId" id="shoppingId"  value = "$!shoppingRefund.id" />
+	 <input  type="hidden" name="shopNum" id="shopNum"  value = "$!shoppingNum" />
+    <div class="formBox">
+		<h3><i></i><span>订单信息</span></h3>
+		<div class="content">
+		<table class="c6">
+            <tr>
+                <th>退货单编号</th>
+                <td>
+                    $!shoppingRefund.refNum
+                </td>
+                <th>退货类型</th>
+                <td>
+                    $!enumShoppingRefundMap.get("${shoppingRefund.type}")
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>供应商名称</th>
+                <td>
+                    $!shoppingRefund.supplierName
+                </td>
+                <th>创建人</th>
+                <td>
+                    $!shoppingRefund.creater
+                </td>
+            </tr>
+
+            <tr>
+                <th>退货时间</th>
+                <td>
+                    &nbsp;$!date.format("yyyy-MM-dd",$!shoppingRefund.refTime)&nbsp;
+                </td>
+                <th>退货状态</th>
+                <td>
+                    $!enumShopRefundMap.get("${shoppingRefund.status}")
+                </td>
+            </tr>
+            <tr>
+                <th>退货一级仓库</th>
+                <td>
+                    $!depositoryNameMap.get($!shoppingRefund.depFirstId)
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+			</table>
+        </div>
+    </div>
+
+	<div class="listBox" >
+		<h4><span>退货单明细</span></h4>
+		<table>
+          <tr>
+            <th>产品名称</th>
+            <th>产品编码</th>
+    		#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+    		<th>采购订单号</th>
+    		#end
+    		#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+            <th>采购数量</th>
+            <th>采购单价</th>
+    		#end
+            <th>退货正品数量</th>
+            <th>退货残品数量</th>
+            <th>退货单价</th>
+            <th>应收金额</th>
+            <th>实收金额</th>
+            <th>退货原因</th>
+            <th>备注</th>
+        #if("${shoppingRefund.status}"!="stock_finished" && "refund_storage"!="${shoppingRefund.type}")
+            <th>操作</th>
+        #end
+          </tr>
+        #if($shoppingRefundDetailList.size() > 0)
+          #foreach($shoppingRefundDetail in $shoppingRefundDetailList)
+    		<tr #if($velocityCount%2==0) class="bg" #end>
+                 <td  align="center">$!shoppingRefundDetail.instanceName</td>
+                 <td  align="center">$!shoppingRefundDetail.code</td>
+    		    #if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+    		     <td  align="center">$!shoppingRefundDetail.shoppingNum</td>
+    		     #end
+    			 #if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+                 <td  align="center">$!shoppingRefundDetail.amount</td>
+                 <td  align="center">$!shoppingRefundDetail.unitPrice</td>
+    			 #end
+                 <td  align="center">$!shoppingRefundDetail.refNum</td>
+                 <td  align="center">$!shoppingRefundDetail.damagedNum</td>
+                 <td  align="center">￥$!moneyUtil.getFormatMoney($!shoppingRefundDetail.refPrice,'0.00')</td>
+                 <td  align="center">￥$!moneyUtil.getFormatMoney($!shoppingRefundDetail.dueFee,'0.00')</td>
+                 <td  align="center">￥$!moneyUtil.getFormatMoney($!shoppingRefundDetail.factFee,'0.00')</td>
+                 <td  align="center">$!enumShoppingRefundRMap.get("${shoppingRefundDetail.reason}")</td>
+        		 <td  align="center">$!shoppingRefundDetail.remark</td>
+
+        		#if("${shoppingRefund.status}"!="stock_finished" && "refund_storage"!="${shoppingRefund.type}")
+    				<td  align="center">
+    					<a href="#" onclick="doDelete('$!shoppingRefundDetail.id','$!shoppingRefundDetail.shopRefId');">删除</a>
+    				</td>
+                 #end
+    		</tr>
+    	  #end
+    		<tr class="bg">
+    			#if($!enumShoppingRefundMap.get("${shoppingRefund.type}") == "采购退货")
+    				<td  align="center" colspan="5"><b>合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;计</b></td>
+    			#else
+    				<td  align="center" colspan="2"><b>合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;计</b></td>
+    			#end
+                 <td  align="center">$!sumRefNum</td>
+                 <td  align="center">$!sumDamagedNum</td>
+    			 <td  align="center">&nbsp;</td>
+                 <td  align="center">￥$!moneyUtil.getFormatMoney($!sumDueFee,'0.00')</td>
+                 <td  align="center">￥$!moneyUtil.getFormatMoney($!sumFactFee,'0.00')</td>
+    			 #if("${shoppingRefund.status}"!="stock_finished" && "refund_storage"!="${shoppingRefund.type}")
+    				<td  align="center" colspan="3">&nbsp;</td>
+    			 #else
+    				<td  align="center" colspan="3">&nbsp;</td>
+    			 #end
+    		</tr>
+    	#end
+		</table>
+    </div>
+  </form>
+</div>

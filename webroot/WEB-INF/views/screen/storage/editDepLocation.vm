@@ -1,0 +1,178 @@
+#set($layout = "layout/default.vm")
+#set($title = "管理中心 - 编辑库位")
+
+<body>
+<div class="main">
+	<h2>管理中心 - 编辑库位</h2>
+
+	#if($message && "$message" == "isExist")
+		<div class="mag-t1" id="massage">这个仓库中已存在此库位名称！</div>
+	#end
+
+	<div class="tool">
+		<span><a href="searchDepLocation.html" hidefocus="true" class="bt_ren">库位列表</a></span>
+	</div>
+
+	<!-- 表单模块 -->
+	<form name="form1" action="editDepLocation.html" method="post">
+		#springBind("loc.id")
+		<input type="hidden" name="${status.expression}" id="loc.id" value="$!{status.value}"/>
+
+		<div class="formBox">
+			<div class="content">
+				<table class="c2">
+					<tr>
+						<th>仓库</th>
+						<td>
+							#springBind("loc.depId")
+							<select name="${status.expression}" id="loc.depId" onchange="checkByDepId(this.value);">
+								<option value="">-=请选择=-</option>
+								#foreach($d in $depositoryLists)
+									<option value="$!{d.id}" #if("$!{status.value}" == "${d.id}") selected="selected" #end>$!{d.name}</option>
+								#end
+							</select>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>库位名称</th>
+						<td>
+							#springBind("loc.locName")
+							<input type="text" name="${status.expression}" id="loc.locName" value="$!{status.value}" maxlength="50" onchange="checkLocNameIsExist(this.value);" class="inp"/>
+							<span class="red">*</span>
+						</td>
+					</tr>
+					<tr>
+						<th>库位编号</th>
+						<td>
+							#springBind("loc.locCode")
+							<input type="text" name="${status.expression}" id="loc.locCode" value="$!{status.value}" maxlength="30" class="inp"/>
+						</td>
+					</tr>
+					<tr>
+						<th>库位大小</th>
+						<td>
+							#springBind("loc.locSize")
+							<input type="text" name="${status.expression}" id="loc.locSize" value="$!{status.value}"  maxlength="10" onchange="checkLocSize(this.value);" class="inp"/>
+						</td>
+					</tr>
+					<tr>
+						<th>库位描述</th>
+						<td>
+							#springBind("loc.locDescription")
+							<textarea cols="50" rows="3" id="loc.locDescription" name="${status.expression}" onkeyup="textLimitCheck(this,200);">$!{loc.locDescription}</textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			
+			<!-- 表单按钮区 -->
+			<div class="form-but">
+				<button type="button" class="button-s4" onclick="javascript:formSubmit();">保存</button>
+				<button type="button" class="button-s4" onclick="javascript:history.go(-1);">取消</button>
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+		function formSubmit(){
+			var locName=document.getElementById("loc.locName").value.replace(/-/g, "/");
+			var depId=document.getElementById("loc.depId").value.replace(/-/g, "/");
+			var locSize=document.getElementById("loc.locSize").value.replace(/-/g, "/");
+
+			if(depId==""){
+				alert("仓库必须选择！");
+    			return false;
+			}
+			if(locName==""){
+				alert("库位名称必须填写！");
+    			return false;
+			}
+			if(!checkLocSize(locSize)){
+    			return false;
+			}
+
+			document.getElementById("loc.locName").value=document.getElementById("loc.locName").value.trim();
+			document.getElementById("loc.locCode").value=document.getElementById("loc.locCode").value.trim();
+			document.getElementById("loc.locSize").value=document.getElementById("loc.locSize").value.trim();
+			document.getElementById("loc.locDescription").value=document.getElementById("loc.locDescription").value.trim();
+
+        	document.forms[0].submit();
+	    }
+
+	//DWR的方式验证库位名称是否存在
+	function checkByDepId(depId){
+		var depId=depId.replace(/-/g, "/");
+		var locName = document.getElementById("loc.locName").value.replace(/-/g, "/");
+		var id = document.getElementById("loc.id").value.replace(/-/g, "/");
+
+		if(locName != ""){
+			depIdValue=parseInt(depId);
+			idValue=parseInt(id);
+			jQuery.get('checkLocNameIsExistByDwr.html',{param1:idValue,param2:depIdValue,param3:locName},function(message){callBackCheckDepLocation(message);});
+		}
+	}
+
+	//DWR的方式验证库位名称是否存在
+	function checkLocNameIsExist(locName){
+		var locName=locName.replace(/-/g, "/");
+		var depId = document.getElementById("loc.depId").value.replace(/-/g, "/");
+		var id = document.getElementById("loc.id").value.replace(/-/g, "/");
+		var locObj=document.getElementById("loc.locName");
+		var depObj=document.getElementById("loc.depId");
+
+		if(depId==""){
+			alert("请先选择仓库！");
+			locObj.value="";
+			depObj.select();
+            depObj.focus();
+			return false;
+		}
+		if(locName != ""){
+			depIdValue=parseInt(depId);
+			idValue=parseInt(id);
+			jQuery.get('checkLocNameIsExistByDwr.html',{param1:idValue,param2:depIdValue,param3:locName},function(message){callBackCheckDepLocation(message);});
+		}
+	}
+
+	function callBackCheckDepLocation(msg){
+		var locName=document.getElementById("loc.locName");
+		var msgType = msg.substring(msg.indexOf("\'") + 1, msg.indexOf("\',"));
+
+		if (msgType == 'false') {
+			alert("库位名称重复，请重新填写！");
+			locName.value="";
+			locName.select();
+            locName.focus();
+		}
+	}
+
+	function textLimitCheck(thisArea, maxLength){
+		if (thisArea.value.length > maxLength){
+    		alert(maxLength + ' 个字符限制。 \r超出的将自动去除。');
+    		thisArea.value = thisArea.value.substring(0, maxLength);
+    		thisArea.focus();
+		}
+	}
+
+	function checkLocSize(val){
+		var reg = /^[1-9]*[1-9][0-9]*$/;
+		if(val != ""){
+			if(!reg.test(val)){
+        		alert("输入的库位大小不正确！");
+        		return false;
+    		}else{
+    			return true;
+    		}
+		}
+		return true;
+	}
+</script>

@@ -1,0 +1,69 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<script type="text/javascript"> 
+    function check()
+    {
+    	var money = document.getElementById("money").value;
+    	if(money == "")
+    	{
+    		alert("取款金额不能为空");
+    		return false;
+    	}
+    	if(isNaN(money))
+    	{
+    		alert("取款金额必须为数字！")
+    		return false;
+    	}
+    	var kequ = document.getElementById("kequ").value;
+    	if(parseInt(kequ) < parseInt(money))
+    	{
+    		alert("取款金额不能大于可取金额");
+    		return false;
+    	}
+    	return true;
+    }
+</script>
+
+<style type="text/css">
+.red{color:red}
+	
+</style>
+</head>
+
+	<div class="main">
+    	 <h2>寄卖产品--客户取款</h2>
+		
+		 	
+		 #set($message = $request.getParameter('message'))
+		 #if($!message)
+		<div class="mag-t2">
+				$!message
+		</div>
+		 #end
+		 
+		 <center>
+		 <form action="draw.html" name="/consignmentPro/draw.html" method="post"  onsubmit="return check()">
+			
+			  <input type="hidden" name="conId" value="$!conId"/>
+			  <input type="hidden" name="id" value="$!id"/>
+			取款方式：
+			<select name="type"> 
+				<option value="1">&nbsp;&nbsp;现金&nbsp;&nbsp;</option>
+				<option value="2">银行转账</option>
+			</select><br/><br/>
+			可取金额：
+			<input type="kequ" id="kequ" value="$!kequ" size="12" readonly /><br/><br/>
+			
+			取款金额：
+			<input type="text" name="money" id="money"  maxlength="10" class="inp inp-w105"   onkeyup="value=value.replace(/[^\d]/g,'')"  /><span class="red">*</span><br/><br/>
+			
+		<div class="form-but">
+    		<button type="submit" id="allcheckbutton" class="button-s4">确认</button>
+    		<button type="button" id="allcheckbutton" class="button-s4" onclick="javascript:history.go(-1)">返回 </button>
+		</div>
+		 
+		 </form>
+
+		 </center>
+    </div>

@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>
+		#if("$!title" != "")
+			$title
+		#else
+			尚上商贸
+		#end
+	</title>
+	<!-- HTTP 1.1 -->
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <!-- HTTP 1.0 -->
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <!-- Prevents caching at the Proxy Server -->
+    <meta http-equiv="Expires" content="0"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <meta name="description" content="网上商城,在线销售童装、男童、女童、裤子、套装、T恤、毛衣、线衣、衬衫、外套、牛仔装、连身衣、运动装、卫衣、绒衫、羽绒服、手套、裙子、婴儿裙、半身裙、吊带裙、连衣裙、吊带衫、亲子装、内衣裤、袜子、饰品、发饰、耳饰、毛衣链、项链、胸针、手链、手镯、戒指、脚链、挂链、手机链、皮包链、童包、家居用品、配饰、丝巾、方巾、儿童玩具。提供优质服务。全场购物快递送货上门。"/>
+    <meta name="robots" content="index,follow" />
+    <meta name="googlebot" content="index,follow" />
+    <meta name="baiduspider" content="index,follow" />
+    <meta name="keywords" content="1858,童装,男童,女童,长裤,短裤,九分裤,七分裤,背带裤,PP裤,靴裤,套装,T恤,长袖T恤,半袖T恤,短袖T恤,牛仔装,连身衣,毛衣,线衣,衬衫,长袖衬衫,短袖衬衫,外套,大衣,棉服,夹克,披风,马甲,背心,针织背心,棉背心,羽绒背心,运动装,卫衣,绒衫,帽衫,套头,开衫,羽绒服,帽子,围巾,套装,手套,裙子,婴儿裙,半身裙,吊带裙,短袖连衣裙,长袖连衣裙,背心裙,吊带衫,亲子装,母女装,母子装,父女装,父子装,三口装,内衣,内裤,袜子,船袜,辞袜,中筒袜,高筒袜,连裤袜,饰品,发饰,香蕉夹,边夹,顶夹,抓夹,对夹,发圈绳,发梳,插梳,簪子,皇冠,耳饰,耳坠,耳钉,耳线,毛衣链,项链,胸针,手链,手镯,开口手镯,闭口手镯,戒指,脚链,挂链,手机链,皮包链,童包,书包,双肩包,拉杆包,腰包,挎包,家居用品,丝巾,方巾,玩具,毛绒类玩具,电动类玩具,益智类玩具,动物类玩具,军事类玩具,手工类玩具,DIY类玩具,轮滑类玩具,滑板,轮滑"/>
+
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/general.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/main.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/menu.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/top.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/dtree.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/print/include.css" />
+	<link rel="stylesheet" type="text/css" href="${imageServer}/styles/calendar-blue.css" />
+
+	<script src="${imageServer}/scripts/jquery-1.4.2.min.js" type="text/javascript"></script>
+	
+	<style>
+		input, textarea{ background:none}
+		.ems_tab{float:left;width: 350px;margin-top:120px;overflow:hidden; margin-left:140px; _margin-left:70px}
+		.ems_name, .ems_tel{width: 100px; height:30px}
+		.ems_name input{width: 90px;}
+		.ems_tel input{width: 110px;}
+		.ems_add{width: 270px; margin-top: 5px; margin-left: 6px; height: 65px;}
+		.ems_comp{height:30px}
+		.ems_comp input{ margin-left:60px;width: 215px;}
+
+		.r{margin-left:30px}
+		
+		.STYLE1 {
+			font-size: 14px;
+			font-family: "宋体";
+		}
+		
+		.sf_tab{float:left;width:350px;margin-top:35px;overflow:hidden;*margin-top:32px; margin-left:60px;_margin-left:30px}
+		.sf_bh{text-align:center; padding-bottom:90px;}
+		.sf_bh input{margin-left:58px;width: 138px;}
+		.sf_comp{width: 240px;overflow:hidden;}
+		.sf_comp input{margin-left: 45px; width: 155px;}
+		.sf_name input{width: 70px;text-align:left;}
+		.sf_tel{margin-left: 28px; width: 147px;}
+		.sf_qh{margin-left: 25px;width: 60px; margin-top: 3px;}
+		.sf_add{margin-left: 35px; height: 48px; margin-top: 10px; *margin-top: 5px;width: 278px;}
+		.b td{padding-top:20px;*padding-top:15px}
+		.sf_add1{margin-top: 35px; *margin-top: 30px;width: 308px;height:48px;}
+		.sf_tel1{margin-left: 28px; width: 177px;}
+		.sf_qh1{margin-left: 25px;width: 80px;margin-top: 3px;}
+		.STYLE2 {
+			font-size: 14px;
+			font-family: "宋体";
+		}
+</style>
+	
+	#if($base)
+		<base target="_self"/>
+	#end
+</head>
+
+<body>
+
+	$screen_content
+
+</body>
+</html>

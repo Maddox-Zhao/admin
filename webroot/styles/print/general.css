@@ -1,0 +1,65 @@
+body {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; font: 12px "sans-serif", "arial", "verdana"; color: #192e32; padding-top: 0px
+}
+p {
+	font: 12px "sans-serif", "arial", "verdana"
+}
+td {
+	font: 12px "sans-serif", "arial", "verdana"
+}
+div {
+	font: 12px "sans-serif", "arial", "verdana"
+}
+th {
+	font: bold 12px "sans-serif", "arial", "verdana"
+}
+form {
+	padding-right: 0px; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px
+}
+input {
+	font: 12px "courier new"
+}
+textarea {
+	font: 12px "courier new"
+}
+select {
+	font: 12px "courier new"
+}
+a:visited {
+	color: #3377B6; text-decoration: none
+}
+a:link {
+	color: #3377B6; text-decoration: none
+}
+a:hover {
+	color: #eb8a3d; text-decoration: underline
+}
+a:active {
+	color: #eb8a3d; text-decoration: underline
+}
+.clear {
+	clear: both; padding-right: 0px; display: block; padding-left: 0px; font-size: 0px; float: none; padding-bottom: 0px; margin: 0px; padding-top: 0px
+}
+.nowrap {
+	white-space: nowrap
+}
+.btn {
+background:transparent url(../../images/btn.png) no-repeat scroll 0 0;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:78px;
+}
+
+.btnl {
+background:transparent url(../../images/btnl.png) no-repeat scroll 0 0;
+border:0 none;
+cursor:pointer;
+height:25px;
+width:105px;
+}
+.btn-confirm {
+color:white;
+font-weight:bold;
+}
+

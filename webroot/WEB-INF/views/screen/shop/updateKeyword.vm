@@ -1,0 +1,113 @@
+#set($layout = "layout/default.vm")
+#set($title = "关键字管理 - 添加热门关键字")
+		<div class="main">
+		<div class="formBox">
+				<h3><i></i><span>添加热门关键字</span></h3>
+	<div class="content">
+		<form __unmht_action="#" name="theForm" action="/shop/updatekw.html" method="post" enctype="multipart/form-data">
+			#springBind("keyword.id")
+			<input type="hidden" name="${status.expression}" id="${status.expression}" value="$!{status.value}" />
+			<table class="c2" id="general-table" width="100%">
+			<tbody>
+				<div class="form">
+				<ol>
+          <li>
+			<label>关键字：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("keyword.name")
+					<input  type="text"  id="name" name="${status.expression}"  value="$!{keyword.name}" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  <li>
+			<label>关键字类目：</label>
+				<span class="con">
+					<ul>
+              <li>#springBind("keyword.link")
+					<select name="${status.expression}" id="link">
+                        <option value=''>请选择</option>
+            			#foreach($category in $categorysList)
+                        <option value="$!{category.catCode}" #if(${keyword.link} && ${keyword.link}== ${category.catCode}) selected #end>
+                        #direct($!{category.cache})
+									#if($!category.catName.length()>20)
+                                    <div title="$!category.catName">$!category.catName.substring(0,20)...</div>
+                    				#else
+                    					$!category.catName
+                    				#end
+						#end
+						</option>
+					</select></li>
+					<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		   <li>
+			<label>备注：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("keyword.desc")
+					<textarea name="${status.expression}" rows="5" cols="35">$!{keyword.desc}</textarea>
+				</li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		            <li>
+			<label>次序：</label>
+			<span class="con">
+					<ul>
+              <li>#springBind("keyword.sortstr")
+					<input name="${status.expression}" id="sortstr" size="3" type="text" value="$!{keyword.sortstr}" onchange="checkValue('$!{keyword.sortstr}');" />
+				</li>
+						<li><em>*</em></li>
+				<li>
+                <label class="red">${status.errorMessage}</label>
+				</li>
+            </ul>
+            </span>
+          </li>
+		  </table></form></div>
+  <div class="form-but">
+<input class="btn" value="确定" type="submit" onClick="javascript:addkeyword();" > <input class="btn" value="重置" type="reset" onclick="javascript:resetkeyword()"> <input value="insert" name="act" type="hidden"> <input name="id" type="hidden">
+</div></tbody></div></div>
+<script language="javascript" type="text/javascript">
+
+	function checkValue(oldValue){
+	       var f=document.getElementById("sortstr");
+		   var c=document.getElementById("sortstr")
+			var content=jQuery.trim(document.getElementById("sortstr").value);
+		if(content!=null && content!=""){
+			if(isNaN(content)||content<0){
+			alert("出错：请输入数字.");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+		}else if(content==null||content==""){
+			alert("次序不能为空");
+			c.value=oldValue;
+			f.select();
+            f.focus();
+		}
+
+	}
+
+	function addkeyword(){
+	document.theForm.submit();
+	}
+
+		function resetkeyword(){
+	document.theForm.reset();
+	}
+	</script>

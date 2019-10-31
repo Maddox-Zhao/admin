@@ -1,0 +1,65 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+<script type="text/javascript"> 
+function check()
+{
+	return true;
+}
+</script>
+
+<style type="text/css">
+.red{color:red}
+</style>
+</head>
+
+	<div class="main">
+		<form action="find.html" method="post">
+			#springBind("baseData.type")
+    		型号:<input type="text"  name="${status.expression}" value="$!{status.value}"/><br/>
+			#springBind("baseData.material")
+    		材质:<input type="text"  name="${status.expression}" value="$!{status.value}"/><br/>
+			#springBind("baseData.color")
+    		颜色:<input type="text"  name="${status.expression}" value="$!{status.value}"/><br/>
+			<input type="submit"/>
+		</form>
+		
+		
+    </div>		 
+		 
+		 
+<table width="1061" border="1" align="center">
+  <tr>
+    <td width="110" align="center">品牌</td>
+    <td width="74" align="center">品名</td>
+    <td width="92" align="center">型号</td>
+    <td width="92" align="center">材质</td>
+    <td width="92" align="center">颜色</td>
+    <td width="92" align="center">欧洲价</td>
+    <td width="112" align="center">尚上价</td>
+    <td width="132" align="center">未完成采购数量</td>
+    <td width="92" align="center">被预订数量</td>
+    <td width="109" align="center">图片</td>
+  </tr>
+  #set($String = 'a')
+ #foreach($baseData in $query.items)
+  <tr>	
+	<td align="center">$!brandMap.get($String.valueOf($baseData.idBrand))</td>
+	<td  align="center">$!serialMap.get($String.valueOf($baseData.idSeries))</td>
+	<td align="center">$!baseData.type</td>
+	<td align="center">$!baseData.material </td>
+	<td align="center">$!baseData.color </td>
+	<td align="center"><a href="euPriceChange.html?goodsId=$!baseData.goodsId">$!baseData.euPrice </a></td>
+	<td align="center"><a href="hkPriceChange.html?goodsId=$!baseData.goodsId">$!baseData.hkPrice</a></td>
+	<td align="center">$!baseData.noPurchase</td>
+	<td align="center">$!baseData.bookNumber</td>
+	<td align="center"><img src="http://lussomoda.com.cn/upload/$!baseData.picture"></img></td>
+  </tr>
+  #end
+</table>
+
+#if($query.items.size()>0)
+		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/purchase/find.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+#else
+		没有结果！
+#end

@@ -1,0 +1,124 @@
+#set($layout = "layout/default.vm")
+
+<div class="main">
+	<h2>管理中心 - 仓库管理</h2>
+  <form action="/storage/gather_out_depository.html" name="searchForm" method="post">
+	<div class="searchBox">
+    <h3><span>出库单成本汇总统计</span></h3>
+		<table>
+        	<tr>
+                <th>单据编号：</th>
+				<td >
+					#springBind("gatherQuery.billNum")
+					<input type="text" id="billNum" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+            	<th>产品名称：</th>
+				<td >
+					#springBind("gatherQuery.instanceName")
+					<input type="text" id="instanceName" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+			</tr>
+			<tr>
+            	<th>产品编码：</th>
+				<td >
+					#springBind("gatherQuery.goodsInstanceCode")
+					<input type="text" id="goodsInstanceCode" name="${status.expression}" value="$!{status.value}" class="inp" onblur="javascript:this.value=this.value.trim()"/>
+                </td>
+
+            	<th>出库时间：</th>
+				<td>
+					#springBind("gatherQuery.outDepTimeStart")
+					<input type="text" id="outDepTimeStart" name="${status.expression}" value="$!{status.value}" size="10" readonly="true"/>
+					-
+					#springBind("gatherQuery.outDepTimeEnd")
+					<input type="text" id="outDepTimeEnd" name="${status.expression}" value="$!{status.value}" size="10" readonly="true"/>
+        			  <script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "outDepTimeStart",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			      Calendar.setup({
+        			          inputField : "outDepTimeEnd",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+				</td>
+				<th >
+					 <input type="button" value=" 查询 " class="btn"  onclick="formSubmit();"/>
+                </th>
+
+				<td >
+					<input type="button" value="Excel导出" class="btn" onclick="doExport();"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+  </form>
+<!-- 入库单列表 -->
+<div class="listBox" id="listDiv">
+	<h3><span>出库单成本汇总列表</span></h3>
+	<table  id="listTable" name="listTable">
+      <tr>
+        <th>单据编号</th>
+        <th>产品名称</th>
+		<th>产品编码</th>
+		<th>产品属性</th>
+        <th>出库时间</th>
+		<th>单价（￥）</th>
+		<th>数量</th>
+		<th>金额（￥）</th>
+      </tr>
+   #if($query && $query.items.size()>0)
+		#foreach($obj in $query.items)
+	  <tr>
+           <td><a href="showOutDetail.html?outDepId=$!obj.outDepositoryId" target="_blank">$!obj.billNum</a></td>
+		   <td>$obj.instanceName</td>
+		   <td>$obj.goodsInstanceCode</td>
+		   <td title="$!attributeManager.getFullAttributeStringByAttrs($obj.attrs)">
+				$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attrs),20)
+		   </td>
+		   <td >$!dateUtil.convertDateToString("yyyy-MM-dd",$!obj.gmtOutDep)</td>
+		   <td>$!moneyUtil.getFormatMoney($!obj.unitPrice,'0.00')</td>
+           <td>$!obj.outNum</td>
+           <td>$!moneyUtil.getFormatMoney($!obj.sumMoney,'0.00')</td>
+      </tr>
+	  #end
+   #end
+    </table>
+    <!-- 分页 -->
+            #if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/gather_out_depository.html").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+        		没有结果！
+            #end
+  </div>
+</div>
+<script language="javascript" type="text/javascript">
+	String.prototype.trim = function() {
+    	// 用正则表达式将前后空格
+    	// 用空字符串替代。
+    	return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+
+	function doExport(){
+		var form1=document.forms[0];
+		form1.action="exportGetherOutDep.html";
+		form1.submit();
+		form1.action="/storage/gather_out_depository.html";
+	}
+
+		function formSubmit(){
+		    var outDepDateStart1=document.getElementById("outDepTimeStart").value.replace(/-/g, "/");
+    		var outDepDateEnd1=document.getElementById("outDepTimeEnd").value.replace(/-/g, "/");
+    		var bb_date1=new Date(Date.parse(outDepDateStart1));
+    		var ee_date1=new Date(Date.parse(outDepDateEnd1));
+
+    		if(ee_date1 < bb_date1){
+    				   alert("出库起始时间不能大于结束时间！");
+    			   return false;
+    		}
+        	document.forms[0].submit();
+	    }
+</script>

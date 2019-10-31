@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">
+	<typeAlias alias="provideUpdateGoodsXiYouLog" type="com.huaixuan.network.biz.domain.provider.ProvideUpdateGoodsXiYouLog" />
+	<resultMap id="provideGoodsResult"
+		class="com.huaixuan.network.biz.domain.provider.ProvideUpdateGoodsXiYouLog">
+		<result column="id" property="id" />
+		<result column="prodid" property="prodid" />
+		<result column="stock" property="stock" />
+		<result column="brandname" property="brandname" />
+		<result column="prodname" property="prodname" />
+		<result column="cost" property="cost" />
+		<result column="our_sale_price" property="oursaleprice" />
+		<result column="newcost" property="newcost" />
+		<result column="new_our_sale_price" property="newoursaleprice" />
+		<result column="cost_change_time" property="costchangetime" />
+		<result column="insert_time" property="inserttime" />
+	</resultMap>
+	<insert id="insertXiYouProductlog" parameterClass="provideUpdateGoodsXiYouLog">
+		insert into provide_update_goods_xiyou_log (prodid,stock,brandname,prodname,cost,our_sale_price,newcost,new_our_sale_price,cost_change_time,insert_time) values(#prodid#,#stock#,#brandname#,#prodname#,#cost#,#oursaleprice#,#newcost#,#newoursaleprice#,#costchangetime#,now())
+	</insert>
+	
+	<select id="getproviderSaleInfolistCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select COUNT(*)FROM provide_update_goods_xiyou_log where prodid = #id#
+	
+	</select>
+	
+	<select id="getproviderSaleInfoList" resultMap="provideGoodsResult" parameterClass="java.util.Map">
+		select * from provide_update_goods_xiyou_log where  prodid = #id#
+	</select>
+</sqlMap>

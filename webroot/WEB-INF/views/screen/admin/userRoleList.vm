@@ -1,0 +1,57 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<script>
+$(document).ready(function(){
+	$('#save').click(function(){
+		$('input[type="checkbox"]').each(function(){
+			if(this.checked) {
+				$('#ids').val(this.value+","+$('#ids').val());
+			}
+		});
+    	$('#form1').submit();
+	});
+});  
+</script>
+    <div class="main">
+        <!-- 表单模块 -->
+      <div class="formBox">
+		 <form action="$appServer.get('/admin/modifyUserRole.html')" name="form1" id="form1" method="post">
+        	<h3><i></i><span>编辑员工职务</span></h3>
+
+        	<div class="content">
+        		<table class="c5">
+					<tr>
+	                    <input type="hidden" id="ids" name="ids" value=""/>
+	                    <input type="hidden" id="adminId" name="adminId" value="$!adminId"/>
+					</tr>
+                           	<tbody>
+								<tr>
+                                	<th>职务:</th>
+                                	<td>
+										#foreach($role in $roles)
+											#set($checked = false)
+											#foreach($adminRole in $adminRoles)
+											#if($!{adminRole.roleId} == $!{role.id})
+												#set($checked = true)
+											#end
+											#end
+											<input type="checkbox" value="$!{role.id}" #if($checked) checked #end> $!{role.name}
+											#if($velocityCount%4 == 0) <br> #end
+										#end
+									</td>   
+                                </tr>
+                            </tbody>
+              </table>
+			</div>
+            <div class="form-but"><!-- 表单按钮区 -->
+
+            	<button type="button" class="button-s4" id="save">保存</button>
+                <button type="button" class="button-s4" onclick="#if(!$!{url})history.go(-1)#else javascript:location.href= '$!{appServer}/$!{url}' #end">取消</button>
+
+          	</div>
+
+         </form>
+        </div> 
+    </div>

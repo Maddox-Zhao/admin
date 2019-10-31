@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BoardSQL">
+<typeAlias alias="board" type="com.huaixuan.network.biz.domain.shop.Board"/>
+	<resultMap class="board" id="boardResult">
+		<result column="id" property="id"/>
+		<result column="shop_id" property="shopId"/>
+		<result column="name" property="name"/>
+		<result column="title" property="title"/>
+		<result column="position" property="position"/>
+		<result column="priority" property="priority"/>
+		<result column="display" property="display"/>
+		<result column="period" property="period"/>
+		<result column="amount" property="amount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+	</resultMap>
+<!-- create Board object -->
+<insert id="addBoard" parameterClass="board">
+<![CDATA[
+		insert into emall_board
+		(id,shop_id,name,title,position,priority,display,period,amount,gmt_create,gmt_modify )values( null,
+		#shopId#,
+		#name#,
+		#title#,
+		#position#,
+		#priority#,
+		#display#,
+		#period#,
+		#amount#,
+		sysdate(),
+		sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update Board object -->
+<update id="editBoard" parameterClass="board">
+	update emall_board set gmt_modify = sysdate()
+		<isNotEmpty property="shopId">
+				,shop_id = #shopId#
+		</isNotEmpty>
+		<isNotEmpty property="name">
+			,name = #name#
+		</isNotEmpty>
+		<isNotEmpty property="title">
+			,title = #title#
+		</isNotEmpty>
+		<isNotEmpty property="position">
+			,position = #position#
+		</isNotEmpty>
+		<isNotEmpty property="priority">
+			,priority = #priority#
+		</isNotEmpty>
+		<isNotEmpty property="display">
+			,display = #display#
+		</isNotEmpty>
+		<isNotEmpty property="period">
+			,period = #period#
+		</isNotEmpty>
+		<isNotEmpty property="amount">
+			,amount = #amount#
+		</isNotEmpty>
+		 where id = #id#
+</update>
+<!-- delete Board object -->
+<delete id="removeBoard" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from emall_board where emall_board.ID = #value#
+]]>
+</delete>
+<!-- search Board object -->
+<select id="getBoard" parameterClass="java.lang.Long" resultMap="boardResult">
+<![CDATA[
+		select emall_board.* from emall_board where emall_board.ID = #value#
+]]>
+</select>
+<!-- searchAll Board List -->
+<select id="getBoards" resultMap="boardResult">
+<![CDATA[
+		select emall_board.* from emall_board
+]]>
+</select>
+<select id="getBoardByName" resultMap="boardResult">
+<![CDATA[
+		select emall_board.* from emall_board where emall_board.name = #value#
+]]>
+</select>
+</sqlMap>

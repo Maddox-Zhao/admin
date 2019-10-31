@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="platformorderdetailstock">	
+	 <typeAlias alias="platFormOrderDetails" type="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderDetails"/>
+	<resultMap id="platFormOrderDetail" class="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderDetails" >
+         
+       <result column="idorder" property="idorder"/>
+       <result column="tmall" property="tmall"/>
+       
+       <result column="palcedTime" property="palcedTime"/>
+       <result column="name" property="name"/>
+       <result column="realName" property="realName"/>
+       <result column="identityNumber" property="identityNumber"/>
+       
+       <result column="mobile" property="mobile"/>
+       <result column="country" property="country"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		
+		<result column="district" property="district"/>
+		<result column="streetAddress" property="streetAddress"/>
+		<result column="zipCode" property="zipCode"/>
+		<result column="totalPrice" property="totalPrice"/>
+		
+		<result column="discountPrice" property="discountPrice"/>
+		<result column="freight" property="freight"/>
+		<result column="skuId" property="skuId"/>
+		<result column="merchantSkuId" property="merchantSkuId"/>
+		
+		<result column="quantity" property="quantity"/>
+		<result column="productname" property="productname"/>
+		<result column="size" property="size"/>
+		<result column="supply_price" property="supplyprice"/>
+		
+		<result column="currency" property="currency"/>
+		<result column="insertTime" property="insertTime"/>
+		<result column="payTime" property="payTime"/>
+		<result column="ptype" property="ptype"/>
+		<result column="pay_price" property="payPrice"/>
+		<result column="price" property="price"/>
+		
+   </resultMap>
+	<resultMap  id="platFormOrderDetails" class="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderDetails">
+		
+		<result column="idorder" property="idorder"/>
+		<result column="idPlartform" property="idPlartform"/>
+		<result column="idStatus" property="idStatus"/>
+		<result column="tmall" property="tmall"/>
+		
+		<result column="palcedTime" property="palcedTime"/>
+		<result column="name" property="name"/>
+		<result column="realName" property="realName"/>
+		<result column="identityNumber" property="identityNumber"/>
+		
+		<result column="mobile" property="mobile"/>
+        <result column="country" property="country"/>
+		<result column="province" property="province"/>
+	    <result column="city" property="city"/>
+	    
+		<result column="district" property="district"/>
+		<result column="streetAddress" property="streetAddress"/>
+		<result column="zipCode" property="zipCode"/>
+		<result column="create_time" property="createDate"/>
+		
+		<result column="totalPrice" property="totalPrice"/>
+		<result column="discountPrice" property="discountPrice"/>
+		<result column="freight" property="freight"/>
+		<result column="skuId" property="skuId"/>
+		
+		<result column="merchantSkuId" property="merchantSkuId"/>
+		<result column="quantity" property="quantity"/>
+		<result column="productname" property="productname"/>
+		<result column="size" property="size"/>
+		
+		<result column="supply_price" property="supplyprice"/>
+		<result column="currency" property="currency"/>
+		
+		
+	</resultMap>
+	
+	<resultMap id="OrderDetail" class="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderDetails" >
+       
+       <result column="idorder" property="idorder"/>
+       <result column="tmall" property="tmall"/>  
+       <result column="palcedTime" property="palcedTime"/>
+       <result  column="insertTime" property="insertTime"/>
+      
+       <result column="name" property="name"/>
+       <result column="realName" property="realName"/>
+       <result column="identityNumber" property="identityNumber"/>       
+       <result column="mobile" property="mobile"/>
+      
+       <result column="country" property="country"/>
+	   <result column="province" property="province"/>
+	   <result column="city" property="city"/>	
+	   <result column="district" property="district"/>
+	   
+	    <result column="streetAddress" property="streetAddress"/>
+		<result column="zipCode" property="zipCode"/>
+		<result column="totalPrice" property="totalPrice"/>
+		<result column="discountPrice" property="discountPrice"/>
+		
+		<result column="freight" property="freight"/>
+		<result column="skuId" property="skuId"/>
+		<result column="merchantSkuId" property="merchantSkuId"/>
+		<result column="quantity" property="quantity"/>
+		
+		<result column="productname" property="productname"/>
+		<result column="size" property="size"/>
+		<result column="supply_price" property="supplyprice"/>
+		<result column="currency" property="currency"/>
+		
+		<result column="ptype" property="ptype"/>
+		<result column="payTime" property="payTime"/>
+   </resultMap>
+	
+
+		<insert id="platformorderdetails" parameterClass="com.huaixuan.network.biz.domain.platformstock.PlatFormOrderDetails">
+			insert into hx_stock_update_platform_orderdetails (idorder,tmall,palcedTime,insertTime,payTime,name,realName,identityNumber,mobile,country,province,city,district,streetAddress,zipCode,totalPrice,discountPrice,pay_price,freight,skuId,merchantSkuId,quantity,productname,size,price,supply_price,currency,ptype) values(#idorder#,#tmall#,#palcedTime#,sysdate(),#payTime#,#name#,#realName#,#identityNumber#,#mobile#,#country#,#province#,#city#,#district#,#streetAddress#,#zipCode#,#totalPrice#,#discountPrice#,#payprice#,#freight#,#skuId#,#merchantSkuId#,#quantity#,#productname#,#size#,#price#,#supplyprice#,#currency#,#ptype#)
+		</insert>
+		
+		<select id="searchdetails" resultMap="platFormOrderDetail" parameterClass="platFormOrderDetails">
+			select * from hx_stock_update_platform_orderdetails where idorder = #idorder#
+		</select>
+		
+		<!--用于weimob和银泰(yinTai)多条详情 -->
+		<select id="searchListWeimob" resultMap="platFormOrderDetail" parameterClass="platFormOrderDetails">
+			select * from hx_stock_update_platform_orderdetails where 1=1
+			
+			<isNotNull prepend="and" property="idorder">
+			   idorder=#idorder#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="merchantSkuId">
+			   merchantSkuId=#merchantSkuId#
+			</isNotNull>
+			<isNotEmpty property="insertTime" prepend="and">
+				<![CDATA[ insertTime >= #insertTime# ]]>
+			</isNotEmpty>
+			
+		</select>
+		
+		<!-- 查询Derdetails总条数 -->
+		<select id="hxDerdetailsOrderCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+			select count(*) from hx_stock_update_platform_order hp,
+				hx_stock_update_platform_orderdetails ho
+				WHERE hp.order_id=ho.idorder
+			<isNotEmpty prepend="and" property="orderId">
+				hp.order_id =#orderId#  
+			</isNotEmpty>
+		</select>
+		<!-- 根据条件查询 -->
+		
+		
+		
+		<select id="searchDetailsOrderProduct" parameterClass="java.util.Map"  resultMap="platFormOrderDetails">
+			SELECT 
+			hp.create_time create_time,
+			hp.idPlartform idPlartform, hp.idStatus idStatus, ho.*, hp.order_id order_id 
+			FROM hx_stock_update_platform_order hp,
+			hx_stock_update_platform_orderdetails ho
+			WHERE hp.order_id=ho.idorder					
+		<isNotEmpty prepend="and" property="orderId">
+				ho.idorder =#orderId#  
+		</isNotEmpty>
+ 		<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		 </isNotEmpty>		
+		
+		</select>	
+		
+		
+		<!--无条件查询 Derdetails总条数 -->
+		<select id="selectDerdetailsOrderCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+			select count(*) from hx_stock_update_platform_orderdetails 
+			where 1=1
+			<isNotEmpty prepend="and" property="idorder">
+				idorder =#idorder#  
+			</isNotEmpty>		
+			<isNotEmpty prepend="and" property="skuId">
+				skuId =#skuId#  
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="merchantSkuId">
+				merchantSkuId =#merchantSkuId#  
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="ptype">
+			   ptype=#ptype#
+			</isNotEmpty>
+			
+			<isNotEmpty property="createDateStarts" prepend="and">
+				<![CDATA[ insertTime >= #createDateStarts# ]]>
+			</isNotEmpty>
+			<isNotEmpty property="createDateEnds" prepend="and">
+				<![CDATA[  insertTime <= '$createDateEnds$ 23:59:59'  ]]>
+	 		 </isNotEmpty>
+						
+		</select>
+		<!--  -->
+		<select id="selectDetailsOrderProduct" parameterClass="java.util.Map"  resultMap="OrderDetail">
+			select * from hx_stock_update_platform_orderdetails
+			where 1=1
+		<isNotEmpty prepend="and" property="idorder">
+			idorder =#idorder#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="skuId">
+			skuId =#skuId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="merchantSkuId">
+			merchantSkuId =#merchantSkuId#  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ptype">
+			   ptype=#ptype#
+			</isNotEmpty>
+		<isNotEmpty property="createDateStarts" prepend="and">
+			<![CDATA[ insertTime >= #createDateStarts# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="createDateEnds" prepend="and">
+			<![CDATA[  insertTime <= '$createDateEnds$ 23:59:59'  ]]>
+ 		 </isNotEmpty>
+ 		 ORDER BY insertTime Desc
+			<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		 </isNotEmpty>	
+		</select>		
+</sqlMap>
+
+

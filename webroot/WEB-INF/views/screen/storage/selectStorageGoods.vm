@@ -1,0 +1,281 @@
+#set($layout = "layout/default.vm")
+#set($title = "选择产品")
+
+<div class="main">
+#set($mut = ($request.getParameter('muse')=='true') )
+<div style="color:red;">注意：为了避免出现错误，请不要选择次品库或批发库记录进行外借操作！</div>
+    <form name="searchform" id="searchform" action="selectStorageGoods.html" method="post">
+		<input type="hidden" name="sid" value="$!{sid}" />
+		<input type="hidden" id="selectedIds" name="selectedIds" value="$!{selectedIds}" />
+		<input type="hidden" id="selectGoodsCount" name="selectGoodsCount" value="$!{selectGoodsCount}" />
+		<input type="hidden" id="isSearch" name="isSearch" value="true" />
+    	<div class="searchBox">
+        	<table>
+        		<tr>
+        			#set($allShow = "1")
+        			$contain.get('/storage/depSelect.html').put('allShow',$allShow).put('depositoryFirstList',$depositoryFirstList).put('depositoryList',$depositoryList).put('depLocationLists',$depLocationLists).put('queryObject',$!queryObject)
+        		</tr>
+        		<tr>
+                    <th>产品名称：</th>
+            		<td>
+            			<input type="text" name="instanceName" value="$!{queryObject.instanceName}" onblur="javascript:this.value=jQuery.trim(this.value)"/>
+                    </td>
+                    <th>产品编码：</th>
+            		<td>
+            			<input type="text" name="code" value="$!{queryObject.code}" onblur="javascript:this.value=jQuery.trim(this.value)"/>
+                    </td>
+                    <th>供应商：</th>
+        			<td>
+        				<input type="text" name="supplierName" value="$!{queryObject.supplierName}" onblur="javascript:this.value=jQuery.trim(this.value)"/>
+                    </td>
+                </tr>
+        		<input type="hidden" name="orderBy" id="queryObject.orderBy" value="$!queryObject.orderBy">
+        		##<input type="reset" value="重置" class="button"/>
+        		<tr>
+            		<th>产品一级类目：</th>
+            		<td>
+                			<select name="catCode" id="catCode" style="width:100px;" onchange="selectTwoCatCode(this.value,'twoCatCode');">
+                				<option value="">-=请选择=-</option>
+                				#foreach($cat in $catList)
+                				<option value="$cat.catCode" #if("$cat.catCode"==$queryObject.catCode) selected #end>$cat.catName</option>
+                				#end
+                			</select>
+                    </td>
+            		<th> 产品二级类目：</th>
+            		<td>
+                			<select name="twoCatCode" id="twoCatCode">
+                				<option value="">请选择</option>
+                				#foreach($twocat in $twocatListInit)
+                				<option value="$twocat.catCode" #if("$twocat.catCode"==$queryObject.twoCatCode) selected #end>$twocat.catName</option>
+                				#end
+                			</select>
+                    </td>
+
+            		<th >
+                    </th>
+            		<td>
+            			<input type="button" value="查询" class="button" onclick="formSubmit();"/>
+                    </td>
+                </tr>
+        	</table>
+    	</div>
+		<div class="listBox">
+			<table style="display:table;" id="general-table">
+					<tr>
+						<th align="left">
+							<input name="anothercheckall" type="checkbox" onclick="checkAllWithName(this.form,'anothercheckall');"/>
+						</th>
+						<th width="">
+							<a href="#" onclick="goodsCode();">产品编码</a>
+						</th>
+						<th width="">
+							产品名称
+						</th>
+						<th width="">
+							类目
+						</th>
+						<th width="">
+							属性
+						</th>
+						<th width="">
+							一级仓库
+						</th>
+						<th width="">
+							仓库
+						</th>
+						<th width="">
+							库位
+						</th>
+						<th width="">
+							<a href="#" onclick="supplierName();">供应商</a>
+						</th>
+						<th width="">
+							<a href="#" onclick="storageNumSum();">库存</a>
+						</th>
+					</tr>
+					 #foreach($obj in $query.items)
+    					<tr #if($velocityCount%2==0) class="bg" #end>
+    							<td>
+    								<input type="checkbox" name="ids" id="gi_${velocityCount}" value="${obj.id}" #if($!selectMap.get("${obj.id}")=="${obj.id}") checked="true" #end/>
+    							</td>
+    							<td height="27">
+    								$!{obj.code}
+    							</td>
+    							<td title="$!{obj.instanceName}">
+    								$!controlUtil.getNoticesTitle($!{obj.instanceName},15)
+    							</td>
+    							<td title="$!categoryManager.getCatFullNameByCatcode($obj.catCode)">
+    								$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($obj.catCode),20)
+    							</td>
+    							<td title="$!attributeManager.getFullAttributeStringByAttrs($obj.attrs)">
+    								$!controlUtil.getNoticesTitle($!attributeManager.getFullAttributeStringByAttrs($obj.attrs),20)
+    							</td>
+    							<td>
+    								$!{obj.depFirstName}
+    							</td>
+    							<td>
+    								$!{obj.depositoryName}
+    							</td>
+    							<td>
+    								$!{obj.depLocationName}
+    							</td>
+    							<td title="$!{obj.supplierName}">
+    								<a href="$appServer/supplier/viewSupplier.html?sid=$!{obj.supplierId}" target="_blank">$!controlUtil.getNoticesTitle($!{obj.supplierName},10)</a>
+    							</td>
+    							<td align="right">
+    								$!{obj.storageNum}
+    							</td>
+    						</tr>
+					 #end
+				</table>
+    			<table cellpadding="4" cellspacing="0">
+                    <tr class="bg">
+                      <td align="center"><input type="button" id="btnSubmit" value="确定" class="button" onclick="cmt();"/>
+        				<input type="button" id="btnSubmit" value="关闭" class="button" onclick="cl();"/></td>
+                    </tr>
+              </table>
+			</div>
+		  </form>
+    		<!-- 分页 -->
+        	#if($query.items.size()>0)
+        		$contain.get('/contain/formPageSlider.html').put('slider_query',$query).put('slider_target',"/storage/selectStorageGoods.html?isSearch=true").put('slider_path','/contain/formPagingPageSlider').put("slider_width",3)
+            #else
+				<input type="hidden" name="clickchoose" id="clickchoose" value="false"/>
+        		没有结果！
+        	#end
+</div>
+<script language="javascript" type="text/javascript">
+	function cmt(){
+		var sCount = 0;
+		#if($selectGoodsCount && $selectGoodsCount != "")
+			sCount = $selectGoodsCount;
+		#end
+		var back = [];
+		var good;
+		var size = 25;
+
+		#if($storageList)
+    		size = $!storageList.size();;
+        #end
+    		for(var i=1;i<=size;i++){
+    			var cid = 'gi_'+i;
+    			var one = document.getElementById(cid);
+    			if(one && one.checked){
+    				var obj = buildGi(i);
+    				back.push(obj);
+    			}
+    		}
+		#if($selectList && $selectList.size() > 0)
+			#foreach($sid in $selectList)
+    			good = new Object();
+    			good.id = $sid;
+    			back.push(good);
+			#end
+		#end
+		if(back.length==0){
+			alert('请选择产品!');
+		} else if(back.length + sCount > 100){
+			alert('添加的产品数量不能超过100条！');
+		}else {
+    	    window.opener.backStorageInstance(back);
+            self.close();
+		}
+	}
+	function buildGi(count){
+		var cid = 'gi_'+count;
+		var back = new Object();
+		back.id = document.getElementById(cid).value;
+		return back;
+	}
+	function cl(){
+		window.opener.backStorageInstance();
+		window.close();
+	}
+
+	function f() {
+	    var pageclick = document.getElementById("clickchoose").value;
+		if(pageclick == "false"){
+		   cl();
+		}else{
+		   document.getElementById("clickchoose").value = "false";
+		}
+	}
+	window.onbeforeunload = f;
+
+	function checkAllWithName(theForm, allCheckName) { // check all the checkboxes in the list with the name of the all check box
+  	  var allcheck;
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if(eName==allCheckName){
+            	allcheck=e;
+            }
+        }
+      for (var i=0;i<theForm.elements.length;i++) {
+        var e = theForm.elements[i];
+            var eName = e.name;
+            if (eName != allCheckName &&
+                (e.type.indexOf("checkbox") == 0)) {
+                e.checked = allcheck.checked;
+            }
+        }
+    }
+
+	function goodsCode(){
+	    var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("asc")>=1){
+		  document.getElementById("orderBy").value="goodsCodeDesc";
+		}
+		else{
+		  document.getElementById("orderBy").value="goodsCodeAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+
+	function supplierName(){
+	    var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("asc")>=1){
+		   document.getElementById("orderBy").value="supplierIdDesc";
+		}else{
+		   document.getElementById("orderBy").value="supplierIdAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+
+	function storageNumSum(){
+		var orderBy = document.getElementById("orderBy").value;
+		if(orderBy.indexOf("asc")>=1){
+		document.getElementById("orderBy").value="storageNumSumDesc";
+		}else{
+		   document.getElementById("orderBy").value="storageNumSumAsc";
+		}
+		document.getElementById('searchform').submit();
+	}
+	
+	function formSubmit(){
+	   var clickchoose = document.getElementById("clickchoose");
+	   if(clickchoose != null){
+	      clickchoose.value = "true";
+	   }
+	   document.searchform.submit();
+	}
+
+	var twocatList = new Array();
+		var k=0;
+        #foreach($twocat in $twocatList)
+            twocatList[k] = new Array("$!{twocat.catCode}","$!{twocat.parentCode}","#direct($!{twocat.catName})");
+            k++;
+        #end
+		var num=k;
+		function selectTwoCatCode(code,twoCatCode){
+            var obj = document.getElementById(twoCatCode);
+            var length = obj.length = 0;
+    		obj.options[length++] = new Option("请选择", "");
+            for(var m=0; m<num; m++){
+                if( twocatList[m][1] == code){
+                    obj.options[length] = new Option(twocatList[m][2], twocatList[m][0]);
+                    length++;
+                }
+            }
+        }
+</script>

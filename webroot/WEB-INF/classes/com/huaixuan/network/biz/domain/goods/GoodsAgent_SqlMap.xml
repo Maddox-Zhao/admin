@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GoodsAgentSQL">
+    <typeAlias alias="goodsagent" type="com.huaixuan.network.biz.domain.goods.GoodsAgent" />
+    <resultMap id="goodsagentResult" class="goodsagent">
+         <result property="gmtCreate" column="gmt_create"/>
+         <result property="gmtModify" column="gmt_modify"/>
+         <result property="userId" column="user_id"/>
+         <result property="goodsId" column="goods_id"/>
+         <result property="status" column="status"/>
+    </resultMap>
+    <resultMap id="goodsagentStatus" class="com.huaixuan.network.biz.domain.goods.GoodsAgent">
+         <result column="user_id" property="userId"/>
+         <result column="status" property="status"/>
+         <result column="title" property="title"/>
+         <result column="img_small" property="imgSmall"/>
+         <result column="goods_status" property="goodsStatus"/>
+         <result column="goods_sn" property="goodsSn"/>
+         <result column="is_agent" property="isAgent"/>
+         <result column="goods_id" property="goodsId"/>
+    </resultMap>
+
+    <update id="updateAgentStatusById" parameterClass="java.util.Map">
+     <![CDATA[
+        update emall_agent_goods set status=#status#,
+        gmt_modify = sysdate()
+         where user_id = #userId# and goods_id=#goodsId#
+     ]]>
+    </update>
+
+<sql id="GOODS.AGENT.COMMON_CONDITION">
+		<isNotEmpty prepend="and" property="catCode">
+			b.cat_code like concat(#catCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="brandId">
+			b.BRAND_ID = #brandId#
+		</isNotEmpty>
+        <isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodsStatus">
+			b.goods_status = #goodsStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModifyStart">
+			<![CDATA[ a.gmt_modify > STR_TO_DATE(#gmtModifyStart#,'%Y-%m-%d %H:%i:%s') ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="gmtModifyEnd">
+			<![CDATA[ a.gmt_modify < DATE_ADD(STR_TO_DATE(#gmtModifyEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+		</isNotEmpty>
+</sql>
+<!-- modified by chenyan 2010/05/16 start 修改了排序，按添加日期  -->
+    	<select id="getGoodsAgentByParameterMap" resultClass="goodsagent" parameterClass="java.util.Map">
+    	<include refid="pageSQLHead"/>
+		<![CDATA[
+        select a.user_id userId,
+		       a.status status,
+		       a.gmt_modify gmtModify,
+		       b.goods_sn goodsSn,
+		       b.title title,
+		       b.img_small imgSmall,
+		       b.goods_status goodsStatus,
+		       b.is_agent isAgent,
+		       a.goods_id goodsId,
+		       b.agent_price agentPrice,
+		       b.market_price marketPrice,
+		       b.goods_number goodsNumber,
+		       b.goods_price goodsPrice,
+		       (select re.name
+		          from emall_goods_rel_rule r, ioss_return_point re
+		         where r.return_id = re.id
+		           and re.apply_role = 'd'
+		           and r.goods_id = a.goods_id
+		           LIMIT 1 ) as ruleName,
+		       (select re.id
+		          from emall_goods_rel_rule r, ioss_return_point re
+		         where r.return_id = re.id
+		           and re.apply_role = 'd'
+		           and r.goods_id = a.goods_id
+		           LIMIT 1 ) as ruleId
+		  from emall_agent_goods a, emall_goods b
+		 where a.goods_id = b.id
+		   and a.status = 'y'
+		   and b.is_agent = 'y'
+ 	 ]]>
+		<include refid="GOODS.AGENT.COMMON_CONDITION"/>
+		<dynamic prepend="ORDER BY">
+		   	<isEqual prepend="order by" property="order" compareValue="orderByGmt">
+				a.gmt_modify desc,b.goods_sn
+			</isEqual>
+			<isEqual prepend="order by" property="order" compareValue="agentPriceDesc">
+				b.agent_price desc,b.goods_sn
+			</isEqual>
+			<isEqual prepend="order by" property="order" compareValue="agentPrice">
+				b.agent_price,b.goods_sn
+			</isEqual>
+	  	</dynamic>
+
+		<include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getGoodsAgentCountByParameterMap" parameterClass="java.util.Map" resultClass="int" >
+		<![CDATA[
+  	  select count(1)
+  	  	from emall_agent_goods a,emall_goods b
+		where a.goods_id=b.id and a.status='y' and b.is_agent='y'
+ 	 ]]>
+		<include refid="GOODS.AGENT.COMMON_CONDITION"/>
+
+	</select>
+
+    <select id="getErrorGoodsAgentByParameterMap" resultMap="goodsagentStatus" parameterClass="java.util.Map">
+      <include refid="pageSQLHead"/>
+		<![CDATA[
+        select
+         a.user_id,
+         a.status,
+         b.goods_sn,
+         b.title,
+         b.img_small,
+         b.goods_status,
+         b.is_agent,
+         a.goods_id
+		from emall_agent_goods a,emall_goods b
+		where a.goods_id=b.id and a.status='y' and b.is_agent='n'
+ 	 ]]>
+        <isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		order by b.goods_sn
+		<include refid="pageSQLFoot"/>
+	</select>
+
+	<select id="getErrorGoodsAgentCountByParameterMap" parameterClass="java.util.Map" resultClass="int" >
+		<![CDATA[
+	   select count(1) from
+        ( select
+         a.user_id,
+         a.status,
+         b.goods_sn,
+         b.title,
+         b.img_small,
+         b.goods_status,
+         b.is_agent,
+         a.goods_id
+		from emall_agent_goods a,emall_goods b
+		where a.goods_id=b.id and a.status='y' and b.is_agent='n'
+ 	 ]]>
+		<isNotEmpty prepend="and" property="goodCode">
+			b.goods_sn like concat('%',#goodCode#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="goodName">
+			b.title like concat('%',#goodName#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="agentUserId">
+			a.user_id = #agentUserId#
+		</isNotEmpty>
+		) aa
+	</select>
+
+<insert id="addGoodsAgent" parameterClass="com.huaixuan.network.biz.domain.goods.GoodsAgent">
+        <![CDATA[
+INSERT INTO emall_agent_goods
+  (gmt_create, gmt_modify, user_id, goods_id, status)
+VALUES
+  (sysdate(), sysdate(), #userId#, #goodsId#, #status#)
+        ]]>
+    </insert>
+
+    <sql id="goodsAgentParamter">
+        <isNotEmpty prepend="and" property="userId">
+           user_id =#userId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="goodsId">
+           goods_id =#goodsId#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="status">
+           status =#status#
+        </isNotEmpty>
+    </sql>
+
+     <select id="countGoodsAgent"  resultClass="int" >
+        <![CDATA[
+		select count(1) from emall_agent_goods
+    	where 1=1
+     ]]>
+    	<include refid="goodsAgentParamter" />
+    </select>
+
+     <select id="getGoodsAgent" parameterClass="java.util.Map" resultClass="goodsagent" >
+        <![CDATA[
+     select
+        gmt_create gmtCreate,
+        gmt_modify gmtModify,
+        user_id userId,
+        goods_id goodsId,
+        status
+    from emall_agent_goods
+    where 1=1
+     ]]>
+    <include refid="goodsAgentParamter" />
+    </select>
+
+	<select id="getPastUserIdForAddGoodsRelation" resultClass="java.lang.Long">
+		select distinct user_id from emall_agent_goods
+	</select>
+	<select id="getCurrUserIdForAddGoodsRelation" resultClass="java.lang.Long">
+		select user_id from emall_agent_info
+		where user_id not in (select distinct user_id from emall_agent_goods)
+		AND status = 'success'
+		<isNotNull prepend="and">
+           user_id = #value#
+        </isNotNull>
+	</select>
+	<update id="editStatusByUserIdGoodsId" parameterClass="com.huaixuan.network.biz.domain.goods.GoodsAgent">
+		update emall_agent_goods set gmt_modify=sysdate(),status=#status# where user_id=#userId# and goods_id=#goodsId#
+	</update>
+
+	<insert id="insertBatchAgentUserForGoodsId" parameterClass="java.lang.Long">
+      <![CDATA[
+      INSERT INTO emall_agent_goods
+  (gmt_create, gmt_modify, user_id, goods_id, status)
+  SELECT sysdate(), sysdate(), e.user_id, #goodsId#, 'y'
+    FROM (select user_id
+            from (SELECT DISTINCT a.user_id FROM emall_agent_goods a) d
+           where not exists (select 1
+                    from (select b.user_id
+                            from emall_agent_goods b
+                           where goods_id = #goodsId#) c
+                   where c.user_id = d.user_id)) e
+	  ]]>
+	</insert>
+</sqlMap>

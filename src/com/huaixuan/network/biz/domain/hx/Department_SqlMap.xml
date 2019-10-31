@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="department">
+	<typeAlias alias="Department" type="com.huaixuan.network.biz.domain.hx.Department" />
+	<resultMap id="DepartmentResult" class="com.huaixuan.network.biz.domain.hx.Department">
+		<result column="id" property="id" javaType="int" />
+		<result column="dep_code" property="depCode" javaType="string"/>
+		<result column="name" property="name" javaType="string"/>
+		<result column="parent_code" property="parentCode" javaType="string"/>
+		<result column="staff_num" property="staffNum" javaType="int"/>
+		<result column="role_ids" property="roleIds" javaType="string"/>
+		<result column="role_names" property="roleNames" javaType="string"/>
+		<result column="child_nums" property="childNums" javaType="int"/>
+		<result column="note" property="note"  javaType="string"/>
+		<result column="status" property="status" javaType="string"/>
+		<result column="gmt_create" property="gmtCreate"  javaType="string"/>
+		<result column="gmt_modify" property="gmtModify"  javaType="string"/>
+	</resultMap>
+	
+	<sql id="allDepartment">
+		id, dep_code, name, parent_code, staff_num, role_ids, role_names, child_nums, note, status, gmt_create, gmt_modify
+	</sql>
+	<select id="selectDepartmentParent" parameterClass="java.lang.String" resultMap="DepartmentResult">
+		select
+		  <include refid="allDepartment"/>
+		from hx_department
+		where dep_code = #depCode#
+	</select>
+	
+	
+	
+	<select id="selectOneDepartmentById" parameterClass="java.lang.Integer" resultMap="DepartmentResult">
+		select 
+			<include refid="allDepartment"/>
+		 from hx_department 
+		where 
+			id = #id#
+	</select>
+	
+	<select id="selectallDepartment" resultMap="DepartmentResult">
+		select 
+		<include refid="allDepartment"/>
+		from hx_department
+	</select>
+	
+	
+	<select id="selectByName" resultMap="DepartmentResult">
+		select 
+		<include refid="allDepartment"/>
+		from hx_department
+		where name=#name#
+	</select>
+	
+	<insert id="addDepartment" parameterClass="Department">
+		insert into hx_department(<include refid="allDepartment"/>)
+		values(null,#depCode#,#name#,#parentCode#,#staffNum#,#roleIds#,#roleNames#,#childNums#,#note#,#status#,now(),now())
+	</insert>
+	
+	<update id="updateDepartment" parameterClass="Department" >
+		update hx_department
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="name">
+				name = #name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="parentCode">
+				parent_code=#parentCode#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="status">
+				status = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="staffNum">
+				staff_num = #staffNum#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="note">
+				note = #note#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="roleIds">
+				role_ids = #roleIds#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="roleNames">
+				role_names = #roleNames#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="childNums">
+				child_nums = #childNums#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="gmtModify">
+				gmt_modify = now()
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="where">
+			<isNotEmpty property="id">
+				id = #id#
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	
+	<delete id="deleteDepartment" parameterClass="java.lang.String">
+		delete from hx_department where dep_code  like '%$depcode$'
+	</delete>
+	
+ 	<update id="updateDepartmentStaffNum" parameterClass="java.lang.String">
+		update hx_department set hx_department.staff_num = hx_department.staff_num + 1
+		where hx_department.dep_code in ($depCode$)
+	</update>
+	
+	
+</sqlMap>

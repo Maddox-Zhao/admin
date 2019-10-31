@@ -1,0 +1,288 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>预开单订单</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+            <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<style type="text/css">
+    .redRow
+    {
+        background:#FFEBCD;
+    }
+
+</style>
+<body>
+	<form id="excelForm" action="/order1/customerordeexport.html" method="post" target="excelIFrame">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">订单号：</td>
+                    <td style="width:150px">
+                        <input name="id" class="mini-textbox" onenter="search()"/>
+                    </td>
+                     
+                    <td class="form-label" style="width:75px;">渠道：</td>
+                    <td style="width:100px">
+                       <input  name="idChannel" onenter="search()" class="mini-combobox"   textField="name" valueField="id" emptyText="请选择..."
+                            url="/sell/getAllSellChannel.html"  allowInput="false" showNullItem="true" nullItemText="请选择..."/> 
+                    </td>
+                    <td class="form-label" style="width:60px;">订单状态：</td>
+                    <td style="width:150px">
+                       <input  name="status" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..." multiSelect="true" 
+							data="statusdata"    allowInput="false" /> 
+                    </td>
+					 <td class="form-label" style="width:60px;">订单总额：</td>
+                    <td style="width:150px">
+                        <input  id="subTotal" class="mini-textbox"  readonly="readonly"/>
+                    </td>
+                    <td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label" style="width:60px;">客户ID：</td>
+                    <td style="width:150px">
+                         <input name="idCustomer" class="mini-textbox" onenter="search()"/>
+                    </td>
+                    <td class="form-label" style="width:60px;">客户姓名：</td>
+                    <td style="width:150px">
+                        <input name="customerName" class="mini-textbox" onenter="search()"/>
+                    </td>
+ 
+                    <td class="form-label" style="width:60px;">起止时间：</td>
+                    <td   colspan="3">
+                        <input id="sellDateStart" name="sellDateStart" class="mini-datepicker"  format="yyyy-MM-dd" />
+                        ~
+                        <input id="sellDateEnd" name="sellDateEnd" class="mini-datepicker" format="yyyy-MM-dd"  />
+						
+                    </td>
+                </tr>
+ 
+            </table>
+        </div>
+    </div>
+    </form>
+	
+	
+	<div style="width:100%;">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:100%;">
+							<a class="mini-button" id="add2ShoppingCar" iconCls="icon-add" onclick="showDetail()">批量查看</a>
+							<a class="mini-button"  iconCls="icon-add" onclick="showRealyOrder()">查看实际订单</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	
+	
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:450px;" allowResize="true" multiSelect="true"  allowCellEdit="true" allowCellSelect="true"
+        url="/reservedOrder/showOrderList.html"  idField="id" multiSelect="false"  pageSize="100" allowAlternating="true" onRowdblclick="edit()"
+	 >
+        <div property="columns">
+			<div type="checkcolumn"></div>
+            <div field="id" width="40" headerAlign="center" align="center" allowSort="true">订单号</div>
+			<div field="idOrder" width="40" headerAlign="center" align="center" allowSort="true">实际订单号</div>
+            <div field="createDate" width="80" headerAlign="center" align="center"  allowSort="true"   >日期</div>
+            <div field="subTotal" width="60" headerAlign="center" align="center"  allowSort="true">总价</div>
+            <div field="currencyName" width="40" headerAlign="center" align="center"  allowSort="true">币种</div>
+            <div field="customerName" width="80" headerAlign="center" align="center"  allowSort="true">客户</div>
+            <div field="sellChannelName" width="60" headerAlign="center" align="center"  allowSort="true">渠道</div>
+			<div field="status" width="60" headerAlign="center" align="center"  allowSort="true" renderer="renderStatus">订单状态</div>
+			<div field="createUserName" width="60" headerAlign="center" align="center"  allowSort="true" >创建人</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var deliverystatus = [{id:"YES",value:"Yes"},{id:"NO",value:"No"}]
+		var statusdata = [{id:-1,value:"已取消"},{id:0,value:"未处理"},{id:1,value:"已处理"},{id:2,value:"已处理,部分缺货"},{id:3,value:"已处理,部分取消"}]
+        mini.parse();
+        var grid = mini.get("datagrid1");
+		mini.get("sellDateStart").setValue(new Date());
+		mini.get("sellDateEnd").setValue(new Date());
+		
+        search();
+		
+		
+		grid.on("drawcell", function (e) {
+            var record = e.record,
+            column = e.column,
+            field = e.field,
+            value = e.value;
+
+			if(field == 'status'  && value >= 2)
+			{
+				 e.rowCls = "redRow";
+			}
+		});
+		
+		//订单状态
+		function renderStatus(row) {
+          if (row.value == '-1') return "已取消";
+          if (row.value == '0') return "未处理";
+          if (row.value == '1') return "已处理";
+		  if (row.value == '2') return "已处理,部分缺货";
+		  if (row.value == '3') return "已处理,部分取消";
+        }
+		   
+		function search()
+        {
+    		var form = new mini.Form("#form1");
+    		var data = form.getData();
+    		var date = mini.get("sellDateStart").getValue();
+            if (date instanceof Date) {
+                data.sellDateStart = formatDate(date);
+            }
+			var date = mini.get("sellDateEnd").getValue();
+            if (date instanceof Date) {
+                data.sellDateEnd = formatDate(date);
+            }
+			grid.load(data);
+
+    		//获取总金额
+    		jQuery.post("/reservedOrder/showOrderListPrice.html",data,function(text)
+    		{
+    				var arr = text.split(",");
+					mini.get("subTotal").setValue(arr[0])
+    		})
+		}
+
+		
+		function showDetail()
+		{	
+			var rows = grid.getSelecteds();
+            if (rows) {
+				var ids = "";
+				var idCustomerResult = "";
+				for(var i = 0; i < rows.length; i++)
+				{
+					var row = rows[i]
+					var id = row.id;
+					var idCustomer = row.idCustomer;
+					if(!idCustomerResult)
+						idCustomerResult = idCustomer;
+					else
+					{
+						if(idCustomerResult != idCustomer)
+						{
+							mini.alert("请选中相同客户的订单查看");
+							return;
+						}
+					}
+					idCustomerResult = idCustomer;
+					ids  = ids + id;
+					if(i < rows.length - 1)
+					{
+						ids = ids + ",";
+					}
+				}
+				
+				
+				 mini.open({
+                    url: "/reservedOrder/toShowOrderDetail.html",
+                    title: "订单明细",
+                    width: 1100,
+                    height: 490,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+                            id: ids
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                         grid.reload();
+                    }
+                });
+			
+			}
+			else
+			{
+				mini.alert("请选中一条数据");
+			}
+		}
+	     function edit() {
+            var row = grid.getSelected();
+            if (row) {
+                mini.open({
+                    url: "/reservedOrder/toShowOrderDetail.html",
+                    title: "订单明细",
+                    width: 1100,
+                    height: 490,
+                    onload: function() {
+                        var iframe = this.getIFrameEl();
+                        var data = {
+                            id: row.id
+                        };
+						 iframe.contentWindow.SetData(data);
+                    },
+                    ondestroy: function(action) {
+                         grid.reload();
+                    }
+                });
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+		function formatDate(now, showTime) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+             var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            var result = year + "-" + month + "-" + date;
+            if (showTime == true) {
+                result += " " + hour + ":" + minute + ":" + second;
+            }
+            return result;
+        }
+		
+		
+		//查看实际订单
+		 function showRealyOrder() {
+            var row = grid.getSelected();
+            if (row) {
+				if(row.idOrder)
+				{
+                    mini.open({
+                        url: "/order/orderinformation.html",
+                        title: "订单明细",
+                        width: 1100,
+                        height: 490,
+                        onload: function() {
+                            var iframe = this.getIFrameEl();
+                            var data = {
+                                id: row.idOrder,
+    							idPayment:row.idPayment,
+    							deliverystatus:row.deliverystatus
+                            };
+    						 iframe.contentWindow.SetData(data);
+                        },
+                        ondestroy: function(action) {
+                             grid.reload();
+                        }
+                    });
+				}
+				else
+				{
+					mini.alert('还未处理!未关联订单号');
+				}
+            } else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+</script>
+</body>
+</html>

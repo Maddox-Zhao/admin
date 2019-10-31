@@ -1,0 +1,833 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GoodsInstanceSQL">
+	<typeAlias alias="StockAgeAlias"
+		type="com.huaixuan.network.biz.domain.storage.StockAge" />
+    <typeAlias alias="ProductForTaobaoFxAdd"
+		type="com.huaixuan.network.biz.domain.goods.ProductForTaobaoFxAdd" />
+	<resultMap class="com.huaixuan.network.biz.domain.goods.GoodsInstance"
+		id="goodsInstance">
+		<result column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="code" property="code" />
+		<result column="cat_code" property="catCode" />
+		<result column="attrs" property="attrs" />
+		<result column="sell_price" property="sellPrice" />
+		<result column="market_price" property="marketPrice" />
+		<result column="sales_pro_price" property="salesProPrice" />
+		<result column="instance_name" property="instanceName" />
+		<result column="py_code" property="pyCode" />
+		<result column="status" property="status" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="remark" property="remark" />
+		<result column="max_num" property="maxNum" />
+		<result column="min_num" property="minNum" />
+		<result column="is_present" property="isPresent" />
+		<result column="goods_unit" property="goodsUnit" />
+		<result column="exist_num" property="existNum" nullValue="0" />
+		<result column="hk_exist_num" property="hkExistNum" nullValue="0" />
+		<result column="way_num" property="wayNum" nullValue="0" />
+        <result column="Type" property="type" />
+        <result column="Material" property="material" />
+        <result column="Color" property="color" />
+        <result column="Size" property="size" />
+        <result column="hkhx_price" property="hkhxPrice" />
+        <result column="hk_price" property="hkPrice" />
+        <result column="eu_price" property="euPrice" />
+        <result column="sell_num" property="sellNum" />
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.goods.GoodsInstance"
+		id="goodsInstanceWidthBrand" extends="goodsInstance">
+		<result column="brand_id" property="brandId" />
+		<result column="idSeries" property="idSeries" />
+		<result column="img_middle" property="imgMiddle" />
+		<result column="goodsTitle" property="goodsTitle" />
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.goods.GoodsInstance"
+		id="goodsInstanceStorage">
+		<result column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="code" property="code" />
+		<result column="cat_code" property="catCode" />
+		<result column="attrs" property="attrs" />
+		<result column="sell_price" property="sellPrice" />
+		<result column="market_price" property="marketPrice" />
+		<result column="sales_pro_price" property="salesProPrice" />
+		<result column="instance_name" property="instanceName" />
+		<result column="py_code" property="pyCode" />
+		<result column="status" property="status" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="remark" property="remark" />
+		<result column="max_num" property="maxNum" />
+		<result column="min_num" property="minNum" />
+		<result column="is_present" property="isPresent" />
+		<result column="goods_unit" property="goodsUnit" />
+		<result column="exist_num" property="existNum" nullValue="0" />
+		<result column="hk_exist_num" property="hkExistNum" nullValue="0" />
+		<result column="way_num" property="wayNum" nullValue="0" />
+		<result column="storage_num" property="storageNum"
+			nullValue="0" />
+	</resultMap>
+
+	<resultMap class="com.huaixuan.network.biz.domain.storage.StockAge"
+		id="stockAgeReturn">
+		<result column="id" property="id" />
+		<result column="goods_instance_id" property="goodsInstanceId" />
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="dep_id" property="depositoryId" />
+		<result column="supplier_id" property="supplierId" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="price" property="storagePrice" />
+		<result column="supplier_id" property="supplierId" />
+	</resultMap>
+
+	<resultMap class="com.huaixuan.network.biz.domain.storage.StockAge"
+		id="stockSupolier">
+		<result column="storage_num" property="storageNum" nullValue="0"/>
+		<result column="supplier_id" property="supplierId" />
+		<result column="price" property="storagePrice" />
+		<result column="loc_id" property="locId" />
+		<result column="stor_type" property="storType" />
+		<result column="goods_instance_id" property="goodsInstanceId" />
+	</resultMap>
+
+	<resultMap id="productsForTaobaoFxAddResult"
+		class="ProductForTaobaoFxAdd">
+	    <result column="goods_id" property="goodsId"/>
+	    <result column="attrs" property="attrs" jdbcType="VARCHAR"/>
+	    <result column="exist_num" property="existNum" nullValue="0" />
+	    <result column="TITLE" property="title" jdbcType="VARCHAR"/>
+	    <result column="goods_price" property="goodsPrice" nullValue="0"/>
+	    <result column="agent_price" property="agentPrice" nullValue="0"/>
+	    <result column="goods_desc" property="goodsDesc" />
+	    <result column="attr_desc" property="attrDesc" />
+	    <result column="instance_name" property="instanceName" jdbcType="VARCHAR"/>
+	    <result column="code" property="code" jdbcType="VARCHAR"/>
+	    <result column="py_code" property="pyCode" jdbcType="VARCHAR"/>
+	    <result column="cat_code" property="catCode" jdbcType="VARCHAR"/>
+	    <result column="id" property="productId"/>
+	    <result column="goods_number" property="goodsNumber" nullValue="0"/>
+	</resultMap>
+
+	<!-- 查询产品对应的淘宝销售 -->
+	<resultMap class="com.huaixuan.network.biz.domain.goods.GoodsInstance"
+		id="goodsInstanceOfTaobaoProp">
+		<result column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="code" property="code" />
+		<result column="attrs" property="attrs" />
+		<result column="attr_desc" property="attrDesc" />
+		<result column="taobao_sku_property" property="taobaoSkuProperty" />
+	</resultMap>
+	
+	<resultMap class="com.huaixuan.network.biz.domain.goods.GoodsInstance" id="giftGoodsInstance" extends="goodsInstance">
+	    <result column="goods_price" property="goodsPrice"/>
+	    <result column="img_small" property="imgSmall"/>
+	</resultMap>
+
+	<insert id="createGoodsInstance">
+		<![CDATA[
+		insert into ioss_goods_instance
+  (id,
+  goods_id,
+   code,
+   cat_code,
+   attrs,
+   sell_price,
+   market_price,
+   sales_pro_price,
+   instance_name,
+   py_code,
+   status,
+   attr_desc,
+   remark,
+   gmt_create,
+   gmt_modify,
+   max_num,
+   min_num,
+   is_present,
+   goods_unit,
+   Type,
+   Material,
+   Color,
+   Size,
+   hkhx_price,
+   hk_price,
+   eu_price,
+   exist_num,
+   hk_exist_num,
+   sell_num)
+values
+  (null,
+  #goodsId#,
+   #code#,
+   #catCode#,
+   #attrs#,
+   #sellPrice#,
+   #marketPrice#,
+   #salesProPrice#,
+   #instanceName#,
+   #pyCode#,
+   #status#,
+   #attrDesc#,
+   #remark#,
+   sysdate(),
+   sysdate(),
+   #maxNum#,
+   #minNum#,
+   #isPresent#,
+   #goodsUnit#,
+   #type#,
+   #material#,
+   #color#,
+   #size#,
+   #hkhxPrice#,
+   #hkPrice#,
+   #euPrice#,
+   #existNum#,
+   #hkExistNum#,
+   #sellNum#)
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<select id="findGoodsInstanceByGoodsId" resultMap="goodsInstance">
+		<![CDATA[
+		select * from ioss_goods_instance where goods_id = #value# order by id asc
+]]>
+	</select>
+	<select id="loadGoodsInstanceById" resultMap="goodsInstance">
+		<![CDATA[
+		select * from ioss_goods_instance where id = #value#
+]]>
+	</select>
+	
+	<select id="getClientInstance" resultMap="goodsInstance">
+		<![CDATA[
+		select t.* from ioss_goods_instance t
+		]]>
+		<dynamic prepend="where">
+        <isNotNull property="color" prepend="and">
+		<![CDATA[  t.Color = #color# ]]>
+        </isNotNull>
+        <isNotNull property="material" prepend="and">
+		<![CDATA[  t.Material = #material# ]]>
+        </isNotNull>
+        <isNotNull property="type" prepend="and">
+		<![CDATA[  t.Type = #type# ]]>
+        </isNotNull>
+        <isNotNull property="size" prepend="and">
+		<![CDATA[  t.size = #size# ]]>
+        </isNotNull>
+        </dynamic>
+        limit 1
+	</select>
+
+	<select id="getInstanceByCode" resultMap="goodsInstance">
+		<![CDATA[
+		select * from ioss_goods_instance where code = #value#
+]]>
+	</select>
+	<update id="updateGoodsInstance">
+		<![CDATA[
+		update ioss_goods_instance
+		set
+			code = #code#,
+			attrs = #attrs#,
+			sell_price = #sellPrice#,
+			market_price = #marketPrice#,
+			sales_pro_price = #salesProPrice#,
+			instance_name = #instanceName#,
+			py_code = #pyCode#,
+			status = #status#,
+			attr_desc = #attrDesc#,
+			remark = #remark#,
+			gmt_modify = sysdate(),
+			is_present = #isPresent#,
+			max_num=#maxNum#,
+			min_num=#minNum#,
+			taobao_sku_property = #taobaoSkuProperty#
+		 where id = #id#
+]]>
+	</update>
+
+
+	<sql id="GoodsInstanceSearchCommonWhere">
+		<isNotEmpty property="instanceName" prepend="and">
+			gi.instance_name like
+			concat(trim(#instanceName#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			gi.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="attrs" prepend="and">
+			gi.attrs = trim(#attrs#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+			gi.goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="pyCode" prepend="and">
+			gi.py_code = trim(#pyCode#)
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			gi.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="isPresent" prepend="and">
+			gi.is_present = #isPresent#
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+			gi.id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="min" prepend="and">
+			<![CDATA[ gi.exist_num<=gi.min_num]]>
+		</isNotEmpty>
+		<isNotEmpty property="max" prepend="and">
+			<![CDATA[ gi.exist_num>=gi.max_num ]]>
+		</isNotEmpty>
+		
+		<isNotEmpty property="goodsTitle" prepend="and">
+			t.title like concat('%',upper(#goodsTitle#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="type" prepend="and">
+			gi.type = upper(#type#)
+		</isNotEmpty>
+		<isNotEmpty property="material" prepend="and">
+			gi.material = upper(#material#)
+		</isNotEmpty>
+		<isNotEmpty property="color" prepend="and">
+			gi.color = upper(#color#)
+		</isNotEmpty>
+		<isNotEmpty property="existNum" prepend="and">
+			gi.exist_num >= #existNum#
+		</isNotEmpty>
+		<isNotEmpty property="hkExistNum" prepend="and">
+			gi.hk_exist_num >= #hkExistNum#
+		</isNotEmpty>
+		<isNotEmpty property="brandId" prepend="and">
+			t.brand_id = #brandId#
+		</isNotEmpty>
+		<isNotEmpty property="size" prepend="and">
+			gi.size = #size#
+		</isNotEmpty>
+	</sql>
+	
+	<select id="searchGoodsInstanceCount" resultClass="int">
+		select count(*) from ioss_goods_instance gi,emall_goods t
+		where gi.goods_id = t.id
+		<dynamic prepend="and">
+			<include refid="GoodsInstanceSearchCommonWhere" />
+		</dynamic>
+	</select>
+
+
+	<select id="searchGoodsInstance" resultMap="goodsInstanceWidthBrand">
+		<include refid="pageSQLHead" />
+		select gi.*,t.brand_id as brand_id,t.idSeries as idSeries,t.img_middle as img_middle,t.title as goodsTitle
+		from ioss_goods_instance gi,emall_goods t
+		where gi.goods_id = t.id
+		<dynamic prepend="and">
+			<include refid="GoodsInstanceSearchCommonWhere" />
+		</dynamic>
+		order by t.gmt_modify desc
+		<include refid="pageSQLFoot" />
+	</select>
+
+<!-- modified by chenyan 2011/02/17 start 只有上架中的商品才进行库存预警 -->
+	<select id="searchGoodsInstancesHasStorageCount"
+		resultClass="int">
+		select count(1) from (
+		select * from (select gi.id,max(gi.min_num) as min_num,
+		max(gi.max_num) as max_num,sum(s.storage_num) as storage_num
+		from ioss_goods_instance gi,ioss_storage s where gi.id =
+		s.goods_instance_id
+		<isNotEmpty property="instanceName" prepend="and">
+			gi.instance_name like
+			concat(trim(#instanceName#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			gi.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="attrs" prepend="and">
+			gi.attrs = trim(#attrs#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+			gi.goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			gi.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+			gi.id = #id#
+		</isNotEmpty>
+
+		group by gi.id )t
+		<dynamic prepend="where">
+			<isNotEmpty property="min" prepend="and">
+				<![CDATA[ t.storage_num<t.min_num]]>
+			</isNotEmpty>
+			<isNotEmpty property="max" prepend="and">
+				<![CDATA[ t.storage_num>t.max_num ]]>
+			</isNotEmpty>
+		</dynamic>
+			)a,emall_goods b,ioss_goods_instance c
+		 where a.id=c.id and c.goods_id=b.id
+		and b.goods_status='on_sale'
+	</select>
+	<select id="searchGoodsInstancesHasStorage"
+		resultMap="goodsInstanceStorage">
+		<include refid="pageSQLHead" />
+		select a.* from (
+		select * from ( select t.storage_num,s.* from (select
+		gi.id,max(gi.min_num) as min_num, max(gi.max_num) as
+		max_num,sum(s.storage_num) as storage_num from
+		ioss_goods_instance gi,ioss_storage s where gi.id =
+		s.goods_instance_id
+		<isNotEmpty property="instanceName" prepend="and">
+			gi.instance_name like
+			concat(trim(#instanceName#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			gi.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="attrs" prepend="and">
+			gi.attrs = trim(#attrs#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+			gi.goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			gi.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+			gi.id = #id#
+		</isNotEmpty>
+
+		group by gi.id )t,ioss_goods_instance s where s.id=t.id )k
+		<dynamic prepend="where">
+			<isNotEmpty property="min" prepend="and">
+				<![CDATA[ k.storage_num<k.min_num]]>
+			</isNotEmpty>
+			<isNotEmpty property="max" prepend="and">
+				<![CDATA[ k.storage_num>k.max_num ]]>
+			</isNotEmpty>
+		</dynamic>
+			)a,emall_goods b
+		 where a.goods_id=b.id
+		and b.goods_status='on_sale'
+		<include refid="pageSQLFoot" />
+	</select>
+<!-- modified by chenyan 2011/02/17 end-->
+	<select id="searchSupplierGoodsInstanceCount" resultClass="int">
+		select count(*) from ioss_goods_instance
+		gi,ioss_goods_instance_supplier gis where gi.id =
+		gis.goods_instance_id and gis.supplier_id = #supplierId#
+		<include refid="GoodsInstanceSearchCommonWhere" />
+	</select>
+
+	<select id="searchSupplierGoodsInstance"
+		resultMap="goodsInstance">
+		<include refid="pageSQLHead" />
+		select gi.* from ioss_goods_instance
+		gi,ioss_goods_instance_supplier gis where gi.id =
+		gis.goods_instance_id and gis.supplier_id = #supplierId#
+		<include refid="GoodsInstanceSearchCommonWhere" />
+		order by gi.code
+		<include refid="pageSQLFoot" />
+	</select>
+
+	<select id="findGoodsInstanceByCode" resultMap="goodsInstance">
+		select * from ioss_goods_instance where code like
+		CONCAT('%',trim(#value#),'%')
+	</select>
+
+	<delete id="deleteGoodsInstanceLocations">
+		<![CDATA[
+		delete from ioss_goods_location where goods_instance_id = #value#
+]]>
+	</delete>
+	<delete id="deleteGoodsInstanceAttrs">
+		<![CDATA[
+		delete from ioss_goods_instance where goods_id = #value#
+]]>
+	</delete>
+	<insert id="insertGoodsInstanceLocations">
+		<![CDATA[
+		insert into ioss_goods_location
+		(
+			id,loc_id,goods_instance_id,gmt_create,gmt_modify
+		)values(
+			null,#loid#,#goodsInstanceId#,sysdate(),sysdate()
+		 )
+]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+
+	<select id="findGoodsInstanceLocations" resultClass="long">
+		select loc_id from ioss_goods_location where goods_instance_id =
+		#value#
+	</select>
+
+	<select id="findGoodsInstanceInLocations" resultClass="long">
+		select goods_instance_id from ioss_goods_location where loc_id =
+		#value#
+	</select>
+
+	<update id="updateGoodsInstanceExistNumById"
+		parameterClass="java.util.Map">
+		UPDATE ioss_goods_instance SET gmt_modify = sysdate(),exist_num =
+		IFNULL(exist_num, 0)+ #count# WHERE id = #id#
+	</update>
+	
+	<update id="updateGoodsInstanceSaleNumberById"
+		parameterClass="java.util.Map">
+		UPDATE ioss_goods_instance SET gmt_modify = sysdate(),sell_num =
+		IFNULL(sell_num, 0)+ #count# WHERE id = #id#
+	</update>
+	
+	<update id="updateGoodsInstanceNumberZero"
+		parameterClass="java.util.Map">
+		UPDATE ioss_goods_instance SET gmt_modify = sysdate(),exist_num = 0, hk_exist_num=0
+	</update>
+	
+	<update id="updateGoodsInstanceHKExistNumById"
+		parameterClass="java.util.Map">
+		UPDATE ioss_goods_instance SET gmt_modify = sysdate(),hk_exist_num =
+		IFNULL(hk_exist_num, 0)+ #count# WHERE id = #id#
+	</update>
+
+	<update id="updateWayNumById" parameterClass="java.util.Map">
+		UPDATE ioss_goods_instance SET gmt_modify = sysdate(),way_num =
+		IFNULL(way_num, 0)+ #count# WHERE id = #id#
+	</update>
+
+	<update id="updateGoodsInstanceByMap"
+		parameterClass="java.util.Map">
+		update ioss_goods_instance set
+		sell_price=#sellPrice#,market_price=#marketPrice# where
+		goods_id=#goodsId#
+	</update>
+
+	<update id="updateGoodsInstanceUnit">
+		update ioss_goods_instance set gmt_modify = sysdate(),goods_unit =
+		#goodsUnit# where goods_id = #goodsId#
+	</update>
+
+	<select id="getStockNumByInstanceId" parameterClass="java.util.Map"
+		resultClass="int">
+		<![CDATA[
+         select sum(storage_num)
+          from ioss_storage
+         where goods_instance_id = #id# and supplier_id=#supplierId# and loc_id=#locId# and stor_type=#storType#
+       ]]>
+		<isNotEmpty prepend="and" property="days">
+			<![CDATA[	 gmt_create > DATE_SUB(STR_TO_DATE(DATE_FORMAT(SYSDATE(),'%Y-%m-%e'),'%Y-%m-%d %H:%i:%s') ,INTERVAL #days# DAY ) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="afterDays">
+			<![CDATA[	 gmt_create <= DATE_SUB(STR_TO_DATE(DATE_FORMAT(SYSDATE(),'%Y-%m-%e'),'%Y-%m-%d %H:%i:%s'),INTERVAL #afterDays# DAY ) ]]>
+		</isNotEmpty>
+		group by goods_instance_id,stor_type
+	</select>
+
+	<select id="getStockSupplierByInstanceId"
+		parameterClass="java.lang.Long" resultMap="stockSupolier">
+		select
+		supplier_id,storage_num,price,loc_id,stor_type,goods_instance_id
+		from ( select supplier_id,sum(storage_num) as
+		storage_num,sum(storage_num*price) as
+		price,loc_id,stor_type,goods_instance_id from ioss_storage where
+		goods_instance_id=#value# group by
+		supplier_id,loc_id,stor_type,goods_instance_id )t where
+		storage_num>0
+	</select>
+
+	<select id="getStockAgeListByInstanceId"
+		parameterClass="java.lang.Long" resultClass="java.lang.Long">
+		select dep_id from ioss_dep_location where id=#locId#
+
+	</select>
+	<insert id="insertStockAgeBySa" parameterClass="StockAgeAlias">
+		<![CDATA[
+	    insert into ioss_stock_age(
+	    id,
+	    goods_instance_id,
+	    LOC_ID,
+	    SUPPLIER_ID,
+	    STORAGE_NUM,
+	    storage_price,
+	    half_month,
+	    one_month,
+	    onehalf_month,
+	    two_month,
+	    three_month,
+	    above_month,
+	    after_onemonth,
+	    onemonth_threemonty,
+	    threemonty_sixmonty,
+	    sixmonty_twelvemonth,
+	    above_twelvemonth,
+	    gmt_create,
+	    gmt_modify,
+	    countdate,
+	    stor_type
+	    ) values(
+	    null,
+	    #goodsInstanceId#,
+	    #locId#,
+	    #supplierId#,
+	    #storageNum#,
+	    #storagePrice#,
+	    #halfMonth#,
+	    #oneMonth#,
+	    #oneHalfMonth#,
+	    #twoMonth#,
+	    #threeMonth#,
+	    #aboveMonth#,
+		#afterOnemonth#,
+	    #onemonthThreemonty#,
+	    #threemontySixmonty#,
+	    #sixmontyTwelvemonth#,
+	    #aboveTwelvemonth#,
+	    sysdate(),
+	    sysdate(),
+	    #countDate#,
+	    #storType#
+	    )
+	]]>
+<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<update id="updateStockAgeBysa" parameterClass="StockAgeAlias">
+		<![CDATA[
+	  update ioss_stock_age set storage_num=#storageNum#,storage_price=#storagePrice#,
+	  half_month=#halfMonth#,one_month=#oneMonth#,onehalf_month=#oneHalfMonth#,two_month=#twoMonth#,three_month=#threeMonth#,above_month=#aboveMonth#,
+	  gmt_modify=sysdate()
+	  where goods_instance_id=#goodsInstanceId# and loc_id=#locId# and supplier_id=#supplierId# and countdate=#countDate# and stor_type=#storType#
+		]]>
+	</update>
+
+	<select id="getGoodsInstances" resultMap="goodsInstance">
+	  <![CDATA[
+	    select ioss_goods_instance.* from ioss_goods_instance
+	  ]]>
+	</select>
+
+	<select id="searchBackGoodsInstanceCount" resultClass="int">
+	  select count(1) from
+		(select gi.*
+           from ioss_goods_instance gi, emall_goods g
+        where gi.goods_id = g.id
+          and g.is_agent = 'y'
+          and gi.exist_num > 0
+		<isNotEmpty property="instanceName" prepend="and">
+			gi.instance_name like
+			concat('%',trim(#instanceName#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			gi.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="attrs" prepend="and">
+			gi.attrs = trim(#attrs#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+			gi.goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="pyCode" prepend="and">
+			gi.py_code = trim(#pyCode#)
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			gi.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="isPresent" prepend="and">
+			gi.is_present = #isPresent#
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+			gi.id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="min" prepend="and">
+			<![CDATA[ gi.exist_num<=gi.min_num]]>
+		</isNotEmpty>
+		<isNotEmpty property="max" prepend="and">
+			<![CDATA[ gi.exist_num>=gi.max_num ]]>
+		</isNotEmpty>
+		) aa
+	</select>
+
+
+	<select id="searchBackGoodsInstance" resultMap="goodsInstance">
+		<include refid="pageSQLHead" />
+		select gi.*
+           from ioss_goods_instance gi, emall_goods g
+        where gi.goods_id = g.id
+          and g.is_agent = 'y'
+          and gi.exist_num > 0
+		<isNotEmpty property="instanceName" prepend="and">
+			gi.instance_name like
+			concat('%',trim(#instanceName#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			gi.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="attrs" prepend="and">
+			gi.attrs = trim(#attrs#)
+		</isNotEmpty>
+		<isNotEmpty property="goodsId" prepend="and">
+			gi.goods_id = #goodsId#
+		</isNotEmpty>
+		<isNotEmpty property="pyCode" prepend="and">
+			gi.py_code = trim(#pyCode#)
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			gi.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="isPresent" prepend="and">
+			gi.is_present = #isPresent#
+		</isNotEmpty>
+		<isNotEmpty property="id" prepend="and">
+			gi.id = #id#
+		</isNotEmpty>
+		<isNotEmpty property="min" prepend="and">
+			<![CDATA[ gi.exist_num<=gi.min_num]]>
+		</isNotEmpty>
+		<isNotEmpty property="max" prepend="and">
+			<![CDATA[ gi.exist_num>=gi.max_num ]]>
+		</isNotEmpty>
+		order by gi.code
+		<include refid="pageSQLFoot" />
+	</select>
+
+	<select id="getProductsForTaobaoFxAdd"  resultMap="productsForTaobaoFxAddResult">
+		<include refid="pageSQLHead"/>
+      <![CDATA[
+		select a.GOODS_ID,
+               a.ATTRS,
+               a.EXIST_NUM,
+               a.hk_exist_num,
+               b.TITLE,
+               b.goods_price,
+               b.agent_price,
+               b.goods_desc,
+               b.attr_desc,
+               a.instance_name,
+               a.code,
+               a.py_code,
+               a.cat_code,
+               a.id,
+               c.goods_number
+        from ioss_goods_instance a, emall_goods b, emall_available_stock c
+        where a.GOODS_ID = b.ID
+        and a.id = c.goods_instance_id
+        AND a.EXIST_NUM > 0
+        AND b.IS_AGENT = 'y'
+        AND b.GOODS_STATUS = 'on_sale'
+        and c.dep_first_id = #depFirstId#
+       ]]>
+       <isNotEmpty property="title" prepend="and">
+			b.title like
+			concat(trim(#title#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="code" prepend="and">
+			a.code like CONCAT('%',trim(#code#),'%')
+		</isNotEmpty>
+		<isNotEmpty property="pyCode" prepend="and">
+			a.py_code = trim(#pyCode#)
+		</isNotEmpty>
+		<isNotEmpty property="catCode" prepend="and">
+			a.cat_code like concat(trim(#catCode#),'%')
+		</isNotEmpty>
+		<include refid="pageSQLFoot"/>
+    </select>
+
+	<select id="getProductsForTaobaoFxAddCount" resultClass="java.lang.Integer">
+      <![CDATA[
+		select count(a.GOODS_ID)
+		from ioss_goods_instance a, emall_goods b, emall_available_stock c
+        where a.GOODS_ID = b.ID
+        and a.id = c.goods_instance_id
+        AND a.EXIST_NUM > 0
+        AND b.IS_AGENT = 'y'
+        AND b.GOODS_STATUS = 'on_sale'
+        and c.dep_first_id = #depFirstId#
+      ]]>
+      <isNotEmpty property="title" prepend="and">
+			b.title like
+			concat(trim(#title#),'%')
+	  </isNotEmpty>
+	  <isNotEmpty property="code" prepend="and">
+			a.code like CONCAT('%',trim(#code#),'%')
+	  </isNotEmpty>
+	  <isNotEmpty property="pyCode" prepend="and">
+			a.py_code = trim(#pyCode#)
+	  </isNotEmpty>
+	  <isNotEmpty property="catCode" prepend="and">
+			a.cat_code like concat(trim(#catCode#),'%')
+	  </isNotEmpty>
+   </select>
+
+   	<select id="searchTaobaoSkuPropByGoodsInsId" parameterClass="java.lang.Long" resultMap="goodsInstanceOfTaobaoProp">
+	  select * from ioss_goods_instance gi
+        where gi.id = #value#
+	</select>
+	
+	<select id="getSkuPropertyListByGoodsId" parameterClass="java.lang.Long" resultClass="java.lang.String">
+	  select taobao_sku_property 
+      from ioss_goods_instance 
+      where goods_id=#value# 
+	</select>
+	
+	<select id="getSaleGiftGoodsInstance" parameterClass="java.util.Map" resultMap="giftGoodsInstance">
+	  <include refid="pageSQLHead"/>
+	    <![CDATA[
+	      select gi.*, g.goods_price, g.img_small
+          from ioss_goods_instance gi, emall_goods g
+          where gi.goods_id = g.id and g.goods_status = 'on_sale'
+	    ]]>
+	    <isNotEmpty prepend="and" property="code">
+	         gi.code like CONCAT('%',trim(#code#),'%')
+	    </isNotEmpty>
+	    <isNotEmpty prepend="and" property="instanceName">
+	         gi.instance_name like CONCAT('%',trim(#instanceName#),'%')
+	    </isNotEmpty>
+	    <isNotEmpty prepend="and" property="catCode">
+	         gi.cat_code like concat(#catCode#,'%')
+	    </isNotEmpty>
+	  <include refid="pageSQLFoot"/>
+	</select>
+	
+	<select id="getSaleGiftGoodsInstanceCount" parameterClass="java.util.Map" resultClass="int">
+		<![CDATA[
+		select count(1) from
+		(select gi.*, g.goods_price, g.img_small
+          from ioss_goods_instance gi, emall_goods g
+          where gi.goods_id = g.id and g.goods_status = 'on_sale'
+	    ]]>
+	    <isNotEmpty prepend="and" property="code">
+	         gi.code like CONCAT('%',trim(#code#),'%')
+	    </isNotEmpty>
+	    <isNotEmpty prepend="and" property="instanceName">
+	         gi.instance_name like CONCAT('%',trim(#instanceName#),'%')
+	    </isNotEmpty>
+	    <isNotEmpty prepend="and" property="catCode">
+	         gi.cat_code like concat(#catCode#,'%')
+	    </isNotEmpty>
+		)aa
+	</select>
+	
+	<select id="getFullGiveGoodsInstance" resultMap="goodsInstance">
+	  <![CDATA[select * 
+      		from ioss_goods_instance t
+      		where 1=1
+      ]]>
+      	<isNotEmpty property="idList">
+			<iterate prepend="AND" property="idList" open="(" close=")" conjunction="or">
+				t.id=#idList[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+</sqlMap>

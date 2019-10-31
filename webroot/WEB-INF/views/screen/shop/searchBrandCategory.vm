@@ -1,0 +1,54 @@
+#set($layout = "layout/default.vm")
+
+<script type="text/javascript">
+
+	function deleteBrandCategory(id){
+	  if(confirm("确认删除？")){
+	   var obj = document.getElementById("brandCategoryId");
+	   obj.value = id;
+	   document.searchForm.action = "/shop/deleteBrandCategory.html";
+	   document.searchForm.submit();
+	   }
+	}
+
+	function addBrandCategoryPage(){
+	   document.searchForm.action = "/shop/addBrandCategoryPage.html";
+	   document.searchForm.submit();
+	}
+
+</script>
+#set($title = "品牌管理 - 品牌关联类目")
+<form  name="searchForm"  action="/shop/searchBrandCategory.html" method="post">
+	<input type="hidden" id="brandId" name="brandId" value="$!brand.id" />
+	<input type="hidden" id="brandCategoryId" name="brandCategoryId" value="" />
+<div class="list-div" id="listDiv">
+	<div class="tool">
+            <span><a href="#" onclick="addBrandCategoryPage();return false;" hidefocus="true" class="bt_add">添加类目关联</a></span>
+        </div>
+			<div class="listBox">
+			<h3><span>品牌关联类目</span></h3>
+<table cellpadding="3" cellspacing="1">
+  <tbody>
+			<tr>
+			<th width="20%">品牌</th>
+			<th width="60%">类目</th>
+			<th width="20%">操作</th>
+            </tr>
+		    #foreach($bc in $brandCategoryList)
+			<tr>
+                <td align="center">$bc.brandName</td>
+				<td title="$!categoryManager.getCatFullNameByCatcode($bc.catCode)" align="center">
+					$!controlUtil.getNoticesTitle($!categoryManager.getCatFullNameByCatcode($bc.catCode),20)
+				</td>
+                <td align="center"><a href="javascript:deleteBrandCategory('$!{bc.id}')">删除</a></td>
+			</tr>
+			#end
+		</tbody>
+	</table>
+	#if($brandCategoryList.size()>0)
+    #else
+		没有结果
+    #end
+</div>
+</form>
+

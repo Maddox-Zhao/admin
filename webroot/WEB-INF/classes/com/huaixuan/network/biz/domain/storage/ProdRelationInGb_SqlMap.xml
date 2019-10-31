@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ProdRelationInGbSQL">
+<typeAlias alias="prodRelationInGb" type="com.huaixuan.network.biz.domain.storage.ProdRelationInGb"/>
+
+	<resultMap class="prodRelationInGb" id="prodRelationInGbResult">
+		<result column="id" property="id"/>
+		<result column="relation_id" property="relationId"/>
+		<result column="in_dep_id" property="inDepId"/>
+		<result column="goods_instance_id" property="goodsInstanceId"/>
+		<result column="amount" property="amount"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="in_detail_id" property="inDetailId"/>
+		<result column="loc_id" property="locId"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="batch_num" property="batchNum"/>
+		<result column="self_cost" property="selfCost"/>
+		<result column="dep_first_id" property="depFirstId"/>
+		<result column="stor_type" property="storType"/>
+		<result column="is_wholesale" property="isWholesale"/>
+		<result column="tid" property="tid"/>
+		<result column="bill_id" property="billId"/>
+	</resultMap>
+
+<insert id="addProdRelationInGb" parameterClass="prodRelationInGb">
+<![CDATA[
+		insert into ioss_prod_relation_in_gb
+		(id,relation_id,in_dep_id,goods_instance_id,amount,gmt_create,gmt_modify,goods_id,in_detail_id,loc_id,supplier_id,batch_num,self_cost,dep_first_id,stor_type,is_wholesale,tid,bill_id )values(
+		null,
+		#relationId#,
+		#inDepId#,
+		#goodsInstanceId#,
+		#amount#,
+		sysdate(),
+		sysdate(),
+		#goodsId#,
+		#inDetailId#,
+		#locId#,
+		#supplierId#,
+		#batchNum#,
+		#selfCost#,
+		#depFirstId#,
+		#storType#,
+		#isWholesale#,
+		#tid#,
+		#billId#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+</sqlMap>

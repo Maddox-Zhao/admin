@@ -1,0 +1,37 @@
+
+<table width="727"  border="0" align="center"  style="border:1px #CCCCCC">
+  <tr>
+    <td width="150" align="center">图片</td>
+	<td width="63" align="center">型号</td>
+    <td width="47" align="center">材质</td>
+    <td width="63" align="center">颜色</td>
+    <td width="149" align="center">品牌</td>
+    <td width="66" align="center">品名</td>
+   	<td width="109" align="center">价格改变</td>
+  </tr>
+  #foreach($sendGoodsInfo in $list)
+  <tr style="border-bottom:1px #CCCCCC">
+	<td align="center">
+		#if($!sendGoodsInfo.middleImg)
+			<img src="$upServer/$!sendGoodsInfo.middleImg" width="120" height="120" />
+		#else
+			<img src="../images/noimage_275_287.jpg" width="100" height="100" />
+		#end
+	</td>
+    <td align="center">$!sendGoodsInfo.type</td>
+    <td align="center">$!sendGoodsInfo.material</td>
+    <td align="center">$!sendGoodsInfo.color</td>
+    <td align="center">$!sendGoodsInfo.brand</td>
+    <td align="center">$!sendGoodsInfo.series</td>
+    <td align="center">以前：$sendGoodsInfo.beforPrice  <br/>
+			                  <span style="color:red"> 现在：  $sendGoodsInfo.nowPrice</span>
+	</td>
+    
+  </tr>
+  #end
+</table>
+
+
+
+
+

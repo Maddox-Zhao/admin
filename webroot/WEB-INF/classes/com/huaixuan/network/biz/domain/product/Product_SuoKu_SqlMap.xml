@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="GB18030" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="clientProductDAO">
+	<typeAlias alias="productSuoKu" type="com.huaixuan.network.biz.domain.product.ProductSuoKu"/>
+	 
+	 
+	 <resultMap id="productSuokuProduct" class="com.huaixuan.network.biz.domain.product.ProductSuoKuProduct">
+	 <result column="idProduct" property="idProduct"/>
+	 <result column="sku" property="sku"/>
+	 <result column="brandName" property="brandName"/>
+	 <result column="seriesName" property="seriesName"/>
+	 <result column="color" property="color"/>
+	 <result column="material" property="material"/>
+	 <result column="type" property="type"/>
+	 <result column="size" property="size" />
+	  <result column="smPrice" property="smPrice" />
+	 <result column="ssPrice" property="ssPrice" />
+	 <result column="status" property="status"/>
+	 <result column="idStatus" property="idStatus"/>
+	 <result column="location" property="location"/>
+	 <result column="idLocation" property="idLocation"/>
+	 <result column="createDate" property="createDate"/>
+	 <result column="endDate" property="endDate"/>
+	 <result column="inStockDate" property="inStockDate"/>
+	 <result column="customerManager" property="customerManager" />
+	 <result column="createUserName" property="createUserName" />
+	  <result column="createUserId" property="createUserId" />
+	 <result column="customerName" property="customerName" />
+	 </resultMap>
+	 
+	 
+	 <resultMap id="productSuokuResultMap" class="productSuoKu">
+		 <result column="id" property="id"/>
+		 <result column="customerId" property="customerId"/>
+		 <result column="custonerName" property="custonerName"/>
+		 <result column="createDate" property="createDate"/>
+		 <result column="endDate" property="endDate"/>
+		 <result column="createUser" property="createUser"/>
+		 <result column="createUserName" property="createUserName"/>
+	 </resultMap>
+	 
+	  <insert id="addProductSuoKu" parameterClass="productSuoKu">
+	  		insert into hx_product_lockup values(null,#customerId#,#endDate#,#createUser#,sysdate())
+	  		<selectKey resultClass="int" keyProperty="id" > 
+            SELECT @@IDENTITY AS ID 
+        	</selectKey> 
+	  </insert>
+	  
+	  
+	  <insert id="addProductSuoKuProduct" parameterClass="java.util.Map">
+	  		insert into hx_product_lockup_product values(null,#lockupId#,#idProduct#)
+	  		<selectKey resultClass="int" keyProperty="id" > 
+            SELECT @@IDENTITY AS ID 
+        	</selectKey> 
+	  </insert>
+	  
+	  
+	  
+	  <sql id="PRODUCT.SUOKULIST">
+		<isNotEmpty property="custonerName">
+		    and c.name like '%$custonerName$%'
+		</isNotEmpty>
+		<isNotEmpty property="endDateEnd">
+				<![CDATA[ and pl.lockup_end_datetime<= '$endDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		
+	</sql>
+	
+	  <select id="selectSuoKuList" parameterClass="java.util.Map" resultMap="productSuokuResultMap">
+		  	SELECT pl.id,pl.customer_id customerId,c.name custonerName,pl.create_datetime createDate,pl.lockup_end_datetime endDate,
+			pl.create_user createUser,ea.name createUserName
+			FROM hx_product_lockup pl,customer c,emall_admin ea
+			WHERE pl.customer_id = c.idCustomer AND pl.create_user = ea.user_name
+			<include refid="PRODUCT.SUOKULIST"  />
+			ORDER BY create_datetime desc
+			<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		     </isNotEmpty>
+		   
+	  </select>
+	  
+	  <select id="selectSuoKuListCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		  	SELECT  count(pl.id)
+			FROM hx_product_lockup pl,customer c,emall_admin ea
+			WHERE pl.customer_id = c.idCustomer AND pl.create_user = ea.user_name
+			<include refid="PRODUCT.SUOKULIST"  />
+	  </select>
+	  
+	  
+	  <sql id="PRODUCT.SUOKU">
+	  <isNotEmpty property="suokuId">
+		    and loc.id = #suokuId#
+		</isNotEmpty>
+		<isNotEmpty property="customerName">
+		    and c.name like '%$customerName$%'
+		</isNotEmpty>
+		<isNotEmpty property="sku">
+		     and p.sku = #sku#
+		</isNotEmpty>
+		<isNotEmpty property="idProduct">
+		     and p.idProduct = #idProduct#
+		</isNotEmpty>
+		<isNotEmpty property="type">
+		     and p.type = #type#
+		</isNotEmpty>
+		<isNotEmpty property="material">
+		     and p.material = #material#
+		</isNotEmpty>
+		<isNotEmpty property="color">
+		     and p.color = #color#
+		</isNotEmpty>
+		<isNotEmpty property="idOrder">
+		     and l.idOrder = #idOrder#
+		</isNotEmpty>
+		<isNotEmpty property="size">
+		     and p.size = #size#
+		</isNotEmpty>
+		<isNotEmpty property="brandID">
+		     and p.idBrand = #brandID#
+		</isNotEmpty>
+		<isNotEmpty property="seriesId">
+		     and p.idSeries = #seriesId#
+		</isNotEmpty>
+
+		<isNotEmpty property="idLocation">
+		   and   l.idLocation  in ($idLocation$)
+		</isNotEmpty>
+		<isNotEmpty property="idStatus">
+		   and   l.idStatus  = #idStatus#
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateStart">
+				<![CDATA[ and p.gmt_create >= #inStockDateStart# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateEnd">
+				<![CDATA[  and p.gmt_create <= '$inStockDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="endDateStart">
+				<![CDATA[ and loc.lockup_end_datetime >= #endDateStart#  ]]>
+		</isNotEmpty>
+		<isNotEmpty property="endDateEnd">
+				<![CDATA[ and loc.lockup_end_datetime<= '$endDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+		
+	</sql>
+	  
+	  
+	  <select id="selectSuoKuProductsCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		  SELECT
+		  count( p.idProduct) cnt
+		  FROM hx_product_lockup loc,
+		  hx_product_lockup_product locp,
+		  Product p,  brand b,
+		  lifecycle l,
+		  series s,
+		  customer c
+		  WHERE loc.id = locp.lockup_id
+		    AND locp.idProduct = p.idProduct
+		    AND l.idProduct = p.idProduct
+		    AND p.idBrand = b.idBrand
+		    AND p.idSeries = s.idSeries
+		    AND l.idStatus != 7
+		    AND c.idCustomer = loc.customer_id
+		 	<include refid="PRODUCT.SUOKU"  />
+		  
+      
+		 
+	 </select>
+	 
+	 <select id="selectSuoKuProducts" parameterClass="java.util.Map" resultMap="productSuokuProduct">
+		SELECT
+		  p.idProduct,
+		  p.sku,
+		  b.idBrand brandID,
+		  b.name brandName,
+		  s.idSeries seriesId,
+		  s.name seriesName,
+		  p.type,
+		  p.material,
+		  p.color,
+		  p.size,
+		  l.HXPrice ssPrice,
+		  l.HKHXPrice smPrice,
+		  l.idStatus,
+		  (SELECT STATUS FROM STATUS WHERE idStatus = l.idStatus) STATUS,
+		  (SELECT NAME FROM site WHERE idSite = l.idLocation) location,
+		  l.idLocation,
+		  p.gmt_create inStockDate,
+		  loc.lockup_end_datetime endDate,
+		  loc.create_datetime createDate,
+		  (SELECT NAME FROM emall_admin WHERE user_name =   loc.create_user) createUserName,
+		  loc.create_user createUserId,
+		  (SELECT
+		     ea.name
+		   FROM customer c,
+		     emall_admin ea
+		   WHERE c.customer_operate = ea.user_name
+		       AND c.idCustomer = loc.customer_id) customerManager,
+		   c.name customerName
+		FROM hx_product_lockup loc,
+		  hx_product_lockup_product locp,
+		  Product p,  brand b,
+		  lifecycle l,
+		  series s,
+		  customer c
+		WHERE loc.id = locp.lockup_id
+		    AND locp.idProduct = p.idProduct
+		    AND l.idProduct = p.idProduct
+		    AND p.idBrand = b.idBrand
+		    AND p.idSeries = s.idSeries
+		    AND l.idStatus != 7
+		    AND c.idCustomer = loc.customer_id
+		 	<include refid="PRODUCT.SUOKU"  />
+		 	
+		 	
+		 	
+				<isNotEmpty property="id" >
+					 order by  $id$
+		         </isNotEmpty>
+   
+       		  <isEmpty property="sortField" >
+				<isEmpty property="sortOrder" >
+					 ORDER BY p.gmt_create DESC
+		         </isEmpty>
+       		 </isEmpty>
+      
+			  <isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		       </isNotEmpty>
+		       
+	 </select>
+	 
+	 
+	 
+	 
+	 
+	  
+	
+</sqlMap>
+
+

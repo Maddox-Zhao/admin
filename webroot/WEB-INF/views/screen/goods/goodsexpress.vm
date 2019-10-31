@@ -1,0 +1,98 @@
+#set($layout = 'layout/default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+  <form name="form1"  action="/goods/saveGoodsExpress.html" method="post">
+	<div class="searchBox">
+		<h3><span>商品物流公司关联</span></h3>
+			<input type="hidden" id="goodsId" name="goodsId" value="$!goods.id" />
+         <table>
+           <tr>
+              <th>商品名称：</th>
+              <td>$!{goods.title}</td>
+           </tr>
+         </table>
+    </div>
+#set($message = $request.getParameter('message'))
+ #if($!message)
+<div class="mag-t2">
+	#if($!message == "success")
+		关联成功！
+	#end
+</div>
+ #end
+<div class="listBox">
+	<h3><span>选择物流公司</span></h3>
+	<table>
+	<tr>
+	<td>  
+    <select multiple id="select1" style="width:300px;height:250px;">  
+		#foreach($express  in $expressListOne)
+			<option value="$!express.id" onclick="true">$!express.expressName</option>
+		#end
+    </select> 
+    </td>
+	
+	　<td>
+　　　　<input type="button" id="add" value="添加>>" />
+　　　　　　<br/>
+　　　　　　<br/>
+　　　　<input type="button" id="remove" value="<<删除" />
+	　　　 <br/>
+　　　　　　<br/>
+　　　　<input type="button" id="addAll" value="全部添加>>"/>
+         <br/>
+		 <br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	  <input type="button" id="removeAll" value="<<全部删除" />
+　　　</td>
+
+	
+	<td>
+    <select multiple id="select2" name="selectIds" style="width:300px;height:250px;">  
+         #foreach($express  in $expressListTwo)
+			<option value="$!express.id">$!express.expressName</option>
+		#end
+    </select>
+    </td>
+    </tr>
+	
+	 <tr>
+        <td colspan="4" align="center"><input class="button" value=" 确 定 " type="button"  onclick="javascript:formSubmit();"></td>
+     </tr>
+    </table>
+  </div>
+  </form>
+</div>
+<script language="javascript" type="text/javascript">
+     function formSubmit(){
+		jQuery("select[name='selectIds']").find("option").attr("selected",true);
+        document.form1.submit();
+	 }
+		
+	jQuery(document).ready(function(){   
+        jQuery('#add').click(function(){   
+            var $options = jQuery('#select1 option:selected');//获取当前选中的项   
+            var $remove = $options.remove();//删除下拉列表中选中的项   
+            $remove.appendTo('#select2');//追加给对方   
+        });   
+           
+        jQuery('#remove').click(function(){   
+            var $removeOptions = jQuery('#select2 option:selected');   
+            $removeOptions.appendTo('#select1');//删除和追加可以用appendTo()直接完成   
+        });   
+           
+        jQuery('#addAll').click(function(){   
+            var $options = jQuery('#select1 option');   
+            $options.appendTo('#select2');   
+        });   
+           
+        jQuery('#removeAll').click(function(){   
+            var $options = jQuery('#select2 option');   
+            $options.appendTo('#select1');   
+        });  
+           
+    });   
+</script>
+</body>

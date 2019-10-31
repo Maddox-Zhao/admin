@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="WholesaleApplyDetailSQL">
+<typeAlias alias="wholesaleApplyDetail" type="com.huaixuan.network.biz.domain.trade.WholesaleApplyDetail"/>
+	<resultMap class="wholesaleApplyDetail" id="wholesaleApplyDetailResult">
+		<result column="ID" property="id"/>
+		<result column="GMT_CREATE" property="gmtCreate"/>
+		<result column="GMT_MODIFY" property="gmtModify"/>
+		<result column="wholesale_apply_ID" property="wholesaleApplyId"/>
+		<result column="GOODS_INSTANCE_ID" property="goodsInstanceId"/>
+		<result column="APPLY_NUMBER" property="applyNumber"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+		<result column="cat_code" property="catCode"/>
+		<result column="attrs" property="attrs"/>
+	</resultMap>
+<!-- create WholesaleApplyDetail object -->
+<insert id="addWholesaleApplyDetail" parameterClass="wholesaleApplyDetail">
+<![CDATA[
+		insert into wholesale_apply_detail
+		(ID,GMT_CREATE,GMT_MODIFY,wholesale_apply_ID,GOODS_INSTANCE_ID,APPLY_NUMBER )values( null,
+		sysdate(),
+		sysdate(),
+		#wholesaleApplyId#,
+		#goodsInstanceId#,
+		#applyNumber#
+		 )
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+<!-- update WholesaleApplyDetail object -->
+<update id="editWholesaleApplyDetail" parameterClass="wholesaleApplyDetail">
+<![CDATA[
+		update wholesale_apply_detail set GMT_CREATE = #gmtCreate#,
+		GMT_MODIFY = sysdate(),
+		wholesale_apply_ID = #wholesaleApplyId#,
+		GOODS_INSTANCE_ID = #goodsInstanceId#,
+		APPLY_NUMBER = #applyNumber#
+		 where ID = #id#
+		
+]]>
+</update>
+<!-- delete WholesaleApplyDetail object -->
+<delete id="removeWholesaleApplyDetail" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from wholesale_apply_detail where wholesale_apply_detail.ID = #value# 
+]]>
+</delete>
+<!-- search WholesaleApplyDetail object -->
+<select id="getWholesaleApplyDetail" parameterClass="java.lang.Long" resultMap="wholesaleApplyDetailResult">
+<![CDATA[
+		select wholesale_apply_detail.* from wholesale_apply_detail where wholesale_apply_detail.ID = #value# 
+]]>
+</select>
+<!-- searchAll WholesaleApplyDetail List -->
+<select id="getWholesaleApplyDetails" resultMap="wholesaleApplyDetailResult">
+<![CDATA[
+		select wholesale_apply_detail.* from wholesale_apply_detail
+]]>
+</select>
+
+<!-- search WholesaleApplyDetail List by applyId-->
+<select id="getWholesaleApplyDetailsByApplyId" parameterClass="java.lang.Long" resultMap="wholesaleApplyDetailResult">
+<![CDATA[
+		select w.*, t.code, t.instance_name, t.cat_code, t.attrs
+		  from wholesale_apply_detail w, ioss_goods_instance t
+		 where w.goods_instance_id = t.id
+   			and w.wholesale_apply_id = #value# 
+]]>
+</select>
+</sqlMap>

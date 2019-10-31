@@ -1,0 +1,120 @@
+#set($layout = "")
+		<th>#if($back)调入一级仓库#else 一级仓库 #end：</th>
+			<td>
+    			<select name="depfirstId" id="depfirstId" style="width:100px;" onchange="selectDep(this.value);" class="inp">
+					#if($depositoryFirstList.size() > 1 )
+					<option value="">-=请选择=-</option>
+					#end
+					#foreach($depfirst in $depositoryFirstList)
+    				<option value="$depfirst.id" #if($depfirst.id==$!{queryObject.depfirstId}) selected #end>$depfirst.depFirstName</option>
+    				#end
+    			</select>
+            </td>
+         <th>#if($back)调入仓库#else 仓库 #end：</th>
+			<td>
+    			<select name="depId" id="depId" style="width:100px;" onchange="selectLoc(this.value);" class="inp">
+    				<option value="">-=请选择=-</option>
+					#foreach($st in $depositoryList)
+    				<option value="$st.id" #if($st.id==$!{queryObject.depId}) selected #end>$st.name</option>
+    				#end
+    			</select>
+			</td>
+		<th id="labelLoc">#if($back)调入库位#else 库位 #end：</th>
+			<td>
+		        <select name="locId" id="locId" class="inp">
+                     <option value="">-=请选择=-</option>
+                     #foreach($depLocation in $depLocationLists)
+                     <option value="$!{depLocation.id}" #if( $!{depLocation.id}==$!{queryObject.locId} ) selected #end>$!{depLocation.locName}</option>
+                    #end
+                 </select>
+			</td>
+<script language="javascript" type="text/javascript">
+	function load()
+    {
+	   var obj3 = document.getElementById("depfirstId");
+	   var obj = document.getElementById("depId");
+	   var objloc = document.getElementById("labelLoc");
+	   var obj2 = document.getElementById("locId");
+	#if($!depositoryFirstList)
+	 #if($!depositoryFirstList.size()==0)
+       var length3 = obj3.length3 = 0;
+	   obj3.options[length3++] = new Option("您没有权限", "");
+	 #else
+	   obj.style.display='';
+	   #if($!allShow)
+		 obj2.style.display='';
+	   #else
+	     obj2.style.display='none';
+	     objloc.style.display='none';
+	   #end
+
+	   if(obj.value == ""&& obj3.value != ""){
+	   var length = obj.length = 0;
+       obj.options[length++] = new Option("-=请选择=-", "");
+		var code = obj3.value;
+		   jQuery.post('$appServer/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   if(list != null){
+		   	 for(var i=0;i<list.length;i++){
+    		     var dep=list[i];
+    			 obj.options[length++] = new Option(dep.name, dep.id);
+    		    }
+    		   }
+		   }
+		   ,'json');
+       }
+
+	  #end
+    #else
+	   var length3 = obj3.length3 = 0;
+	   obj3.options[length3++] = new Option("您没有权限", "");
+    #end
+	 }
+
+function selectDep(code){
+    var obj = document.getElementById("depId");
+	var obj2 = document.getElementById("locId");
+	var objloc = document.getElementById("labelLoc");
+	var length = obj.length = 0;
+
+		obj.style.display='';
+		#if($!allShow)
+		obj2.style.display='';
+		#else
+	    obj2.style.display='none';
+	    objloc.style.display='none';
+		#end
+
+		obj.options[length++] = new Option("-=请选择=-", "");
+		jQuery.post('$appServer/storage/selectDep.html',{param:code},function(selectdeplist){
+		   var list=selectdeplist;
+		   if(list != null){
+    		   for(var i=0;i<list.length;i++){
+    		     var dep=list[i];
+    			 obj.options[length++] = new Option(dep.name, dep.id);
+    		   	}
+    		  }
+			},'json');
+
+		#if($!allShow)
+	    var obj2 = document.getElementById("locId");
+    	var length2 = obj2.length = 0;
+    	obj2.options[length2] = new Option("-=请选择=-", "");
+		#end
+}
+
+function selectLoc(code){
+    var obj = document.getElementById("locId");
+	var length = obj.length = 0;
+	obj.options[length++] = new Option("-=请选择=-", "");
+	jQuery.post('$appServer/storage/selectLoc.html',{param:code},function(selectloclist){
+		   var list=selectloclist;
+		   obj.style.display='';
+		   if(list != null){
+		   for(var i=0;i<list.length;i++){
+		     var loc=list[i];
+			 obj.options[length++] = new Option(loc.locName, loc.id);
+		   }
+		}},'json');
+}
+</script>

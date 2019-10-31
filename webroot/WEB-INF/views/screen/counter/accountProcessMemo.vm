@@ -1,0 +1,40 @@
+#set($layout = 'layout\default.vm')
+<script type="text/javascript">
+	String.prototype.trim = function() {
+		return this.replace(/(^\s*)|(\s*$)/g, "");
+	}
+    function doProcessAccount(){
+        var memo = document.getElementById("memo").value;
+        if(memo.trim()==""){
+            alert("请输入备注");
+            return;
+        }
+        if(memo.length>86){
+            alert("备注过长！");
+            return;
+        }
+        window.returnValue=memo;
+        window.close();
+    }
+</script>
+    <div class="main">
+    	 <h2>填写备注</h2>
+<div class="formBox">
+                <tr>
+            	    <th>请填写备注：</th>
+            	    <td>
+                        <textarea name="memo" id="memo" class="textarea"></textarea>
+						<font color="red">*</font>
+            	    </td>
+          	    </tr>
+</div>
+<div class="form-but">
+            	<button type="button" onclick="doProcessAccount();" class="button-s4">确认</button>
+                <button type="button" class="button-s4" onclick="window.close();">关闭</button>
+</div><!-- 表单按钮区 END -->
+    <div class="bg_top_left"></div>
+    <div class="bg_top_right"></div>
+    <div class="bg_bottom_left"></div>
+    <div class="bg_bottom_right"></div>
+
+    </div>

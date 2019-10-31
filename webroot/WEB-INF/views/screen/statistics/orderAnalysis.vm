@@ -1,0 +1,172 @@
+#set($layout = 'layout\default.vm')
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+<h2>订单统计</h2>
+        <!-- 搜索模块 -->
+  <div class="searchBox">
+    <h3><span>订单统计</span></h3>
+<div class="main-div">
+  <p style="margin: 10px;">
+  	  <strong>有效订单总金额</strong>:&nbsp;&nbsp;￥$!moneyUtil.getFormatMoney($!{allTradeAmount},'0.00') 元&nbsp;&nbsp;|&nbsp;
+	  <strong>总点击数</strong>:&nbsp;&nbsp;$!{goodsClickNum}&nbsp;&nbsp;|&nbsp;
+	  <strong>每千点击订单数</strong>:&nbsp;&nbsp;$!moneyUtil.getFormatMoney($!{TradeNumPerThousand},'0.0') &nbsp;&nbsp;|&nbsp;
+	  <strong>每千点击购物额</strong>:&nbsp;&nbsp;￥$!moneyUtil.getFormatMoney($!{TradeAmountPerThousand},'0.00') 元 </p>
+</div>
+ <table>
+	<form id="singleForm" name="singleForm">
+  <tr>
+   <td>
+    开始日期&nbsp;&nbsp;
+    <input name="dateStart" id="dateStart" value="" style="width: 80px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="dateStartIco"/>
+    结束日期&nbsp;&nbsp;
+    <input name="dateEnd" id="dateEnd" value="" style="width: 80px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="dateEndIco"/>
+    <input name="flashName" value="${imageServer}/fusionCharts/swf/Pie2D.swf" type="hidden" id="flashName">
+    <input name="chartWidth" value="800" type="hidden" id="chartWidth">
+    <input name="chartHeight" value="360" type="hidden" id="chartHeight">
+    <input name="submit" value="查询" class="button" type="button" onClick="return doCheckSingle(singleForm)"/>
+</td>
+</tr>
+  </form>
+  <form id="multiForm" name="multiForm">
+<tr>
+ <td>
+    查询年月&nbsp;&nbsp;
+    <input name="yearMonth1" id="yearMonth1" value="" style="width: 60px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="yearMonth1Ico"/>
+    &nbsp;+&nbsp;
+    <input name="yearMonth2" id="yearMonth2" value="" style="width: 60px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="yearMonth2Ico"/>
+    &nbsp;+&nbsp;
+    <input name="yearMonth3" id="yearMonth3" value="" style="width: 60px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="yearMonth3Ico"/>
+    &nbsp;+&nbsp;
+    <input name="yearMonth4" id="yearMonth4" value="" style="width: 60px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="yearMonth4Ico"/>
+    &nbsp;+&nbsp;
+    <input name="yearMonth5" id="yearMonth5" value="" style="width: 60px;" disabled/><img src="${imageServer}/images/admin/calendar.png" id="yearMonth5Ico"/>
+    &nbsp; &nbsp;
+
+	##$!ctx/fusionCharts/swf/ScrollColumn2D.swf ##这个是带滚动条的多列报表
+    <input name="flashNameTwo" value="${imageServer}/fusionCharts/swf/MSColumn2D.swf" type="hidden" id="flashNameTwo">
+    <input name="chartWidth" value="900" type="hidden">
+    <input name="chartHeight" value="360" type="hidden">
+    <input name="submit" value="查询" class="button" type="button" onClick="return doCheckMuti(multiForm);" />
+	</td>
+</tr>
+  </form>
+  </table>
+ <div id="allMoney"></div>
+</div>
+</div>
+<div class="tab-div">
+  <div id="tabbar-div">
+    <p> <span class="tab-front" id="order_circs-tab">订单概况</span> </p>
+  </div>
+  <div id="tabbody-div">
+	<div id="report-div">
+  	</div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    Calendar.setup({
+        inputField : "dateStart",
+        ifFormat   : "%Y-%m-%d",
+        align      : "T1" ,
+        button	: "dateStartIco"
+    });
+    Calendar.setup({
+        inputField : "dateEnd",
+        ifFormat   : "%Y-%m-%d",
+        align      : "T1",
+        button	: "dateEndIco"
+    });
+    Calendar.setup({
+        inputField : "yearMonth1",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth1Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth2",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth2Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth3",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth3Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth4",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth4Ico"
+    });
+    Calendar.setup({
+        inputField : "yearMonth5",
+        ifFormat   : "%Y-%m",
+        align      : "T1",
+        button	: "yearMonth5Ico"
+    });
+
+	function doCheckSingle(singleForm){
+		var dateStart=jQuery.trim(document.getElementById("dateStart").value);
+		var dateEnd=jQuery.trim(document.getElementById("dateEnd").value);
+		var b_date=new Date(Date.parse(dateStart));
+    	var e_date=new Date(Date.parse(dateEnd));
+		if(e_date < b_date){
+			alert("起始时间不能大于结束时间！");
+			return false;
+		}
+		var dateStart=document.getElementById('dateStart').value;
+		var dateEnd=document.getElementById('dateEnd').value;
+		var flashName=document.getElementById('flashName').value;
+		var chartWidth=document.getElementById('chartWidth').value;
+		var chartHeight=document.getElementById('chartHeight').value;
+		jQuery.post('/statistics/getSingleOrderAnalysis.html',{param1:dateStart,param2:dateEnd,param3:flashName,param4:chartWidth,param5:chartHeight},function(reportHtml){
+		   document.getElementById('report-div').innerHTML = reportHtml;
+		});
+	    jQuery.post('/statistics/getAllTradeMoney.html',{param1:dateStart,param2:dateEnd},function(trade){
+		   var expressUrlBuff1 = "<p style='margin: 10px;'><strong>商品总金额</strong>:&nbsp;&nbsp;￥";
+		   var expressUrlBuff2 = "元&nbsp;&nbsp;|&nbsp; <strong>物流总金额</strong>:&nbsp;&nbsp;￥";
+		   var expressUrlBuff3 = "元 </p>";
+		   temp = expressUrlBuff1 + trade.goodsAmount + expressUrlBuff2 + trade.shippingAmount + expressUrlBuff3;
+		   document.getElementById('allMoney').innerHTML = temp;
+		});
+	}
+
+	function doCheckMuti(multiForm){
+		var flag=false;
+		var yearMonth1=document.getElementById('yearMonth1').value;
+		var yearMonth2=document.getElementById('yearMonth2').value;
+		var yearMonth3=document.getElementById('yearMonth3').value;
+		var yearMonth4=document.getElementById('yearMonth4').value;
+		var yearMonth5=document.getElementById('yearMonth5').value;
+		var flashName=document.getElementById('flashNameTwo').value;
+		var chartWidth=document.getElementById('chartWidth').value;
+		var chartHeight=document.getElementById('chartHeight').value;
+		var arr=[yearMonth1,yearMonth2,yearMonth3,yearMonth4,yearMonth5];
+		for(var i=0;i<arr.length;i++){
+			if(arr[i]!=''){
+    			for(var j=i+1;j<arr.length;j++){
+    				if(arr[i]==arr[j] && i!=j){
+						flag=true;
+						break;
+    				}
+    			}
+			}
+		}
+		if(flag){
+			alert("有相同的年月！");
+			return false;
+		}
+		jQuery.post('/statistics/getMultiOrderAnalysis.html',{param1:yearMonth1,param2:yearMonth2,param3:yearMonth3,param4:yearMonth4,param5:yearMonth5,param6:flashName,param7:chartWidth,param8:chartHeight},function(returnHtml){
+		    document.getElementById('report-div').innerHTML = returnHtml;
+		});
+	}
+	
+
+</script>
+</body>

@@ -1,0 +1,193 @@
+#set($layout = "layout/default.vm")
+    <script >
+	function preview(oper){
+        bdhtml=window.document.body.innerHTML;//获取当前页的html代码
+        prnhtml=document.getElementById("print").innerHTML;//获取需要打印部分的html代码
+        window.document.body.innerHTML=prnhtml;
+        window.print();
+        window.document.body.innerHTML=bdhtml;
+	}
+
+ 	function checkDamaged(){
+		if(true==confirm("确定要执行审核通过的操作吗？")){
+			document.getElementById("actionType").value = "check";
+			document.form1.submit();
+		}
+	}
+
+	function noPassCheck(){
+		if(true==confirm("确定要执行审核不通过的操作吗？")){
+			document.getElementById("actionType").value = "noPassCheck";
+			document.form1.submit();
+		}
+	}
+
+	function finished(){
+		if(true==confirm("确定要完成此报残单吗？")){
+			document.getElementById("actionType").value = "finished";
+			document.form1.submit();
+		}
+	}
+    </script>
+#set($title = "报残单管理 - 报残单详情")
+<div class="main">
+	<h2>报残单管理 - 报残单详情</h2>
+    <div class="tool">
+		<span><a href="#" onclick="window.history.back(-1);" hidefocus="true" class="bt_wu">返回</a></span>
+		<span><a href="javascript:preview(1);" hidefocus="true" class="bt_wu">打印</a></span>
+		#if("$!{damNew}"=="$!{damaged.status}" || "$!{damNoPassChecked}"=="$!{damaged.status}")
+		<span><a href="editDamagedPage.html?damagedId=$!{damaged.id}" class="bt_wu">编辑</a></span>
+		#end
+		<div style="clear: both;"></div>
+		#if($message)
+				#if($message == "edit")
+			<div class="mag-t1" id="massage">报残单不是新建或审核不通过状态，不能执行编辑或提交审核操作！</div>
+				#elseif($message == "notCheck")
+			<div class="mag-t1" id="massage">报残单不是等待审核通过状态，不能执行审核操作！</div>
+				#elseif($message == "notFinish")
+			<div class="mag-t1" id="massage">报残单不是审核通过状态，不能执行报残完成操作！</div>
+				#elseif(!$succFlag)
+			<div class="mag-t1" id="massage">$message</div>
+				#end
+			<div style="clear: both;"></div>
+		#end
+		#if($succFlag)<div class="success_min" id="modifySuccess">操作成功！</div>#end
+</div>
+	<script src="images/calendar" type="text/javascript"></script>
+	<link href="styles/calendar.css" type="text/css" rel="stylesheet">
+			<div id="print">
+				<div class="formBox">
+				<div class="content">
+                 <table class="c6">
+				<tr>
+				<th>报残单号</th>
+				<td>$!{damaged.damagedCode}</td>
+
+				<th>仓库</th>
+				<td>$!{damaged.depName}</td>
+				</tr>
+
+				<tr>
+				<th>报残时间</th>
+				<td>$!date.format("yyyy-MM-dd",$!{damaged.gmtDamaged})</td>
+
+				<th>状态</td>
+				<td>$!enumDamagedStatus.get("${damaged.status}")</td>
+				</tr>
+
+				<tr>
+				<th>制单人</th>
+				<td>$!{damaged.creater}</td>
+
+				<th>经手人</th>
+				<td>$!{damaged.agent}</td>
+				</tr>
+
+				<tr>
+				<th>创建时间</th>
+				<td>$!date.format('yyyy-MM-dd',${damaged.gmtCreate})</td>
+
+				<th>修改时间</th>
+				<td>$!date.format('yyyy-MM-dd',${damaged.gmtModify})</td>
+				</tr>
+
+								<tr>
+				<th>一级仓库</th>
+				<td>&nbsp;$!depositoryNameMap.get($!damaged.depfirstId)</td>
+
+				<th>&nbsp;</th>
+				<td>&nbsp;</td>
+				</tr>
+
+				<tr>
+				<th>备注</th>
+				<td colspan="3"><textarea cols="80" rows="3" id="damaged.remark" name="damaged.remark" readonly="readonly">$!{damaged.remark}</textarea></td>
+
+				</tr>
+			</tbody>
+		</table>
+</div>
+    </div>
+</div>
+
+<form  name="form1"  action="editDamagedAttribute.html" method="post">
+	<input type="hidden" id="damagedId" name="damagedId" value="$!{damaged.id}"/>
+	<input type="hidden" id="actionType" name="actionType" value=""/>
+<div class="clearing"></div>
+  	<div class="listBox">
+    <table  id="listTable" name="listTable"  class="list-table">
+		<tr>
+    		<th colspan="14"  scope="col">报残产品列表</th>
+		</tr>
+      <tr>
+        <th>产品编码</th>
+        <th>产品名称</th>
+        <th>类目</th>
+        <th>属性</th>
+		<th>品牌</th>
+		<th>供应商</th>
+		<th>库位</th>
+		<th>批次</th>
+        <th>单位</th>
+		<th>数量</th>
+		<th>单位成本</th>
+		<th>合计成本</th>
+		<th>报残原因</th>
+		<th>备注</th>
+      </tr>
+	#if($damagedDetailViews)
+      #foreach($dam in $damagedDetailViews.items)
+	  <tr  #if($velocityCount%2==0) class="bg" #end>
+         <td>&nbsp;$!dam.goodsCode</td>
+         <td>&nbsp;$!dam.goodsName</td>
+         <td title="$!dam.catCode">&nbsp;
+			#if ($!dam.catCode.length()<20)
+				$!dam.catCode
+			#else
+				$!controlUtil.getNoticesTitle($!dam.catCode,20)
+			#end
+		 </td>
+         <td title="$!dam.attrs">&nbsp;
+			#if ($!dam.attrs.length()<20)
+				$!dam.attrs
+			#else
+				$!controlUtil.getNoticesTitle($!dam.attrs,20)
+			#end
+		 </td>
+		 <td>&nbsp;$!dam.brandName</td>
+		 <td>&nbsp;$!dam.supplierName</td>
+		 <td>&nbsp;$!dam.locName</td>
+		 <td>&nbsp;$!dam.batchNum</td>
+		 <td>&nbsp;$!dam.unit</td>
+		 <td>&nbsp;$!dam.amount</td>
+		 <td>￥$!moneyUtil.getFormatMoney($!dam.unitCost,'0.00')</td>
+         <td>￥$!moneyUtil.getFormatMoney($!dam.costCount,'0.00')</td>
+		 <td>&nbsp;$!enumDamagedReason.get("$!{dam.reason}")</td>
+		 <td title="$!dam.remark">&nbsp;
+			#if ($!dam.remark.length()<10)
+				$!dam.remark
+			#else
+				$!controlUtil.getNoticesTitle($!dam.remark,10)
+			#end
+		 </td>
+      </tr>
+	  #end
+	#end
+    </table>
+    <!-- 分页 -->
+    #if($tradeList.size() == 0)
+		没有结果！
+    #end
+ </div>
+ <br />
+   <div align="center">
+	#if("$!{damWaitCheck}"=="$!{damaged.status}")
+		<input type="button" name="finish" value=" 审核通过 " onclick="javascript:checkDamaged();"/>
+		<input type="button" name="finish" value=" 审核不通过 " onclick="javascript:noPassCheck();"/>
+	#end
+	#if("$!{damChecked}"=="$!{damaged.status}")
+		<input type="button" name="finish" value=" 报残完成 " onclick="javascript:finished();"/>
+    #end
+ </div>
+ </form>
+</body>

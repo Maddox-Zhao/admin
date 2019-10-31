@@ -1,0 +1,250 @@
+#set($layout = "layout/default.vm")
+#set($title = "修改汽运信息")
+<script language="javascript" type="text/javascript">
+	function isNumber(val)
+	{
+	  var reg = /^[\d|\.|,]+$/;
+	  return reg.test(val);
+	}
+
+	function isIntNumber(val){
+		var reg = /^[1-9]*[1-9][0-9]*$/;
+		return reg.test(val);
+	}
+
+function isNull( str ){
+    if ( str == "" ) return true;
+    var regu = "^[ ]+$";
+    var re = new RegExp(regu);
+    return re.test(str);
+}
+
+function mobileCheck(code){
+	if(code.length == 0)
+	{
+		return true;
+	}
+    var reg = /^((((13|15|18)[0-9]{1}))+\d{8})$/;
+    var _reg = /^[\d-]{7,13}$/;
+    if(!_reg.test(code) && !reg.test(code)){
+        return false;
+    }
+    return true;
+}
+
+function edit(){
+    var gmtExpressDate = document.getElementById("gmtExpressDate").value;
+    if(gmtExpressDate.length == 0){
+    	alert("请选择日期！");
+    	return false;
+    }
+
+    var tid = document.getElementById("tid").value;
+    if(tid.length > 50){
+    	alert("订单号必须在50字符以内！");
+    	return false;
+    }
+    var expressCode = document.getElementById("expressCode").value;
+    if(expressCode.length > 255){
+    	alert("运单号必须在250字符以内！");
+    	return false;
+    }
+    var expressName = document.getElementById("expressName").value;
+    if(expressName.length > 40 ){
+    	alert("承运公司必须在40字以内！");
+    	return false;
+    }
+    var num = document.getElementById("num").value;
+    if(num.length > 10){
+    	alert("数量必须在10字符以内！");
+    	return false;
+    }else if(num.length > 0 && !isIntNumber(num)){
+		alert("数量必须为整数！");
+    	return false;
+	}
+    var receiverAdd = document.getElementById("receiverAdd").value;
+    if(receiverAdd.length > 300){
+    	alert("收货人地址必须在300字以内！");
+    	return false;
+    }
+    var receiver = document.getElementById("receiver").value;
+    if(receiver.length > 40){
+    	alert("收货人必须在40字以内！");
+    	return false;
+    }
+    var receiverTel = document.getElementById("receiverTel").value;
+	if(!mobileCheck(receiverTel)){
+		alert('收货人联系电话格式不正确');
+        return false;
+    }
+    var expressTel = document.getElementById("expressTel").value;
+	if(!mobileCheck(expressTel)){
+		alert('物流公司电话格式不正确');
+        return false;
+    }
+    var expressAdd = document.getElementById("expressAdd").value;
+    if(expressAdd.length > 300){
+    	alert("物流公司地址必须在300字以内！");
+    	return false;
+    }
+    var fee = document.getElementById("fee").value;
+    if(fee.length > 20 ){
+    	alert("运费必须在20字符以内！");
+    	return false;
+    }
+
+    var payType = document.getElementById("payType").value;
+    if(payType.length > 10 ){
+    	alert("付款方式必须在10字以内！");
+    	return false;
+    }
+
+
+	document.getElementById("fee").value = new Number(fee).toFixed(2);
+
+    document.theForm.submit();
+}
+</script>
+
+<div class="main">
+	<h2>管理中心 - 物流管理</h2>
+<div class="formBox">
+	<h3><span>修改汽运信息</span></h3>
+   <div class="content">
+		<form  name="theForm"  action="/express/edit_motor_trans.html" method="post">
+			#springBind("motorTransInfo.id")
+			<input type="hidden" id ="id" name="${status.expression}" value="$!{status.value}"/>
+			<input id ="optType" name="optType" type="hidden" value ="edit" >
+			<table class="c2">
+			<tbody>
+				#if($!{shopInfoError})
+				<tr>
+				<td colspan="2" align="center" >
+					<span class="require-field">$!{shopInfoError}</span>
+				</td>
+				</tr>
+				#end
+				<tr>
+    				<th>
+    					<span class="require-field">*</span>日期：
+    				</th>
+    				<td>
+						<input type="text" id="gmtExpressDate" name="gmtExpressDate" value="$!{gmtExpressDate}" class="inp" readonly="true"/>
+        			<script type="text/javascript">
+        			      Calendar.setup({
+        			          inputField : "gmtExpressDate",
+        			          ifFormat   : "%Y-%m-%d",
+        			          align      : "BR"
+        			      });
+        			</script>
+					</td>
+				</tr>
+				<tr>
+    				<th>
+    					<span class="require-field"></span>订单号：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.tid")
+						<input id="tid" name="${status.expression}" value="$!{status.value}" class="inp" >
+					</td>
+				</tr>
+				<tr>
+    				<th>
+    					<span class="require-field"></span>运单号：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.expressCode")
+						<input id="expressCode" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>承运公司：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.expressName")
+						<input id="expressName" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+				<tr>
+    				<th>
+    					<span class="require-field"></span>数量（件）：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.num")
+						<input id="num" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>收货人地址：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.receiverAdd")
+						<input id="receiverAdd" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>收货人：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.receiver")
+						<input id="receiver" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>收货人联系电话：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.receiverTel")
+						<input id="receiverTel" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>物流公司电话：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.expressTel")
+						<input id="expressTel" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+								<tr>
+    				<th>
+    					<span class="require-field"></span>物流公司地址：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.expressAdd")
+						<input id="expressAdd" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+				<tr>
+    				<th>
+    					<span class="require-field"></span>运费：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.fee")
+						<input id="fee" name="${status.expression}" value="$!{status.value}" class="inp" onkeypress="if(!this.value.match(/^[\+\-]?\d*?\.?\d*?$/))this.value=this.t_value;else this.t_value=this.value;if(this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/))this.o_value=this.value" onkeyup="if(!this.value.match(/^[\+\-]?\d*?\.?\d*?$/))this.value=this.t_value;else this.t_value=this.value;if(this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/))this.o_value=this.value" onblur="if(!this.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?|\.\d*?)?$/))this.value=this.o_value;else{if(this.value.match(/^\.\d+$/))this.value=0+this.value;if(this.value.match(/^\.$/))this.value=0;this.o_value=this.value}"/>
+    				</td>
+				</tr>
+				<tr>
+    				<th>
+    					<span class="require-field"></span>付费方式：
+    				</th>
+    				<td>
+						#springBind("motorTransInfo.payType")
+						<input id="payType" name="${status.expression}" value="$!{status.value}" class="inp" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="form-but">
+			<input class="button-s4" value=" 修 改 " type="button" onclick="edit();" >
+			<input class="button-s4" value=" 重 置 " type="reset" >
+        </div>
+		</form>
+	</div>
+</div>
+</div>

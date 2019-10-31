@@ -1,0 +1,99 @@
+#set($layout = "layout/default.vm")
+<head>
+  #set($title = "尚上后台管理系统")
+</head>
+<div class="main">
+
+  <table width="100%">
+    <tr>
+      <td>
+      <b>$theComment.userNickname</b>&nbsp;于      &nbsp;$!date.format('yyyy-MM-dd HH:mm:ss',${theComment.gmtCreate}) &nbsp;对&nbsp;<a target="_blank" href="$!{liangpin99Server}/l/gdetail_$!{theComment.idValue}.htm"><b>$theComment.goodsName</b></a>&nbsp;发表评论    </td>
+    </tr>
+    <tr>
+      <td><hr size="1" color="#dadada"></td>
+    </tr>
+    <tr>
+      <td>
+        <div style="overflow: hidden;">$theComment.content</div>
+        <div align="right"><b>评论分数:</b> $theComment.commentRank  &nbsp;&nbsp;<b>IP地址</b>: $!theComment.ipAddress</div>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+      	 <input onclick="changeTheStatus($theComment.id);" id="statusButton"
+      #if($theComment.status == "0")
+               value="允许显示"
+                #elseif($theComment.status == "1")
+                value="隐藏"
+      #end
+                class="button" type="button">
+            </td>
+    </tr>
+  </table>
+
+#if($theComment.replyFlag=="yes")
+<div class="main-div">
+  <table width="100%">
+    <tbody><tr>
+      <td>
+      管理员&nbsp;&nbsp;于      &nbsp;$!date.format('yyyy-MM-dd HH:mm:ss',${theComment.gmtReply}) &nbsp;回复    </td>
+    </tr>
+    <tr>
+      <td><hr size="1" color="#dadada"></td>
+    </tr>
+    <tr>
+      <td>
+        <div style="overflow: hidden;">#direct($theComment.replyContent)</div>
+      </td>
+    </tr>
+  </tbody></table>
+</div>
+#end
+
+    <div >
+        <form  name="updateForm" id="updateForm" action="replycomm.html?commentId=$theComment.id" method="post" enctype="multipart/form-data">
+            <table align="center" border="0">
+              <tr><th colspan="2">
+              <strong>回复评论</strong>
+              </th></tr>
+              <tr>
+                <td>回复:</td>
+                <td><textarea name="theReply" id="theReply" cols="50" rows="10" wrap="VIRTUAL">#direct($!theComment.replyContent)</textarea></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td>提示：若回复内容为空，则视为没有回复！</td>
+              </tr>
+                <tr>
+                <td>&nbsp;</td>
+                <td>
+                  <input name="save" value=" 确定 " class="button" type="button" onclick="formSubmit();">
+                </td>
+              </tr>
+              <script language="javascript" type="text/javascript">
+
+            		function formSubmit(){
+            			var reply= document.getElementById('theReply').value;
+            			if(reply.length>300){
+            			     alert("评论超长，不能保存！");
+                			return false;
+            			}else{
+                	document.getElementById('updateForm').submit();
+                	}
+            	 }
+            	 </script>
+			</table>
+        </form>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+	function changeTheStatus(id){
+	  jQuery.get('showOrHide.html',{param1:id},function(message){changeTheButton(message);},'');
+	}
+	function changeTheButton(msg){
+    	if(document.getElementById('statusButton').value == "隐藏")
+    		document.getElementById('statusButton').value = "允许显示";
+    	else if(document.getElementById('statusButton').value == "允许显示")
+    		document.getElementById('statusButton').value = "隐藏";
+	}
+</script>

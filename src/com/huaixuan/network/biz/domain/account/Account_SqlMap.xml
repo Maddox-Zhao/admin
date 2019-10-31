@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AccountSQL">
+<typeAlias alias="account" type="com.huaixuan.network.biz.domain.account.Account"/>
+	<resultMap class="account" id="accountResult">
+		<result column="account_no" property="accountNo"/>
+		<result column="user_id" property="userId"/>
+		<result column="account_type" property="accountType"/>
+		<result column="account_sub_type" property="accountSubType"/>
+		<result column="balance" property="balance"/>
+		<result column="freeze_amount" property="freezeAmount"/>
+		<result column="enabled_status" property="enabledStatus"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modified" property="gmtModified"/>
+		<result column="creator" property="creator"/>
+		<result column="modifier" property="modifier"/>
+		<result column="memo" property="memo"/>
+		<result column="check_sign" property="checkSign"/>
+	</resultMap>
+	<resultMap class="account" id="accountResultWithAccount">
+		<result column="account_no" property="accountNo"/>
+		<result column="user_id" property="userId"/>
+		<result column="account_type" property="accountType"/>
+		<result column="account_sub_type" property="accountSubType"/>
+		<result column="balance" property="balance"/>
+		<result column="freeze_amount" property="freezeAmount"/>
+		<result column="enabled_status" property="enabledStatus"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modified" property="gmtModified"/>
+		<result column="creator" property="creator"/>
+		<result column="modifier" property="modifier"/>
+		<result column="memo" property="memo"/>
+		<result column="check_sign" property="checkSign"/>
+		<result column="account" property="account"/>
+	</resultMap>
+
+<!-- 得到用户表seq的值 -->
+<select id="getUsersSeq" resultClass="java.lang.Long">
+<![CDATA[
+		SELECT max(a.id)+2 FROM emall_user a
+]]>
+</select>
+
+
+<!-- 得SEQ_PAYMENT_OFFLINE的值 -->
+<select id="getPayMentOffLineSeq" resultClass="java.lang.Long">
+<![CDATA[
+		SELECT max(a.id)+2 FROM ep_bank_pay_online a
+]]>
+</select>
+
+<!-- 得到账户的count值 -->
+<select id="getAccountCount" resultClass="java.lang.Integer" >
+<![CDATA[
+		select count(*) from ep_account
+]]>
+</select>
+
+
+<!-- 判断其子类型账户是否重复 -->
+<select id="getSubAccountCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from ep_account where account_type=#ACCOUNT_TYPE# and account_sub_type = #ACCOUNT_SUB_TYPE#
+]]>
+</select>
+
+<!-- create Account object -->
+<insert id="addAccount" parameterClass="account">
+<![CDATA[
+		insert into ep_account
+		(account_no,user_id,account_type,account_sub_type,balance,freeze_amount,enabled_status,gmt_create,gmt_modified,creator,modifier,memo,check_sign )values( #accountNo#,
+		#userId#,
+		#accountType#,
+		#accountSubType#,
+		#balance#,
+		#freezeAmount#,
+		#enabledStatus#,
+		sysdate(),
+		sysdate(),
+		#creator#,
+		#modifier#,
+		#memo#,
+		#checkSign#
+		 )
+]]>
+</insert>
+<!-- update Account object -->
+<update id="editAccount" parameterClass="account">
+<![CDATA[
+		update ep_account set user_id = #userId#,
+		account_type = #accountType#,
+		account_sub_type = #accountSubType#,
+		balance = #balance#,
+		freeze_amount = #freezeAmount#,
+		enabled_status = #enabledStatus#,
+		gmt_modified = sysdate(),
+		creator = #creator#,
+		modifier = #modifier#,
+		memo = #memo#
+		where account_no = #accountNo#
+
+]]>
+</update>
+<!-- delete Account object -->
+<delete id="removeAccount" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ep_account where ep_account.ID = #value#
+]]>
+</delete>
+<!-- search Account object -->
+<select id="getAccount" parameterClass="java.lang.Long" resultMap="accountResult">
+<![CDATA[
+		select ep_account.* from ep_account where ep_account.ID = #value#
+]]>
+</select>
+<select id="getAccountByUidAndType" resultMap="accountResult">
+<![CDATA[
+		select ep_account.* from ep_account where ep_account.user_id = #userId# and ep_account.account_sub_type = #accountSubType#
+]]>
+</select>
+<!-- searchAll Account List -->
+<select id="getAccounts" resultMap="accountResult">
+<![CDATA[
+		select ep_account.* from ep_account
+]]>
+</select>
+
+<!--  根据条件搜索账号公共SQL -->
+<sql id="account-searchCommon-condition">
+    <dynamic prepend="where" >
+        <isNotEmpty prepend="and" property="accountNo">
+            account_no=#accountNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="userId">
+            user_id=#userId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeStart">
+            <![CDATA[gmt_create>=STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeEnd">
+            <![CDATA[gmt_create<DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="enabledStatus">
+            enabled_status=#enabledStatus#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountType">
+            account_type in ($accountType$)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountTypeSearch">
+            account_type = #accountTypeSearch#
+        </isNotEmpty>
+
+    </dynamic>
+</sql>
+
+<!--  根据条件搜索账号统计满足条件的客户数 -->
+<select id="account-searchAccountByCondition-count" parameterClass="java.util.Map" resultClass="int">
+    <![CDATA[SELECT count(*) FROM ep_account e,emall_users u where e.USER_ID=u.id(+)]]>
+    <isNotEmpty prepend="and" property="accountNo">
+            e.ACCOUNT_NO=#accountNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="userId">
+            e.USER_ID=#userId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="account">
+            u.ACCOUNT=#account#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeStart">
+            <![CDATA[ea.gmt_create>=STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeEnd">
+            <![CDATA[ea.gmt_create<DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+        </isNotEmpty>
+		<isNotEmpty prepend="and" property="accountBalance">
+		    <![CDATA[e.balance>CONVERT(#accountBalance#,DECIMAL(20))]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="enabledStatus">
+            e.ENABLED_STATUS=#enabledStatus#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountType">
+            e.ACCOUNT_TYPE in ($accountType$)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountTypeSearch">
+            e.ACCOUNT_TYPE = #accountTypeSearch#
+        </isNotEmpty>
+</select>
+
+<!--  根据条件搜索账号，查询结果  -->
+<select id="account-searchAccountByCondition-query" parameterClass="java.util.Map" resultMap="accountResultWithAccount">
+		<![CDATA[
+		SELECT e.*,u.account FROM ep_account e,emall_users u
+             where e.USER_ID=u.id(+)
+	    ]]>
+        <isNotEmpty prepend="and" property="accountNo">
+            e.ACCOUNT_NO=#accountNo#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="userId">
+            e.USER_ID=#userId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="account">
+            u.ACCOUNT=#account#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeStart">
+            <![CDATA[ea.gmt_create>=STR_TO_DATE(#createTimeStart#,'%Y-%m-%d %H:%i:%s')]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="createTimeEnd">
+            <![CDATA[ea.gmt_create<DATE_ADD(STR_TO_DATE(#createTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY)]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="enabledStatus">
+            e.ENABLED_STATUS=#enabledStatus#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountType">
+            e.ACCOUNT_TYPE in ($accountType$)
+        </isNotEmpty>
+	    <isNotEmpty prepend="and" property="accountBalance">
+		    <![CDATA[e.balance>CONVERT(#accountBalance#,DECIMAL(20))]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="accountTypeSearch">
+            e.ACCOUNT_TYPE = #accountTypeSearch#
+        </isNotEmpty>
+	    <![CDATA[ORDER BY e.GMT_CREATE DESC ]]>
+		<![CDATA[ LIMIT #startRow#,#endRow#
+        ]]>
+</select>
+<update id="account-processAccount-update" parameterClass="account">
+	<![CDATA[
+			UPDATE ep_account
+	]]>
+	<dynamic prepend="SET" >
+		<isNotEmpty prepend="," property="enabledStatus">
+		    ENABLED_STATUS = #enabledStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="modifier">
+		    MODIFIER = #modifier#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="memo">
+		    MEMO = #memo#
+		</isNotEmpty>
+	</dynamic>
+	<![CDATA[
+	,GMT_MODIFIED = sysdate()
+	WHERE ACCOUNT_NO = #accountNo#]]>
+</update>
+<select id="account-getAccountByAccountNo-query" parameterClass="string" resultMap="accountResult">
+<![CDATA[
+		select * from ep_account where account_no=#value#
+]]>
+</select>
+
+<!-- 判断某账户是否是公司账户 -->
+<select id="getCompayAccountCount" parameterClass="string" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(*) from ep_account where ACCOUNT_NO=#accountNo# and ACCOUNT_TYPE='1' and  ACCOUNT_SUB_TYPE = '02'
+]]>
+</select>
+
+
+<!-- 得到小于某个创建时间的账号 -->
+<select id="getAccountCountByCreate"  resultMap="accountResult">
+<![CDATA[
+		select * from ep_account where gmt_create >= STR_TO_DATE(#datestart#,'%Y-%m-%d %H:%i:%s') and gmt_create<=STR_TO_DATE(#dateEnd#,'%Y-%m-%d %H:%i:%s')
+]]>
+</select>
+
+</sqlMap>

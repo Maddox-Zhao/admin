@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="DepositorySQL">
+	<typeAlias alias="depository" type="com.huaixuan.network.biz.domain.storage.Depository"/>
+	<resultMap class="depository" id="depositoryResult">
+		<result column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="address" property="address"/>
+		<result column="leader" property="leader"/>
+		<result column="tel" property="tel"/>
+		<result column="remark" property="remark"/>
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="gmt_modify" property="gmtModify"/>
+		<result column="status" property="status"/>
+		<result column="type" property="type"/>
+		<result column="DEP_FIRST_ID" property="depFirstId"/>
+	</resultMap>
+<!-- create Depository object -->
+<insert id="addDepository" parameterClass="depository">
+<![CDATA[
+		insert into ioss_depository
+  (id,
+   name,
+   address,
+   leader,
+   tel,
+   remark,
+   status,
+   type,
+   gmt_create,
+   gmt_modify,
+   dep_first_id)
+values
+  (null,
+   #name#,
+   #address#,
+   #leader#,
+   #tel#,
+   #remark#,
+   #status#,
+   #type#,
+   sysdate(),
+   sysdate(),
+   #depFirstId#)
+]]>
+		<selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+
+<!-- update Depository object -->
+<update id="editDepository" parameterClass="depository">
+<![CDATA[
+		update ioss_depository
+   set name       = #name#,
+       address    = #address#,
+       leader     = #leader#,
+       tel        = #tel#,
+       remark     = #remark#,
+       status     = #status#,
+       type       = #type#,
+       gmt_modify = sysdate(),
+       dep_first_id=#depFirstId#
+ where id = #id#
+
+]]>
+</update>
+<!-- delete Depository object -->
+<delete id="removeDepository" parameterClass="java.lang.Long">
+<![CDATA[
+		delete from ioss_depository where ioss_depository.ID = #value#
+]]>
+</delete>
+<!-- search Depository object -->
+<select id="getDepository" parameterClass="long" resultMap="depositoryResult">
+	select ioss_depository.*
+	  from ioss_depository
+	 where ioss_depository.ID = #value#
+</select>
+
+	<select id="getDepositoryByName" parameterClass="java.lang.String" resultMap="depositoryResult">
+<![CDATA[
+		select ioss_depository.* from ioss_depository where ioss_depository.name = #value#
+]]>
+</select>
+	<!-- searchAll Depository List -->
+<select id="getDepositorys" resultMap="depositoryResult">
+<![CDATA[
+		select ioss_depository.* from ioss_depository where ioss_depository.status<>'i'
+]]>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+</select>
+<!-- 仓库记录集合 -->
+<select id="getDepositorysByParMap" resultMap="depositoryResult">
+	<include refid="pageSQLHead"/>
+<![CDATA[
+		select t.* from ioss_depository t where 1=1
+]]>
+	    <isNotEmpty prepend="and" property="name">
+			t.name like concat('%',#name#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="leader">
+			t.leader = #leader#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+            t.status = #status#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="type">
+            t.type = #type#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depFirstId">
+            t.DEP_FIRST_ID = #depFirstId#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="depfirstIds" >
+            t.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="types" >
+            t.type in(
+            <iterate property="types" conjunction=",">#types[]#</iterate>
+            )
+        </isNotEmpty>
+
+		order by t.id desc
+		<include refid="pageSQLFoot"/>
+</select>
+
+<!-- 仓库记录数量 -->
+<select id="getCountByParMap" resultClass="java.lang.Integer">
+<![CDATA[
+		select count(1) from ioss_depository t where 1=1
+]]>
+	    <isNotEmpty prepend="and" property="name">
+			t.name like concat('%',#name#,'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="leader">
+			t.leader = #leader#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+            t.status = #status#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="type">
+            t.type = #type#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="depfirstIds" >
+            t.DEP_FIRST_ID in(
+            <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+            )
+        </isNotEmpty>
+		order by t.id desc
+</select>
+
+<!-- 根据一级仓库id获取全部仓库 -->
+<select id="getDeplistByFirstDepId" resultMap="depositoryResult" parameterClass="java.lang.Long">
+<![CDATA[
+       select ioss_depository.* from ioss_depository where ioss_depository.status<>'i' and ioss_depository.DEP_FIRST_ID = #value#
+]]>
+</select>
+
+<select id="getRightDeplistByFirstDepId" resultMap="depositoryResult" parameterClass="java.lang.Long">
+<![CDATA[
+       select ioss_depository.* from ioss_depository where ioss_depository.status<>'i' and ioss_depository.type!='out_borrow_dep' and ioss_depository.DEP_FIRST_ID = #value#
+]]>
+</select>
+</sqlMap>

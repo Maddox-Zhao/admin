@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="product">	
+  <typeAlias alias="transfer" type="com.huaixuan.network.biz.domain.product.Transfer"/>
+    
+   <resultMap id="transferResultMap" class="com.huaixuan.network.biz.domain.product.Transfer" >
+		<result column="id" property="id"/>
+		<result column="changeTime" property="changeTime"/>
+		<result column="createUser" property="createUser"/>
+		<result column="afterLocation" property="afterLocation"/>		
+		<result column="beforelocation" property="beforelocation"/>
+		<result column="idStatus" property="idStatus"/>
+	</resultMap>
+	
+	
+	<resultMap id="transferProductResultMap" class="com.huaixuan.network.biz.domain.product.Transfer" >
+		<result column="id" property="id"/>
+		<result column="siteName" property="siteName"/>
+		<result column="reallName" property="reallName"/>
+		<result column="createDate" property="createDate"/>	
+		<result column="beforesiteName" property="beforesiteName"/>	
+		<result column="statu" property="statu"/>
+		<result column="remark" property="remark"/>
+		<result column="cname" property="cname"/>
+	</resultMap>
+	
+	<sql id="Transfer.List">	  
+		<isNotEmpty property="reallNAme">
+		     and e.name = #reallName#
+		</isNotEmpty>
+		<isNotEmpty property="createDate">
+				<![CDATA[ and loc.lockup_end_datetime>= '$createDate$ 23:59:59'  ]]>
+		</isNotEmpty>
+	</sql>	
+	<!-- 添加调货信息 -->
+  	 <insert id="addTrsnsferInformation" parameterClass="transfer">
+	  		insert into hx_transfer values(null,#createUser#,#afterLocation#,#beforelocation#,#idStatus#,sysdate(),#idCustomer#,#remark#)
+	  		<selectKey resultClass="int" keyProperty="id" > 
+            SELECT @@IDENTITY AS ID 
+        	</selectKey> 
+	  </insert>
+	  
+		<!-- 查询hx_transfer最大的id -->
+	  <select id="selectMaxId" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+	  	select max(id) from hx_transfer
+	  </select>
+	  <!-- 查询Transfer所有数据 	  -->
+	  <select id="selectShowTranList" parameterClass="java.util.Map"  resultMap="transferProductResultMap">
+	 	SELECT e.name reallName,s.name siteName,h.id id,h.changeTime createDate,h.remark remark,c.name cname,
+	 	(SELECT s.name FROM site s  WHERE h.beforelocation = s.idSite) beforesiteName,
+	 	h.idStatus statu
+	 	FROM emall_admin e,site s,hx_transfer h,customer c
+	 	WHERE h.createUser = e.user_name 
+	 	AND   s.idSite = h.afterLocation
+	 	AND   h.idCustomer = c.idCustomer
+	 	<isNotEmpty prepend="and" property="id">
+			h.id=#id#
+		</isNotEmpty>
+	 	<isNotEmpty prepend="and" property="createDate">
+			h.changeTime=#createDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reallName">
+			e.name=#reallName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idLocation">
+			h.afterLocation=#idLocation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="beforeidLocation">
+			h.beforelocation=#beforeidLocation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			h.idStatus=#status#
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateStart" prepend="and">
+				<![CDATA[  h.changeTime >= #inStockDateStart# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateEnd" prepend="and">
+				<![CDATA[   h.changeTime <= '$inStockDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+			order by h.id DESC		 
+	  	<isNotEmpty property="startRow" >
+					<isNotEmpty property="endRow" >
+						<![CDATA[ LIMIT $startRow$,$endRow$ ]]>
+			         </isNotEmpty>
+		 </isNotEmpty>
+	  </select>
+
+	<!-- 查旬Transfer里面所有的信息的总数 -->
+	<select id="selectTransferListCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from 
+		emall_admin e,site s,hx_transfer h 
+		where
+		h.createUser = e.user_name 
+	 	AND   s.idSite = h.afterLocation
+	 	<isNotEmpty prepend="and" property="id">
+			h.id=#id#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="createDate">
+			h.changeTime=#createDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="reallName">
+			e.name=#reallName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idLocation">
+			h.afterLocation=#idLocation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="beforeidLocation">
+			h.beforelocation=#beforeidLocation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="status">
+			h.idStatus=#status#
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateStart" prepend="and">
+				<![CDATA[  h.changeTime >= #inStockDateStart# ]]>
+		</isNotEmpty>
+		<isNotEmpty property="inStockDateEnd" prepend="and">
+				<![CDATA[   h.changeTime <= '$inStockDateEnd$ 23:59:59'  ]]>
+		</isNotEmpty>
+			order by h.id DESC
+	</select>
+	<update id="updatehxtransferbyid" parameterClass="transfer">
+		update hx_transfer set idStatus= 1 where id = #id#
+	</update>
+</sqlMap>

@@ -1,0 +1,267 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>库存更新日志</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+		<script type="text/javascript" src="/front/scripts/miniui3/jquery.zclip.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+         <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+</head>
+<body>
+	<form target="iframeName"  action="/product/exportProductyuliu.html" enctype="multipart/form-data" method="post" id="uploadForm" name="uploadForm">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>                  
+                    <td class="form-label" style="width:60px;">sku：</td>
+                    <td style="width:150px">
+                        <input name="sku" id="sku" class="mini-textbox" onenter="search()"/>
+                    </td>
+					<td class="form-label" style="width:60px;">订单数：</td>
+                    <td style="width:150px">
+                        <input name="order_stock" id="order_stock" data="searchData" onenter="search()" class="mini-combobox"   textField="value" valueField="id" emptyText="请选择..." multiSelect="false"   allowInput="false" showNullItem="true" nullItemText="请选择..."/>      
+                    </td>
+					
+                      <td class="form-label">sku：</td>
+                    <td style="width:150px">
+                        <a class="mini-button" iconCls="icon-add" onclick="yuliu()">预留操作</a>
+                    </td>
+                    <td rowspan="1">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()" >查询</a>
+                    </td>
+					<td colspan="2">
+					    <a class="mini-button" iconCls="icon-download" onclick="exportProductyuliu()">导出</a>
+                     </td>
+                </tr>
+				
+				      
+					
+				
+            </table>
+        </div>
+    </div>
+ </form> 
+<iframe id="iframeName" name="iframeName" style="display:none;"></iframe>
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:480px;" allowResize="true" multiSelect="false"    allowCellEdit="true" allowCellSelect="true"
+        url="/stockupdate/searchStockUpdate.html"  idField="id"  onRowdblclick="edit()"  pageSize="50" allowAlternating="true" pageIndex="1"  oncellendedit="cellendedit">
+        <div property="columns">
+			  <!--<div type="indexcolumn"></div>        -->           
+            <div type="indexcolumn"></div>
+			 <div type="checkcolumn" ></div>    
+            <div field="sku" width="120" headerAlign="center" align="center" allowSort="true">sku</div>
+			<div field="type" width="60" headerAlign="center" align="center" allowSort="true">渠道</div>
+            <div field="nowStockNum" width="60" headerAlign="center" align="center"  allowSort="true">当前库存
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="orderStockNum" width="80" headerAlign="center" align="center"  allowSort="true">平台订单数</div>
+			<div field="update2PlatformNum" width="90" headerAlign="center" align="center"  allowSort="true" renderer="renderNumber">更新到平台数</div>
+			
+			<div field="pType" width="100" headerAlign="center" align="center"  allowSort="true">型号
+				
+			</div>
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质
+				
+			</div>
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色
+				
+			</div>
+			
+            <div field="shangpinOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">尚品订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="xhsOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">小红书订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="ofashionOrderStock" width="90" headerAlign="center" align="center"  allowSort="true">Ofashion订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="weiMobOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">微盟订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="yinTaiOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">银泰订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="pddOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">拼多多订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			
+			<div field="zhenpinOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">珍品订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="kaolaOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">考拉订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="sikuOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">寺库订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="higoOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">higo订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="tmallOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">tmall订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="yhdOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">1号店订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="mlhOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">魅力惠订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="shepinOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">天猫奢品订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="sikunewOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">新寺库订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+			<div field="ofashionMcOrderStock" width="80" headerAlign="center" align="center"  allowSort="true">OFashionB2B订单数
+				<input property="editor"  class="mini-textbox"  />
+			</div>
+            <div field="lastOrderTime" width="120" headerAlign="center" align="center"  allowSort="true">平台最后下单时间</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+	    
+		var searchData = [{id:'order_stock',value:'平台订单数大于0'},{id:'shangpin_order_stock',value:'尚品订单数大于0'},
+		{id:'xhs_order_stock',value:'小红书订单数大于0'},{id:'ofashion_order_stock',value:'ofashion订单数大于0'},
+		{id:'weimob_order_stock',value:'微盟订单数大于0'},{id:'pdd_order_stock',value:'拼多多订单数大于0'},
+		{id: 'kaola_order_stock',value:'考拉订单数大于0'},{id: 'zhenpin_order_stock',value:'珍品订单数大于0'},
+		{id: 'siku_order_stock',value:'寺库订单数大于0'},{id: 'tmall_order_stock',value:'天猫订单数大于0'},
+		{id: 'higo_order_stock',value:'higo订单数大于0'},{id:'Mlh_order_stock',value:'魅力惠订单数大于0'},
+		{id:'yinTai_order_stock',value:'银泰的订单数大于0'},{id:'shepin_order_stock',value:'天猫奢品订单数大于0'},
+		{id:'sikunew_order_stock',value:'新寺库订单数大于0'},{id:'ofashionMc_order_stock',value:'OFashionB2B订单数大于0'}]
+		
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		
+		
+		function renderNumber(e) {
+           var row = e.row;
+		   var nowStockNum = Number(row.nowStockNum);
+		   var orderStockNum = Number(row.orderStockNum);
+		   var  r = nowStockNum - orderStockNum;
+		   if(r < 0)  r= 0;
+		   return r;
+ 		 	
+        }
+		
+		 function cellendedit(e){
+            var num = e.value;
+			var row = e.row;
+			var state = row._state;
+			var field = e.field;
+			var id = row.id;
+			
+			if('modified' == state)
+			{
+    			if(!isNaN(num))
+    			{
+					var shangpinOrderStock = row.shangpinOrderStock;
+					var  zhenpinOrderStock = row.zhenpinOrderStock;
+					var kaolaOrderStock = row.kaolaOrderStock;
+					var sikuOrderStock = row.sikuOrderStock;
+					var higoOrderStock = row.higoOrderStock;
+					var tmallOrderStock = row.tmallOrderStock;
+					var yhdOrderStock = row.yhdOrderStock;
+					var orderStockNum = Number(shangpinOrderStock) + Number(zhenpinOrderStock) + Number(kaolaOrderStock)+ Number(sikuOrderStock)+Number(higoOrderStock)+Number(tmallOrderStock) + Number(yhdOrderStock) 
+				    row.orderStockNum = orderStockNum;
+					delete row.lastOrderTime;
+					
+					//只更新订单数量 其他数据不做操作
+					var postData = {};
+					for(var p in row)
+					{
+						if(p.indexOf("Stock") > 0)
+						{
+							postData[p] = row[p];
+						}
+					}
+					postData.id = row.id;
+					 jQuery.ajax({
+                      type: 'POST',
+                      url: "/stockupdate/updateStockUpdate.html",
+                      data: postData,
+                      success: function(text)
+					  {
+					  		if(text == 'ok')
+							{
+								grid.reload();
+							}
+					  },
+                      error: function() {
+					  		mini.alert('更新失败,联系管理员');
+					  }
+                    });
+    			}
+    			else
+    			{
+    				mini.alert('请填写数字');
+    			}
+			}
+      }
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据
+			if(!data.sku)
+				delete data.sku;
+			if(!data.order_stock)
+				delete data.order_stock;
+            grid.load(data);
+        }
+		
+		
+		 function yuliu() {
+            var row = grid.getSelected();
+			if (row) {
+				var win = mini.open({ 
+				url: "forYuliu.html",
+				title: "预留产品",
+                width: 800,
+                height: 360,
+				 onload: function() {
+				 	var iframe = this.getIFrameEl();
+						var data = {
+                            action: "yuliu",
+                             sku: row.sku,
+							 type:row.type
+							
+                        };
+						iframe.contentWindow.SetData(data);
+						iframe.focus();
+				 },
+				  ondestroy: function(action) {
+                         grid.reload();
+                    }
+				});
+			}else {
+                alert("请选中一条记录");
+            }
+        }
+		
+		
+		//导出
+        function exportProductyuliu() {
+		
+		
+		  
+            var form = new mini.Form("#form1");
+			
+            var data = form.getData(); //获取表单多个控件的数据   
+			 if(!data.sku){
+			delete data.sku;
+			}
+			if(!data.order_stock){
+			delete data.order_stock;
+			}
+			var uploadForm = document.getElementById("uploadForm");
+			uploadForm.action = "/product/exportProductyuliu.html";
+	  		uploadForm.submit();
+			
+        }
+		
+		
+	</script>
+</body>
+</html>

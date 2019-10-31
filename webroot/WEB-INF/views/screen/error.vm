@@ -1,0 +1,4 @@
+#set($layout = 'layout/default.vm')
+<div class="r-error">
+    <h3>出错了！$!message</h3>
+</div>

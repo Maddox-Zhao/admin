@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="StorageRefundApplySQL">
+<typeAlias alias="storageRefundApply" type="com.huaixuan.network.biz.domain.storage.StorageRefundApply"/>
+	<resultMap id="storageRefundApplyResult" class="storageRefundApply">
+		<result column="gmt_create" property="gmtCreate"/>
+		<result column="relation_num" property="relationNum"/>
+		<result column="status" property="status"/>
+		<result column="apply_user_name" property="applyUserName"/>
+		<result column="dispose_user_name" property="disposeUserName"/>
+		<result column="loc_id" property="locId"/>
+		<result column="dep_first_id" property="depFirstId"/>
+	</resultMap>
+	<resultMap id="storageRefundApplyDetailResult" class="storageRefundApply">
+	    <result column="storage_id" property="storageId"/>
+	    <result column="depLocation_name" property="depLocationName"/>
+	    <result column="batch_num" property="batchNum"/>
+	    <result column="stor_type" property="storType"/>
+	    <result column="storage_num" property="storageNum"/>
+	    <result column="refund_num" property="refundNum"/>
+	    <result column="ref_price" property="refPrice"/>
+	    <result column="due_fee" property="dueFee"/>
+	    <result column="fact_fee" property="factFee"/>
+	    <result column="reason" property="reason"/>
+	    <result column="memo" property="memo"/>
+	    <result column="loc_id" property="locId"/>
+	    <result column="id" property="id"/>
+	    <result column="status" property="status"/>
+	    <result column="apply_user_name" property="applyUserName"/>
+		<result column="dispose_user_name" property="disposeUserName"/>
+		<result column="code" property="code"/>
+		<result column="instance_name" property="instanceName"/>
+	</resultMap>
+	<resultMap id="storageRefundApplyIdResult" class="storageRefundApply">
+	    <result column="id" property="id"/>
+	    <result column="gmt_create" property="gmtCreate"/>
+	    <result column="gmt_modify" property="gmtModify"/>
+	    <result column="relation_num" property="relationNum"/>
+	    <result column="storage_id" property="storageId"/>
+	    <result column="refund_num" property="refundNum"/>
+	    <result column="ref_price" property="refPrice"/>
+	    <result column="fact_fee" property="factFee"/>
+	    <result column="reason" property="reason"/>
+	    <result column="memo" property="memo"/>
+	    <result column="status" property="status"/>
+	    <result column="apply_user_name" property="applyUserName"/>
+		<result column="dispose_user_name" property="disposeUserName"/>
+	</resultMap>
+
+<insert id="addStorageRefundApply">
+		insert into ioss_storage_refund_apply
+		(id,gmt_create,gmt_modify,relation_num,storage_id,refund_num,ref_price,fact_fee,reason,memo,status,apply_user_name)
+        values
+        (null,sysdate(),sysdate(),#relationNum#,#storageId#,#refundNum#,#refPrice#,#factFee#,#reason#,#memo#,#status#,#applyUserName#)
+        <selectKey resultClass="java.lang.Long" keyProperty="id" >
+	      SELECT LAST_INSERT_ID()
+	    </selectKey>
+</insert>
+
+<select id="getStorageRefundApplyListByCondition" parameterClass="java.util.Map" resultMap="storageRefundApplyResult">
+<include refid="pageSQLHead"/>
+   <![CDATA[
+     select a.relation_num as relation_num,
+            max(a.gmt_create) as gmt_create,
+            max(b.loc_id) as loc_id,
+            max(a.apply_user_name) as apply_user_name,
+            max(a.dispose_user_name) as dispose_user_name,
+            max(a.status) as status,
+            max(b.dep_first_id) as dep_first_id
+     from ioss_storage_refund_apply a, ioss_storage b
+     where a.storage_id = b.id
+   ]]>
+   <isNotEmpty prepend="and" property="relationNum">
+           a.relation_num like concat('%',#relationNum#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyUserName">
+           a.apply_user_name like concat('%',#applyUserName#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="disposeUserName">
+           a.dispose_user_name like concat('%',#disposeUserName#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depfirstId">
+           b.dep_first_id = #depfirstId#
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depId">
+           b.loc_id in(select d.id from ioss_dep_location d where d.dep_id = #depId#)
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="locId">
+           b.loc_id in(select d.id from ioss_dep_location d where d.id = #locId#)
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyTimeStart">
+         <![CDATA[ a.gmt_create >= STR_TO_DATE(#applyTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyTimeEnd">
+         <![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#applyTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="status">
+          a.status = #status#
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depfirstIds">
+		  b.dep_first_id in(
+	       <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+		   )
+	</isNotEmpty>
+    group by a.relation_num
+    order by a.relation_num desc
+<include refid="pageSQLFoot"/>
+</select>
+
+<select id="getStorageRefundApplyCountByCondition" parameterClass="java.util.Map" resultClass="int">
+   <![CDATA[
+   select count(1) from(
+     select a.relation_num as relation_num,
+            max(a.gmt_create) as gmt_create,
+            max(b.loc_id) as loc_id,
+            max(a.apply_user_name) as apply_user_name,
+            max(a.dispose_user_name) as dispose_user_name,
+            max(a.status) as status,
+            max(b.dep_first_id) as dep_first_id
+     from ioss_storage_refund_apply a, ioss_storage b
+     where a.storage_id = b.id
+   ]]>
+   <isNotEmpty prepend="and" property="relationNum">
+           a.relation_num like concat('%',#relationNum#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyUserName">
+           a.apply_user_name like concat('%',#applyUserName#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="disposeUserName">
+           a.dispose_user_name like concat('%',#disposeUserName#,'%')
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depfirstId">
+           b.dep_first_id = #depfirstId#
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depId">
+           b.loc_id in(select d.id from ioss_dep_location d where d.dep_id = #depId#)
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="locId">
+           b.loc_id in(select d.id from ioss_dep_location d where d.id = #locId#)
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyTimeStart">
+         <![CDATA[ a.gmt_create >= STR_TO_DATE(#applyTimeStart#,'%Y-%m-%d %H:%i:%s') ]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="applyTimeEnd">
+         <![CDATA[ a.gmt_create < DATE_ADD(STR_TO_DATE(#applyTimeEnd#,'%Y-%m-%d %H:%i:%s'),INTERVAL 1 DAY) ]]>
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="status">
+          a.status = #status#
+   </isNotEmpty>
+   <isNotEmpty prepend="and" property="depfirstIds">
+		  b.dep_first_id in(
+	       <iterate property="depfirstIds" conjunction=",">#depfirstIds[]#</iterate>
+		   )
+	</isNotEmpty>
+    group by a.relation_num
+    ) aa
+</select>
+
+<select id="getStorageRefundApplyCountByRelationNum" parameterClass="java.lang.String" resultClass="int">
+   <![CDATA[
+      select count(1) from(
+       select ioss_storage_refund_apply.* from ioss_storage_refund_apply where ioss_storage_refund_apply.relation_num = #relationNum#
+      ) aa
+   ]]>
+</select>
+
+
+<select id="getStorageRefundApplyCountByStorageId"  parameterClass="java.util.Map" resultClass="int">
+         <![CDATA[
+       select count(id) from ioss_storage_refund_apply
+       where ioss_storage_refund_apply.status in('init','fail')
+          ]]>
+       <isNotEmpty prepend="and" property="storageIds">
+       ioss_storage_refund_apply.storage_id in
+       <iterate property="storageIds" conjunction=","  open="(" close=")">#storageIds[]#</iterate>
+
+       </isNotEmpty>
+</select>
+
+
+<select id="getStorageRefundApplyDetail" parameterClass="java.lang.String" resultMap="storageRefundApplyDetailResult">
+   <![CDATA[
+       select r.id,
+              st.id as storage_id,
+              (select b.loc_name from ioss_dep_location b where b.id = st.loc_id) as depLocation_name,
+              st.batch_num,
+              st.stor_type,
+              st.storage_num,
+              st.loc_id,
+              (select instance_name from ioss_goods_instance gi where gi.id = st.goods_instance_id) as instance_name,
+              (select code from ioss_goods_instance gi where gi.id = st.goods_instance_id) as code,
+              r.refund_num,
+              r.ref_price,
+              r.refund_num * r.ref_price as due_fee,
+              r.fact_fee,
+              r.reason,
+              r.memo,
+              r.status,
+              r.apply_user_name,
+              r.dispose_user_name
+       from ioss_storage st, ioss_storage_refund_apply r
+       where r.storage_id = st.id and r.relation_num = #relationNum#
+       order by r.id
+   ]]>
+</select>
+
+<select id="getStorageRefundApplyById" parameterClass="java.lang.Long" resultMap="storageRefundApplyIdResult">
+     select ioss_storage_refund_apply.* from ioss_storage_refund_apply where ioss_storage_refund_apply.id = #value#
+</select>
+
+<update id="updateStorageRefundApply" parameterClass="storageRefundApply">
+   <![CDATA[
+	update ioss_storage_refund_apply set
+		gmt_modify = sysdate(),
+		apply_user_name = #applyUserName#,
+		dispose_user_name = #disposeUserName#,
+		refund_num = #refundNum#,
+		ref_price = #refPrice#,
+		fact_fee = #factFee#,
+		reason = #reason#,
+		memo = #memo#,
+		status = #status#
+		where id = #id#
+  ]]>
+</update>
+</sqlMap>

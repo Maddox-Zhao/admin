@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="provider">	
+
+
+
+<typeAlias alias="provideOrderWaybillDetail" type="com.huaixuan.network.biz.domain.provider.ProvideOrderWaybillDetail"/>
+<resultMap id="provideOrderWaybill" class="com.huaixuan.network.biz.domain.provider.ProvideOrderWaybillDetail" >
+		<result column="id" property="id"/>
+		<result column="orderId" property="orderId"/>
+		<result column="buyname" property="buyname"/>
+		<result column="phone" property="phone"/>
+		<result column="address" property="address"/>
+		
+		<result column="amount" property="amount"/>
+		<result column="paidamount" property="paidamount"/>
+		<result column="shipname" property="shipname"/>
+		<result column="waybillcode" property="waybillcode"/>
+		<result column="insert_time" property="insertTime"/>
+		
+		<result column="update_time" property="updateTime"/>
+		<result column="sellPlatform" property="sellPlatform"/>
+		<result column="pushPlatform" property="pushPlatform"/>
+		<result column="orderstatus" property="orderstatus"/>
+		<result column="cancelstatus" property="cancelstatus"/>
+</resultMap>
+
+
+
+
+   
+	
+	
+	<insert  id ="insertWayBillDetai"   parameterClass ="java.util.Map"> 
+     
+  insert into provide_order_waybill_detail(id,orderId,orderstatus,buyname,phone,address,amount,paidamount,shipname,waybillcode,insert_time,update_time,sellPlatform,pushPlatform) values(null,#orderId#,#orderstatus#,#buyname#,#phone#,#address#,#amount#,#paidamount#,#shipname#,#waybillcode#,sysdate(),sysdate(),#sellPlatform#,#pushPlatform#)
+         
+      
+  </insert>
+  
+  
+  <select id="selectWayBill" parameterClass ="java.util.Map" resultMap="provideOrderWaybill">
+  
+	  select * from provide_order_waybill_detail
+	  where 1=1
+	  <isNotNull prepend="and" property="orderId">
+			orderId=#orderId#
+	  </isNotNull>
+  </select>
+
+<update id="updateOrderWaybillDetail" parameterClass="java.util.Map">
+	update provide_order_waybill_detail
+	<dynamic prepend="set">
+		update_time= sysdate()
+		
+		<isNotNull  property="orderstatus">
+			,orderstatus=#orderstatus#
+		</isNotNull>
+	
+		<isNotNull  property="shipname">
+			,shipname=#shipname#
+		</isNotNull>
+		
+		<isNotNull  property="waybillcode">
+			,waybillcode=#waybillcode#
+		</isNotNull>
+		<isNotNull  property="cancelstatus">
+			,cancelstatus=#cancelstatus#
+		</isNotNull>
+	 where orderId = #orderId#
+	</dynamic>
+</update>
+ 
+<select id="searchMiniuiProviderOrderCount" resultClass="java.lang.Integer" >
+	SELECT COUNT(*) FROM provide_order_waybill_detail;
+</select>
+
+<select id="selectMiniuiAllProviderOrder" resultMap="provideOrderWaybill" >
+SELECT * from provide_order_waybill_detail where  1=1 
+	<!-- 订单号 -->
+	<isNotEmpty  prepend="and" property="orderId">
+		orderId=#orderId#
+	</isNotEmpty>
+ 	<!-- 手机号 -->
+	<isNotEmpty prepend="and" property="phone">
+		phone=#phone#
+	</isNotEmpty>
+	<!-- 商品金额 -->
+	<isNotEmpty prepend="and" property="amount">
+		amount=#amount#
+	</isNotEmpty>
+	<!-- 买家姓名 -->
+	<isNotEmpty prepend="and" property="buyname">
+		<![CDATA[ buyname  =#buyname# ]]>
+	</isNotEmpty>
+	<!-- 订单状态 -->
+	<isNotEmpty prepend="and" property="orderstatus">
+		orderstatus=#orderstatus#
+	</isNotEmpty>
+	order by id desc 
+	<isNotEmpty property="startRow">
+		<isNotEmpty property="endRow">
+			<![CDATA[ LIMIT $startRow$,$endRow$]]>
+		</isNotEmpty>
+	</isNotEmpty> 	
+
+</select>
+
+
+
+</sqlMap>
+
+

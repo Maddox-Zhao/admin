@@ -1,0 +1,168 @@
+#set($layout = "")
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>调货产品</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script type="text/javascript" src="/front/scripts/miniui3/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="/front/scripts/miniui3/miniui/miniui.js"></script>
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/default/miniui.css">
+        <link type="text/css" rel="stylesheet" href="/front/scripts/miniui3/miniui/themes/icons.css">
+   </head>
+#set($isAdmin = false)
+#if($dutyids.contains("52"))
+		#set($isAdmin = true)
+#end
+<body>
+	## <form id="excelForm"  action="/product/exportSuoKuProduct.html" method="post" target="excelIFrame">
+	<form id="excelForm"  action="/HxStockOrder/exportOnlyIdproduct.html" method="post" target="excelIFrame">
+    <div style="width:100%;" id="form1">
+        <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+            <table class="form-table" border="0" cellpadding="1" cellspacing="2">
+                <tr>
+                    <td class="form-label" style="width:60px;">idProduct：</td>
+                    <td style="width:150px">
+                        <input name="idproduct" class="mini-textbox" onenter="search()"/>
+						<input id="sedid" name="id" class="mini-textbox"  value="$!{id}" style="display:none"/>
+                    </td>  
+					<td >
+						#if($!adminAccess.has('A_SHOPPINGCAR_DIAOHUORUKU'))
+							<a class="mini-button" iconCls="icon-ok"  style="width:110px" onclick="ruku()">调货入库</a>
+						#end
+                    </td>
+                    <td rowspan="4">
+                        <a class="mini-button" iconCls="icon-search" onclick="search()">查询</a>
+						<a class="mini-button" iconCls="icon-download" onclick="exportOnlyIdproduct()">导出</a>
+                    </td>
+                </tr>
+              
+               
+            </table>
+        </div>
+    </div>
+	</form>
+	<iframe id="excelIFrame" name="excelIFrame" style="display:none;"></iframe>
+
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:480px;" allowResize="true" multiSelect="true" 
+        url="getDiaoHuoProductList.html"  idField="idProduct"  pageSize="50" pageIndex="1"  onselectionchanged="canAdd2ShoppingCar()" >
+        <div property="columns">
+			<div type="indexcolumn"></div>
+			<div type="checkcolumn"></div>
+			<div field="gId" width="120" headerAlign="center" align="center" allowSort="true">id</div>
+            <div field="idproduct" width="120" headerAlign="center" align="center"  allowSort="true">idproduct</div>
+            <div field="beforeLocation" width="100" headerAlign="center" align="center"  allowSort="true">原站点</div>
+				
+			<div field="brandName" width="80" headerAlign="center" align="center"  allowSort="true">品牌</div>
+			<div field="seriesName" width="40" headerAlign="center" align="center"  allowSort="true">品类</div>
+            <div field="type" width="80" headerAlign="center" align="center"  allowSort="true">型号</div>
+            <div field="material" width="60" headerAlign="center" align="center"  allowSort="true">材质</div>
+            <div field="color" width="60" headerAlign="center" align="center"  allowSort="true">颜色</div>
+            <div field="size" width="40" headerAlign="center" align="center"  allowSort="true">size</div>
+			<div field="status" width="90" headerAlign="center" align="center"  allowSort="true" renderer= "statu">是否已调入</div>
+	 		<div field="curSiteId" width="100" headerAlign="center" align="center"  allowSort="true">现站点</div>	
+			<div field="remark" width="120" headerAlign="center" align="center"  allowSort="true">备注</div>
+			<div field="cname" width="120" headerAlign="center" align="center"  allowSort="true">客户</div>
+		</div>
+	</div>
+    <script type="text/javascript">
+		 var userSite = "$!{site}"; //site
+		
+		mini.parse();
+        var grid = mini.get("datagrid1");
+		search();
+		
+		function statu(row){
+		if (row.value=="可售") return "是";
+		  else if (row.value=="运输在途") return "否";
+		   else return "未处理";
+		}
+		
+		  //查询
+        function search() {
+            var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据 
+				
+            grid.load(data);
+        }
+		//调货入库
+		function ruku() {
+       var rows = grid.getSelecteds();
+		var total = rows.length;
+        if (rows.length > 0) {
+			var ids = [];
+			var gid = [];
+            for (var i = 0, l = rows.length; i < l; i++) {
+                var r = rows[i];
+                ids.push(r.idproduct);
+				gid.push(r.gId);
+				var status = r.status;
+                if (status != "运输在途") {
+                    mini.alert("第" + (i + 1) + "行不是运输在途状态");
+                    return;
+                }
+            }
+            var id = ids.join(',');
+			var gids = gid.join(',');
+            if(confirm("共" + total + "条数据,确定入库？")) {
+              mini.mask({
+                        el: document.body,
+                        cls: 'mini-mask-loading',
+                        html: '处理中,请勿关闭...'
+                 });
+				var postData = {idProducts: id,gidd:gids};
+                jQuery.ajax({
+					type:"post",
+                    url: "/shoppingCar/diaohuoRuku.html",
+					data:postData,
+                    success: function(text) {
+					if("ok" == text)
+            			{
+						mini.unmask(); 
+						mini.alert("入库成功!");
+						grid.reload();
+						}
+                    },
+                    error: function() {
+						grid.unmask(); 
+						mini.alert("提交出错,联系管理员!");
+						grid.reload();
+					}
+                });
+            }
+        } else {
+            mini.alert("请选中一条记录");
+        }
+    }
+		
+	
+	
+		 //导出
+        function exportOnlyIdproduct() {
+          var rows = grid.getSelecteds();
+		  
+		  if(rows.length==0){
+		    var form = new mini.Form("#form1");
+            var data = form.getData(); //获取表单多个控件的数据  
+		    var excelForm = document.getElementById("excelForm");
+	  		excelForm.submit();
+		  
+		  }else{
+		    
+            var idProducts ="";
+            for(var i=0;i<rows.length;i++){
+               var r = rows[i];
+               var idProduct = r.idproduct;
+               var gid = r.gId;
+               
+               idProducts = idProducts+gid+":"+idProduct+":"+" ;";
+            
+            }
+	     location.href = "/HxStockOrder/exportOnlyIdproduct.html?idProducts="+idProducts;
+		  
+		  }
+		  
+        }
+	
+</script>
+</body>
+</html>
